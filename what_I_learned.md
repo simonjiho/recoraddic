@@ -60,6 +60,7 @@
  
  - Use @Observable(Object) and @EnvironmentObject to store the View's data for showing users feel continuous motions even when view reinitialized (switching the tab always results in deallocation and reinitializtion of View)
  - Variables that have @Published property inside @ObservableObject will make the view rerendered when modified.
+ - withAnimation controls the animation of the view, the view whose existence is determined by conditional statement. Those conditional statement is controlled by the value related to withAnimation closure. 
     
 
 # UIKit

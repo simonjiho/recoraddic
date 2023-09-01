@@ -11,6 +11,7 @@
 
 // need to integrate imports in one file
 import SwiftUI
+import SwiftData
 
 class SelectedView: ObservableObject {
     
@@ -32,8 +33,11 @@ class SelectedView: ObservableObject {
 
 
 struct ContentView: View {
-
-//    @State private var selectedTab = 0
+    
+    @Environment(\.modelContext) private var modelContext
+    
+    // sort by the fixed order later on
+    @Query(sort:\Record.name) private var records: [Record]
     // 여기서 순서 지정
     let viewNames: [SelectedView.ViewName] = [.home, .recommendations, .getRectanyl, .shelf, .shop]
     
@@ -45,88 +49,114 @@ struct ContentView: View {
         .shop: "pills.circle"
     ] // (view name) : (ImageName)
     
-    @StateObject var data: Data = SampleData()
+//    @Bindable var data: Data = SampleData()
     @StateObject var selectedView: SelectedView = SelectedView() //HomeView
     
-    
-    init() {
-        // get data
-        
-        // get sample data
-        
-    }
+    @State var isRecordTodayActivated: Bool = false
     
     
      var body: some View {
-         ZStack {
-             VStack {
-                 Spacer()
-                 MainView(data:data)
-                     .environmentObject(selectedView)
-                 Spacer()
-
-             }
-             VStack {
-                 Spacer()
-                 HStack {
-                     
-                     ForEach (viewNames, id: \.self) {viewName in
-                         
-                         Button(action: {
-                             selectedView.name = viewName
-                             print(selectedView.name)
-                         }) {
-                             
-                             Image(systemName: images[viewName]!)
-                                 .foregroundColor(viewName == selectedView.name ? .white : .gray)
-                                 .modifier(CustomImageStyle())
-
-                             
-                         }
-                         .buttonStyle(CustomButtonStyle())
-//                             .esnvironmentObject(selectedView)
-                             .scaleEffect(viewName == selectedView.name ? 1.2 : 1)
-                         
-                     }
-                     
-                     
- 
+         if isRecordTodayActivated {
+             RecordTodayView(currentRecord: records[0], isRecordTodayActivated: $isRecordTodayActivated)
+//                 .onAppear(perform: {
+//                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                         print("length of dailyRecords after added")
+//                         records[0].dailyRecords.append(DailyRecord(date:.now))
+//                     }
+//                 })
+                 .transition(.slide)
+         }
+         else {
+             ZStack {
+                 VStack {
+                     Spacer()
+                         .frame(height: 50)
+                     Button(action: initiateSampleData, label: {
+                         Text("initiate sampledata")
+                     })
+                     Spacer()
+                     MainView(records: records, isRecordTodayActivated: $isRecordTodayActivated)
+                         .environmentObject(selectedView)
+                     Spacer()
                      
                  }
-                 .frame(height: 800,alignment: .bottom)
-                
-                 Spacer().frame(height: 30)
-                 
+                 VStack {
+                     Spacer()
+                     HStack {
+                         
+                         ForEach (viewNames, id: \.self) {viewName in
+                             
+                             Button(action: {
+                                 selectedView.name = viewName
+                                 print(selectedView.name)
+                             }) {
+                                 
+                                 Image(systemName: images[viewName]!)
+                                     .foregroundColor(viewName == selectedView.name ? .white : .gray)
+                                     .modifier(CustomImageStyle())
+                                 
+                                 
+                             }
+                             .buttonStyle(CustomButtonStyle())
+                             //                             .esnvironmentObject(selectedView)
+                             .scaleEffect(viewName == selectedView.name ? 1.2 : 1)
+                             
+                         }
+                         
+                         
+                         
+                         
+                     }
+                     .frame(height: 800,alignment: .bottom)
+                     
+                     Spacer().frame(height: 30)
+                     
+                     
+                 }
                  
              }
          }
+
      }
+    
+
+    private func initiateSampleData() -> Void {
+        if records[0].purposes.count == 0 {
+            records[0].createSample()
+        }
+    }
 }
 
+
 struct MainView: View {
-    
-    @ObservedObject var data: Data
+    @Environment(\.modelContext) private var modelContext
+
+    var records: [Record]
     @EnvironmentObject var selectedView: SelectedView
+    
+    @Binding var isRecordTodayActivated: Bool
     
     var body: some View {
         
         if selectedView.name == .home {
-            MainView_Home(records: data.records)
+            MainView_Home()
             // Problem(2023.08.26) : Resets every time when buttons Clicked
         }
         else if selectedView.name == .recommendations {
             MainView_Recommendations()
         }
         else if selectedView.name == .getRectanyl {
-            MainView_GetRectanyl()
+            MainView_GetRectanyl(currentRecord: records[0], isRecordTodayActivated: $isRecordTodayActivated)
         }
         else if selectedView.name == .shelf {
-            MainView_Shelf(records: data.records)
+            MainView_Shelf(records: records)
         }
         else if selectedView.name == .shop {
             MainView_Shop()
         }
     }
+    
+
     
     
 }
