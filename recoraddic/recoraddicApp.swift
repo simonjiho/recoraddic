@@ -8,7 +8,12 @@
 import SwiftUI
 
 @main
-struct recoraddictionApp: App {
+struct recoraddicApp: App {
+
+    init() {
+        // get data?
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
