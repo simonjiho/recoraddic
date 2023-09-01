@@ -7,19 +7,57 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B29C702E2A35C5E30046873E /* recoraddictionApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29C702D2A35C5E30046873E /* recoraddictionApp.swift */; };
+		B247D2482A67AB5800E457FB /* stones.swift in Sources */ = {isa = PBXBuildFile; fileRef = B247D2472A67AB5800E457FB /* stones.swift */; };
+		B247D24B2A6D1DA100E457FB /* customMathFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B247D24A2A6D1DA100E457FB /* customMathFunc.swift */; };
+		B2600B052A35DFBF00E00D91 /* allRecordStones.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2600B042A35DFBF00E00D91 /* allRecordStones.swift */; };
+		B2600B0E2A35E4E100E00D91 /* home.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2600B0D2A35E4E100E00D91 /* home.swift */; };
+		B2600B112A37FE3B00E00D91 /* currentRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2600B102A37FE3B00E00D91 /* currentRecord.swift */; };
+		B260A38A2A8CD0E700D73208 /* recordModel_default.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3892A8CD0E700D73208 /* recordModel_default.swift */; };
+		B260A38C2A8DECDB00D73208 /* comboStone.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A38B2A8DECDB00D73208 /* comboStone.swift */; };
+		B260A3912A9B88AE00D73208 /* recommendations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3902A9B88AE00D73208 /* recommendations.swift */; };
+		B260A3942A9B8B8F00D73208 /* getRectanyl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3932A9B8B8F00D73208 /* getRectanyl.swift */; };
+		B260A39A2A9C759B00D73208 /* shelf.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3992A9C759B00D73208 /* shelf.swift */; };
+		B260A39C2A9C7C5400D73208 /* shop.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A39B2A9C7C5400D73208 /* shop.swift */; };
+		B262F2432A86460E00868F27 /* rawData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2422A86460E00868F27 /* rawData.swift */; };
+		B262F2452A86464700868F27 /* metaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2442A86464700868F27 /* metaData.swift */; };
+		B262F2472A86466700868F27 /* uiData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2462A86466700868F27 /* uiData.swift */; };
+		B262F2492A86467E00868F27 /* simpleMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2482A86467E00868F27 /* simpleMetaData.swift */; };
+		B29C702E2A35C5E30046873E /* recoraddicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29C702D2A35C5E30046873E /* recoraddicApp.swift */; };
 		B29C70302A35C5E30046873E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29C702F2A35C5E30046873E /* ContentView.swift */; };
 		B29C70322A35C5E40046873E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B29C70312A35C5E40046873E /* Assets.xcassets */; };
 		B29C70362A35C5E40046873E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B29C70352A35C5E40046873E /* Preview Assets.xcassets */; };
+		B2BD628F2A5EC72B0043B493 /* shadingfunc.metal in Sources */ = {isa = PBXBuildFile; fileRef = B2BD628E2A5EC72B0043B493 /* shadingfunc.metal */; };
+		B2FB726D2A867A8C0012EBE1 /* sampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2FB726C2A867A8C0012EBE1 /* sampleData.swift */; };
+		B2FB726F2A8762810012EBE1 /* customArrayFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2FB726E2A8762810012EBE1 /* customArrayFunc.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B29C702A2A35C5E30046873E /* recoraddiction.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = recoraddiction.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B29C702D2A35C5E30046873E /* recoraddictionApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recoraddictionApp.swift; sourceTree = "<group>"; };
+		B247D2472A67AB5800E457FB /* stones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stones.swift; sourceTree = "<group>"; };
+		B247D24A2A6D1DA100E457FB /* customMathFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customMathFunc.swift; sourceTree = "<group>"; };
+		B2600B042A35DFBF00E00D91 /* allRecordStones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = allRecordStones.swift; sourceTree = "<group>"; };
+		B2600B062A35E1FF00E00D91 /* what_I_learned.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = what_I_learned.md; sourceTree = "<group>"; };
+		B2600B0D2A35E4E100E00D91 /* home.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = home.swift; sourceTree = "<group>"; };
+		B2600B102A37FE3B00E00D91 /* currentRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = currentRecord.swift; sourceTree = "<group>"; };
+		B260A3892A8CD0E700D73208 /* recordModel_default.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recordModel_default.swift; sourceTree = "<group>"; };
+		B260A38B2A8DECDB00D73208 /* comboStone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = comboStone.swift; sourceTree = "<group>"; };
+		B260A3902A9B88AE00D73208 /* recommendations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recommendations.swift; sourceTree = "<group>"; };
+		B260A3932A9B8B8F00D73208 /* getRectanyl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = getRectanyl.swift; sourceTree = "<group>"; };
+		B260A3992A9C759B00D73208 /* shelf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = shelf.swift; sourceTree = "<group>"; };
+		B260A39B2A9C7C5400D73208 /* shop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = shop.swift; sourceTree = "<group>"; };
+		B260A39D2A9C7FAA00D73208 /* note.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = note.md; sourceTree = "<group>"; };
+		B262F2422A86460E00868F27 /* rawData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rawData.swift; sourceTree = "<group>"; };
+		B262F2442A86464700868F27 /* metaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = metaData.swift; sourceTree = "<group>"; };
+		B262F2462A86466700868F27 /* uiData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = uiData.swift; sourceTree = "<group>"; };
+		B262F2482A86467E00868F27 /* simpleMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = simpleMetaData.swift; sourceTree = "<group>"; };
+		B29C702A2A35C5E30046873E /* recoraddic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = recoraddic.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B29C702D2A35C5E30046873E /* recoraddicApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recoraddicApp.swift; sourceTree = "<group>"; };
 		B29C702F2A35C5E30046873E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B29C70312A35C5E40046873E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B29C70332A35C5E40046873E /* recoraddiction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = recoraddiction.entitlements; sourceTree = "<group>"; };
+		B29C70332A35C5E40046873E /* recoraddic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = recoraddic.entitlements; sourceTree = "<group>"; };
 		B29C70352A35C5E40046873E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		B2BD628E2A5EC72B0043B493 /* shadingfunc.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = shadingfunc.metal; sourceTree = "<group>"; };
+		B2FB726C2A867A8C0012EBE1 /* sampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sampleData.swift; sourceTree = "<group>"; };
+		B2FB726E2A8762810012EBE1 /* customArrayFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customArrayFunc.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,10 +71,105 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B247D2462A62DB5500E457FB /* allRecordStones */ = {
+			isa = PBXGroup;
+			children = (
+				B2BD628E2A5EC72B0043B493 /* shadingfunc.metal */,
+				B2600B042A35DFBF00E00D91 /* allRecordStones.swift */,
+				B247D2472A67AB5800E457FB /* stones.swift */,
+			);
+			path = allRecordStones;
+			sourceTree = "<group>";
+		};
+		B247D2492A6D1D6400E457FB /* functions */ = {
+			isa = PBXGroup;
+			children = (
+				B247D24A2A6D1DA100E457FB /* customMathFunc.swift */,
+				B2FB726E2A8762810012EBE1 /* customArrayFunc.swift */,
+			);
+			path = functions;
+			sourceTree = "<group>";
+		};
+		B2600B002A35DEEC00E00D91 /* mainViews */ = {
+			isa = PBXGroup;
+			children = (
+				B260A3982A9C758E00D73208 /* shelf */,
+				B260A3952A9B8FEE00D73208 /* shop */,
+				B260A3922A9B8B7600D73208 /* getRectanyl */,
+				B260A38F2A9B870100D73208 /* recommendations */,
+				B2600B032A35DF6600E00D91 /* home */,
+			);
+			path = mainViews;
+			sourceTree = "<group>";
+		};
+		B2600B032A35DF6600E00D91 /* home */ = {
+			isa = PBXGroup;
+			children = (
+				B2600B0F2A35E58600E00D91 /* elements */,
+				B2600B0D2A35E4E100E00D91 /* home.swift */,
+			);
+			path = home;
+			sourceTree = "<group>";
+		};
+		B2600B0F2A35E58600E00D91 /* elements */ = {
+			isa = PBXGroup;
+			children = (
+				B2FB726B2A864D510012EBE1 /* currentRecord */,
+				B247D2462A62DB5500E457FB /* allRecordStones */,
+			);
+			path = elements;
+			sourceTree = "<group>";
+		};
+		B2600B122A3AE16700E00D91 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				B262F2422A86460E00868F27 /* rawData.swift */,
+				B262F2442A86464700868F27 /* metaData.swift */,
+				B262F2462A86466700868F27 /* uiData.swift */,
+				B262F2482A86467E00868F27 /* simpleMetaData.swift */,
+				B2FB726C2A867A8C0012EBE1 /* sampleData.swift */,
+				B260A39D2A9C7FAA00D73208 /* note.md */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		B260A38F2A9B870100D73208 /* recommendations */ = {
+			isa = PBXGroup;
+			children = (
+				B260A3902A9B88AE00D73208 /* recommendations.swift */,
+			);
+			path = recommendations;
+			sourceTree = "<group>";
+		};
+		B260A3922A9B8B7600D73208 /* getRectanyl */ = {
+			isa = PBXGroup;
+			children = (
+				B260A3932A9B8B8F00D73208 /* getRectanyl.swift */,
+			);
+			path = getRectanyl;
+			sourceTree = "<group>";
+		};
+		B260A3952A9B8FEE00D73208 /* shop */ = {
+			isa = PBXGroup;
+			children = (
+				B260A39B2A9C7C5400D73208 /* shop.swift */,
+			);
+			path = shop;
+			sourceTree = "<group>";
+		};
+		B260A3982A9C758E00D73208 /* shelf */ = {
+			isa = PBXGroup;
+			children = (
+				B260A3992A9C759B00D73208 /* shelf.swift */,
+			);
+			path = shelf;
+			sourceTree = "<group>";
+		};
 		B29C70212A35C5E30046873E = {
 			isa = PBXGroup;
 			children = (
-				B29C702C2A35C5E30046873E /* recoraddiction */,
+				B2600B062A35E1FF00E00D91 /* what_I_learned.md */,
+				B29C702C2A35C5E30046873E /* recoraddic */,
 				B29C702B2A35C5E30046873E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -44,21 +177,24 @@
 		B29C702B2A35C5E30046873E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B29C702A2A35C5E30046873E /* recoraddiction.app */,
+				B29C702A2A35C5E30046873E /* recoraddic.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B29C702C2A35C5E30046873E /* recoraddiction */ = {
+		B29C702C2A35C5E30046873E /* recoraddic */ = {
 			isa = PBXGroup;
 			children = (
-				B29C702D2A35C5E30046873E /* recoraddictionApp.swift */,
+				B247D2492A6D1D6400E457FB /* functions */,
+				B2600B122A3AE16700E00D91 /* Data */,
+				B2600B002A35DEEC00E00D91 /* mainViews */,
+				B29C702D2A35C5E30046873E /* recoraddicApp.swift */,
 				B29C702F2A35C5E30046873E /* ContentView.swift */,
 				B29C70312A35C5E40046873E /* Assets.xcassets */,
-				B29C70332A35C5E40046873E /* recoraddiction.entitlements */,
+				B29C70332A35C5E40046873E /* recoraddic.entitlements */,
 				B29C70342A35C5E40046873E /* Preview Content */,
 			);
-			path = recoraddiction;
+			path = recoraddic;
 			sourceTree = "<group>";
 		};
 		B29C70342A35C5E40046873E /* Preview Content */ = {
@@ -69,12 +205,22 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		B2FB726B2A864D510012EBE1 /* currentRecord */ = {
+			isa = PBXGroup;
+			children = (
+				B2600B102A37FE3B00E00D91 /* currentRecord.swift */,
+				B260A3892A8CD0E700D73208 /* recordModel_default.swift */,
+				B260A38B2A8DECDB00D73208 /* comboStone.swift */,
+			);
+			path = currentRecord;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B29C70292A35C5E30046873E /* recoraddiction */ = {
+		B29C70292A35C5E30046873E /* recoraddic */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B29C70392A35C5E40046873E /* Build configuration list for PBXNativeTarget "recoraddiction" */;
+			buildConfigurationList = B29C70392A35C5E40046873E /* Build configuration list for PBXNativeTarget "recoraddic" */;
 			buildPhases = (
 				B29C70262A35C5E30046873E /* Sources */,
 				B29C70272A35C5E30046873E /* Frameworks */,
@@ -84,9 +230,9 @@
 			);
 			dependencies = (
 			);
-			name = recoraddiction;
+			name = recoraddic;
 			productName = recoraddiction;
-			productReference = B29C702A2A35C5E30046873E /* recoraddiction.app */;
+			productReference = B29C702A2A35C5E30046873E /* recoraddic.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -104,7 +250,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B29C70252A35C5E30046873E /* Build configuration list for PBXProject "recoraddiction" */;
+			buildConfigurationList = B29C70252A35C5E30046873E /* Build configuration list for PBXProject "recoraddic" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -117,7 +263,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B29C70292A35C5E30046873E /* recoraddiction */,
+				B29C70292A35C5E30046873E /* recoraddic */,
 			);
 		};
 /* End PBXProject section */
@@ -139,8 +285,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B260A39A2A9C759B00D73208 /* shelf.swift in Sources */,
+				B2600B052A35DFBF00E00D91 /* allRecordStones.swift in Sources */,
 				B29C70302A35C5E30046873E /* ContentView.swift in Sources */,
-				B29C702E2A35C5E30046873E /* recoraddictionApp.swift in Sources */,
+				B2FB726F2A8762810012EBE1 /* customArrayFunc.swift in Sources */,
+				B247D2482A67AB5800E457FB /* stones.swift in Sources */,
+				B260A3912A9B88AE00D73208 /* recommendations.swift in Sources */,
+				B260A38C2A8DECDB00D73208 /* comboStone.swift in Sources */,
+				B2600B0E2A35E4E100E00D91 /* home.swift in Sources */,
+				B29C702E2A35C5E30046873E /* recoraddicApp.swift in Sources */,
+				B260A3942A9B8B8F00D73208 /* getRectanyl.swift in Sources */,
+				B2BD628F2A5EC72B0043B493 /* shadingfunc.metal in Sources */,
+				B260A38A2A8CD0E700D73208 /* recordModel_default.swift in Sources */,
+				B262F2432A86460E00868F27 /* rawData.swift in Sources */,
+				B247D24B2A6D1DA100E457FB /* customMathFunc.swift in Sources */,
+				B262F2492A86467E00868F27 /* simpleMetaData.swift in Sources */,
+				B260A39C2A9C7C5400D73208 /* shop.swift in Sources */,
+				B2FB726D2A867A8C0012EBE1 /* sampleData.swift in Sources */,
+				B2600B112A37FE3B00E00D91 /* currentRecord.swift in Sources */,
+				B262F2452A86464700868F27 /* metaData.swift in Sources */,
+				B262F2472A86466700868F27 /* uiData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,14 +425,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = recoraddiction/recoraddiction.entitlements;
+				CODE_SIGN_ENTITLEMENTS = recoraddic/recoraddic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"recoraddiction/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"recoraddic/Preview Content\"";
 				DEVELOPMENT_TEAM = K5V8U9HR59;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = recoraddic;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -279,12 +444,12 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddiction;
+				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -299,14 +464,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = recoraddiction/recoraddiction.entitlements;
+				CODE_SIGN_ENTITLEMENTS = recoraddic/recoraddic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"recoraddiction/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"recoraddic/Preview Content\"";
 				DEVELOPMENT_TEAM = K5V8U9HR59;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = recoraddic;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -317,12 +483,12 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddiction;
+				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -335,7 +501,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B29C70252A35C5E30046873E /* Build configuration list for PBXProject "recoraddiction" */ = {
+		B29C70252A35C5E30046873E /* Build configuration list for PBXProject "recoraddic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B29C70372A35C5E40046873E /* Debug */,
@@ -344,7 +510,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B29C70392A35C5E40046873E /* Build configuration list for PBXNativeTarget "recoraddiction" */ = {
+		B29C70392A35C5E40046873E /* Build configuration list for PBXNativeTarget "recoraddic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B29C703A2A35C5E40046873E /* Debug */,
