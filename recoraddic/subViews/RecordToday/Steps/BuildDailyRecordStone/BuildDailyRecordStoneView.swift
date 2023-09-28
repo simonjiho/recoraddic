@@ -208,9 +208,9 @@ struct QuestAccomplishmentView: View {
 }
 
 
-struct CustomeSlider: View {
+struct QuestRecorder: View {
     
-    @Binding private var current: Double
+    @Binding private var current: CGFloat
     
     let minValue = 0.0
     let maxValue = 100.0
@@ -231,9 +231,54 @@ struct CustomeSlider: View {
             }
             .gaugeStyle(.accessoryCircular)
 
-            Slider(value: $current, in: minValue...maxValue)
-                .padding()
+            CustomSlider(value: $current, range: minValue...maxValue)
         }
+    }
+}
+
+
+struct CustomSlider: View {
+
+    @Binding var value: CGFloat
+    let range: ClosedRange<CGFloat>
+    @State private var xOffset: CGFloat = 0
+    @State private var lastOffset: CGFloat = 0
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Rectangle()
+                    .foregroundColor(.gray.opacity(0.3))
+                Rectangle()
+                    .foregroundColor(.blue)
+                    .frame(width: xOffset)
+                Circle()
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(.white)
+                    .shadow(radius: 4)
+                    .offset(x: xOffset)
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                let translation = value.translation
+                                let sliderPos = max(0, min(lastOffset + translation.width, geometry.size.width - 30))
+                                let sliderVal = sliderPos.map(from: 0...(geometry.size.width - 30), to: range)
+                                xOffset = sliderPos
+                                self.value = sliderVal
+                            }
+                            .onEnded { _ in
+                                lastOffset = xOffset
+                            }
+                    )
+            }
+        }
+        .frame(height: 30)
+    }
+}
+
+extension CGFloat {
+    func map(from source: ClosedRange<CGFloat>, to target: ClosedRange<CGFloat>) -> CGFloat {
+        return target.lowerBound + (self - source.lowerBound) * (target.upperBound - target.lowerBound) / (source.upperBound - source.lowerBound)
     }
 }
 

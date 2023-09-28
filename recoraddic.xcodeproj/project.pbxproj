@@ -250,9 +250,25 @@
 			isa = PBXGroup;
 			children = (
 				B2CB9B582ABEACE2003A430D /* IntroView.swift */,
-				B2CB9B5A2ABEAD20003A430D /* BuildDailyRecordStoneView.swift */,
+				B2E783D52AC6B4EE00372ABA /* BuildDailyRecordStone */,
 			);
 			path = Steps;
+			sourceTree = "<group>";
+		};
+		B2E783D52AC6B4EE00372ABA /* BuildDailyRecordStone */ = {
+			isa = PBXGroup;
+			children = (
+				B2E783D62AC6B50300372ABA /* elements */,
+				B2CB9B5A2ABEAD20003A430D /* BuildDailyRecordStoneView.swift */,
+			);
+			path = BuildDailyRecordStone;
+			sourceTree = "<group>";
+		};
+		B2E783D62AC6B50300372ABA /* elements */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = elements;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
