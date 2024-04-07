@@ -19,7 +19,7 @@
 		B247D24B2A6D1DA100E457FB /* customMathFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B247D24A2A6D1DA100E457FB /* customMathFunc.swift */; };
 		B25BF9052B1C886E0039F1F9 /* ResizableText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B25BF9042B1C886E0039F1F9 /* ResizableText.swift */; };
 		B260A3912A9B88AE00D73208 /* MainView_checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3902A9B88AE00D73208 /* MainView_checklist.swift */; };
-		B260A3942A9B8B8F00D73208 /* MainView_QuestAndPurposeInventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3932A9B8B8F00D73208 /* MainView_QuestAndPurposeInventory.swift */; };
+		B260A3942A9B8B8F00D73208 /* MainView_QuestInventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3932A9B8B8F00D73208 /* MainView_QuestInventory.swift */; };
 		B260A39A2A9C759B00D73208 /* MainView_SeeMyDailyRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3992A9C759B00D73208 /* MainView_SeeMyDailyRecord.swift */; };
 		B262F2432A86460E00868F27 /* rawData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2422A86460E00868F27 /* rawData.swift */; };
 		B262F2452A86464700868F27 /* metaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2442A86464700868F27 /* metaData.swift */; };
@@ -84,11 +84,12 @@
 		B220DA452B6524F50039160C /* themeNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = themeNames.swift; sourceTree = "<group>"; };
 		B2314BBA2AECD7DB00EDD5C7 /* idea&plan&simpleNote.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "idea&plan&simpleNote.md"; sourceTree = "<group>"; };
 		B2314BBE2AF4DD7400EDD5C7 /* stone_default1.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = stone_default1.xcassets; sourceTree = "<group>"; };
+		B234C6EC2BC564CA0031BAD7 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		B247D24A2A6D1DA100E457FB /* customMathFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customMathFunc.swift; sourceTree = "<group>"; };
 		B25BF9042B1C886E0039F1F9 /* ResizableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizableText.swift; sourceTree = "<group>"; };
 		B2600B062A35E1FF00E00D91 /* what_I_learned.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = what_I_learned.md; sourceTree = "<group>"; };
 		B260A3902A9B88AE00D73208 /* MainView_checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_checklist.swift; sourceTree = "<group>"; };
-		B260A3932A9B8B8F00D73208 /* MainView_QuestAndPurposeInventory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_QuestAndPurposeInventory.swift; sourceTree = "<group>"; };
+		B260A3932A9B8B8F00D73208 /* MainView_QuestInventory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_QuestInventory.swift; sourceTree = "<group>"; };
 		B260A3992A9C759B00D73208 /* MainView_SeeMyDailyRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_SeeMyDailyRecord.swift; sourceTree = "<group>"; };
 		B260A39D2A9C7FAA00D73208 /* note.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = note.md; sourceTree = "<group>"; };
 		B262F2422A86460E00868F27 /* rawData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rawData.swift; sourceTree = "<group>"; };
@@ -201,10 +202,10 @@
 		B2600B002A35DEEC00E00D91 /* mainViews */ = {
 			isa = PBXGroup;
 			children = (
-				B2B28DB12AC5D69D0071531B /* ProfileAndSettings */,
+				B260A3922A9B8B7600D73208 /* QuestInventory */,
+				B260A38F2A9B870100D73208 /* Checklist */,
 				B260A3982A9C758E00D73208 /* SeeMyDailyRecord */,
-				B260A3922A9B8B7600D73208 /* GritBoardAndStatistics */,
-				B260A38F2A9B870100D73208 /* checkList_home */,
+				B2B28DB12AC5D69D0071531B /* ProfileAndSettings */,
 			);
 			path = mainViews;
 			sourceTree = "<group>";
@@ -224,23 +225,23 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
-		B260A38F2A9B870100D73208 /* checkList_home */ = {
+		B260A38F2A9B870100D73208 /* Checklist */ = {
 			isa = PBXGroup;
 			children = (
 				B2BA89082B32E0CD00A3D50E /* CheckListElements */,
 				B2BA88FB2B2F16FB00A3D50E /* PopUpViews */,
 				B260A3902A9B88AE00D73208 /* MainView_checklist.swift */,
 			);
-			path = checkList_home;
+			path = Checklist;
 			sourceTree = "<group>";
 		};
-		B260A3922A9B8B7600D73208 /* GritBoardAndStatistics */ = {
+		B260A3922A9B8B7600D73208 /* QuestInventory */ = {
 			isa = PBXGroup;
 			children = (
-				B260A3932A9B8B8F00D73208 /* MainView_QuestAndPurposeInventory.swift */,
+				B260A3932A9B8B8F00D73208 /* MainView_QuestInventory.swift */,
 				B2102B132BA5CCCD0041C8FB /* QuestStatisticsInDetail.swift */,
 			);
-			path = GritBoardAndStatistics;
+			path = QuestInventory;
 			sourceTree = "<group>";
 		};
 		B260A3982A9C758E00D73208 /* SeeMyDailyRecord */ = {
@@ -289,6 +290,7 @@
 		B29C70212A35C5E30046873E = {
 			isa = PBXGroup;
 			children = (
+				B234C6EC2BC564CA0031BAD7 /* LICENSE */,
 				B2314BBA2AECD7DB00EDD5C7 /* idea&plan&simpleNote.md */,
 				B2600B062A35E1FF00E00D91 /* what_I_learned.md */,
 				B29C702C2A35C5E30046873E /* recoraddic */,
@@ -511,7 +513,7 @@
 				B2BA89102B36BDC600A3D50E /* SaveDailyRecordView.swift in Sources */,
 				B265D26C2B032D30002E51A8 /* randomColorFunc.swift in Sources */,
 				B2E5522D2BC29CC300ACA5A8 /* StoneTower_0_stone.swift in Sources */,
-				B260A3942A9B8B8F00D73208 /* MainView_QuestAndPurposeInventory.swift in Sources */,
+				B260A3942A9B8B8F00D73208 /* MainView_QuestInventory.swift in Sources */,
 				B2BA890A2B32E0EB00A3D50E /* DiaryView.swift in Sources */,
 				B27CBB592BA41E6C00CD6CD3 /* recalculateVisualValues_dr.swift in Sources */,
 				B262F2432A86460E00868F27 /* rawData.swift in Sources */,

@@ -88,6 +88,8 @@
 - Form : 디바이스에 맞게 form을 자동 렌더링 해줌, textfield, picker, 등등 사용. setting에 사용 가능.
 - 왜인지 모르겠는데 tabview를 전환했다가 gritBoard 다시 들어가면 들어갈 수록 frame전환 횟수가 빨라짐
 - computed properties are really heavy. Don't use it if necessary
+- 같은 뷰 안에 Animation 트리거를 여러 뷰가 공유하면 하나밖에 적용 안됨...? (시뮬레이터 기준)
+- canvas는 simulator에서 rendering을 이상하게 한다.
 
 # UIKit
  - older than SwiftUI, so if not necessary, use SwiftUI as much as you can. Apple will support more on SwiftUI, not UIKit.

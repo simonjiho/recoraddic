@@ -25,18 +25,17 @@ struct AddDailyQuestView: View {
     var recordOfToday: DailyRecord
     
     @Binding var popUp_addDailyQuest: Bool
+    @Binding var selectedView: MainViewName
+    var isDone: Bool
     
-    @State var isPlan: Bool = false
     
     @State var path: [Quest] = []
-
-    
     @State var step: Int = 0
     
     @State var loadQuest: Bool = false
     
     @State var questNameToAppend = ""
-    @State var questDataTypeToAppend = DataType.NONE
+    @State var questDataTypeToAppend = DataType.OX
     @State var customDataTypeNotation: String?
     @State var customDataTypeNotation_textField: String = ""
     
@@ -69,7 +68,7 @@ struct AddDailyQuestView: View {
                 ZStack {
                     //                    if step == 0 {
                     VStack {
-                        Text("추가할 퀘스트를 고르세요")
+                        Text("추가할 일일퀘스트를 고르세요")
                         NavigationStack(path: $path ) {
                             List {
                                 Section {
@@ -89,10 +88,19 @@ struct AddDailyQuestView: View {
 //                                NavigationLink("새로운 퀘스트", value:newQuest)
                             }
                             .navigationDestination(for: Quest.self) { quest in
-                                SetValueForDailyQuest(recordOfToday: recordOfToday, selectedQuest: quest, isPlan: $isPlan, popUp_addDailyQuest: $popUp_addDailyQuest)
+                                SetValueForDailyQuest(recordOfToday: recordOfToday, selectedQuest: quest, popUp_addDailyQuest: $popUp_addDailyQuest, isDone: isDone)
                             }
 
                         }
+                    }
+                    if quests_notHidden.isEmpty {
+                        Button(action:{
+                            popUp_addDailyQuest.toggle()
+                            selectedView = .gritBoardAndStatistics}){
+                            // TODO: 바로 새로운 퀘스트 누른 것처럼 만들기
+                            Text("새로운 퀘스트 만들기")
+                        }
+
                     }
                 }
             }
@@ -111,62 +119,8 @@ struct AddDailyQuestView: View {
         modelContext.insert(dailyQuest)
     }
     
-    func addDailyQuest_load() -> Void {
-        
-        questValueToAppend_Int = quests.first(where: {quest in quest.name == questNameToAppend})!.recentData
-        questPurposesToAppend = quests.first(where: {quest in quest.name == questNameToAppend})!.recentPurpose
-//        customDataTypeNotation??
-        
-        let dailyQuest = DailyQuest(
-            questName: questNameToAppend,
-            data: isPlan ? 0 : questValueToAppend_Int,
-            dataType: questDataTypeToAppend,
-            defaultPurposes: questPurposesToAppend,
-            dailyGoal: questValueToAppend_Int)
-        
-        if questDataTypeToAppend == DataType.CUSTOM {
-            dailyQuest.customDataTypeNotation = customDataTypeNotation
-        }
-        dailyQuest.dailyRecord = recordOfToday
-        modelContext.insert(dailyQuest)
-        
-//        quests.first(where: {quest in quest.name == questNameToAppend})!.recentPurpose = questPurposesToAppend
-        // qcbd 추가, recent에서 전부 가져오고, 새로운 qcbd에 해당하는 것 focus (checklist view에 전달 -> 새로 생긴 questCheckBox view에 전달)
-    }
-    
-    func addDailyQuest_new() -> Void {
-        
-
-        let newQuest = Quest(name: questNameToAppend, dataType: questDataTypeToAppend)
-        if questDataTypeToAppend == DataType.CUSTOM {
-            newQuest.customDataTypeNotation = customDataTypeNotation
-        }
-        newQuest.recentPurpose = questPurposesToAppend
-        modelContext.insert(newQuest)
-        
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+0.15) {
-            let dailyQuest = DailyQuest(
-                questName: questNameToAppend,
-                data: isPlan ? 0 : questValueToAppend_Int,
-                dataType: questDataTypeToAppend,
-                defaultPurposes: questPurposesToAppend,
-                dailyGoal: questValueToAppend_Int)
-            
-            if questDataTypeToAppend == DataType.CUSTOM {
-                dailyQuest.customDataTypeNotation = customDataTypeNotation
-            }
-            dailyQuest.dailyRecord = recordOfToday
-            modelContext.insert(dailyQuest)
-            
-            quests.first(where: {quest in quest.name == questNameToAppend})!.recentPurpose = questPurposesToAppend
-            quests.first(where: {quest in quest.name == questNameToAppend})!.recentData = questValueToAppend_Int
-            
-        }
-
-                
 
 
-    }
     
 
 }
@@ -186,10 +140,10 @@ struct SetValueForDailyQuest: View {
     var recordOfToday: DailyRecord
     var selectedQuest: Quest
     
-    @Binding var isPlan: Bool
     @Binding var popUp_addDailyQuest: Bool
     
 
+    @State var isDone: Bool
     @State var popUp_newFreeSet: Bool = false
     @State var popUp_newFreeSet_Hours: Bool = false
     @State var popUp_newFreeSet_notHours: Bool = false
@@ -198,7 +152,6 @@ struct SetValueForDailyQuest: View {
     @State var inputValue: String = ""
     
     @State var useFreeSets:Bool = false
-    @State var isDone:Bool = false
     
     @State var value:Int = 0
     @State var value_String: String = ""
@@ -277,11 +230,11 @@ struct SetValueForDailyQuest: View {
                                 
                         }
                     }
-//                    .foregroundStyle(!isDone ? .white : .black)
+//                    .foregroundStyle(!isPlan ? .white : .black)
                     .padding(.horizontal,geoWidth*0.1)
                     .padding(.top, geoHeight*0.2)
                     .padding(.bottom, geoHeight*0.2)
-//                    .background(isDone ? .white : .black.adjust(brightness:0.3))
+//                    .background(isPlan ? .white : .black.adjust(brightness:0.3))
 //                    .clipShape(.rect(cornerSize: CGSize(width: questNameWidth*0.05, height: questNameHeight*0.05)))
 
 
@@ -336,21 +289,25 @@ struct SetValueForDailyQuest: View {
                             selectedQuest.freeSetDatas.remove(atOffsets: indexSet)
                         }
                         
-                        Button(action: {
-                            if selectedFreeSetIndex == selectedQuest.freeSetDatas.count {
-                                selectedFreeSetIndex = nil
+                        if selectedQuest.recentData != 0 {
+                            Button(action: {
+                                if selectedFreeSetIndex == selectedQuest.freeSetDatas.count {
+                                    selectedFreeSetIndex = nil
+                                }
+                                else { selectedFreeSetIndex = selectedQuest.freeSetDatas.count}
+                            }) {
+                                HStack {
+                                    Image(systemName: "checkmark")
+                                        .opacity(selectedFreeSetIndex == selectedQuest.freeSetDatas.count ? 1.0 : 0.0)
+                                    
+                                    Text("가장 최근 달성: \(DataType.string_unitDataToRepresentableData(data: selectedQuest.recentData, dataType: selectedQuest.dataType)) \(DataType.unitNotationOf(dataType: selectedQuest.dataType, customDataTypeNotation: selectedQuest.customDataTypeNotation))")
+                                        .bold(selectedFreeSetIndex == selectedQuest.freeSetDatas.count)
+    //                                        .font(selectedFreeSetIndex == index ? .callout : .subheadline)
+                                }
+                                
                             }
-                            else { selectedFreeSetIndex = selectedQuest.freeSetDatas.count}
-                        }) {
-                            HStack {
-                                Image(systemName: "checkmark")
-                                    .opacity(selectedFreeSetIndex == selectedQuest.freeSetDatas.count ? 1.0 : 0.0)
-                                Text("가장 최근 달성: \(DataType.string_unitDataToRepresentableData(data: selectedQuest.recentData, dataType: selectedQuest.dataType)) \(DataType.unitNotationOf(dataType: selectedQuest.dataType, customDataTypeNotation: selectedQuest.customDataTypeNotation))")
-                                    .bold(selectedFreeSetIndex == selectedQuest.freeSetDatas.count)
-//                                        .font(selectedFreeSetIndex == index ? .callout : .subheadline)
-                            }
-                            
                         }
+
 
                         
                         
@@ -407,7 +364,7 @@ struct SetValueForDailyQuest: View {
 //                    .toggleStyle(.button)
 //                    .clipShape(.rect(cornerSize: CGSize(width: geoWidth*0.02, height: geoWidth*0.02*0.3)))
 //                    
-//                    Toggle(isOn: $isDone) {
+//                    Toggle(isOn: $isPlan) {
 //                        Text("달성")
 //                            .font(.caption)
 //                    }
@@ -451,7 +408,7 @@ struct SetValueForDailyQuest: View {
         
         let dailyQuest = DailyQuest(
             questName: selectedQuest.name,
-            data: isPlan ? 0 : data,
+            data: isDone ? data : 0,
             dataType: selectedQuest.dataType,
             defaultPurposes: selectedQuest.recentPurpose,
             dailyGoal: data)

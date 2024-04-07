@@ -42,7 +42,7 @@ struct StartNewRecordSet:View {
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
-            let gridSize = geoWidth/5
+            let gridSize = geoWidth/4
             
             let xButtonHeight = geoHeight*0.05
             
@@ -78,6 +78,7 @@ struct StartNewRecordSet:View {
                                             popUp_startNewRecordSet.toggle()
                                         }
                                         else {
+                                            
                                             steps += 1
                                         }
                                     }) {
@@ -208,26 +209,35 @@ struct StartNewRecordSet:View {
     func createNewDailyRecordSet() -> Void {
         
         // 만약 그전에 dailyRecordSet에 dailyRecords가 없다면, 그 전의 것을 지움.(시작 날짜가 같다면, 그 전 것에 dr이 있을리가 없음)
+        let newDailyRecordSet: DailyRecordSet
         if dailyRecordSets.last!.dailyRecords!.count == 0 {
-            modelContext.delete(dailyRecordSets.last!)
+            // reset current daily record set
+            newDailyRecordSet = dailyRecordSets.last!
+            newDailyRecordSet.start = getDateOfNow()
+            newDailyRecordSet.dailyQuestions = []
+            
+            
         }
+        
         else {
+            
+            newDailyRecordSet = DailyRecordSet(start: getDateOfNow())
             // 그 전 DRS end date 설정
             dailyRecordSets.last!.end = dailyRecordSets.last!.dailyRecords!.sorted(by: { dr1, dr2 in
                 dr1.date < dr2.date
             }).last!.date
+            
+            modelContext.insert(newDailyRecordSet)
+            
         }
-
         
         // newDailyRecordSet 생성, 설정해준 값들 넣어주기(DRThemeName, questions)
-        let newDailyRecordSet: DailyRecordSet = DailyRecordSet(start: getDateOfNow())
         newDailyRecordSet.dailyRecordThemeName = selectedDailyRecordThemeName!
         newDailyRecordSet.dailyQuestions.append(question1)
         if numberOfQuestions >= 2 {newDailyRecordSet.dailyQuestions.append(question2)}
         if numberOfQuestions == 3 {newDailyRecordSet.dailyQuestions.append(question3)}
         
         
-        modelContext.insert(newDailyRecordSet)
 
     
         selectedDailyRecordSetIndex = dailyRecordSets_notHidden.count - 1 // onChangeOf..

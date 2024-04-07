@@ -10,8 +10,8 @@ import Foundation
 final class DataType {
     
     // 상용단위 도 추가
-    static let NO = -1 // ~~하지 않기 -> 이후 출시
-    static let NONE = 0
+//    static let NO = -1 // ~~하지 않기 -> 이후 출시
+//    static let NONE = 0
     static let OX = 1
     static let REP = 2 // 최대 100000회
     static let SEC = 3 // 최대 2시간 -> 7200초
@@ -23,11 +23,11 @@ final class DataType {
     init() {
     }
     
-    static func stringOf(dataType: Int) -> String {
-        if dataType == DataType.NONE {
-            return "none"
-        }
-        else if dataType == DataType.OX {
+    static func eng_stringOf(dataType: Int) -> String {
+//        if dataType == DataType.NONE {
+//            return "none"
+//        }
+        if dataType == DataType.OX {
             return "ox"
         }
         else if dataType == DataType.REP {
@@ -51,11 +51,11 @@ final class DataType {
     }
     
     static func kor_stringOf(dataType: Int) -> String {
-        if dataType == DataType.NONE {
-            return "없음"
-        }
-        else if dataType == DataType.OX {
-            return "OX"
+//        if dataType == DataType.NONE {
+//            return "없음"
+//        }
+        if dataType == DataType.OX {
+            return "OX (달성 유무 확인)"
         }
         else if dataType == DataType.REP {
             return "횟수"
@@ -67,7 +67,7 @@ final class DataType {
             return "시간_분"
         }
         else if dataType == DataType.HOUR {
-            return "시간_시간 (소숫점 첫째자리까지)"
+            return "시간_시간\n(최소단위 0.1시간)"
         }
         else if dataType == DataType.CUSTOM {
             return "사용자 지정"
@@ -77,43 +77,43 @@ final class DataType {
         }
     }
     
-    static func dataTypeOf(string: String) -> Int {
-        if string == "none" {
-            return DataType.NONE
-        }
-        else if string == "ox" {
-            return DataType.OX
-        }
-        else if string == "rep" {
-            return DataType.REP
-        }
-        else if string == "sec" {
-            return DataType.SEC
-        }
-        else if string == "min" {
-            return DataType.MIN
-        }
-        else if string == "hour" {
-            return DataType.HOUR
-        }
-        else if string == "custom" {
-            return DataType.CUSTOM
-        }
-        else {
-            return -99999
-        }
-
-        
-    }
+//    static func dataTypeOf(string: String) -> Int {
+////        if string == "none" {
+////            return DataType.NONE
+////        }
+//        if string == "ox" {
+//            return DataType.OX
+//        }
+//        else if string == "rep" {
+//            return DataType.REP
+//        }
+//        else if string == "sec" {
+//            return DataType.SEC
+//        }
+//        else if string == "min" {
+//            return DataType.MIN
+//        }
+//        else if string == "hour" {
+//            return DataType.HOUR
+//        }
+//        else if string == "custom" {
+//            return DataType.CUSTOM
+//        }
+//        else {
+//            return -99999
+//        }
+//
+//        
+//    }
     
     static func unitNotationOf(dataType: Int, customDataTypeNotation: String? = nil) -> String {
         
-        if dataType > DataType.CUSTOM || dataType < DataType.NONE
+        if dataType > DataType.CUSTOM || dataType < DataType.OX
         { return "ERROR" }
         
         
-        if dataType == DataType.NONE
-        { return "" }
+//        if dataType == DataType.NONE
+//        { return "" }
         
         // set to get O / X later
         else if dataType == DataType.OX {
@@ -147,11 +147,11 @@ final class DataType {
     
     
     static func maximumUnitOf(dataType:Int) -> Int {
-        if dataType == DataType.NONE
-        { return 1000000 }
-        
+//        if dataType == DataType.NONE
+//        { return 1000000 }
+//        
         // set to get O / X later
-        else if dataType == DataType.OX {
+        if dataType == DataType.OX {
             return 1
         }
         
@@ -197,12 +197,12 @@ final class DataType {
         
     static func string_unitDataToRepresentableData(data: Int, dataType: Int) -> String {
         
-        if data < 0 || dataType > DataType.CUSTOM || dataType < DataType.NONE
+        if data < 0 || dataType > DataType.CUSTOM || dataType < DataType.OX
         { return String(format: "%g", 99999) }
         
         
-        if dataType == DataType.NONE
-        { return String(format: "%d", data) }
+//        if dataType == DataType.NONE
+//        { return String(format: "%d", data) }
         
         else if dataType == DataType.OX {
             if data != 0 && data != 1 { return String(format: "%d", 99999) }
@@ -235,12 +235,12 @@ final class DataType {
     
     static func float_unitDataToRepresentableData(data: Int, dataType: Int) -> CGFloat {
         
-        if data < 0 || dataType > DataType.CUSTOM || dataType < DataType.NONE
+        if data < 0 || dataType > DataType.CUSTOM || dataType < DataType.OX
         { return 99999 }
         
         
-        if dataType == DataType.NONE
-        { return CGFloat(data) }
+//        if dataType == DataType.NONE
+//        { return CGFloat(data) }
         
         else if dataType == DataType.OX {
             if data != 0 && data != 1 { return 99999 }

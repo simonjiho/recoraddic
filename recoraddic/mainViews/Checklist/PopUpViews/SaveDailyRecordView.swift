@@ -319,7 +319,7 @@ struct SaveDailyRecordView: View {
                         }
                         
                         Button(action:nextStepOrDone) {
-                            Text(steps<1 && askQuestions ? "다음" : "기록 저장")
+                            Text(steps == 0 && askQuestions ? "다음" : "기록 저장")
                         }
                         .disabled((steps == 0 && selectedFacialExpressionNum == 0))
                     }

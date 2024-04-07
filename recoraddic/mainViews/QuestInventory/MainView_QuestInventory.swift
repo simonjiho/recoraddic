@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-struct MainView_QuestAndPurposeInventory: View {
+struct MainView_QuestInventory: View {
     
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
@@ -27,7 +27,6 @@ struct MainView_QuestAndPurposeInventory: View {
     } // add customPurpose later
     
     
-    @State var statisticOption: StatisticOption = .quest
     
     @State var selectedQuest: Quest?
     @State var popUp_questStatisticsInDetail: Bool = false
@@ -50,14 +49,18 @@ struct MainView_QuestAndPurposeInventory: View {
 //            let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
             ZStack {
                 VStack {
-                    Picker("", selection: $statisticOption) {
-                        Text("퀘스트").tag(StatisticOption.quest)
-                        Text("성향").tag(StatisticOption.defaultPurpose)
-                    }
-                    .frame(height: geometry.size.height*0.1)
+//                    Picker("", selection: $statisticOption) {
+//                        Text("퀘스트").tag(StatisticOption.quest)
+//                        Text("성향").tag(StatisticOption.defaultPurpose)
+//                    }
+//                    .frame(height: geometry.size.height*0.1)
+                    Text("퀘스트 보관함")
+                        .font(.title3)
+                        .bold()
+                        .fontDesign(.serif)
+                        .frame(height: geoHeight*0.1)
                     
-                    if statisticOption == .quest {
-//                        ZStack {
+                        ZStack {
                             ScrollView {
                                 LazyVGrid(columns: [GridItem(.adaptive(minimum:gridItemSize))], spacing: gridItemSpacing) {
                                     ForEach(notHiddenQuests,id:\.createdTime) { quest in
@@ -87,8 +90,9 @@ struct MainView_QuestAndPurposeInventory: View {
                                     }) {
                                         Image(systemName: "plus.circle")
                                             .resizable()
-                                            .frame(width: gridItemSize*0.5, height: gridItemSize*0.5)
+                                            .frame(width: gridItemSize*0.4, height: gridItemSize*0.4)
                                     }
+                                    .buttonStyle(.plain)
                                     
                                     
                                     
@@ -99,16 +103,25 @@ struct MainView_QuestAndPurposeInventory: View {
                             .frame(width:geometry.size.width, height: geometry.size.height*0.9)
                             
 
-                            
-//                        }
-//                        .frame(width:geometry.size.width, height: geometry.size.height*0.9)
+                            if quests.filter({!$0.isHidden}).isEmpty {
+                                VStack {
+                                    Text("반복적으로 해야 할 일을 퀘스트를 생성하고 ")
+                                    HStack {
+                                        Image(systemName: "checklist.checked")
+                                            .bold()
+                                        Text("체크리스트")
+                                            .bold()
+                                        Text("에 추가해보세요!")
+                                        
+                                    }
+                                }
+                                .foregroundStyle(.opacity(0.5))
+                            }
+                        }
+                        .frame(width:geometry.size.width, height: geometry.size.height*0.9)
                         
-                    }
                     
-                    else {
-                        
-                        
-                    }
+
                     
                 } // VStack
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
@@ -280,7 +293,7 @@ struct CreateNewQuest: View {
     // isPlan, popUp
     
     @State var questNameToAppend = ""
-    @State var questDataTypeToAppend = DataType.NONE
+    @State var questDataTypeToAppend = DataType.OX
     @State var customDataTypeNotation: String?
     @State var customDataTypeNotation_textField: String = ""
     
@@ -432,3 +445,75 @@ struct PurposeInventoryView: View {
         /*@START_MENU_TOKEN@*//*@PLACEHOLDER=Hello, world!@*/Text("Hello, world!")/*@END_MENU_TOKEN@*/
     }
 }
+
+
+//let sampleQuest = {
+//    let workOut = Quest(name: "운동", dataType: DataType.HOUR)
+//    workOut.dailyData = [Date():1000]
+//    workOut.tier = 20
+//    workOut.momentumLevel = 10
+//    return workOut
+//}()
+//
+
+struct QuestThumbnailView_forPreview: View {
+    
+    var name: String
+    var tier: Int
+    var momentumLevel: Int
+    var cumulativeVal: String
+    var unitNotation: String
+
+    
+    var body: some View {
+        
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+//            let gridItemSize = geoWidth
+            
+            ZStack {
+                QuestTierView(tier: tier)
+                    .frame(width: geoWidth, height: geoHeight)
+                FireView(momentumLevel: momentumLevel)
+                //                                        Fire6()
+                    .frame(width: geoWidth/1.5, height: geoHeight/1.5)
+                    .position(x:geoWidth/2,y:geoHeight/2)
+                //                                            .opacity(0.7)
+                VStack {
+                    Text("\(name)")
+                        .foregroundStyle(.black)
+                        .bold()
+                        .minimumScaleFactor(0.3)
+                        .lineLimit(2)
+                        .padding(.bottom, geoHeight/10)
+                    
+                    //                                        Text(QuestRepresentingData.titleOf(representingData: quest.representingData))
+                    
+                    Text("\(cumulativeVal)\(unitNotation)")
+                        .foregroundStyle(.black)
+                        .bold()
+                        .minimumScaleFactor(0.3)
+                        .lineLimit(1)
+                    
+                }
+                .padding(10)
+                .frame(width:geoWidth ,height: geoHeight, alignment: .center)
+                .onAppear() {
+//                    print("\(name): tier \(tier)")
+                }
+                
+            }
+        }
+    }
+}
+//
+//#Preview(body: {
+//    QuestThumbnailView_forPreview(
+//        name: "운동",
+//        tier: 23,
+//        momentumLevel: 7,
+//        cumulativeVal: "1000.0",
+//        unitNotation: "시간")
+//        .frame(width: 100, height: 100)
+//})

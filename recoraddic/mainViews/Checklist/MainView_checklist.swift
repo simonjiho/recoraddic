@@ -46,6 +46,8 @@ struct MainView_checklist: View {
     @State var popUp_addDiary: Bool = false
     @State var popUp_saveDailyRecord: Bool = false
     @State var popUp_changePurpose: Bool = false
+    
+    @State var selectDiaryOption = false
 
     
     @State var selectedDailyQuest: DailyQuest? = nil
@@ -61,8 +63,12 @@ struct MainView_checklist: View {
     @State var yesterdayRecordDeleted:Bool = false
     
     @State var isAnimating = false
+    @State var isAnimating2 = false
+    @State var isAnimating3 = false
 
-//    init(recordOfToday: DailyRecord, recordOfYesterday: DailyRecord?, currentRecordSet: DailyRecordSet, popUp_addQuest_plan: Binding<Bool>, popUp_addQuest_done: Binding<Bool>, popUp_addDiary: Binding<Bool>, popUp_createRecordStone: Binding<Bool>, selectedView: Binding<MainViewName>) 
+    
+    
+//    init(recordOfToday: DailyRecord, recordOfYesterday: DailyRecord?, currentRecordSet: DailyRecordSet, popUp_addQuest_plan: Binding<Bool>, popUp_addQuest_done: Binding<Bool>, popUp_addDiary: Binding<Bool>, popUp_createRecordStone: Binding<Bool>, selectedView: Binding<MainViewName>)
     init(recordOfToday: DailyRecord, recordOfYesterday: DailyRecord?, currentRecordSet: DailyRecordSet, selectedView: Binding<MainViewName>, isNewDailyRecordAdded: Binding<Bool>)
     {
         self._recordOfToday = State(initialValue: recordOfToday)
@@ -99,6 +105,12 @@ struct MainView_checklist: View {
         
         let shadowColor:Color = getShadowColor(colorScheme)
 
+        let middleColor:Color = colorScheme == .light ? Color.black.adjust(brightness: 0.2) : Color.white
+        let linearGradient1: LinearGradient =
+        LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .leading, endPoint: .trailing)
+        let linearGradient2: LinearGradient =
+        LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .topLeading, endPoint: .bottomTrailing)
+        
         // currentRecord == records.last => 기간이 지났어도 currentRecord임
         GeometryReader { geometry in
 
@@ -119,42 +131,27 @@ struct MainView_checklist: View {
                     ZStack{
 
                         
-                        Menu {
 
-                            Button(action:{popUp_saveDailyRecord.toggle()}) {
-                                Text(isTodayRelated&&yesterdayDataRemains ? "전날의 기록부터 저장하세요!" :"저장")
-                            }
-                            .disabled( isTodayRelated && ( selectedDailyRecord.date != getDateOfNow() || yesterdayDataRemains ) )
-                            if (yesterdayDataRemains && !isTodayRelated) {
-                                Button("넘어가기") {
-                                    isTodayRelated.toggle()
-                                    yesterdayRecordDeleted.toggle()
-                                }
-                            }
-                            
-                        } label: {
 
-                            ZStack {
-                                ForEach(0..<2) { i in
-                                    LinearGradient(gradient: Gradient(colors: [Color.blue, Color.green, Color.blue]), startPoint: .leading, endPoint: .trailing)
-                                        .frame(width: geoWidth)
-                                        .offset(x: (CGFloat(i) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
-                                        .animation(Animation.linear(duration: 4).repeatForever(autoreverses: false), value: isAnimating)
-                                }
-                            }
-                            .mask(
-                                Text("\(kor_yyyymmddFormatOf(selectedDailyRecord.date))")
-                                    .font(.title3)
-                                    .bold()
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.5)
-                            )
-                            .frame(width:geoWidth*0.5, height: geoHeight*0.07)
-                            .onAppear() {
-                                self.isAnimating = true
+                        ZStack {
+                            ForEach(0..<2) { i in
+                                linearGradient1
+                                    .frame(width: geoWidth)
+                                    .offset(x: (CGFloat(i) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                                    .animation(Animation.linear(duration: 4).repeatForever(autoreverses: false), value: isAnimating)
                             }
                         }
-                        .buttonStyle(.plain)
+                        .mask(
+                            Text("\(kor_yyyymmddFormatOf(selectedDailyRecord.date))")
+                                .font(.title3)
+                                .bold()
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                        )
+                        .frame(width:geoWidth*0.5, height: geoHeight*0.07)
+                        .onAppear() {
+                            self.isAnimating = true
+                        }
 //                            .border(.red)
 
                         
@@ -190,7 +187,8 @@ struct MainView_checklist: View {
                         isTodayRelated: $isTodayRelated,
                         yesterdayDataRemains: $yesterdayDataRemains,
                         editDiary: $editDiary,
-                        yesterdayRecordDeleted: $yesterdayRecordDeleted
+                        yesterdayRecordDeleted: $yesterdayRecordDeleted,
+                        selectDiaryOption: $selectDiaryOption
                     )
 
                 }
@@ -208,22 +206,29 @@ struct MainView_checklist: View {
 //                        })
 //                        .labelStyle(.iconOnly)
 //                        .buttonStyle(.borderedProminent)
-                        Button("하루요약",systemImage:"book.closed.fill", action:{
-                            editDiary = true // 아래하고 순서 바뀌면 안됨
-                            selectedDailyRecord.dailyTextType = DailyTextType.inShort
-                            selectedDailyRecord.dailyText = ""
-                            
-                            
-                        })
-                        .labelStyle(.iconOnly)
-                        .buttonStyle(.borderedProminent)
-                        .disabled(selectedDailyRecord.dailyTextType != nil)
+//                        Button("하루요약",systemImage:"book.closed.fill", action:{
+//                            editDiary = true // 아래하고 순서 바뀌면 안됨
+//                            selectedDailyRecord.dailyTextType = DailyTextType.inShort
+//                            selectedDailyRecord.dailyText = ""
+//                            
+//                            
+//                        })
+//                        .labelStyle(.iconOnly)
+//                        .buttonStyle(.borderedProminent)
+//                        .disabled(selectedDailyRecord.dailyTextType != nil)
+//                        Button("일기",systemImage:"book.closed.fill", action:{
+//                            editDiary = true // 아래하고 순서 바뀌면 안됨
+////                            popUp_addDiary.toggle()
+//                            selectedDailyRecord.dailyTextType = DailyTextType.diary
+//                            selectedDailyRecord.dailyText = ""
+//                            
+//
+//                        })
+//                        .labelStyle(.iconOnly)
+//                        .buttonStyle(.borderedProminent)
+//                        .disabled(selectedDailyRecord.dailyTextType != nil)
                         Button("일기",systemImage:"book.closed.fill", action:{
-                            editDiary = true // 아래하고 순서 바뀌면 안됨
-//                            popUp_addDiary.toggle()
-                            selectedDailyRecord.dailyTextType = DailyTextType.diary
-                            selectedDailyRecord.dailyText = ""
-                            
+                            selectDiaryOption = true
 
                         })
                         .labelStyle(.iconOnly)
@@ -233,31 +238,86 @@ struct MainView_checklist: View {
                     }
                 } label: {
 
+//                    ZStack {
                     ZStack {
-                        ZStack {
                             ForEach(0..<2) { i in
-                                LinearGradient(gradient: Gradient(colors: [Color.black.adjust(brightness: 0.3), Color.gray.adjust(brightness: 0.15), Color.black.adjust(brightness: 0.3)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                                linearGradient2
                                     .frame(width:geoWidth, height:geoWidth/10)
-                                    .offset(x: (CGFloat(i) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
-                                    .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                                    .offset(x: (CGFloat(i) - (self.isAnimating2 ? 0.0 : 1.0)) * geoWidth)
+                                    .animation(Animation.linear(duration: 6).repeatForever(autoreverses: false), value: isAnimating2)
+                                    .onAppear() {
+                                        isAnimating2 = true
+                                    }
                             }
                         }
-                        .frame(width:geoWidth/10, height:geoWidth/10)
                         .mask {
 //                            Text("asdfasdfasdfasdf")
                             Image(systemName: "plus.circle.fill")
                                 .resizable()
-//                                .bold()
                                 .frame(width:geoWidth/10, height:geoWidth/10)
+//                                .bold()
                         }
+                        .frame(width:geoWidth/10, height:geoWidth/10)
 
-                    }
-                    .frame(width:geoWidth/10, height:geoWidth/10)
+
+//                    }
+//                    .frame(width:geoWidth/10, height:geoWidth/10)
 
                 }
                 .buttonStyle(.plain)
-                .position(x:geoWidth/2, y:geoHeight-geoHeight/20 - 10)
+                .frame(width:geoWidth/10, height:geoWidth/10)
+                .position(x:geoWidth/2, y:geoHeight*0.95 - 10)
             
+                
+                
+                Menu {
+
+                    Button(action:{popUp_saveDailyRecord.toggle()}) {
+                        Text(isTodayRelated&&yesterdayDataRemains ? "전날의 기록부터 저장하세요!" :"저장")
+                    }
+                    .disabled( isTodayRelated && ( selectedDailyRecord.date != getDateOfNow() || yesterdayDataRemains ) )
+                    if (yesterdayDataRemains && !isTodayRelated) {
+                        Button("넘어가기") {
+                            isTodayRelated.toggle()
+                            yesterdayRecordDeleted.toggle()
+                        }
+                    }
+                    
+                } label: {
+                    Image(systemName: "arrowshape.forward.fill")
+                        .resizable()
+                        .frame(width:geoWidth/10, height:geoWidth/10)
+
+//                    ZStack {
+//                        ForEach(0..<2) { i in
+//                            linearGradient2
+//                                .frame(width:geoWidth, height:geoWidth/10)
+//                                .offset(x: (CGFloat(i) - (self.isAnimating3 ? 0.0 : 1.0)) * geoWidth)
+//                                .animation(Animation.linear(duration: 12).repeatForever(autoreverses: false), value: isAnimating3)
+//                                .onAppear() {
+//                                    isAnimating3 = true
+//                                }
+//                        }
+//                    }
+//                    .frame(width:geoWidth/10, height:geoWidth/10)
+//                    .mask(
+//                        ZStack {
+//                            Rectangle()
+//                                .foregroundStyle(.foreground)
+//                                .clipShape(.buttonBorder)
+//                            Text("저장")
+//                                .bold()
+//                        }
+//                        .frame(width:geoWidth/10, height:geoWidth/10)
+//
+////                        Image(systemName: "arrowshape.forward.fill")
+////                            .resizable()
+////                            .frame(width:geoWidth/10, height:geoWidth/10)
+//                    )
+                }
+                .buttonStyle(.plain)
+                .position(x:geoWidth*0.9, y: geoHeight*0.95 - 10)
+
                 
                 
                 if popUp_addDailyQuest || popUp_addDiary || popUp_saveDailyRecord {
@@ -271,12 +331,14 @@ struct MainView_checklist: View {
                     AddDailyQuestView(
                         recordOfToday: selectedDailyRecord,
                         popUp_addDailyQuest: $popUp_addDailyQuest,
-                        isPlan: isTodayRelated ? false : true
+                        selectedView:$selectedView,
+                        isDone: isTodayRelated ? false : true
                     )
                     .popUpViewLayout(width: geometry.size.width*0.9, height: popUp_addQuest_height, color: colorSchemeColor)
                     .position(x: geometry.size.width/2, y: popUp_addQuest_yPos)
                     
                 }
+                
 //                if popUp_addDailyQuest_done {
 //                    AddDailyQuestView(
 //                        recordOfToday: selectedDailyRecord,
@@ -459,6 +521,8 @@ struct ChecklistView: View {
     
     @Binding var editDiary: Bool
     @Binding var yesterdayRecordDeleted: Bool
+    
+    @Binding var selectDiaryOption: Bool
 
     @State var applyDailyQuestRemoval: Bool = false
     @State var applyDailyTextRemoval: Bool = false
@@ -512,7 +576,28 @@ struct ChecklistView: View {
                         Spacer()
                             .frame(width:geometry.size.width, height: 20)
                         
-                        if (selectedDailyRecord.dailyTextType == DailyTextType.diary) {
+                        if selectDiaryOption {
+                            HStack(spacing:geoWidth*0.1) {
+                                Button("한줄요약", action:{
+                                    editDiary = true // 아래하고 순서 바뀌면 안됨
+                                    selectedDailyRecord.dailyTextType = DailyTextType.inShort
+                                    selectedDailyRecord.dailyText = ""
+                                    selectDiaryOption = false
+                                })
+                                .buttonStyle(.bordered)
+                                Button("길게", action:{
+                                    editDiary = true // 아래하고 순서 바뀌면 안됨
+                                    //                            popUp_addDiary.toggle()
+                                    selectedDailyRecord.dailyTextType = DailyTextType.diary
+                                    selectedDailyRecord.dailyText = ""
+                                    selectDiaryOption = false
+                                    
+                                })
+                                .buttonStyle(.bordered)
+                            }
+
+                        }
+                        else if (selectedDailyRecord.dailyTextType == DailyTextType.diary) {
 
                             DiaryView(
                                 selectedDailyRecord: selectedDailyRecord,
@@ -616,7 +701,9 @@ struct ChecklistView: View {
                         if !editDiary {
                             if isTodayRelated && selectedDailyRecord.date != getDateOfNow() {
                                 Text("오전10시부터 저장할 수 있습니다!")
+                                    .foregroundStyle(.opacity(0.5))
                                     .padding(.top, 20)
+                                
                             }
                             else if !isTodayRelated {
                                 VStack {
@@ -626,7 +713,9 @@ struct ChecklistView: View {
                                     }
                                     .padding(.top, 20)
                                 }
+                                .foregroundStyle(.opacity(0.5))
                                 Text("빨리 저장하세요!")
+                                    .foregroundStyle(.opacity(0.5))
                             }
                         }
                         Spacer()
@@ -657,6 +746,10 @@ struct ChecklistView: View {
 //
 ////                        .backButton(viewToggler: $popUp_changePurpose)
 //                }
+                if selectedDailyRecord.dailyQuestList!.isEmpty && selectedDailyRecord.dailyTextType == nil {
+                    Text("체크리스트에 내용을 추가하세요!")
+                        .opacity(0.5)
+                }
 
 
 

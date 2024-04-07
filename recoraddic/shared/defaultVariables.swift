@@ -15,7 +15,7 @@ let defaultPurposes_per: [String] = [DefaultPurpose.atr, DefaultPurpose.hlt, Def
 let defaultPurposes_notper: [String] = [DefaultPurpose.sgn, DefaultPurpose.fml, DefaultPurpose.cmn, DefaultPurpose.alt, DefaultPurpose.wrl]
 
 
-let defaultDataTypes:[Int] = [DataType.NONE, DataType.OX, DataType.REP, DataType.SEC, DataType.MIN, DataType.HOUR, DataType.CUSTOM]
+let defaultDataTypes:[Int] = [DataType.OX, DataType.REP, DataType.SEC, DataType.MIN, DataType.HOUR, DataType.CUSTOM]
 
 //let diaryTopics:[String] = [DiaryTopic.inShort, DiaryTopic.feedbacks, DiaryTopic.specialEvent]
 // feedback is too heavy, making people irritated

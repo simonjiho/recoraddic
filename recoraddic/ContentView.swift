@@ -141,6 +141,12 @@ struct ContentView: View {
 
                      
                      TabView(selection: $selectedView){
+                         MainView_QuestInventory()
+                         .tabItem {
+                             Image(systemName: images[mainViews[1]]!)
+                         }
+                         .ignoresSafeArea(.keyboard)
+                         .tag(mainViews[1])
                          MainView_checklist(
                             recordOfToday: recordOfToday,
                             // recordOfYesterday is nil if it is not remained one.
@@ -167,16 +173,12 @@ struct ContentView: View {
                          }
                          .tag(mainViews[0])
                          .ignoresSafeArea(.keyboard)
-                         MainView_QuestAndPurposeInventory()
-                         .tabItem {
-                             Image(systemName: images[mainViews[1]]!)
-                         }
-                         .ignoresSafeArea(.keyboard)
-                         .tag(mainViews[1])
+
                          MainView_SeeMyDailyRecord(
                             selectedDailyRecordSetIndex: dailyRecordSets_notHidden.count-1,
                             selectedDailyRecordSet: currentDailyRecordSet,
-                            isNewDailyRecordAdded: $isNewDailyRecordAdded
+                            isNewDailyRecordAdded: $isNewDailyRecordAdded,
+                            selectedView: $selectedView
 //                            navigationBarHeight: navigationBarHeight
                          )
                          .tabItem {
@@ -194,6 +196,7 @@ struct ContentView: View {
                          .ignoresSafeArea(.keyboard)
                          .tag(mainViews[3])
                      }
+                     
                      
 
                  }

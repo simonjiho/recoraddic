@@ -53,8 +53,10 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     @State var recalculatingVisualValues_themeChanged: Bool = false // not used yet. Will be used to hide when calculation is on process
     
     @State var dailyRecordSetHidden: Bool = false
+    @State var isEditingTermGoals: Bool = false
     
     @Binding var isNewDailyRecordAdded: Bool
+    @Binding var selectedView: MainViewName
     
     var body: some View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
@@ -64,6 +66,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         
         let backGroundColor:Color = getColorSchemeColor(colorScheme)
         
+        let dailyRecordSetEmpty: Bool = selectedDailyRecordSet.dailyRecords!.filter({!$0.hide}).count == 0
+        
         GeometryReader { geometry in
             
             let geoWidth = geometry.size.width
@@ -72,7 +76,6 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             ZStack {
                 
                 if !recalculatingVisualValues_themeChanged {
-                    
                     if selectedDailyRecordSet.dailyRecordThemeName == "stoneTower_0" {
                         StoneTower_0(
                             dailyRecordSet: $selectedDailyRecordSet,
@@ -81,7 +84,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                             popUp_startNewRecordSet: $popUp_startNewRecordSet,
                             popUp_recordInDetail: $popUp_recordInDetail,
                             dailyRecordSetHidden: $dailyRecordSetHidden,
-                            popUp_changeStyle: $popUp_changeStyle
+                            popUp_changeStyle: $popUp_changeStyle,
+                            isEditingTermGoals: $isEditingTermGoals
                         )
                         .frame(width:geoWidth, height: geoHeight)
                     }
@@ -93,7 +97,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                             popUp_startNewRecordSet: $popUp_startNewRecordSet,
                             popUp_recordInDetail: $popUp_recordInDetail,
                             dailyRecordSetHidden: $dailyRecordSetHidden, 
-                            popUp_changeStyle: $popUp_changeStyle
+                            popUp_changeStyle: $popUp_changeStyle,
+                            isEditingTermGoals: $isEditingTermGoals
                         )
                         .frame(width:geoWidth, height: geoHeight)
                     }
@@ -108,6 +113,31 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     Text("변경하는 중..")
                 }
                 
+                let noSavedDailyRecords: Bool = selectedDailyRecordSet.dailyRecords?.filter({$0.visualValue1 != nil}).count == 0
+                
+                if noSavedDailyRecords && selectedDailyRecordSetIndex == dailyRecordSets_notHidden.count - 1 && !isEditingTermGoals {
+                    VStack {
+                        HStack {
+                            Text("매일매일의 기록을 저장하세요!")
+                        }
+                        .foregroundStyle(.opacity(0.5))
+
+                        Button(action:{
+                            selectedView = .checkList
+                        }) {
+                            Text("저장하러 가기")
+                                .font(.caption)
+                        }
+                    }
+                    
+                }
+                
+//                if !isEditingTermGoals && selectedDailyRecordSet.termGoals.isEmpty {
+//                    Text("나만의 목표를 설정하세요!")
+//                        .opacity(0.5)
+//                }
+                
+                
                 if popUp_startNewRecordSet {
                     Color.gray.opacity(0.5)
                     StartNewRecordSet(
@@ -118,8 +148,12 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                         .popUpViewLayout(width: geoWidth*0.9, height: (geoHeight-statusBarHeight)*0.9, color: backGroundColor)
                         .position(x:geoWidth/2,y: statusBarHeight + (geoHeight-statusBarHeight)/2 )
                 }
+                
                 if popUp_changeStyle {
                     Color.gray.opacity(0.5)
+                        .onTapGesture {
+                            popUp_changeStyle.toggle()
+                        }
                     if selectedDailyRecordSet.dailyRecordThemeName == "stoneTower_0" {
                         StoneTower_0_popUp_ChangeStyleView(
                             popUp_changeStyle:$popUp_changeStyle,
@@ -139,6 +173,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                         .clipShape(.rect(cornerSize: CGSize(width: geoWidth*0.8*0.1, height: geoHeight*0.7*0.1)))
                     }
                 }
+                
+                
             }
             .sheet(isPresented: $popUp_recordInDetail) {
                 RecordInDetailView_optional(
@@ -152,13 +188,12 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 
                 //TODO: light모드일 때,  Col
             }
-
-                        
+            .scrollDisabled(dailyRecordSetEmpty)
         }
         .onChange(of: selectedDailyRecordSetIndex) {
             updateSelectedDailyRecordSet = true
         }
-        .onChange(of: selectedDailyRecordSetIndex) {
+        .onChange(of: updateSelectedDailyRecordSet) {
             selectedDailyRecordSet = dailyRecordSets_notHidden[selectedDailyRecordSetIndex]
             updateSelectedDailyRecordSet = false // MARK: onChange 클로저 안에서는 본인의 변화를 detect하지 않는 것 같다. 무한 루프가 생성되지 않는다. 바꿔줘도 됨.
             selectedRecord = nil
@@ -170,6 +205,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             }
             updateSelectedDailyRecordSet = true
         }
+
         .onChange(of: isNewDailyRecordAdded, {
             
             selectedDailyRecordSetIndex = dailyRecordSets_notHidden.count - 1

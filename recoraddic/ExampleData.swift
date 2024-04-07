@@ -19,9 +19,13 @@ extension ContentView {
         let firstDailyRecordSet = DailyRecordSet(start: getDateOfNow())
         modelContext.insert(firstDailyRecord)
         modelContext.insert(firstDailyRecordSet)
-        firstDailyRecord.dailyRecordSet = firstDailyRecordSet // 이거 먼저 적으면 drs가 두번 추가됨
+        
+        // dailyRecord는 절대 저장 전까지 ㄴㄴ
+//        firstDailyRecord.dailyRecordSet = firstDailyRecordSet // 이거 먼저 적으면 drs가 두번 추가됨
 
     }
+    
+    
     
     func situation_YesterdayDataRemains() -> Void {
         print("generating example data.....")
@@ -83,8 +87,8 @@ extension ContentView {
         )
         dr1.mood = 21
         dr1.questionValue1 = 3
-        dr1.visualValue1 = 0
-        dr1.visualValue2 = -3
+        dr1.visualValue1 = 3
+        dr1.visualValue2 = 0
         dr1.visualValue3 = 0
         dr1.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr1)
@@ -114,8 +118,8 @@ extension ContentView {
         dr2.dailyText = "ㅋㅋㅋㅋㅋ 호호호호호호홐ㅋㅋㅋ 홈ㅋㅋㅎㅇㅁㅇㄴㅁㅇㄴㄹㅁㄴㅇㅎㄴ앞ㅍㅁㅎㅁㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㄹㅇㄹㅁㄴㄹㅁㄴㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹㅁㄴㅇㄹㅁㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹ"
         dr2.mood = 48 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
         dr2.questionValue1 = 2
-        dr2.visualValue1 = 0
-        dr2.visualValue2 = -2
+        dr2.visualValue1 = 3
+        dr2.visualValue2 = 0
         dr2.visualValue3 = 0
         dr2.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr2)
@@ -149,8 +153,8 @@ extension ContentView {
         dr3.dailyText = "세번째 날의 일기"
         dr3.mood = 124 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
         dr3.questionValue1 = 1
-        dr3.visualValue1 = 0
-        dr3.visualValue2 = -1
+        dr3.visualValue1 = 3
+        dr3.visualValue2 = 0
         dr3.visualValue3 = 0
         dr3.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr3)
@@ -181,7 +185,7 @@ extension ContentView {
         dr4.dailyText = "네번째 날의 일기"
         dr4.mood = 14 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
         dr4.questionValue1 = 0
-        dr4.visualValue1 = 0
+        dr4.visualValue1 = 3
         dr4.visualValue2 = 0
         dr4.visualValue3 = 0
         dr4.dailyRecordSet = initialDailyRecordSet
@@ -215,9 +219,9 @@ extension ContentView {
         dr5.dailyText = "다섯번째 날의 일기"
         dr5.mood = 12 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
         dr5.questionValue1 = -1
-        dr5.visualValue1 = 0
-        dr5.visualValue2 = 1
-        dr5.visualValue3 = 1
+        dr5.visualValue1 = 3
+        dr5.visualValue2 = 0
+        dr5.visualValue3 = 0
         dr5.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr5)
         dr5_qd1.dailyRecord = dr5
@@ -248,9 +252,9 @@ extension ContentView {
         dr6.dailyText = "여섯번째 날의 일기"
         dr6.mood = 65 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
         dr6.questionValue1 = -2
-        dr6.visualValue1 = 0
-        dr6.visualValue2 = 2
-        dr6.visualValue3 = -1
+        dr6.visualValue1 = 3
+        dr6.visualValue2 = 0
+        dr6.visualValue3 = 0
         dr6.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr6)
         dr6_qd1.dailyRecord = dr6
@@ -281,9 +285,9 @@ extension ContentView {
         dr7.dailyText = "일곱번째 날의 일기"
         dr7.mood = 90 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
         dr7.questionValue1 = -3
-        dr7.visualValue1 = 0
-        dr7.visualValue2 = 3
-        dr7.visualValue3 = -4
+        dr7.visualValue1 = 3
+        dr7.visualValue2 = 0
+        dr7.visualValue3 = 0
         dr7.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr7)
         dr7_qd1.dailyRecord = dr7
@@ -317,8 +321,8 @@ extension ContentView {
         dr8.mood = 98 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
         dr8.questionValue1 = -3
         dr8.visualValue1 = 3
-        dr8.visualValue2 = -3
-        dr8.visualValue3 = -7
+        dr8.visualValue2 = 0
+        dr8.visualValue3 = 0
         dr8.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr8)
         dr8_qd1.dailyRecord = dr8

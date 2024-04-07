@@ -39,14 +39,12 @@ struct StoneTower_1: View {
 //    @Binding var editedIndex: Int
 
     @Binding var popUp_changeStyle: Bool
-    
-    
+    @Binding var isEditingTermGoals: Bool
 //    @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
 
     
     @State var scrollViewCenterY: CGFloat = 0
     
-    @State var canEdit: Bool = false
     
     @State var editText:[String] = []
 
@@ -65,6 +63,8 @@ struct StoneTower_1: View {
     }
     
     @State var presentQuestions: Bool = false
+    
+    @FocusState var editTermGoals: Int?
     
     
     var body: some View {
@@ -242,7 +242,7 @@ struct StoneTower_1: View {
                                             
                                             
                                             
-                                            canEdit = false
+                                            isEditingTermGoals = false
                                         }) {
                                             Image(systemName: "arrowshape.left")
                                                 .resizable()
@@ -253,7 +253,7 @@ struct StoneTower_1: View {
                                         
                                         ZStack {
                                             HStack(spacing:0.0) {
-                                                if canEdit || dailyRecordSet.termGoals.count != 0 {
+                                                if isEditingTermGoals || dailyRecordSet.termGoals.count != 0 {
                                                     Text("목표")
                                                         .bold()
                                                         .font(.title3)
@@ -267,10 +267,15 @@ struct StoneTower_1: View {
 
 //                                                    .border(.red)
 
-                                                if canEdit {
+                                                if isEditingTermGoals {
                                                     Button (action:{
-                                                        dailyRecordSet.termGoals = editText
-                                                        canEdit.toggle()
+                                                        dailyRecordSet.termGoals = []
+                                                        for text in editText {
+                                                            if text != "" {
+                                                                dailyRecordSet.termGoals.append(text)
+                                                            }
+                                                        }
+                                                        isEditingTermGoals.toggle()
                                                     }) {
                                                         Text("저장")
 //                                                                .frame(width:goalEditButtonSize*0.8, height: goalEditButtonSize*0.8)
@@ -284,7 +289,7 @@ struct StoneTower_1: View {
 
                                             }
                                             .frame(width:geoWidth/2,height: groundHeight*0.15)
-                                            .offset(x:canEdit ? goalEditButtonSize/2 : 0.0)
+                                            .offset(x:isEditingTermGoals ? goalEditButtonSize/2 : 0.0)
 //                                            .frame(alignment:.center)
 //                                            .border(.black)
                                             
@@ -306,7 +311,7 @@ struct StoneTower_1: View {
 
 
                                     VStack {
-                                        if canEdit {
+                                        if isEditingTermGoals {
                                             if editText.count != 0 {
                                                 ForEach(0...editText.count - 1, id:\.self) { index in
                                                     HStack {
@@ -314,13 +319,28 @@ struct StoneTower_1: View {
                                                         TextField("",text:$editText[index])
                                                             .textFieldStyle(RoundedBorderTextFieldStyle())
                                                             .frame(width:geoWidth*0.7, alignment:.leading)
-                                                        Button(action: {
-                                                            editText.remove(at: index)
-                                                        }) {
-                                                            Image(systemName: "x.circle")
+                                                            .focused($editTermGoals, equals:index)
+                                                        
+                                                        if index != 0 {
+                                                            Button(action: {
+                                                                if editTermGoals == index {
+                                                                    if editTermGoals != 0 {
+                                                                        editTermGoals? -= 1
+                                                                    }
+                                                                }
+                                                                editText.remove(at: index)
+                                                                
+                                                            }) {
+                                                                Image(systemName: "x.circle")
+                                                            }
+                                                            .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
+                                                            .buttonStyle(MainButtonStyle2(width: plusMinusButtonSize, height: plusMinusButtonSize))
                                                         }
-                                                        .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
-                                                        .buttonStyle(MainButtonStyle3(colorScheme: _colorScheme))
+                                                        else {
+                                                            Spacer()
+                                                            .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
+
+                                                        }
                                                     }
                                                 }
                                             }
@@ -343,13 +363,15 @@ struct StoneTower_1: View {
                                                 
                                             }
                                         }
-                                        if canEdit && editText.count <= 2 {
-                                            Button(action:{editText.append("")}) {
+                                        if isEditingTermGoals && editText.count <= 2 {
+                                            Button(action:{
+                                                editText.append("")
+                                                editTermGoals? += 1
+                                            }) {
                                                 Image(systemName: "plus.circle")
                                             }
                                             .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
-                                            .buttonStyle(MainButtonStyle3(colorScheme: _colorScheme))
-
+                                            .buttonStyle(MainButtonStyle2(width: plusMinusButtonSize, height: plusMinusButtonSize))
                                         }
                                     }
                                     .frame(height:groundHeight*0.55, alignment: .top)
@@ -358,9 +380,9 @@ struct StoneTower_1: View {
                                 
 //                                        HStack(spacing:0.0) {
                                         Menu {
-                                            Text("통계")
+//                                            Text("통계")
 //                                            Text("스타일 변경") // DRtheme, background, DRColor변경
-                                            Button("색 변경") { // 나중에 스타일 변경에 통합
+                                            Button("스타일 변경") { // 나중에 theme, theme별 선택 가능 요소(색,배경 등등들 다 바꿀 수 있게 하기
                                                 popUp_changeStyle.toggle()
                                             }
                                             Button("숨기기") {
@@ -372,16 +394,22 @@ struct StoneTower_1: View {
                                                 Button(action: {
                                                     popUp_startNewRecordSet.toggle()
                                                 }) {
-                                                    Text("새로 만들기")
+                                                    Text("새로운 기록의 탑 생성")
 //                                                            .minimumScaleFactor(0.5)
                                                 }
                                                 Button (action:{
                                                     editText = dailyRecordSet.termGoals
-                                                    canEdit.toggle()
+                                                    if editText.isEmpty {
+                                                        editText.append("")
+                                                    }
+                                                    isEditingTermGoals.toggle()
+                                                    editTermGoals = editText.count - 1
+                                                    
                                                 }) {
-                                                    Text("목표 편집")
+                                                    let noTermGoals = dailyRecordSet.termGoals.count == 0
+                                                    Text("목표 \(noTermGoals ? "설정" : "편집")")
                                                 }
-                                                .disabled(canEdit)
+                                                .disabled(isEditingTermGoals)
 
                                             }
                                             
@@ -406,7 +434,36 @@ struct StoneTower_1: View {
                                 
                                 
                             
+                            if numberOfStones == 0 {
+                                VStack(spacing:0) {
 
+                                    StoneTower_1_stone(
+                                        shapeNum: 3,
+                                        brightness: 0,
+                                        defaultColorIndex: defaultColorIndex,
+                                        facialExpressionNum: 3
+                                    )
+                                    .frame(width: stoneWidth, height: stoneHeight)
+                                    .opacity(0.2)
+                                    StoneTower_1_stone(
+                                        shapeNum: 1,
+                                        brightness: 2,
+                                        defaultColorIndex: defaultColorIndex,
+                                        facialExpressionNum: 2
+                                    )
+                                    .frame(width: stoneWidth, height: stoneHeight)
+                                    .opacity(0.3)
+                                    StoneTower_1_stone(
+                                        shapeNum: 2,
+                                        brightness: 1,
+                                        defaultColorIndex: defaultColorIndex,
+                                        facialExpressionNum: 1
+                                    )
+                                    .frame(width: stoneWidth, height: stoneHeight)
+                                    .opacity(0.4)
+                                }
+                                .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
+                            }
 
                             Menu {
                                 ForEach(0...dailyRecordSet.dailyQuestions.count-1, id:\.self) { qIndex in
@@ -496,6 +553,8 @@ struct StoneTower_1: View {
             }
     
         }
+        
+
 
 
 
