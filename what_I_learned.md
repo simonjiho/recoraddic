@@ -2,6 +2,9 @@
 
 
 
+# git
+- pull안하고 변경한 다음에 다시 pull하면 rebase체크하면 전부 사라진다.
+
 # 주요 용어
  - ~Delegate
  - ~Representable: wraps the ~, to integrate with View
@@ -30,11 +33,12 @@
  - AppKit -> macOS
  - UIView and NSView belongs to default library, it is activated based on the OS detection. (Ex: iOS -> UIView activated, NSView deactivated)
  - @Published -> make variable observable outside the object.
-
+ - in OrderedCollection library, there's OrderedDictionary that have order for each element
+ - 다른 폴더여도 같은 프로젝트에 같은 파일이름 있으면 안됨 -> error message: "multiple commands produced" 
 
 
 # swift
-
+ - list.enumerated -> (int, element) pairs
 
 
 
@@ -62,6 +66,28 @@
  - Variables that have @Published property inside @ObservableObject will make the view rerendered when modified.
  - withAnimation controls the animation of the view, the view whose existence is determined by conditional statement. Those conditional statement is controlled by the value related to withAnimation closure. 
     
+ - View의 @State variable이 선언되지 않으면 이상한 곳에서 compile 에러 발생 (~ buildExpression 어쩌구 저쩌구..)
+ 
+ - Always in mind, SwiftUI's frame origin is top-leading edge of square frame
+ 
+ - View's modifier is adjusted from the bottom, in other words, from the last one.
+ 
+ - Stack is the view with automatic frame size, so if you want to fix the size, you should use .frame() on it.
+
+                        // frame -> padding : padding added outside frame
+                        // padding -> frame : padding inside frame
+                        // position -> frame : positioned based on the parent view's coordinate system
+                        // frame -> position : positioned based on the frame's coordinate system + frame size destroyed
+- stack(alignment) -> stack의 element들의 크기에 따라 임의의 frame정하고, 각 element들이 그 frame안에서 어떻게 정렬되는지
+- stack().frame(alignment) -> stack이 들어갈 frame의 크기를 정하고, stack뭉텡이가 그 frame안에서 어느쪽으로 정렬될지 
+- ForEach View 관련 error에서 원인을 못찾겠다면, 안의 구현이 잘못된 경우가 많다. 에러메시지가 이상하게 뜨니, 그걸로 분석하려 하지 말것.
+- scrollViewReader : id 설정해서 id있는 쪽으로 자동 스크롤 되는 버튼 만들 수 있음(show quick help 참조)
+- CGRect.frame(in:) 은 바깥의 뷰가 자기가 종속하고 있고, 사이즈를 자신의 사이즈에 의해 결정하는 내부 뷰의 좌표계를 참조 할 수 없다.
+- .popOver : 위에서 아래로 쓸어내리면 사라지는 popUp
+- .contextMenu : 오래 누르고 있으면 나오는 메뉴
+- Form : 디바이스에 맞게 form을 자동 렌더링 해줌, textfield, picker, 등등 사용. setting에 사용 가능.
+- 왜인지 모르겠는데 tabview를 전환했다가 gritBoard 다시 들어가면 들어갈 수록 frame전환 횟수가 빨라짐
+- computed properties are really heavy. Don't use it if necessary
 
 # UIKit
  - older than SwiftUI, so if not necessary, use SwiftUI as much as you can. Apple will support more on SwiftUI, not UIKit.

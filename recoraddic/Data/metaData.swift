@@ -8,45 +8,46 @@
 import Foundation
 import SwiftData
 
-@Model
-class RecordMetaData {
-    
-    init(_ input: Record) {
 
-    }
-}
-
-@Model
-class PurposeMetaData {
-    var burning_gage: Int?
-    var achivement_gage: Int?
-    
-    init(_ input: Purpose) {
-        
-    }
-    
-}
-
-@Model
-class QuestMetaData {
-    
-    var rawData: Quest
-    var combo: Int
-    var process: Float
-    
-    init(input: Quest) {
-        rawData = input
-        combo = 0
-        process = 0.0
-    }
-    
-    func update() {
-        combo = countNonzeroFromEnd(rawData.data)
-        process = sumFloatArray(rawData.data) / rawData.questOption.finalGoal
-        
-        if process > 1 { process = 1}
-    }
-    
-
-    
-}
+//@Model
+//class PurposeMetaData {
+//    var burning_gage: Int?
+//    var achivement_gage: Int?
+//    
+//    init(_ input: String) {
+//        
+//    }
+//    
+//}
+//
+//@Model
+//class QuestMetaData {
+//    
+//    var rawData: Quest
+//    var combo: Int
+//    var process: Float
+//    
+//    init(input: Quest) {
+//        rawData = input
+//        combo = 0
+//        process = 0.0
+//    }
+//    
+//    func sortDictionaryByDate(input: [Date: Int]) -> [Int] {
+//        let sortedKeys = Array(input.keys).sorted()
+//        var sortedValues: [Int] = []
+//        
+//        for key in sortedKeys {
+//            if let value = input[key] {
+//                sortedValues.append(value)
+//            }
+//        }
+//        
+//        return sortedValues
+//    }
+//    
+//
+//    
+//
+//    
+//}
