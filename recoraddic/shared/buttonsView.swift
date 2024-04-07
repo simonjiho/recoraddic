@@ -30,28 +30,6 @@ struct BackButton: ViewModifier {
     }
 }
 
-//struct DoneButton: ViewModifier {
-//
-//    @Binding var viewToggler: Bool
-//    
-//    func body(content:Content) -> some View {
-//        VStack {
-//            content
-//            Spacer().frame(height: 15)
-//            HStack {
-//                Button(action: {viewToggler.toggle()}) {
-//                    Image(systemName: "arrowshape.backward.fill")
-//                }
-//                Spacer()
-//            }
-//
-//        }
-//            
-//    }
-//}
-
-
-
 
 
 extension View {

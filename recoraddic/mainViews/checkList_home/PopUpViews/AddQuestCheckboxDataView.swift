@@ -45,7 +45,7 @@ struct AddDailyQuestView: View {
     @State var questPurposesToAppend: Set<String> = Set()
     @State var popUp_choosePurpose: Bool = false
     
-    var newQuest: Quest = Quest(name: "tmpQuest", dataType: DataType.NONE)
+//    var newQuest: Quest = Quest(name: "tmpQuest", dataType: DataType.NONE)
     
     var body: some View {
         
@@ -74,7 +74,15 @@ struct AddDailyQuestView: View {
                             List {
                                 Section {
                                     ForEach(quests_notHidden) { quest in
-                                        NavigationLink(quest.name, value: quest)
+                                        if quest.dataType == DataType.OX {
+                                            Button(quest.name) {
+                                                addDailyQuest_OX(quest)
+                                                popUp_addDailyQuest.toggle()
+                                            }
+                                        }
+                                        else {
+                                            NavigationLink(quest.name, value: quest)
+                                        }
                                     }
                                 }
 
@@ -91,6 +99,17 @@ struct AddDailyQuestView: View {
         }
     }
 
+    func addDailyQuest_OX(_ quest: Quest) -> Void {
+        let dailyQuest = DailyQuest(
+            questName: quest.name,
+            data: 0,
+            dataType: quest.dataType,
+            defaultPurposes: quest.recentPurpose,
+            dailyGoal: 1)
+        
+        dailyQuest.dailyRecord = recordOfToday
+        modelContext.insert(dailyQuest)
+    }
     
     func addDailyQuest_load() -> Void {
         
@@ -210,18 +229,8 @@ struct SetValueForDailyQuest: View {
                     .background(isDone ? .white : .black.adjust(brightness:0.3))
                     .clipShape(.rect(cornerSize: CGSize(width: questNameWidth*0.05, height: questNameHeight*0.05)))
                     .shadow(radius: 3)
-//                    .padding(.bottom, geoHeight*0.05)
 
-//                VStack(spacing: 10) {
-//                    Toggle(isOn: $useFreeSets, label: {
-//                        Text("프리셋 사용")
-//                    })
-//                    
-//                    Toggle(isOn: $isDone) {
-//                        Text("달성")
-//                    }
-//                }
-//                .padding(.horizontal,geoWidth*0.2)
+                
                 HStack(spacing: 0.0) {
                     Toggle(isOn: $useFreeSets, label: {
                         Text("프리셋 사용")
