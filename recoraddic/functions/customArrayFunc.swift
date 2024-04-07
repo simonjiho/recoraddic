@@ -8,7 +8,7 @@
 import Foundation
 
 
-func countNonzeroFromEnd(_ input: Array<Float>) -> Int {
+func countNonzeroFromEnd(_ input: Array<Int>) -> Int {
     
     var count = 0
     for element in input.reversed() {
@@ -23,7 +23,16 @@ func countNonzeroFromEnd(_ input: Array<Float>) -> Int {
 }
 
 
-func sumFloatArray(_ input: Array<Float>) -> Float {
+func sumIntArray(_ input: Array<Int>) -> Int {
+    if input.isEmpty { return 0 }
+    else {
+        let sum = input.reduce(0, +)
+        return sum
+    }
+}
+
+
+func sumDoubleArray(_ input: Array<Double>) -> Double {
     let sum = input.reduce(0, +)
     return sum
 }

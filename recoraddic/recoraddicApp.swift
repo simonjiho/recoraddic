@@ -5,43 +5,40 @@
 //  Created by 김지호 on 2023/06/11.
 //
 
+// MARK: Recoraddic의 기조: 1)기록 삭제는 가능하지만 기록 수정은 불가능하다. 2)각각의 기록 삭제(quest <-> dr&drs)는 서로의 데이터에 영향을 끼치지 않는다.
+
+
+// openSettingsURLString -> For direct to cloud setting
+
+
 import SwiftUI
 import SwiftData
+import CloudKit
 
 @main
 struct recoraddicApp: App {
     
-    @MainActor
-    static var sampleContainer: ModelContainer = {
-        let s = DateComponents(year:2023, month:6, day:11)
-        let e = DateComponents(year:2023, month:10, day:11)
-        
-        let sampleStart:Date! = Calendar.current.date(from: s)
-        let sampleEnd:Date! = Calendar.current.date(from: e)
-        
-        let schema = Schema([Record.self])
-        let configuration = ModelConfiguration(isStoredInMemoryOnly: false)
-        
-        let container: ModelContainer = try! ModelContainer(for: schema, configurations: [configuration])
-        
-        var context_root: ModelContext = container.mainContext
-        context_root.insert(Record(name: "SampleRecord", start: sampleStart, end: sampleEnd))
-        
-        return container
-        
-        
-    }()
+    
+    static let container = try! ModelContainer(for:Schema([Quest.self, DailyRecord.self, DefaultPurposeData.self, DailyRecordSet.self, Profile.self]), configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic))
 
-    
-    
+    var syncManager: SyncManager = SyncManager()
+
     
     var body: some Scene {
 
         
         WindowGroup {
             ContentView()
-//        }.modelContainer(for:Record.self)
-        }.modelContainer(recoraddicApp.sampleContainer)
+                .onAppear() {
+                    print("App started")
+
+                }
+        }
+
+        .modelContainer(Self.container)
+
+    
+
 
     }
 }

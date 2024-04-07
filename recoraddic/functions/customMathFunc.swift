@@ -37,3 +37,25 @@ func windingNumberAlgorithm(coordinates: CGPoint, polygon: [CGPoint]) -> Bool {
 func isLeft(_ p1: CGPoint, _ p2: CGPoint, _ point: CGPoint) -> CGFloat {
     return (p2.x - p1.x) * (point.y - p1.y) - (point.x - p1.x) * (p2.y - p1.y)
 }
+
+
+func twoNumberToHour(hour:Int,min6:Int) -> Int{
+    
+    return hour*12 + min6
+} // 0.1시간 == 6분 == 1
+
+
+func minimumBoundary(of data: Int, byMultiplying blockValue: Int) -> CGFloat {
+    var returnVal:Int = blockValue
+    while returnVal <  data {
+        returnVal += blockValue
+    }
+    
+    return CGFloat(returnVal)
+}
+
+func divideBy10(_ value: Int) -> (Int, Int) {
+    let a: Int = value / 10
+    let b: Int = value % 10
+    return (a, b)
+}

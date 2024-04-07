@@ -15,6 +15,10 @@
 // dailyRecord 수정 중에는 UI상에서도 다른 작업 금지
 
 
+// Record와 Quest의 완전분리
+
+// 나중에 서버 만들면 구조 살짝 변경하기 -> 관리 및 분석 용이하게 (+보안)
+
 // Each property should be unique,to prevent extra synchronization process. No need to store the same property in each classes.
 
 
@@ -26,133 +30,276 @@ import SwiftData
 // didn't use enums for HowFrequent, DataType, GoalType to use SwiftData
 
 
-
 // ------------ Custom enum behaviored classes for @Model --------------- //
 
+// if this is okay, change RecordInterval and DataType into enum (23.11.08) -> Nope. Impossible
+//@Model
+//enum testForCaseIterable: CaseIterable {
+//    case one
+//    case two
+//    case three
+////    static var allCases: [testForCaseIterable]
+//}
+
+
 @Model
-final class RecordPeriod {
+final class RecordInterval {
     static let everyDay = 0
     static let onceInNdays = 1
-    static let chooseInCalender = 2
+    static let chooseInCalander = 2
     
     init() {
     }
 }
 
-
-@Model
-final class DataType {
-    static let OX = 0
-    static let REP = 1
-    static let HOUR = 2
-    static let MIN = 3
-    static let MONEY = 4
+final class DefaultPurpose {
     
-    init() {
-    }
-}
-
-
-@Model
-final class GoalSetting {
-    static let setFinalGoal = 0
-    static let setDailyGoal = 1
     
-    init() {
-    }
-    
+    // 개인지향
+    static let atr = "attractiveness" // 외모, 매력 (atr)
+    static let inq = "inquisitiveness" // 지식, 탐구 (inq)
+    static let ent = "entertainmentAndFun" // 즐거움 (ent)
+    static let hlt = "personalHealth" // 건강 (hlt)
+    static let ftr = "myFuture" // 개인적인 미래 (ftr)
+    static let ach = "selfAchievement"
+    static let rts = "relationship"
 
+    // 타인지향
+    static let sgn = "significantOther" // 사랑하는, 소중한 사람 (sgn)
+    static let fml = "family" // 가족 (fml)
+    static let cmn = "community" // 공동체 (cmn)
+    static let alt = "alturism" // 이타심 (alt)
+    static let wrl = "world"  // 인류의 미래 (wrl)
     
-}
-
-//@Model
-//final class DailyPlan {
-//    
-//    var date: Date
-//    
-//    var plans: [String:[Int]]
-//    
-//    
-//    init () {
-//        
-//    }
-//}
-@Model
-final class DailyAccomplishment {
-    var date: Date
-    var purposeNames: [String] = []
-    var questNames: [String:[String]] = [:]
-    var questDailyGoals: [String:Float] = [:]
-    var questIsCheckingDate: [String:Bool] = [:]
-    var questDataTypes: [String:Int] = [:]
     
-//    var belongingDailyRecord: DailyRecord?
     
-    init(date:Date) {
-        self.date = date
-
-    }
-    
-    func getData(_ record:Record) -> Void {
-        
-        
-        for purpose in record.purposes {
-            purposeNames.append(purpose.name)
-            questNames[purpose.name] = []
-
-            for quest in purpose.quests {
-                questNames[purpose.name]?.append(quest.name)
-                questDailyGoals[quest.name] = quest.questOption.dailyGoal
-                questIsCheckingDate[quest.name] = quest.checkDate.contains(.now)
-                questDataTypes[quest.name] = quest.questOption.dataType
-            }
-            
+    static func inKorean(_ input: String) -> String {
+        if input == DefaultPurpose.atr {
+            return "나의 매력"
         }
+        else if input == DefaultPurpose.inq {
+            return "탐구심"
+        }
+        else if input == DefaultPurpose.ent {
+            return "행복/즐거움"
+        }
+        else if input == DefaultPurpose.hlt {
+            return "나의 건강"
+        }
+        else if input == DefaultPurpose.ftr {
+            return "나의 미래"
+        }
+        else if input == DefaultPurpose.ach {
+            return "성취감"
+        }
+        else if input  == DefaultPurpose.rts {
+            return "인간관계"
+        }
+        
+        
+        else if input == DefaultPurpose.sgn {
+            return "사랑하는 사람"
+        }
+        else if input == DefaultPurpose.fml {
+            return "가족"
+        }
+        else if input == DefaultPurpose.cmn {
+            return "공동체"
+        }
+        else if input == DefaultPurpose.alt {
+            return "이타심"
+        }
+        else if input == DefaultPurpose.wrl {
+            return "세상"
+        }
+        else {
+            return "에러: KORPURP"
+        }
+        
+    }
+    
+    
+}
 
+
+
+@Model
+final class DailyTextType {
+    // 소감 / 감정 / 다짐 / 피드백 / 즐거웠던 일 / 인상깊었던 일 / 기억하고 싶은 일
+
+    static let inShort = "inShort" // 한줄평 (-) : 오늘 하루를 최대한 간략하고 위트있게 표현해보세요!
+//    static let feedbacks = "feedbacks" // 더 나은 내가 되려면 어떻게 해야할까요?(can tag on quests or purpose)
+    static let diary = "diary" // 오늘 있었던 특별했던, 또는 중요했던, 잊고 싶지 않은 일을 상세히 기록하세요!
+    
+    init() {
     }
 }
 
 
+
+// 이놈도 데이터 따로 저장하는 이유: quest가 삭제되어도 기록 유지하기 위해서
 @Model
-final class DailyRecord {
+final class DefaultPurposeData {
     
-    // 각 퀘스트별 이름과 수치
-    // 기분
-    // 효율성
-    // 멘트 및 기억하고 싶은 내용 및 하루 소감
-    // UI data
+//    @Attribute(.unique)
+    var name: String = ""
     
-    var date: Date
-    var mood: String = ""
-    var achievementRate: Int = 0
-    var efficiency: Int = 0
-    var comment: String = ""
+    var cumulativeData: [String:[Date:Int]] = [:] // for each dataType, add data
+    var cumulativeData_custom: [String:[Date:Int]] = [:]
+    // 1 week, 1 month, 3 months, 6 months, 1 years, 3 years, 10 years, cumulative
     
-    @Relationship(deleteRule:.cascade)
-    var dailyAccomplishment: DailyAccomplishment?
+    var tier_notHour: Int = 0
+    var tier_hour: Int = 0
     
-    var isDataLoaded: Bool = false
+    var feedBacks: [String] = []
     
-    //    ImageData is not available -> Store it seperately
-    //    var picture: Image = Image(systemName: "rectangle.fill.badge.xmark")
-    var belongingRecord: Record?
+    init(name: String) {
+        self.name = name
+    }
     
+}
+
+
+
+// 여기에 데이터를 따로 담는 이유: quest가 삭제 되어도 일일기록은 남게 하기 위해
+@Model
+class DailyQuest: Hashable, Equatable, Identifiable {
+    
+    var id:UUID = UUID()
+    
+//    @Attribute(.unique)
+    var createdTime: Date = Date()
+    
+    var questName: String = ""
+    var questSubName: String? //MARK: 아직 사용하지는 않지만, 일단 만들어둠. 쓸까 말까..
+    var data: Int = 0
+    var dataType: Int = 0
+    var defaultPurposes: Set<String> = []
+    var dailyGoal: Int = 0
+    
+    var customDataTypeNotation: String?
+    
+    var dailyRecord: DailyRecord?
+    
+    
+    init(createdTime: Date = .now, questName: String, data: Int, dataType: Int, defaultPurposes: Set<String>, dailyGoal: Int) {
+        self.createdTime = createdTime
+        self.questName = questName
+        self.data = data
+        self.dataType = dataType
+        self.defaultPurposes = defaultPurposes
+        self.dailyGoal = dailyGoal
+    }
+    
+    static func == (lhs: DailyQuest, rhs: DailyQuest) -> Bool {
+            return lhs.createdTime == rhs.createdTime
+            // Add any other properties that determine equality
+    }
+    
+    
+    func hash(into hasher: inout Hasher) {
+            hasher.combine(createdTime)
+            // Add any other properties that should be included in the hash
+    }
+    
+    
+}
+
+
+@Model
+final class DailyRecordSet: Equatable {
+    
+    var createdTime: Date = Date()
+    
+    var start:Date = Date()
+    var end:Date?
+    
+    var dailyQuestions: [String] = []
+
+    var dailyRecordThemeName: String = "stoneTower_0"
+    var backgroundThemeName: String = "stoneTowerBackground_1" //MARK: backgroundSetting 하는 view에서 dailyRecordThemeName에 따라서 선택할 수 있는 backgroundThemeName 제한
+    var dailyRecordColorIndex: Int = 0
+    
+    var termGoals: [String] = []
+    
+    var isHidden: Bool = false
+    var inTrashCan: Bool = false
+    
+    @Relationship(deleteRule:.cascade, inverse: \DailyRecord.dailyRecordSet)
+    var dailyRecords:[DailyRecord]? = []
+    
+    init(start: Date) {
+        self.start = start
+    }
+    
+    
+    static func == (lhs: DailyRecordSet, rhs: DailyRecordSet) -> Bool {
+            return lhs.createdTime == rhs.createdTime
+            // Add any other properties that determine equality
+    }
+    
+    
+}
+
+
+@Model
+final class DailyRecord: Equatable {
+    
+    var createdTime: Date = Date()
+
+//    @Attribute(.unique)
+    var date: Date = Date()
+    
+    @Relationship(deleteRule:.cascade, inverse: \DailyQuest.dailyRecord)
+    var dailyQuestList:[DailyQuest]? = []
+    
+//    @Relationship(deleteRule:.cascade, inverse: \EventCheckBoxData.dailyRecord)
+//    var eventCheckBoxDataList:[EventCheckBoxData] = []
+    
+    var diaryImage: Data?
+    var dailyTextType: String? // diary or inShort
+    var dailyText: String?
+
+    var mood: Int = 0 // facial expression
+    
+    // TODO: change steppedForward into dailyQuestionValue1, dailyQuestionValue2(for subscribers)
+    
+    
+    // TODO: visual value: is determined by the sequence of steppedForward in dailyRecords, and each theme of StoneTower has it's unique function to caculate them, based on the theme's concept and design. Also, when theme changes, the whole visual value will be recalculated to fit it's theme.
+    var questionValue1: Int?
+    var questionValue2: Int?
+    var questionValue3: Int?
+    var visualValue1: Int?
+    var visualValue2: Int?
+    var visualValue3: Int?
+
+    
+    var isFavorite: Bool = false
+    
+    var hide: Bool = false
+    var inTrashCan: Bool = false
+
+    
+    var dailyRecordThemeNum: Int? // stone + background
+    var dailyRecordStoneActionNum: Int?
+    var dailyRecordStoneAccesseryNum: Int?
+    
+    var dailyRecordSet: DailyRecordSet?
     
     init(date:Date) {
-        print("dailRecordinitialization start")
+        print("dailyRecordinitialization start")
         self.date = date
         
-//        self.dailyAccomplishment = DailyAccomplishment(date: self.date)
-        print(dailyAccomplishment == nil)
+
         print("dailyRecordinitialized")
     }
     
     
-
-    
-    func fetchData() -> Void {
-        // update each quest
+    static func == (lhs: DailyRecord, rhs: DailyRecord) -> Bool {
+            return lhs.createdTime == rhs.createdTime
+            // Add any other properties that determine equality
     }
+ 
     
 }
 
@@ -165,223 +312,127 @@ final class DailyRecord {
 
 
 
+//보류! calendar 만들게 되면 만들기
+//@Model
+//class QuestSchedule {
+//    
+//    var questName: String
+//    var dataType: Int
+//    var createdDate: Date
+//    var lock: Bool = true
+//    
+//
+//    var defaultPurposeTags: Set<String> = []
+//    var dailyGoal: Int = 0
+//    var checkDates: [Date] = []
+//    
+//    
+//    // variables below here should go to option of record..?
+//
+//    var adjustedThemeSetName: String = "default1"
+//    
+//
+//    
+////    var achievements
+////    var metaData: RecordMetaData!
+////    var metadata
+////    var statistics
+//
+//    
+//    init(questName:String, dataType: Int) {
+////    init(name in0: String, start in1 : Date, end in2: Date) {
+//
+//        self.questName = questName
+//        self.dataType = dataType
+//        self.createdDate = Date()
+//
+//    
+//    }
+//    
+//    
+//
+//}
 
-@Model
-class Record {
-    
-    var name: String
-    
-    var start: Date
-    var end: Date
-    
-    @Relationship(deleteRule:.cascade, inverse: \Purpose.belongingRecord)
-    var purposes: [Purpose] = [Purpose]()
-    
-    var lock: Bool = true
-    var is_current_record : Bool = false
-    
+// 데이터 구조를 record 바로 아래에 quest로 두고, purpose를 quest 속성으로 만들고, quest를 Purpose별로 정렬하는 함수 만들기 -> View 구성 때 써먹기 위해
 
-    
-    
-    
-    // variables below here should go to option of record..?
+// 외모/지식/건강/지구/가족/공동체/타인/미래(돈?권력?)/취미&재미/모름
 
-    var adjustedModel: String = "default"
-    
-//    var uiData_RecordStone: UIData_RecordStone!
-//    var uiData_CurrentRecord: UIData_CurrentRecord!
-//    var uiData_DailyStones: UIData_DailyStones!
-    
-//    var achievements
-//    var metaData: RecordMetaData!
-//    var metadata
-//    var statistics
-    
-    @Relationship(deleteRule:.cascade, inverse: \DailyRecord.belongingRecord)
-    var dailyRecords: [DailyRecord] = [DailyRecord]()
 
-    
-    init(name: String, start: Date, end: Date) {
-//    init(name in0: String, start in1 : Date, end in2: Date) {
-
-        self.name = name
-        self.start = start
-        self.end = end
-        
-        
-//        for Purpose in Purposes {
-//            Purpose.connectRecord(self)
-//        }
-        
-//         위의 과정과 합쳐놓으면 thread에서 문제 생김(connect 되기전에 start와 end를 넘기려고 함)
-
-//        
-
-    }
-    
-    
-
-}
-
-// 나중에는 상위 그룹으로 한번 더 묶을 수 있게 만들기
-
-@Model
-class Purpose {
-    
-    @Attribute(.unique)
-    var name: String
-    
-    
-    @Relationship(deleteRule:.cascade, inverse:\Quest.belongingPurpose)
-    var quests: [Quest] = [Quest]()
-//    var metaData: PurposeMetaData?
-    var belongingRecord: Record?
-    
-    
-    // variables below here should go to option of Purpose
-    var lock: Bool = true
-    var color: Int?
-    
-
-    init(name in1: String) {
-        name = in1
-        
-
-    }
-    
-
-    
-}
-
+// 만약 Data를 하나의 model로 만든다면? 그리고 dailyRecord를 없애는 거임.
+// quest, purpose(이것 역시 model화), date, value
 
 
 // 커스텀 기능들 제공 (ex: 매일/며칠/특정일(캘린더 통해 선택) 마다 몇 시간/분/회/OX/money)
 // 설정 주기보다 더 자주 한 날은 더 큰 버닝 게이지 제공
 @Model
-class Quest {
+class Quest: Equatable, Identifiable, Hashable {
     
-    @Attribute(.unique)
-    var name: String
-    
-    var data: [Float] = []
-    
-    
-    @Relationship(deleteRule:.cascade,inverse: \QuestOption.belongingQuest)
-    var questOption: QuestOption
-    
-    
-    var checkDate: [Date] = []
-    
-    @Relationship(deleteRule:.cascade)
-    var metaData: QuestMetaData?
-    
-    var belongingPurpose: Purpose?
-    
-    // setting options
-    init(name in1: String, recordPeriod: Int, dataType: Int, goalSetting:Int, goalValue: Float) {
-        name = in1
-        questOption = QuestOption(recordPeriod, dataType, goalSetting, goalValue)
-        metaData = QuestMetaData(input: self)
-        
-    }
-    
+    var createdTime: Date = Date()
 
-
+//    @Attribute(.unique)
+    var name: String = ""
+    var subName: String? //MARK: 아직 사용하지는 않지만, 일단 만들어둠. 쓸까 말까..
+    var dataType: Int = 0
+    var dailyData: [Date:Int] = [:]
     
-    func addData(_ input: Float) -> Void {
-        data.append(input)
-        metaData!.update()
-    }
-    
-
-    
-    // activated after connected to record.
-    func getStartEndDate() -> Void {
-        
-//       questOption.updateDateRelatedData()
-        createCheckDate()
-        questOption.calculateFinalGoal()
-
-    }
-    
-    
-    func createCheckDate() {
-        
-        if questOption.recordPeriod == RecordPeriod.everyDay {
-            var start = self.belongingPurpose!.belongingRecord!.start
-            let end = self.belongingPurpose!.belongingRecord!.start
-            while start <= end {
-                checkDate.append(start)
-                start = Calendar.current.date(byAdding: .day, value: 1, to: start)!
-            }
-        }
-        
-//        Schema.PropertyMetadata(name: <#T##String#>, keypath: <#T##AnyKeyPath#>, defaultValue: <#T##Any?#>)
-        
-    }
-    
-
-    
-    
-
-}
-
-
-@Model
-class QuestOption {
+    var recentData: Int = 0 // DailyQuest 새로 생성 및 수정 시 새로이 수정
+    var freeSetDatas: [Int] = []
     
     var lock: Bool = true
     
+    // 나중에 알림 설정 기능 추가
+    var recentPurpose: Set<String> = []
     
     
     // Default settings
-    var recordPeriod: Int = 0
-    var dataType: Int = 0
-    var goalSetting: Int = 0
-    var goalValue: Float = 0.0
-    // if .setFinalGoal -> finalGoal = goalValue
-    // if .setDailyGoal -> dailyGoal = goalValue
-
+    var customDataTypeNotation: String?
+    var dailyGoal: Int = 0
     
-    var dailyGoal: Float = 0.0 // if .setFinalGoal -> dailyGoal remains as nil
-    var finalGoal: Float = 10.0
+    var comments: [String] = []  // 나중을 위해 일단 만들어둠.
     
-    // 장소 추가
+    var representingData: Int = QuestRepresentingData.cumulativeData
     
+    var isHidden:Bool = false // not used yet.
+    var inTrashCan: Bool = false
     
-    var belongingQuest: Quest?
-    
-
+    var tier: Int = 0 // 0~40
+    //MARK: 0~9: 1시간(회) 10~19: 10시간(회) 10
+    var momentumLevel: Int = 0
+    // normal momentum: 0~10
+    // special momentum: 11~31
     
     
-    init(_ recordPeriod: Int, _ dataType: Int, _ goalSetting: Int, _ goalValue: Float) {
-        self.recordPeriod = recordPeriod
+//    @Relationship(deleteRule:.cascade)
+//    var metaData: QuestMetaData?
+    
+    
+//    // find belongingRecords by startDate
+//    var belongingRecordsStartDate: [Date] = []
+    
+    // setting options
+    init(name: String, dataType: Int) {
+        self.name = name
+        
         self.dataType = dataType
-        self.goalSetting = goalSetting
-        self.goalValue = goalValue
         
-        if dataType == DataType.OX && goalSetting == GoalSetting.setDailyGoal{
-            dailyGoal = goalValue
-            
-        }
-        else if goalSetting == GoalSetting.setFinalGoal {
-            finalGoal = goalValue
-            // dailyGoal stays as nil
-        }
-        else {
-            
-        }
+        
+//        metaData = QuestMetaData(input: self)
+        
+        
+    }
+    
+    static func == (lhs: Quest, rhs: Quest) -> Bool {
+            return lhs.createdTime == rhs.createdTime
+            // Add any other properties that determine equality
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(createdTime)
+        hasher.combine(name)
+        hasher.combine(dailyData)
+            // Add any other properties that should be included in the hash
     }
 
-    
-    
-    // only if .setDailyGoal
-    func calculateFinalGoal() -> Void {
-        if (goalSetting == GoalSetting.setFinalGoal) {return}
-        
-        finalGoal = Float(belongingQuest!.checkDate.count) * dailyGoal
-        return
-    }
     
     func changeLockState() {
         lock.toggle()
@@ -390,23 +441,70 @@ class QuestOption {
 //        else {lock = true}
     }
     
-    func calculateDailyGoal() -> Void {
-        if (goalSetting == GoalSetting.setDailyGoal) {return}
-        
-        dailyGoal = finalGoal / Float(belongingQuest!.checkDate.count)
-        
-        return
-    }
-    // calculate goals automathically...
 
     
+    
+ 
 }
 
 
 
+@Model
+class Profile {
+    
+    var name: String = ""
+    var birthDay: Date = Date.now
+    var email: String = ""
+    
+    // need other cumulative times also..
+    var cumulativeRecordHours: Int = 0 // will be used later..
+    var numberOfDailyRecords: Int = 0
+    //    var cumulativeRecord
+    // unit of sleepingTime: 1 -> 5min, 12 -> 1hour
+    var sleepingTime: Int = 0 // deprecated...
+    
+    var adjustedThemeSetName: String = "default1" // deprecated....
+    
+    
     
 
     
+    init() {
+    
+    }
+}
+
+
+
+final class QuestRepresentingData {
+    
+    static let cumulativeData = 0
+    static let recentMontlyData = 1
+    static let recentYearlyData = 2
+    
+    init() {}
+    
+    static func titleOf(representingData:Int) -> String {
+        if representingData == QuestRepresentingData.cumulativeData {
+            return "누적:"
+        }
+        
+        else if representingData == QuestRepresentingData.recentMontlyData {
+            return "최근 30일:"
+        }
+        else {
+            return "titleOfRepresentingData: Error"
+        }
+    }
+    
+}
+
+
+    
+// 누적데이터 -> (전체/purpose별/quest별)
+// quest별 -> 원래 다 저장되어 있음
+// purpose별, 전체 -> 따로 저장해주어야 함.
+
 
 
 
