@@ -22,19 +22,19 @@ extension Quest {
                 let minus: Int = {
                     switch i {
                     case 0...9:
-                        return 10
+                        return 10 // 1시간
                     case 10...14:
-                        return 60
+                        return 60 // 6시간
                     case 15...19:
-                        return 120
+                        return 120 // 12시간
                     case 20...24:
-                        return 600
+                        return 600 // 60시간
                     case 25...29:
-                        return 1200
+                        return 1200 // 120시간
                     case 30...34:
-                        return 6000
+                        return 6000 // 600시간
                     case 35...39:
-                        return 12000
+                        return 12000 // 1200시간
                     default:
                         return 9999999
                     }

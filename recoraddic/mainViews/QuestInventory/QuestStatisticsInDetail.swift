@@ -92,7 +92,7 @@ struct QuestStatisticsInDetail: View {
                 VStack {
                     Text(selectedQuest!.name)
                         .font(.title)
-                    if let startDate: Date  = selectedQuest!.dailyData.keys.first {
+                    if let startDate: Date  = selectedQuest!.dailyData.keys.sorted().first {
                         Text("시작일: \(yyyymmddFormatOf(startDate))")
                     }
                     Text("진행상황")

@@ -17,9 +17,7 @@ struct StartNewRecordSet:View {
     
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
     
-    var dailyRecordSets_notHidden: [DailyRecordSet] {
-        dailyRecordSets.filter({!$0.isHidden})
-    }
+
     
     @Binding var popUp_startNewRecordSet: Bool
     @Binding var selectedDailyRecordSetIndex: Int
@@ -74,7 +72,7 @@ struct StartNewRecordSet:View {
                                     Button(action:{
                                         selectedDailyRecordThemeName = dailyRecordThemeName
                                         if selectedDailyRecordThemeName == "stoneTower_0" {
-                                            createNewDailyRecordSet()
+                                            createNewDailyRecordSet_withQuestion()
                                             popUp_startNewRecordSet.toggle()
                                         }
                                         else {
@@ -129,7 +127,7 @@ struct StartNewRecordSet:View {
                             .frame(width: geoWidth*0.45, alignment: .leading)
 
                             Button(action:{
-                                createNewDailyRecordSet() // 완료 -> 새로운 dailyRecordSet 생성,
+                                createNewDailyRecordSet_withQuestion() // 완료 -> 새로운 dailyRecordSet 생성,
                                 popUp_startNewRecordSet.toggle()
                             }) {
                                 Text("생성")
@@ -206,7 +204,7 @@ struct StartNewRecordSet:View {
 
     }
     
-    func createNewDailyRecordSet() -> Void {
+    func createNewDailyRecordSet_withQuestion() -> Void {
         
         // 만약 그전에 dailyRecordSet에 dailyRecords가 없다면, 그 전의 것을 지움.(시작 날짜가 같다면, 그 전 것에 dr이 있을리가 없음)
         let newDailyRecordSet: DailyRecordSet
@@ -216,32 +214,73 @@ struct StartNewRecordSet:View {
             newDailyRecordSet.start = getDateOfNow()
             newDailyRecordSet.dailyQuestions = []
             
+            // newDailyRecordSet 생성, 설정해준 값들 넣어주기(DRThemeName, questions)
+            newDailyRecordSet.dailyRecordThemeName = selectedDailyRecordThemeName!
+            newDailyRecordSet.dailyQuestions.append(question1)
+            if numberOfQuestions >= 2 {newDailyRecordSet.dailyQuestions.append(question2)}
+            if numberOfQuestions == 3 {newDailyRecordSet.dailyQuestions.append(question3)}
+            
             
         }
         
         else {
             
-            newDailyRecordSet = DailyRecordSet(start: getDateOfNow())
-            // 그 전 DRS end date 설정
-            dailyRecordSets.last!.end = dailyRecordSets.last!.dailyRecords!.sorted(by: { dr1, dr2 in
+            let prev_drs_end: Date = dailyRecordSets.last!.dailyRecords!.sorted(by: { dr1, dr2 in
                 dr1.date < dr2.date
             }).last!.date
             
+            dailyRecordSets.last!.end = prev_drs_end
+
+            let new_drs_start: Date
+            if prev_drs_end == getDateOfNow() {//MARK: 만약 오늘저장한 dr이 이미 이전의 drs에 저장된 상태에서 새로운 drs를 만든다면?
+                new_drs_start = Calendar.current.date(byAdding: .day, value: 1, to: prev_drs_end)!
+            }
+            else {
+                new_drs_start = getDateOfNow()
+            }
+            
+            newDailyRecordSet = DailyRecordSet(start: new_drs_start)
+            
             modelContext.insert(newDailyRecordSet)
+            
+            let dailyRecordSets_notHidden_count:Int = dailyRecordSets.filter({!$0.isHidden}).count
+            
+            // newDailyRecordSet 생성, 설정해준 값들 넣어주기(DRThemeName, questions)
+            newDailyRecordSet.dailyRecordThemeName = selectedDailyRecordThemeName!
+            newDailyRecordSet.dailyQuestions.append(question1)
+            if numberOfQuestions >= 2 {newDailyRecordSet.dailyQuestions.append(question2)}
+            if numberOfQuestions == 3 {newDailyRecordSet.dailyQuestions.append(question3)}
+            
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) { // 빠르게 바꾸면, insert되어서 반영되기 전에 해당 코드가 실행된다. SwiftData의 modelContext는 독립적인 flow로 작동하기 때문에 기다려 새로운 내용이 저장되기 전에 읽으려고 하면 곧바로 작동하지 않는다.
+                selectedDailyRecordSetIndex = dailyRecordSets_notHidden_count - 1 // onChangeOf..
+            }
             
         }
         
-        // newDailyRecordSet 생성, 설정해준 값들 넣어주기(DRThemeName, questions)
-        newDailyRecordSet.dailyRecordThemeName = selectedDailyRecordThemeName!
-        newDailyRecordSet.dailyQuestions.append(question1)
-        if numberOfQuestions >= 2 {newDailyRecordSet.dailyQuestions.append(question2)}
-        if numberOfQuestions == 3 {newDailyRecordSet.dailyQuestions.append(question3)}
+//        // newDailyRecordSet 생성, 설정해준 값들 넣어주기(DRThemeName, questions)
+//        newDailyRecordSet.dailyRecordThemeName = selectedDailyRecordThemeName!
+//        newDailyRecordSet.dailyQuestions.append(question1)
+//        if numberOfQuestions >= 2 {newDailyRecordSet.dailyQuestions.append(question2)}
+//        if numberOfQuestions == 3 {newDailyRecordSet.dailyQuestions.append(question3)}
         
+        
+//        DispatchQueue.main.asyncAfter(deadline: .now()+0.3) { // 빠르게 바꾸면, insert되어서 반영되기 전에 해당 코드가 실행된다. SwiftData의 modelContext는 독립적인 flow로 작동하기 때문에 기다려 새로운 내용이 저장되기 전에 읽으려고 하면 곧바로 작동하지 않는다.
+//            let dailyRecordSets_notHidden_count:Int = dailyRecordSets.filter({!$0.isHidden}).count
+//            
+//
+//            if selectedDailyRecordSetIndex == dailyRecordSets_notHidden_count - 1 {
+//                updateSelectedDailyRecordSet = true
+//                print(selectedDailyRecordSetIndex)
+//                print("index didn't change")
+//            }
+//            else {
+//                selectedDailyRecordSetIndex = dailyRecordSets_notHidden_count - 1 // onChangeOf..
+//                print(selectedDailyRecordSetIndex)
+//                print("index changed")
+//            }
+//        }
         
 
-    
-        selectedDailyRecordSetIndex = dailyRecordSets_notHidden.count - 1 // onChangeOf..
-        updateSelectedDailyRecordSet = true
         
 //        let newDailyRecordSet = Daily
     }

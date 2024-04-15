@@ -113,7 +113,7 @@ struct QuestCheckBoxView: View {
 
     
     @State var value: Int
-    var width: CGFloat
+//    var width: CGFloat
     var range: ClosedRange<CGFloat> {
         return 0.0...CGFloat(dailyQuest.dailyGoal)
     }
@@ -399,6 +399,57 @@ struct QuestCheckBoxView: View {
 
 
 
+struct EmptyQuestCheckBoxView: View {
+
+    @Environment(\.colorScheme) var colorScheme
+
+    
+    var ratio: CGFloat
+
+    var body: some View {
+        
+        
+        GeometryReader { geometry in
+            
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            
+            var xOffset: CGFloat = max(0.0, min(geoWidth*ratio,geoWidth))
+            
+            let percentage = xOffset / geoWidth
+            let brightness = percentage + 0.1
+
+
+            ZStack(alignment:.leading) {
+                
+                Color.red.opacity(0.0)
+                
+                Rectangle()
+                    .frame(width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth + 0.1) ? xOffset : 0.0, height: geoHeight)
+                    // MARK: 0.1을 넣지 않으면 xOffset이 geoWidth보다 커지는 상황 발생... 왤까?
+                    .clipShape(.buttonBorder)
+                    .foregroundStyle(.black.adjust(brightness:brightness))
+                
+                
+
+                
+            } // zstack
+            .frame(width: geometry.size.width, height: geometry.size.height)
+            .background(.black.adjust(brightness:0.3))
+            .clipShape(.buttonBorder)
+
+
+        } // geometryReader
+
+
+
+    }
+
+
+
+
+
+}
 
 
 extension CGFloat {

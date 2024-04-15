@@ -78,6 +78,7 @@ struct AddDailyQuestView: View {
                                                 addDailyQuest_OX(quest)
                                                 popUp_addDailyQuest.toggle()
                                             }
+                                            .buttonStyle(.plain)
                                         }
                                         else {
                                             NavigationLink(quest.name, value: quest)
@@ -210,7 +211,7 @@ struct SetValueForDailyQuest: View {
             
                 if !useFreeSets {
                     HStack {
-                        Text("목표:")
+//                        Text("목표:")
                         if selectedQuest.dataType == DataType.HOUR {
                             DialForHours_setValue(value: $value)
                             //                                .frame()
@@ -227,6 +228,9 @@ struct SetValueForDailyQuest: View {
                                 .onChange(of: value_String) {value = Int(value_String) ?? 0}
                                 
                             Text(DataType.unitNotationOf(dataType: selectedQuest.dataType, customDataTypeNotation: selectedQuest.customDataTypeNotation))
+                                .minimumScaleFactor(0.5)
+                                .lineLimit(1)
+                            
                                 
                         }
                     }
@@ -543,6 +547,8 @@ struct DialForHours_addFreeSet: View {
 
     var body: some View {
         GeometryReader { geometry in
+            let geoWidth: CGFloat = geometry.size.width
+            let geoHeight: CGFloat = geometry.size.height
             VStack {
                 
                 ZStack {
@@ -568,9 +574,8 @@ struct DialForHours_addFreeSet: View {
                 .padding(.top, 10)
 //                .border(.red)
                 
-                HStack {
+                HStack(spacing:0.0) {
                     
-                    Text("목표:")
                     
                     Picker(selection: $naturalPart, label: Text("First Value")) {
                         ForEach(0..<25) { i in
@@ -590,6 +595,8 @@ struct DialForHours_addFreeSet: View {
                     .clipped()
                     .pickerStyle(.wheel)
                     Text("시간")
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
                     
                     
                 }
@@ -612,6 +619,7 @@ struct DialForHours_addFreeSet: View {
                 value = naturalPart*10  + firstDecimalPart
 
             }
+            .frame(height: geoHeight)
             // hour아닌것도 만들기
 
         }

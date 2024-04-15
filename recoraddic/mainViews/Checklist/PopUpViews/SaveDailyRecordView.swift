@@ -78,6 +78,15 @@ struct SaveDailyRecordView: View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
         
+//        let facialExpressionColor: Color = {
+//            if colorScheme == .dark {
+//                return reversedColorSchemeColor.adjust(brightness: -0.)
+//            }
+//            else {
+//                return reversedColorSchemeColor
+//            }
+//        }()
+//        
 //        let askQuestions: Bool =
         
         GeometryReader { geometry in
@@ -156,6 +165,7 @@ struct SaveDailyRecordView: View {
                                                 .frame(width:VGridSize*0.7, height: VGridSize*0.7)
                                         }
                                         .frame(width:VGridSize, height: VGridSize)
+                                        .opacity(0.6)
                                         .background(selectedFacialExpressionNum == index ? Color.blue : colorSchemeColor)                                          .clipShape(.rect(cornerRadius: VGridSize*0.05))
                                         .shadow(radius: 1)
                                         .border(reversedColorSchemeColor, width: /* border width */ 1)

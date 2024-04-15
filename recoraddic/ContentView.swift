@@ -5,7 +5,6 @@
 //  Created by 김지호 on 2023/06/11.
 //
 
-
 // make configuration of some features, such as the view's size for each device
 // TODO: network연결 끊기면 DR 저장 불가능하게 하기
 // TODO: 지속적으로 화면 상태 초기화해서 데이터 동기화된 것 바로 적용하기
@@ -29,6 +28,9 @@ enum MainViewName {
     case profileAndSettings
     
 }
+
+let sampleData: Bool = true
+
 
 // MARK: cloud 연결확인 코드 후보3
 class NetworkMonitor: ObservableObject {
@@ -117,8 +119,12 @@ struct ContentView: View {
                              }
                              if dailyRecords.count == 0 || dailyRecordSets.count == 0 {
                                  // put functions that you wanna set as default data for debug
-//                                 situation_YesterdayDataRemains()
-                                 defaultInitialization()
+                                 if sampleData {
+                                     situation_YesterdayDataRemains()
+                                 }
+                                 else {
+                                     defaultInitialization()
+                                 }
                              }
                              if defaultPurposeDatas.count == 0 {
                                  for defaultPurpose in recoraddic.defaultPurposes {

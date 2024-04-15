@@ -76,7 +76,12 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             ZStack {
                 
                 if !recalculatingVisualValues_themeChanged {
-                    if selectedDailyRecordSet.dailyRecordThemeName == "stoneTower_0" {
+                    if updateSelectedDailyRecordSet {
+                        Text("변경중")
+                        // MARK: 없으면 drs바뀔 때 이전 drs의 theme이 바뀐 drs에 적용되는 경우가 생김 -> 에러 가능성 up (실제로 질문 없는 DRS에 질문있는 theme이 적용되면 에러 발생)
+                        // TODO: 변경 시 눈에 안보일 정도로 빠르게 지나가지만 오래걸린다면? -> 자연스러운 view로 바꾸기
+                    }
+                    else if selectedDailyRecordSet.dailyRecordThemeName == "stoneTower_0" {
                         StoneTower_0(
                             dailyRecordSet: $selectedDailyRecordSet,
                             selectedDailyRecordSetIndex: $selectedDailyRecordSetIndex,
@@ -113,9 +118,9 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     Text("변경하는 중..")
                 }
                 
-                let noSavedDailyRecords: Bool = selectedDailyRecordSet.dailyRecords?.filter({$0.visualValue1 != nil}).count == 0
+                let noSavedDailyRecords_notHidden: Bool = selectedDailyRecordSet.dailyRecords?.filter({$0.visualValue1 != nil && !$0.hide}).count == 0
                 
-                if noSavedDailyRecords && selectedDailyRecordSetIndex == dailyRecordSets_notHidden.count - 1 && !isEditingTermGoals {
+                if noSavedDailyRecords_notHidden && selectedDailyRecordSetIndex == dailyRecordSets_notHidden.count - 1 && !isEditingTermGoals {
                     VStack {
                         HStack {
                             Text("매일매일의 기록을 저장하세요!")
@@ -149,7 +154,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                         .position(x:geoWidth/2,y: statusBarHeight + (geoHeight-statusBarHeight)/2 )
                 }
                 
-                if popUp_changeStyle {
+                if popUp_changeStyle { //TODO: 나중에는 theme에 관계없이 통일된 popup창 -> 동일한 theme내에서 색만 변경 가능, 질문 있는 theme -> 질문없는 theme으로 변경 가능(경고메시지), 질문 있는 theme -> 질문 있는 theme, 질문 없는 theme -> 질문 없는 theme 기능 제공
                     Color.gray.opacity(0.5)
                         .onTapGesture {
                             popUp_changeStyle.toggle()
@@ -194,9 +199,11 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             updateSelectedDailyRecordSet = true
         }
         .onChange(of: updateSelectedDailyRecordSet) {
-            selectedDailyRecordSet = dailyRecordSets_notHidden[selectedDailyRecordSetIndex]
-            updateSelectedDailyRecordSet = false // MARK: onChange 클로저 안에서는 본인의 변화를 detect하지 않는 것 같다. 무한 루프가 생성되지 않는다. 바꿔줘도 됨.
-            selectedRecord = nil
+            if updateSelectedDailyRecordSet {
+                selectedDailyRecordSet = dailyRecordSets_notHidden[selectedDailyRecordSetIndex]
+                updateSelectedDailyRecordSet = false // MARK: onChange 클로저 안에서는 본인의 변화를 detect하지 않는 것 같다. 무한 루프가 생성되지 않는다. 바꿔줘도 됨.
+                selectedRecord = nil
+            }
             
         }
         .onChange(of: dailyRecordSetHidden) {
@@ -206,7 +213,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             updateSelectedDailyRecordSet = true
         }
 
-        .onChange(of: isNewDailyRecordAdded, {
+        .onChange(of: isNewDailyRecordAdded, { // 
             
             selectedDailyRecordSetIndex = dailyRecordSets_notHidden.count - 1
         })

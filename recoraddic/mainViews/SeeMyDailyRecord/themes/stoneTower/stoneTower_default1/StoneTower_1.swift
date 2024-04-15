@@ -239,9 +239,6 @@ struct StoneTower_1: View {
                                         Button(action:{
                                             
                                             selectedDailyRecordSetIndex -= 1
-                                            
-                                            
-                                            
                                             isEditingTermGoals = false
                                         }) {
                                             Image(systemName: "arrowshape.left")

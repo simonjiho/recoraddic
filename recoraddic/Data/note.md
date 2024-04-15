@@ -51,3 +51,6 @@ inverse 관계 없을 때:
 - inverse 설정의 장점: .delete하면 modelContainer에서 inverse로 관련된 모든 곳에서 사라진다. 그러나 리스트에서 없애면(remove), modelContainer에서는 안사라진다.
 
 - modelContext is strong: it tracks the changes of data that is used as input of the external function from the View.
+
+
+- modelContext apply the changes asynchronously,which causes undefined result if the main thread tries to approach the data from modelContext. it may need time interval to adjust the changes and execute the code appropriately. 

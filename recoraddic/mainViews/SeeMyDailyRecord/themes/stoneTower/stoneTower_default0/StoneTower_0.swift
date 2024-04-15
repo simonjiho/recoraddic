@@ -195,9 +195,7 @@ struct StoneTower_0: View {
                                             let position:Int = record.visualValue3!
                                             
                                             ZStack {
-                                                StoneTower_1_stone(
-                                                    shapeNum: shapeNum,
-                                                    brightness: brightness,
+                                                StoneTower_0_stone(
                                                     defaultColorIndex: defaultColorIndex,
                                                     facialExpressionNum: record.mood
                                                 )

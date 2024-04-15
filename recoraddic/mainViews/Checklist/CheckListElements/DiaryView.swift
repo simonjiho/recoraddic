@@ -559,11 +559,13 @@ struct DiaryView_WholeContent: View {
             
                 
                 VStack(spacing:0.0) {
+                    
                     Image(systemName: "book.closed.fill")
                         .resizable()
                         .frame(width:iconWidth, height: iconHeight)
                         .foregroundStyle(getReversedColorSchemeColor(colorScheme))
                         .padding(.vertical, 10)
+                    
                     
                     ScrollView {
                         Text("\(diaryText)")
