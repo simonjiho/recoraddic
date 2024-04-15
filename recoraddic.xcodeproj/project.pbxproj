@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B2030E052BCCF0F600CE0EDF /* StoneTower_0_stone.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2030E042BCCF0F600CE0EDF /* StoneTower_0_stone.swift */; };
 		B20902302B94577700B26E8B /* recalculateVisualValues_drs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B209022F2B94577700B26E8B /* recalculateVisualValues_drs.swift */; };
 		B2102B142BA5CCCD0041C8FB /* QuestStatisticsInDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2102B132BA5CCCD0041C8FB /* QuestStatisticsInDetail.swift */; };
 		B220DA2E2B612EB60039160C /* colorFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA2D2B612EB60039160C /* colorFunc.swift */; };
@@ -67,13 +68,13 @@
 		B2E1AB712B24D6E300EBF359 /* TextFieldForHour.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E1AB702B24D6E300EBF359 /* TextFieldForHour.swift */; };
 		B2E552282BC297A400ACA5A8 /* StoneTower_0.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E552272BC297A400ACA5A8 /* StoneTower_0.swift */; };
 		B2E5522B2BC2989000ACA5A8 /* stoneTower_shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E5522A2BC2989000ACA5A8 /* stoneTower_shared.swift */; };
-		B2E5522D2BC29CC300ACA5A8 /* StoneTower_0_stone.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E5522C2BC29CC300ACA5A8 /* StoneTower_0_stone.swift */; };
 		B2E5522F2BC29E2700ACA5A8 /* StoneTower_0_sharedFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E5522E2BC29E2700ACA5A8 /* StoneTower_0_sharedFunc.swift */; };
 		B2FB22002B1367DC00AB17FA /* buttonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2FB21FF2B1367DC00AB17FA /* buttonsView.swift */; };
 		B2FB726F2A8762810012EBE1 /* customArrayFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2FB726E2A8762810012EBE1 /* customArrayFunc.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B2030E042BCCF0F600CE0EDF /* StoneTower_0_stone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower_0_stone.swift; sourceTree = "<group>"; };
 		B209022F2B94577700B26E8B /* recalculateVisualValues_drs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recalculateVisualValues_drs.swift; sourceTree = "<group>"; };
 		B2102B132BA5CCCD0041C8FB /* QuestStatisticsInDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestStatisticsInDetail.swift; sourceTree = "<group>"; };
 		B220DA2D2B612EB60039160C /* colorFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = colorFunc.swift; sourceTree = "<group>"; };
@@ -140,7 +141,6 @@
 		B2E1AB702B24D6E300EBF359 /* TextFieldForHour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldForHour.swift; sourceTree = "<group>"; };
 		B2E552272BC297A400ACA5A8 /* StoneTower_0.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower_0.swift; sourceTree = "<group>"; };
 		B2E5522A2BC2989000ACA5A8 /* stoneTower_shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stoneTower_shared.swift; sourceTree = "<group>"; };
-		B2E5522C2BC29CC300ACA5A8 /* StoneTower_0_stone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower_0_stone.swift; sourceTree = "<group>"; };
 		B2E5522E2BC29E2700ACA5A8 /* StoneTower_0_sharedFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower_0_sharedFunc.swift; sourceTree = "<group>"; };
 		B2F758A82B812FB2002A3B80 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B2FB21FF2B1367DC00AB17FA /* buttonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = buttonsView.swift; sourceTree = "<group>"; };
@@ -388,8 +388,8 @@
 			isa = PBXGroup;
 			children = (
 				B2E552272BC297A400ACA5A8 /* StoneTower_0.swift */,
-				B2E5522C2BC29CC300ACA5A8 /* StoneTower_0_stone.swift */,
 				B2E5522E2BC29E2700ACA5A8 /* StoneTower_0_sharedFunc.swift */,
+				B2030E042BCCF0F600CE0EDF /* StoneTower_0_stone.swift */,
 			);
 			path = stoneTower_default0;
 			sourceTree = "<group>";
@@ -488,6 +488,7 @@
 				B265D2852B049FBA002E51A8 /* theme.swift in Sources */,
 				B220DA2E2B612EB60039160C /* colorFunc.swift in Sources */,
 				B2E5522B2BC2989000ACA5A8 /* stoneTower_shared.swift in Sources */,
+				B2030E052BCCF0F600CE0EDF /* StoneTower_0_stone.swift in Sources */,
 				B2E1AB712B24D6E300EBF359 /* TextFieldForHour.swift in Sources */,
 				B283397D2AFB97E9009AEB2A /* calendarFunc.swift in Sources */,
 				B2D7AD082B9451920045C9EA /* StartNewRecordSet.swift in Sources */,
@@ -512,7 +513,6 @@
 				B29C702E2A35C5E30046873E /* recoraddicApp.swift in Sources */,
 				B2BA89102B36BDC600A3D50E /* SaveDailyRecordView.swift in Sources */,
 				B265D26C2B032D30002E51A8 /* randomColorFunc.swift in Sources */,
-				B2E5522D2BC29CC300ACA5A8 /* StoneTower_0_stone.swift in Sources */,
 				B260A3942A9B8B8F00D73208 /* MainView_QuestInventory.swift in Sources */,
 				B2BA890A2B32E0EB00A3D50E /* DiaryView.swift in Sources */,
 				B27CBB592BA41E6C00CD6CD3 /* recalculateVisualValues_dr.swift in Sources */,
