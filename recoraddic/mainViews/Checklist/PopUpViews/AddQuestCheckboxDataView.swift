@@ -22,7 +22,7 @@ struct AddDailyQuestView: View {
         quests.filter({!$0.isHidden})
     }
     
-    var recordOfToday: DailyRecord
+    var currentDailyRecord: DailyRecord
     
     @Binding var popUp_addDailyQuest: Bool
     @Binding var selectedView: MainViewName
@@ -68,7 +68,7 @@ struct AddDailyQuestView: View {
                 ZStack {
                     //                    if step == 0 {
                     VStack {
-                        Text("추가할 일일퀘스트를 고르세요")
+                        Text("추가할 누적 퀘스트를 고르세요")
                         NavigationStack(path: $path ) {
                             List {
                                 Section {
@@ -89,7 +89,7 @@ struct AddDailyQuestView: View {
 //                                NavigationLink("새로운 퀘스트", value:newQuest)
                             }
                             .navigationDestination(for: Quest.self) { quest in
-                                SetValueForDailyQuest(recordOfToday: recordOfToday, selectedQuest: quest, popUp_addDailyQuest: $popUp_addDailyQuest, isDone: isDone)
+                                SetValueForDailyQuest(recordOfToday: currentDailyRecord, selectedQuest: quest, popUp_addDailyQuest: $popUp_addDailyQuest, isDone: isDone)
                             }
 
                         }
@@ -114,9 +114,11 @@ struct AddDailyQuestView: View {
             data: 0,
             dataType: quest.dataType,
             defaultPurposes: quest.recentPurpose,
-            dailyGoal: 1)
+            dailyGoal: 1
+        )
         
-        dailyQuest.dailyRecord = recordOfToday
+        dailyQuest.dailyRecord = currentDailyRecord
+        dailyQuest.currentTier = quest.tier
         modelContext.insert(dailyQuest)
     }
     
@@ -358,28 +360,6 @@ struct SetValueForDailyQuest: View {
                     })
                 }
 
-//                HStack(spacing: 10) {
-//                    Toggle(isOn: $useFreeSets, label: {
-//                        Text("프리셋 사용")
-//                            .font(.caption)
-//                    })
-//                    .frame(width: geoWidth*0.3)
-////                    .background(.teal)
-//                    .toggleStyle(.button)
-//                    .clipShape(.rect(cornerSize: CGSize(width: geoWidth*0.02, height: geoWidth*0.02*0.3)))
-//                    
-//                    Toggle(isOn: $isPlan) {
-//                        Text("달성")
-//                            .font(.caption)
-//                    }
-//                    .frame(width: geoWidth*0.3)
-////                    .background(.teal)
-//                    .clipShape(.rect(cornerSize: CGSize(width: geoWidth*0.02, height: geoWidth*0.02*0.3)))
-//
-//                }
-//                .padding(.horizontal,geoWidth*0.2)
-//                .padding(.vertical,10)
-
                 Button("생성") {
                     
                     if useFreeSets {
@@ -415,12 +395,14 @@ struct SetValueForDailyQuest: View {
             data: isDone ? data : 0,
             dataType: selectedQuest.dataType,
             defaultPurposes: selectedQuest.recentPurpose,
-            dailyGoal: data)
+            dailyGoal: data
+        )
         
         if selectedQuest.dataType == DataType.CUSTOM {
             dailyQuest.customDataTypeNotation = selectedQuest.customDataTypeNotation
         }
         dailyQuest.dailyRecord = recordOfToday
+        dailyQuest.currentTier = selectedQuest.tier
         modelContext.insert(dailyQuest)
     }
 }

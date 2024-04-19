@@ -78,6 +78,9 @@ struct MainView_QuestInventory: View {
                                                 quest.isHidden = true
                                             }
                                         }))
+                                        .onAppear() {
+                                            quest.updateMomentumLevel()
+                                        }
                     
                                         
                                         
@@ -144,6 +147,7 @@ struct MainView_QuestInventory: View {
                         .shadow(color:shadowColor, radius: 3.0)
                 }
             }
+
         } // geometryRecord
         
 
@@ -155,96 +159,31 @@ struct MainView_QuestInventory: View {
 struct QuestTierView: View {
     
     @Environment (\.colorScheme) var colorScheme
-    @Environment (\.modelContext) var modelContext
+//    @Environment (\.modelContext) var modelContext
     
     @Binding var tier: Int
     
-    let iron = Color.black.adjust(brightness: 0.5)
-    let bronze = Color.brown.adjust(brightness: 0.0)
-    let silver = Color.gray.adjust(brightness:0.2) //
-    let gold = Color.brown.adjust(brightness:0.37) //
-    let platinum = Color.blue.adjust(saturation:-0.5, brightness:0.5) //
-    let diamond = Color.cyan.adjust(saturation:-0.57, brightness:0.2) //
-    let master = Color(red: 0.3, green: 0.5, blue: 1.0).adjust(brightness:0) //
-    let superMaster = Color(red: 0.46, green: 0.4, blue: 0.9).adjust(brightness:0.7)
-    let grandMaster = Color.gray.adjust(brightness:0.25) // 무지개
+
     
     var body: some View {
         
         let shadowColor:Color = getShadowColor(colorScheme)
         
-        let tierColor:Color = {
-            switch tier/5 {
-            case 0:
-                return iron
-            case 1:
-                return bronze
-            case 2:
-                return silver
-            case 3:
-                return gold
-            case 4:
-                return platinum
-            case 5:
-                return diamond
-            case 6:
-                return master
-            case 7:
-                return superMaster
-            case 8:
-                return grandMaster
-            default:
-                return Color.black
-            }
-            
-        }()
+        let tierColor:Color = getTierColorOf(tier: tier)
         
-        let nextTierColor: Color = {
-            switch tier/5 {
-            case 0:
-                return bronze
-            case 1:
-                return silver
-            case 2:
-                return gold
-            case 3:
-                return platinum
-            case 4:
-                return diamond
-            case 5:
-                return master
-            case 6:
-                return superMaster
-            case 7:
-                return grandMaster
-            case 8:
-                return grandMaster
-            default:
-                return Color.black
-            }
-            
-        }()
+        let nextTierColor: Color = getTierColorOf(tier: tier+5)
         
         
-        
-        let tierColor_bright:Color = tier/5 != 4 ? tierColor.adjust(brightness: 0.2) : tierColor.adjust(brightness: 0.35)
+        let tierColor_bright:Color = getBrightTierColorOf2(tier: tier)
         let tierColor_frame1:Color = tierColor_bright.adjust(brightness: 0.05)
         let tierColor_frame2:Color = tierColor.adjust(brightness: -0.05)
         
         let currentTierColor_frame:Color = tierColor.adjust(brightness: 0.1)
         let nextTierColor_frame:Color = nextTierColor.adjust(brightness: 0.1)
-        //        let nextTierColor_frame2:Color = tierColor.adjust(brightness: -0.05)
+
         
         let colorsForGradient: [Color] = {
             switch tier%5 {
-            case 0:
-                return [tierColor_frame1, tierColor_frame2, tierColor_frame1, tierColor_frame2, tierColor_frame1]
-            case 1:
-                return [tierColor_frame1, tierColor_frame2, tierColor_frame1, tierColor_frame2, tierColor_frame1]
-            case 2:
-                return [tierColor_frame1, tierColor_frame2, tierColor_frame1, tierColor_frame2, tierColor_frame1]
-            case 3:
-                return [tierColor_frame1, tierColor_frame2, tierColor_frame1, tierColor_frame2, tierColor_frame1]
             case 4:
                 return [currentTierColor_frame, nextTierColor_frame, currentTierColor_frame, nextTierColor_frame, currentTierColor_frame]
             default:
@@ -279,7 +218,7 @@ struct QuestTierView: View {
             
             ZStack {
                 tierViewFrame
-                    .fill(LinearGradient(colors: [tierColor, tierColor_bright, tierColor], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .fill(LinearGradient(colors: getTierColorsOf(tier: tier, type:1), startPoint: .topLeading, endPoint: .bottomTrailing))
                 
                 RotatingGradient(level: tier%5, colors: colorsForGradient)
                     .frame(width:(geoWidth+strokeWidth*2)*1.5, height: (geoHeight+strokeWidth*2)*1.5)
@@ -289,16 +228,14 @@ struct QuestTierView: View {
                             .stroke(lineWidth: strokeWidth)
                             .frame(width:geoHeight+strokeWidth/2, height: geoHeight+strokeWidth/2)
                     }
-//                tierViewFrame
-//                    .stroke(lineWidth: strokeLineWidth)
-//                //                .fill(background)
-//                    .fill(LinearGradient(colors: [tierColor_bright,  tierColor,tierColor_bright], startPoint: .bottomTrailing, endPoint: .topLeading))
-                // stroke밝기를 라이트 다크모드에 따라 다르게?
+
                 
                 
             }
             .frame(width: geoWidth, height: geoHeight)
-            .shadow(color: shadowColor, radius: 1)
+//            .shadow(color: shadowColor, radius: 1)
+//            .shadow(color: getTierColorOf(tier: tier).adjust(brightness: -0.3), radius: 1)
+
 
 
         }
@@ -586,15 +523,81 @@ struct QuestThumbnailView_forPreview: View {
     }
 }
 //
-//#Preview(body: {
-//    QuestThumbnailView_forPreview(
-//        name: "운동",
-//        tier: 23,
-//        momentumLevel: 7,
-//        cumulativeVal: "1000.0",
-//        unitNotation: "시간")
-//        .frame(width: 100, height: 100)
-//})
+#Preview(body: {
+    HStack {
+        VStack {
+            QuestThumbnailView_forPreview(
+                name: "운동",
+                tier: 0,
+                momentumLevel: 7,
+                cumulativeVal: "1000.0",
+                unitNotation: "시간")
+            .frame(width: 100, height: 100)
+            QuestThumbnailView_forPreview(
+                name: "운동",
+                tier: 5,
+                momentumLevel: 7,
+                cumulativeVal: "1000.0",
+                unitNotation: "시간")
+            .frame(width: 100, height: 100)
+            QuestThumbnailView_forPreview(
+                name: "운동",
+                tier: 10,
+                momentumLevel: 7,
+                cumulativeVal: "1000.0",
+                unitNotation: "시간")
+            .frame(width: 100, height: 100)
+            QuestThumbnailView_forPreview(
+                name: "운동",
+                tier: 15,
+                momentumLevel: 7,
+                cumulativeVal: "1000.0",
+                unitNotation: "시간")
+            .frame(width: 100, height: 100)
+            QuestThumbnailView_forPreview(
+                name: "운동",
+                tier: 20,
+                momentumLevel: 7,
+                cumulativeVal: "1000.0",
+                unitNotation: "시간")
+            .frame(width: 100, height: 100)
+
+        }
+        VStack {
+            QuestThumbnailView_forPreview(
+                name: "운동",
+                tier: 25,
+                momentumLevel: 7,
+                cumulativeVal: "1000.0",
+                unitNotation: "시간")
+            .frame(width: 100, height: 100)
+            QuestThumbnailView_forPreview(
+                name: "운동",
+                tier: 30,
+                momentumLevel: 7,
+                cumulativeVal: "1000.0",
+                unitNotation: "시간")
+            .frame(width: 100, height: 100)
+            QuestThumbnailView_forPreview(
+                name: "운동",
+                tier: 35,
+                momentumLevel: 7,
+                cumulativeVal: "1000.0",
+                unitNotation: "시간")
+            .frame(width: 100, height: 100)
+            QuestThumbnailView_forPreview(
+                name: "운동",
+                tier: 40,
+                momentumLevel: 7,
+                cumulativeVal: "1000.0",
+                unitNotation: "시간")
+            .frame(width: 100, height: 100)
+
+        }
+        
+    }
+
+})
 
 
 struct RotatingGradient: View {
@@ -618,54 +621,24 @@ struct RotatingGradient: View {
             default: return 1.0
             }
         }()
-
-        
-        Circle()
-            .fill(
-                AngularGradient(gradient: Gradient(colors: colors), center: .center)
-            )
-            .scaleEffect(0.9)
-            .rotationEffect(.degrees(isRotating ? 360 : 0))
-            .animation(Animation.linear(duration: duration).repeatForever(autoreverses: false))
-            .onAppear() {
-                self.isRotating = true
-            }
+        GeometryReader { geometry in
+            
+            Circle()
+                .fill(
+                    AngularGradient(gradient: Gradient(colors: colors), center: .center)
+                )
+                .scaleEffect(0.9)
+                .position(CGPoint(x:geometry.size.width/2, y:geometry.size.height/2))
+//                .rotationEffect(.degrees(isRotating ? 360 : 0), anchor: .center)
+                .animation(.linear(duration: duration).repeatForever(autoreverses: false), body: { a in
+                    a.rotationEffect(.degrees(isRotating ? 360 : 0), anchor: .center)
+                })
+//                .animation(Animation.linear(duration: duration).repeatForever(autoreverses: false))
+                .onAppear() {
+                    self.isRotating = true
+                }
+        }
     }
 }
 
-//struct BorderView: View {
-//    let level: Int
-//    var body: some View {
-//        GeometryReader { geometry in
-//            
-//            let geoWidth: CGFloat = geometry.size.width
-//            let geoHeight: CGFloat = geometry.size.height
-//            let strokeWidth: CGFloat = {
-//                switch level {
-//                case 0:
-//                    return 0.0
-//                case 1:
-//                    return geoWidth*0.04
-//                case 2:
-//                    return geoWidth*0.06
-//                case 3:
-//                    return geoWidth*0.09
-//                case 4:
-//                    return geoWidth*0.12
-//                default:
-//                    return 0.0
-//                }
-//            }()
-////            let strokeWidth: CGFloat = geoWidth*0.03*CGFloat(level)
-//            RotatingGradient(level: level)
-//                .frame(width:(geoWidth+strokeWidth*2)*1.5, height: (geoHeight+strokeWidth*2)*1.5)
-//                .position(x:geoWidth/2, y:geoHeight/2)
-//                .mask {
-//                    RoundedRectangle(cornerSize: CGSize(width: 10, height: 10))
-//                        .stroke(lineWidth: strokeWidth)
-//                        .frame(width:geoHeight+strokeWidth/2, height: geoHeight+strokeWidth/2)
-//                }
-//                .border(.red)
-//        }
-//    }
-//}
+

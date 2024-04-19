@@ -40,6 +40,130 @@ extension Color { // hue: 색조 , saturation: 채도
     }
 }
 
+func getTierColorOf(tier:Int) -> Color {
+    let iron = Color.black.adjust(brightness: 0.5)
+    let bronze = Color.brown.adjust(brightness: 0.0)
+    let silver = Color.gray.adjust(brightness:0.2) //
+    let gold = Color.brown.adjust(brightness:0.37) //
+    let platinum = Color.blue.adjust(saturation:-0.5, brightness:0.4) //
+    let diamond = Color.cyan.adjust(saturation:-0.57, brightness:0.2) //
+    let master = Color(red: 0.3, green: 0.5, blue: 1.0).adjust(brightness:0.2) //
+    let superMaster = Color(red: 0.46, green: 0.4, blue: 0.9).adjust(brightness:0.7)
+    let grandMaster = Color(red: 1.0, green: 0.5, blue: 0.5).adjust(brightness:0.3) // 무지개
+    
+        
+    switch tier/5 {
+    case 0:
+        return iron
+    case 1:
+        return bronze
+    case 2:
+        return silver
+    case 3:
+        return gold
+    case 4:
+        return platinum
+    case 5:
+        return diamond
+    case 6:
+        return master
+    case 7:
+        return superMaster
+    case 8:
+        return grandMaster
+    default:
+        return Color.black
+    }
+        
+}
+
+
+func getBrightTierColorOf(tier:Int) -> Color {
+    
+    let tierColor: Color = getTierColorOf(tier: tier)
+    
+    switch tier/5 {
+    case 0...2:
+        return tierColor.adjust(brightness: 0.2)
+    case 3:
+        return tierColor.adjust(brightness: 0.15)
+    case 4:
+        return tierColor.adjust(brightness: 0.3)
+    case 5:
+        return tierColor.adjust(brightness: 0.1)
+    case 6:
+        return tierColor.adjust(brightness: 0.3)
+    case 7:
+//        return tierColor.adjust(brightness: -0.2)
+//        return tierColor.adjust(brightness: 0.1)
+//        return Color.purple.adjust(brightness: 0.8)
+        return tierColor.adjust(brightness: 0.4)
+
+
+    case 8:
+        return tierColor.adjust(brightness: 0.4)
+
+    default:
+        return tierColor.adjust(brightness: 0.1)
+    }
+}
+
+
+func getBrightTierColorOf2(tier:Int) -> Color {
+    
+    let tierColor: Color = getTierColorOf(tier: tier)
+    
+    switch tier/5 {
+    case 0...1:
+        return tierColor.adjust(brightness: 0.35)
+    case 2...3:
+        return tierColor.adjust(brightness: 0.25)
+    case 4:
+        return tierColor.adjust(brightness: 0.5)
+    case 5:
+        return tierColor.adjust(brightness: 0.15)
+    case 6:
+        return tierColor.adjust(brightness: 0.4)
+    case 7:
+        return tierColor.adjust(brightness: 0.4)
+    case 8:
+        return tierColor.adjust(brightness: 0.4)
+
+    default:
+        return tierColor.adjust(brightness: 0.1)
+    }}
+
+
+
+func getTierColorsOf(tier:Int, type:Int = 0) -> [Color] {
+    
+
+    let tierColor:Color = getTierColorOf(tier: tier)
+    let tierColor_bright:Color = getBrightTierColorOf(tier: tier)
+    let tierColor_bright2:Color = getBrightTierColorOf2(tier: tier)
+
+    
+    let tierColor_frame1:Color = tierColor_bright.adjust(brightness: 0.05)
+    let tierColor_frame2:Color = tierColor.adjust(brightness: -0.05)
+    
+    if type == 0 { //questCheckbox
+        return [tierColor, tierColor_bright, tierColor]
+    }
+    else if type == 1 { //questThumbnail
+        return [tierColor, tierColor_bright2, tierColor]
+    }
+    else if type == 2 {
+        return [tierColor, tierColor_bright, tierColor, tierColor_bright, tierColor]
+    }
+    else if type == 3 {
+        return [tierColor, tierColor_bright2, tierColor, tierColor_bright2, tierColor]
+    }
+    else {
+        return [tierColor, tierColor_bright, tierColor]
+    }
+    
+}
+
 
 func getShadowColor(_ colorScheme:ColorScheme) -> Color {
     return colorScheme == .light ? .black.adjust(brightness:0.2) : .white.adjust(brightness:-0.2)

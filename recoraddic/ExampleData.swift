@@ -15,8 +15,8 @@ extension ContentView {
 //    @Environment(\.modelContext) 
     
     func defaultInitialization() -> Void {
-        let firstDailyRecord = DailyRecord(date: getDateOfNow())
-        let firstDailyRecordSet = DailyRecordSet(start: getDateOfNow())
+        let firstDailyRecord = DailyRecord(date: getStartDateOfNow())
+        let firstDailyRecordSet = DailyRecordSet(start: getStartDateOfNow())
         modelContext.insert(firstDailyRecord)
         modelContext.insert(firstDailyRecordSet)
         
@@ -55,16 +55,16 @@ extension ContentView {
 //        let day9 = getDateOfYesterDay()
 //        let day10 = getDateOfNow()
         
-        let day1 = Calendar.current.date(byAdding: .day, value:-9, to: getDateOfYesterDay())!
-        let day2 = Calendar.current.date(byAdding: .day, value:-8, to: getDateOfYesterDay())!
-        let day3 = Calendar.current.date(byAdding: .day, value:-7, to: getDateOfYesterDay())!
-        let day4 = Calendar.current.date(byAdding: .day, value:-6, to: getDateOfYesterDay())!
-        let day5 = Calendar.current.date(byAdding: .day, value:-5, to: getDateOfYesterDay())!
-        let day6 = Calendar.current.date(byAdding: .day, value:-4, to: getDateOfYesterDay())!
-        let day7 = Calendar.current.date(byAdding: .day, value:-3, to: getDateOfYesterDay())!
-        let day8 = Calendar.current.date(byAdding: .day, value:-2, to: getDateOfYesterDay())!
-        let day9 = Calendar.current.date(byAdding: .day, value:-1, to: getDateOfYesterDay())!
-        let day10 = getDateOfYesterDay()
+        let day1 = Calendar.current.date(byAdding: .day, value:-9, to: getStartDateOfYesterday())!
+        let day2 = Calendar.current.date(byAdding: .day, value:-8, to: getStartDateOfYesterday())!
+        let day3 = Calendar.current.date(byAdding: .day, value:-7, to: getStartDateOfYesterday())!
+        let day4 = Calendar.current.date(byAdding: .day, value:-6, to: getStartDateOfYesterday())!
+        let day5 = Calendar.current.date(byAdding: .day, value:-5, to: getStartDateOfYesterday())!
+        let day6 = Calendar.current.date(byAdding: .day, value:-4, to: getStartDateOfYesterday())!
+        let day7 = Calendar.current.date(byAdding: .day, value:-3, to: getStartDateOfYesterday())!
+        let day8 = Calendar.current.date(byAdding: .day, value:-2, to: getStartDateOfYesterday())!
+        let day9 = Calendar.current.date(byAdding: .day, value:-1, to: getStartDateOfYesterday())!
+        let day10 = getStartDateOfYesterday()
         
         
         let initialDailyRecordSet = DailyRecordSet(start:day1)
@@ -333,7 +333,7 @@ extension ContentView {
         
         
         
-        let dr9 = DailyRecord(date: day9)
+        let dr9 = DailyRecord()
         let dr9_qd1 = DailyQuest(
             questName: "Create apps",
             data: 0,
@@ -359,7 +359,7 @@ extension ContentView {
         
         
         
-        let dr10 = DailyRecord(date: day10)
+//        let dr10 = DailyRecord(date: day10)
 //        let dr10_qd1 = DailyQuest(
 //            questName: "Create apps",
 //            data: 0,
@@ -376,7 +376,7 @@ extension ContentView {
 //        )
 //        dr10.dailyTextType = DiaryTopic.inShort
 //        dr10.dailyText = "열번째 날의 일기"
-        modelContext.insert(dr10)
+//        modelContext.insert(dr10)
 //        dr10_qd1.dailyRecord = dr10
 //        dr10_qd2.dailyRecord = dr10
 //        modelContext.insert(dr10_qd1)
@@ -394,7 +394,9 @@ extension ContentView {
         // adding QuestData
         let doneList: [DailyQuest] = [dr1_qd1, dr2_qd1, dr2_qd2, dr3_qd1, dr3_qd2, dr4_qd1, dr4_qd2, dr5_qd1, dr5_qd2, dr6_qd1, dr6_qd2, dr7_qd1, dr7_qd2, dr8_qd1, dr8_qd2]
         for questData in doneList {
-            quests.first(where: {quest in quest.name == questData.questName})!.dailyData[questData.dailyRecord!.date] = questData.data
+            if questData.dailyRecord!.date != nil {
+                quests.first(where: {quest in quest.name == questData.questName})!.dailyData[questData.dailyRecord!.date!] = questData.data
+            }
             
         }
         

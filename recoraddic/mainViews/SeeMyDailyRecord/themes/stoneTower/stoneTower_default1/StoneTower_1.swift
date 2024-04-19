@@ -71,7 +71,7 @@ struct StoneTower_1: View {
         
         let dailyRecordSet_notHidden_count: Int = dailyRecordSets.filter({!$0.isHidden}).count
         
-        let dailyRecords_savedAndNotHidden: [DailyRecord] = dailyRecordSet.dailyRecords!.sorted(by: {$0.date < $1.date}).filter({$0.questionValue1 != nil && !$0.hide})
+        let dailyRecords_savedAndNotHidden: [DailyRecord] = dailyRecordSet.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({$0.questionValue1 != nil && !$0.hide})
         
         let dailyRecords_savedAndNotHidden_withVisualValues: [DailyRecord] = dailyRecords_savedAndNotHidden.filter({$0.visualValue3 != nil})
         
@@ -213,7 +213,7 @@ struct StoneTower_1: View {
                                                 }
                                                 
                                                 
-                                                Text(yyyymmddFormatOf(record.date))
+                                                Text(yyyymmddFormatOf(record.date!))
                                                     .bold(isSelectedRecord)
                                                     .font(.caption)
                                                 //                                                    .font(isOnCenter ? .footnote : .subheadline)
@@ -255,7 +255,7 @@ struct StoneTower_1: View {
                                                         .bold()
                                                         .font(.title3)
                                                         .frame(width: geoWidth/5)
-                                                        .opacity(0.6)
+                                                        .opacity(0.8)
                                                 }
                                                 else {
                                                     Spacer()
@@ -352,7 +352,7 @@ struct StoneTower_1: View {
                                                             .frame(width:geoWidth*0.7, alignment:.leading)
                                                             
                                                     }
-                                                    .opacity(0.6)
+                                                    .opacity(0.8)
                                                     .padding(.vertical,3)
                                                     
                                                     

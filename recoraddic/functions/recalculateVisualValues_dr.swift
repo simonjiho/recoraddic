@@ -16,7 +16,7 @@ func recalculateVisualValues_hiddenOrDeleted(dailyRecord:DailyRecord) -> Void {
     
     let dailyRecordSet: DailyRecordSet = dailyRecord.dailyRecordSet!
     let dailyRecords: [DailyRecord] = dailyRecordSet.dailyRecords!
-    let dailyRecords_savedAndUnhidden: [DailyRecord] = dailyRecords.sorted(by: {dr1, dr2 in dr1.date < dr2.date}).filter({$0.visualValue1 != nil && !$0.hide})
+    let dailyRecords_savedAndUnhidden: [DailyRecord] = dailyRecords.filter({$0.date != nil && !$0.hide}).sorted(by: {dr1, dr2 in dr1.date! < dr2.date!})
     let targetIndex: Int = dailyRecords_savedAndUnhidden.firstIndex(of: dailyRecord)!
     let drCount: Int = dailyRecords_savedAndUnhidden.count
     
@@ -69,7 +69,7 @@ func recalculateVisualValues_unhidden(dailyRecord:DailyRecord) -> Void {
     
     let dailyRecordSet: DailyRecordSet = dailyRecord.dailyRecordSet!
     let dailyRecords: [DailyRecord] = dailyRecordSet.dailyRecords!
-    let dailyRecords_savedAndUnhidden: [DailyRecord] = dailyRecords.sorted(by: {dr1, dr2 in dr1.date < dr2.date}).filter({$0.visualValue1 != nil && !$0.hide})
+    let dailyRecords_savedAndUnhidden: [DailyRecord] = dailyRecords.filter({$0.date != nil && !$0.hide}).sorted(by: {dr1, dr2 in dr1.date! < dr2.date!})
     let targetIndex: Int = dailyRecords_savedAndUnhidden.firstIndex(of: dailyRecord)!
     let drCount: Int = dailyRecords_savedAndUnhidden.count
     

@@ -43,31 +43,30 @@ struct QuestCheckBoxView_OX: View {
 //            let color2 =
             
             ZStack {
+                
+
+
+                Path(CGRect(x: 0, y: 0, width: geoWidth, height: geoHeight))
+                    .fill(LinearGradient(colors: getTierColorsOf(tier: dailyQuest.currentTier, type: 0), startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .opacity(dailyQuest.data == 1 ? 1.0 :0.0)
+                
                 HStack {
                     Image(systemName: dailyQuest.data == 1 ? "checkmark.square" : "square")
                         .resizable()
                         .frame(width: checkBoxSize, height: checkBoxSize)
-                        .onTapGesture {
-                            checkBoxToggle.toggle()
-                            if checkBoxToggle == true {
-                                dailyQuest.data = 0
-                                
-                            }
-                            else {
-                                dailyQuest.data = 1
-                            }
-                        }
                     Text(dailyQuest.questName)
 //                        .padding(geometry.size.height*0.05)
 //                        .background(dailyQuest.data == 1 ? .white : .white.opacity(0.6))
 //                        .clipShape(.buttonBorder)
                         .frame(width: TextBoxWidth, height: TextBoxHeight)
-                        .foregroundStyle(dailyQuest.data == 1 ? .black : .white)
+                        .foregroundStyle(.black)
                         .bold()
 //                        .background(dailyQuest.data == 1 ? .white.opacity(0.9) : .white.opacity(0.4))
 
                 } // HStack
-                .frame(width: geometry.size.width, height: geometry.size.height)
+                .frame(width: geometry.size.width, height: geometry.size.height)      
+
+
                 
                 Menu {
                     Button("delete", action: {
@@ -86,8 +85,20 @@ struct QuestCheckBoxView_OX: View {
 
             } // ZStack
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
-            .background(dailyQuest.data == 1 ? .white.adjust(brightness:-0.1) : .black.adjust(brightness:0.3))
+            .background(.black.adjust(brightness:0.3))
+
+
             .clipShape(.buttonBorder)
+            .onTapGesture {
+                checkBoxToggle.toggle()
+                if checkBoxToggle == true {
+                    dailyQuest.data = 0
+                    
+                }
+                else {
+                    dailyQuest.data = 1
+                }
+            }
             
 
             
@@ -158,24 +169,40 @@ struct QuestCheckBoxView: View {
 //            let sliderBoxHeight = geometry.size.height*0.5
 //            let sliderBoxWidth = contentWidth*0.75
             
-            let percentage = CGFloat(value) / CGFloat(dailyGoal)
-            let brightness = percentage + 0.1
+            let percentage:CGFloat = xOffset / geoWidth
+            let brightness:CGFloat = percentage * 0.0
+//            let brightness:CGFloat = percentage * 0.2
             
             
+            let gradientColors = getTierColorsOf(tier: dailyQuest.currentTier, type:0)
+            let adjustedGradient: [Color] = {
+                var newGradient: [Color] = []
+                for idx in 0...(gradientColors.count - 1) {
+                    if idx % 2 == 0 {
+                        newGradient.append(gradientColors[idx].adjust(brightness: brightness))
+                    }
+                    else {
+                        newGradient.append(gradientColors[idx].adjust(brightness: brightness*0.5))
+                    }
+                }
+                return newGradient
+            }()
+            
+            let cornerWidth = xOffset > geoWidth/20*2 ? geoWidth/20 : 0
+            let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth +  0.1) ? xOffset : 0.0, height: geoHeight), transform: nil))
+            // 0.1 없으면 끝에서 이상해짐
 
-//            let thumbSize = geoHeight*1.04
-
-//            let color1 =
-//            let color2 =
-//            let color3 =
-//            let color4 = 
 
             ZStack(alignment:.leading) {
-                Rectangle()
-                    .frame(width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth + 0.1) ? xOffset : 0.0, height: geoHeight)
+                a
+                    .fill(LinearGradient(colors: adjustedGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .shadow(color:getTierColorOf(tier: dailyQuest.currentTier).adjust(brightness: -0.1),radius:1)
+
+//                Rectangle()
+//                    .frame(width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth + 0.1) ? xOffset : 0.0, height: geoHeight)
                     // MARK: 0.1을 넣지 않으면 xOffset이 geoWidth보다 커지는 상황 발생... 왤까?
-                    .clipShape(.buttonBorder)
-                    .foregroundStyle(.black.adjust(brightness:brightness))
+//                    .clipShape(.buttonBorder)
+//                    .foregroundStyle(LinearGradient(colors: adjustedGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
                     .onChange(of:brightness) {
                         print("brightness changed")
                         print(brightness)
@@ -184,11 +211,12 @@ struct QuestCheckBoxView: View {
                 HStack(spacing: 0.0) {
                     Text("\(questName)")
                         .frame(alignment: .trailing)
-                        .foregroundStyle(CGFloat(value)/range.upperBound > 0.5 ? .black : .white)
+                        .foregroundStyle(.black)
+
                         .lineLimit(1)
                         .bold()
                     Text(": ")
-                        .foregroundStyle(CGFloat(value)/range.upperBound > 0.5 ? .black : .white)
+                        .foregroundStyle(.black)
                         .bold()
                     HStack(spacing:0.0) { // hstack for values
                         
@@ -196,19 +224,21 @@ struct QuestCheckBoxView: View {
                             
                             Text("\(DataType.string_unitDataToRepresentableData(data: value, dataType: dataType)) / ")
                                 .bold()
-                                .foregroundStyle(CGFloat(value)/range.upperBound > 0.5 ? .black : .white)
+                                .foregroundStyle(.black)
 
                             
                             if dailyQuest.dataType == DataType.HOUR {
                                 Text("\(DataType.string_unitDataToRepresentableData(data:dailyQuest.dailyGoal , dataType: dataType))")
-                                    .foregroundStyle(CGFloat(value)/range.upperBound > 0.5 ? .black : .white)
+                                    .foregroundStyle(.black)
+
 
                             }
                             else {
                                 TextField("", text:$goalValueInText)
                                     .keyboardType(.numberPad)
                                     .frame(width:80)
-                                    .foregroundStyle(CGFloat(value)/range.upperBound > 0.5 ? .black : .white)
+                                    .foregroundStyle(.black)
+
                                     .onAppear() {
                                         goalValueInText = DataType.string_unitDataToRepresentableData(data: dailyQuest.dailyGoal, dataType: dataType)
                                     }
@@ -217,14 +247,15 @@ struct QuestCheckBoxView: View {
                             }
                             
                             Text("\(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation:dailyQuest.customDataTypeNotation))")
-                                .foregroundStyle(CGFloat(value)/range.upperBound > 0.5 ? .black : .white)
+                                .foregroundStyle(.black)
+
                             
 
                         
                         }
                         else {
                             Text("\(DataType.string_unitDataToRepresentableData(data: value, dataType: dataType)) \(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation:dailyQuest.customDataTypeNotation))")
-                                .foregroundStyle(CGFloat(value)/range.upperBound > 0.5 ? .black : .white)
+                                .foregroundStyle(.black)
                                 .lineLimit(1)
                                 .bold()
 
@@ -541,3 +572,79 @@ struct DialForHours: View {
         }
     }
 }
+
+
+
+struct QuestCheckBoxColorPreview: View {
+
+    var tier: Int
+    
+    var body: some View {
+        
+
+        
+        GeometryReader { geometry in
+            
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            
+            let a: Path = Path(CGPath(roundedRect: CGRect(x: 0, y: 0, width: geoWidth, height: geoHeight), cornerWidth: geoWidth/20, cornerHeight: geoHeight/20, transform: nil))
+
+            
+            let percentage:CGFloat = 1.0
+            let brightness:CGFloat = percentage * 0.0
+            
+            
+            let gradientColors = getTierColorsOf(tier: tier, type:0)
+            let adjustedGradient: [Color] = {
+                var newGradient: [Color] = []
+                for idx in 0...(gradientColors.count - 1) {
+                    if idx % 2 == 0 {
+                        newGradient.append(gradientColors[idx].adjust(brightness: brightness))
+                    }
+                    else {
+                        newGradient.append(gradientColors[idx].adjust(brightness: brightness*0.5))
+                    }
+                }
+                return newGradient
+            }()
+            
+            
+            a
+                .fill(LinearGradient(colors: adjustedGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
+                .frame(width: geoWidth, height: geoHeight)
+            // MARK: 0.1을 넣지 않으면 xOffset이 geoWidth보다 커지는 상황 발생... 왤까?
+
+                .clipShape(.buttonBorder)
+                .shadow(color:getTierColorOf(tier: tier).adjust(brightness: -0.1),radius:1)
+
+//                .foregroundStyle(LinearGradient(colors: adjustedGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
+
+        }
+    }
+}
+
+#Preview(body: {
+    VStack {
+        QuestCheckBoxColorPreview(tier: 0)
+            .frame(width:300, height: 45)
+        QuestCheckBoxColorPreview(tier: 5)
+            .frame(width:300, height: 45)
+        QuestCheckBoxColorPreview(tier: 10)
+            .frame(width:300, height: 45)
+        QuestCheckBoxColorPreview(tier: 15)
+            .frame(width:300, height: 45)
+        QuestCheckBoxColorPreview(tier: 20)
+            .frame(width:300, height: 45)
+        QuestCheckBoxColorPreview(tier: 25)
+            .frame(width:300, height: 45)
+        QuestCheckBoxColorPreview(tier: 30)
+            .frame(width:300, height: 45)
+        QuestCheckBoxColorPreview(tier: 35)
+            .frame(width:300, height: 45)
+        QuestCheckBoxColorPreview(tier: 40)
+            .frame(width:300, height: 45)
+
+    }
+
+})

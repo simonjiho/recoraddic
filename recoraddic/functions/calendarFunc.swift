@@ -10,39 +10,69 @@ import Foundation
 
 let dueTime:Int = 10 // 10AM
 
-func getDateOfNow() -> Date {
+//func getDateOfNow() -> Date {
+//    let now = Date()
+//    var calendar = Calendar.current
+//    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
+//    let hour = calendar.component(.hour, from: now)
+//    
+//    if hour >= recoraddic.dueTime {
+////        print("\(hour)hours passed, so today")
+////        print(calendar.startOfDay(for: now))
+//        return calendar.startOfDay(for: now)
+//    } else {
+////        print("\(hour)hours passed, so yesterday")
+//        let yesterday = calendar.date(byAdding: .day, value: -1, to: now)!
+////        print(calendar.startOfDay(for: yesterday))
+//        return calendar.startOfDay(for: yesterday)
+//    }
+//}
+func getStartDateOfNow() -> Date {
     let now = Date()
     var calendar = Calendar.current
     calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
-    let hour = calendar.component(.hour, from: now)
     
-    if hour >= recoraddic.dueTime {
-//        print("\(hour)hours passed, so today")
-//        print(calendar.startOfDay(for: now))
-        return calendar.startOfDay(for: now)
-    } else {
-//        print("\(hour)hours passed, so yesterday")
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: now)!
-//        print(calendar.startOfDay(for: yesterday))
-        return calendar.startOfDay(for: yesterday)
-    }
+    return calendar.startOfDay(for: now)
 }
 
-
-func getDateOfYesterDay() -> Date {
+func getStartDateOfYesterday() -> Date {
     let now = Date()
     var calendar = Calendar.current
     calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
-    let hour = calendar.component(.hour, from: now)
+    let yesterday = calendar.date(byAdding: .day, value: -1, to: now)!
     
-    if hour >= recoraddic.dueTime {
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: now)!
-        return calendar.startOfDay(for: yesterday)
-    } else {
-        let twoDaysAgo = calendar.date(byAdding: .day, value: -2, to: now)!
-        return calendar.startOfDay(for: twoDaysAgo)
-    }
+    return calendar.startOfDay(for: yesterday)
 }
+
+func getYesterdayOf(_ date: Date) -> Date {
+    var calendar = Calendar.current
+    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
+    let yesterday = calendar.date(byAdding: .day, value: -1, to: date)!
+    return calendar.startOfDay(for: yesterday)
+}
+
+func getTomorrowOf(_ date: Date) -> Date {
+    var calendar = Calendar.current
+    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
+    let tomorrow = calendar.date(byAdding: .day, value: 1, to: date)!
+    return calendar.startOfDay(for: tomorrow)
+}
+
+
+//func getDateOfYesterDay() -> Date {
+//    let now = Date()
+//    var calendar = Calendar.current
+//    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
+//    let hour = calendar.component(.hour, from: now)
+//    
+//    if hour >= recoraddic.dueTime {
+//        let yesterday = calendar.date(byAdding: .day, value: -1, to: now)!
+//        return calendar.startOfDay(for: yesterday)
+//    } else {
+//        let twoDaysAgo = calendar.date(byAdding: .day, value: -2, to: now)!
+//        return calendar.startOfDay(for: twoDaysAgo)
+//    }
+//}
 
 
 

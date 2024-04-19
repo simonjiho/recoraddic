@@ -123,6 +123,114 @@ struct ChoosePurposeView2: View {
     }
 }
 
+struct ChoosePurposeView3: View {
+    @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
+    
+    var dailyQuest: DailyQuest
+    
+    var body: some View {
+        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+        
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            let gridSize = geoWidth/3
+            let tagSize = gridSize*0.8
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: tagSize))],spacing: tagSize*0.2) {
+
+                ForEach(recoraddic.defaultPurposes, id:\.self) { purpose in
+                    VStack {
+                        
+                        PurposeTagView(purpose: purpose)
+                            .frame(width: tagSize*0.7, height: tagSize*0.7)
+                            .onTapGesture {
+                                if dailyQuest.defaultPurposes.contains(purpose) { dailyQuest.defaultPurposes.remove(purpose)}
+                                else if dailyQuest.defaultPurposes.count < 3 {
+                                    dailyQuest.defaultPurposes.insert(purpose)
+                                }
+                                
+                            }
+                        Text(DefaultPurpose.inKorean(purpose))
+                            .font(.caption)
+                            .padding(.horizontal,2)
+//                                .frame(width: geometry.size.width*0.3)
+                            .minimumScaleFactor(0.5)
+                            .foregroundStyle(dailyQuest.defaultPurposes.contains(purpose) ? colorSchemeColor : reversedColorSchemeColor)
+                        
+                        
+                    } // Vstack
+                    .frame(width: tagSize, height: tagSize)
+                    .background(dailyQuest.defaultPurposes.contains(purpose) ? reversedColorSchemeColor : colorSchemeColor)
+                    .clipShape(.buttonBorder)
+                    
+                    
+                } // forEach
+
+            } // scrollView
+            .padding(10)
+            .frame(width:geoWidth, height:geoHeight)
+//            .border(.red)
+        }
+    }
+}
+
+struct ChoosePurposeView4: View {
+    @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
+    
+    var todo: Todo
+    
+    var body: some View {
+        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+        
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            let gridSize = geoWidth/3
+            let tagSize = gridSize*0.8
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: tagSize))],spacing: tagSize*0.2) {
+
+                ForEach(recoraddic.defaultPurposes, id:\.self) { purpose in
+                    VStack {
+                        
+                        PurposeTagView(purpose: purpose)
+                            .frame(width: tagSize*0.7, height: tagSize*0.7)
+                            .onTapGesture {
+                                if todo.purpose.contains(purpose) { todo.purpose.remove(purpose)}
+                                else if todo.purpose.count < 3 {
+                                    todo.purpose.insert(purpose)
+                                }
+                                
+                            }
+                        Text(DefaultPurpose.inKorean(purpose))
+                            .font(.caption)
+                            .padding(.horizontal,2)
+//                                .frame(width: geometry.size.width*0.3)
+                            .minimumScaleFactor(0.5)
+                            .foregroundStyle(todo.purpose.contains(purpose) ? colorSchemeColor : reversedColorSchemeColor)
+                        
+                        
+                    } // Vstack
+                    .frame(width: tagSize, height: tagSize)
+                    .background(todo.purpose.contains(purpose) ? reversedColorSchemeColor : colorSchemeColor)
+                    .clipShape(.buttonBorder)
+                    
+                    
+                } // forEach
+
+            } // scrollView
+            .padding(10)
+            .frame(width:geoWidth, height:geoHeight)
+//            .border(.red)
+        }
+    }
+}
+
+
+
 struct PurposeTagsView_leading: View {
     
     var purposes: Set<String>
@@ -194,6 +302,84 @@ struct PurposeTagsView_center: View {
     }
 }
 
+
+struct PurposeTagsView_horizontal: View {
+    
+    var purposes: Set<String>
+    var purposes_sorted : [String]
+    let tagSize: CGFloat
+    let spacing: CGFloat
+    let totalWidth: CGFloat
+
+    init(purposes: Set<String>, tagSize: CGFloat, spacing: CGFloat, totalWidth:CGFloat) {
+        self.purposes = purposes
+        self.purposes_sorted = Array(purposes).sorted(by: { s1, s2 in
+            return recoraddic.defaultPurposes.firstIndex(of: s1)! > recoraddic.defaultPurposes.firstIndex(of: s2)!
+        })
+        self.tagSize = tagSize
+        self.spacing = spacing
+        self.totalWidth = totalWidth
+    }
+    
+    
+    var body: some View {
+        
+        GeometryReader { geometry in
+            
+
+            
+            HStack(spacing:spacing) {
+                ForEach(purposes_sorted, id:\.self) { purpose in
+                    PurposeTagView(purpose: purpose)
+                        .frame(width: tagSize, height: tagSize)
+                        .shadow(radius: 10.0)
+                }
+
+            }
+            .frame(width:totalWidth, height: geometry.size.height)
+
+            
+        }
+    }
+}
+
+
+
+
+
+struct PurposeTagsView_vertical: View {
+    
+    var purposes: Set<String>
+    var purposes_sorted : [String]
+
+    init(purposes: Set<String>) {
+        self.purposes = purposes
+        self.purposes_sorted = Array(purposes).sorted(by: { s1, s2 in
+            return recoraddic.defaultPurposes.firstIndex(of: s1)! > recoraddic.defaultPurposes.firstIndex(of: s2)!
+        })
+    }
+    
+    
+    var body: some View {
+        
+        GeometryReader { geometry in
+            
+            let tagSize = min(geometry.size.width*0.8,geometry.size.height*0.3)
+
+            VStack(spacing:geometry.size.height*0.05) {
+                ForEach(purposes_sorted, id:\.self) { purpose in
+                    PurposeTagView(purpose: purpose)
+                        .frame(width: tagSize, height: tagSize)
+                        .shadow(radius: 10.0)
+                }
+
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
+
+            
+        }
+    }
+}
 
 
 

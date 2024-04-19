@@ -17,46 +17,44 @@ struct SaveDailyRecordView: View {
     @Query var quests: [Quest]
     @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
     
+    
+    
     var currentDailyRecordSet: DailyRecordSet
-    var selectedDailyRecord: DailyRecord
-    
+    var currentDailyRecord: DailyRecord
     @Binding var popUp_createRecordStone: Bool
-
-    @Binding var isTodayRelated: Bool
-    @Binding var yesterdayDataRemains: Bool
+    let saveAsToday: Bool
+    let todayRecordExists: Bool
     @Binding var isNewDailyRecordAdded: Bool
+    @Binding var selectedView:MainViewName
     
     
+    
+    @State var selectedClassification: String = "긍정적"
     @State var steps: Int = 0
-    
     @State var selectedFacialExpressionNum: Int = 0
-
-//    @State var selectedFacialExpressionNums: [Int] = []
     @State var questionValue1: Int? = 0
     @State var questionValue2: Int?
     @State var questionValue3: Int?
-
     @State var questionValue1_nonNil: Int = 0
     @State var questionValue2_nonNil: Int = 0
     @State var questionValue3_nonNil: Int = 0
-    
-    
-    @Binding var selectedView:MainViewName
-    
-    @State var selectedClassification: String = "긍정적"
-    
     let askQuestions: Bool
+    let savingDate: Date
 
-    init(currentDailyRecordSet: DailyRecordSet, selectedDailyRecord: DailyRecord, popUp_createRecordStone: Binding<Bool>, isTodayRelated: Binding<Bool>, yesterdayDataRemains: Binding<Bool>, selectedView: Binding<MainViewName>, isNewDailyRecordAdded: Binding<Bool>) {
+
+    init(currentDailyRecordSet: DailyRecordSet, currentDailyRecord: DailyRecord, popUp_createRecordStone: Binding<Bool>, saveAsToday: Bool, todayRecordExists: Bool, isNewDailyRecordAdded: Binding<Bool>, selectedView: Binding<MainViewName>) {
+        
         self._quests = Query()
         self._dailyRecords = Query(sort:\DailyRecord.date)
+        
         self.currentDailyRecordSet = currentDailyRecordSet
-        self.selectedDailyRecord = selectedDailyRecord
+        self.currentDailyRecord = currentDailyRecord
         self._popUp_createRecordStone = popUp_createRecordStone
-        self._isTodayRelated = isTodayRelated
-        self._yesterdayDataRemains = yesterdayDataRemains
-        self._selectedView = selectedView
+        self.saveAsToday = saveAsToday
+        self.todayRecordExists = todayRecordExists
         self._isNewDailyRecordAdded = isNewDailyRecordAdded
+        self._selectedView = selectedView
+        
         
         switch currentDailyRecordSet.dailyQuestions.count {
         case 2:
@@ -67,27 +65,27 @@ struct SaveDailyRecordView: View {
         default:
             _ = 0
         }
-        
         self.askQuestions = doesThemeAskQuestions(currentDailyRecordSet.dailyRecordThemeName)
+        self.savingDate = {
+            if saveAsToday {
+                return getStartDateOfNow()
+            }
+            else {
+                return getStartDateOfYesterday()
+            }
 
+        }()
+
+        
     }
 
     
     var body: some View {
         
+        
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
         
-//        let facialExpressionColor: Color = {
-//            if colorScheme == .dark {
-//                return reversedColorSchemeColor.adjust(brightness: -0.)
-//            }
-//            else {
-//                return reversedColorSchemeColor
-//            }
-//        }()
-//        
-//        let askQuestions: Bool =
         
         GeometryReader { geometry in
             
@@ -103,8 +101,7 @@ struct SaveDailyRecordView: View {
             let recordStoneGridHeight = stepsContentViewHeight*0.35
             let recordStoneWidth = geoWidth*0.3
             let recordStoneHeight = recordStoneWidth*0.67
-//            let sliderBoxWidth = stepsContentViewWidth*0.9
-//            let sliderBoxHeight = stepsContentViewHeight*0.2
+
   
             let questionBoxWidth = stepsContentViewWidth
             let questionBoxHeight = stepsContentViewHeight*0.55
@@ -122,7 +119,7 @@ struct SaveDailyRecordView: View {
                     //mood -> 표정
                     if steps == 0 {
                         // 나중에 전체/긍정적/부정적/... 등등으로 선택 옵션 고르면 바꾸게 나오기
-                        Text("\(yyyymmddFormatOf(selectedDailyRecord.date)) 을 표현할 표정을 고르세요!")
+                        Text("\(yyyymmddFormatOf(savingDate)) 을 표현할 표정을 고르세요!")
 //                        HStack {
 //                            if selectedFacialExpressionNum != 0 {
 //                                Image("facialExpression_\(selectedFacialExpressionNum)")
@@ -361,26 +358,27 @@ struct SaveDailyRecordView: View {
         
     }
     
-    func saveDailyRecord() -> Void {
+    func saveDailyRecord() -> Void { // TODO: 이 과정에서 에러 일어나면 전부 undo 처리하고, 똑같은 에러가 다시 일어나지 않게 처리
+        
+        currentDailyRecord.date = savingDate
         
         if currentDailyRecordSet.dailyRecords!.count == 0 {
-            currentDailyRecordSet.start = selectedDailyRecord.date
+            currentDailyRecordSet.start = savingDate
         }
 
         
         // TODO: 만약 DRS에 하나도 없었다면 시작 날짜를 첫 DR의 날짜로 바꾸기
-        selectedDailyRecord.mood = selectedFacialExpressionNum
-        selectedDailyRecord.questionValue1 = questionValue1
-        selectedDailyRecord.dailyRecordSet = currentDailyRecordSet
-        if questionValue2 != nil { selectedDailyRecord.questionValue2 = questionValue2! }
-        if questionValue3 != nil { selectedDailyRecord.questionValue3 = questionValue3! }
+        currentDailyRecord.mood = selectedFacialExpressionNum
+        currentDailyRecord.questionValue1 = questionValue1
+        currentDailyRecord.dailyRecordSet = currentDailyRecordSet
+        if questionValue2 != nil { currentDailyRecord.questionValue2 = questionValue2! }
+        if questionValue3 != nil { currentDailyRecord.questionValue3 = questionValue3! }
 
-        let currentDate = selectedDailyRecord.date
 
         
         var removingList:[DailyQuest] = []
         
-        for dailyQuest in selectedDailyRecord.dailyQuestList! {
+        for dailyQuest in currentDailyRecord.dailyQuestList! {
             if dailyQuest.data == 0 {
                 removingList.append(dailyQuest)
             }
@@ -389,16 +387,28 @@ struct SaveDailyRecordView: View {
         for emptyDailyQuest in removingList {
             modelContext.delete(emptyDailyQuest)
         }
+        
+        
+        var removingList2:[Todo] = []
+        for todo in currentDailyRecord.todoList! {
+            if todo.done == false || todo.content == "" {
+                removingList2.append(todo)
+            }
+        }
+        
+        for emptyTodo in removingList2 {
+            modelContext.delete(emptyTodo)
+        }
 
         
-        for questData in selectedDailyRecord.dailyQuestList! {
+        for questData in currentDailyRecord.dailyQuestList! {
             let quest: Quest? = quests.first(where: {quest in quest.name == questData.questName})
             if quest != nil {
-                if quest!.dailyData.keys.contains(currentDate) {
-                    quest!.dailyData[currentDate]! += questData.data
+                if quest!.dailyData.keys.contains(savingDate) {
+                    quest!.dailyData[savingDate]! += questData.data
                 }
                 else {
-                    quest!.dailyData[currentDate] = questData.data
+                    quest!.dailyData[savingDate] = questData.data
                 }
                 quest!.updateTier()
                 quest!.updateMomentumLevel()
@@ -410,41 +420,63 @@ struct SaveDailyRecordView: View {
         var dateComponents = DateComponents()
         dateComponents.day = 1
         let calendar = Calendar.current
-        let nextDay = calendar.date(byAdding: dateComponents, to: currentDate)
-        
-        
-        if isTodayRelated {
-            modelContext.insert(DailyRecord(date: nextDay!))
-        }
-        else {
-            yesterdayDataRemains = false
-            isTodayRelated = true
-        }
-        
+        let nextDay = calendar.date(byAdding: dateComponents, to: savingDate)
         
         
         calculateVisualValues()
+        
+        if !saveAsToday && todayRecordExists {
+            recalculateVisualValuesOfToday()
+        }
+        
+        // 오늘게 있는데 currentDRS에 없다면 애초에 어제 것을 저장 불가 -> 기록의 탑 저장 시 알려주기
+        
+        modelContext.insert(DailyRecord())
+        
         isNewDailyRecordAdded.toggle()
+        
+        
+    }
+    
+    func recalculateVisualValuesOfToday() -> Void { // 어제의 기록을 올리는데 이미 오늘의 기록이 있을 때
+        
+        // savingDate is yesterday in this case
+        let today = getTomorrowOf(savingDate)
+        let dailyRecord_today = currentDailyRecordSet.dailyRecords?.filter({$0.date == today}).first!
+        let dailyRecord_yesterday = currentDailyRecord
+        
+        let qVal1:Int? = dailyRecord_today!.questionValue1
+        let qVal2:Int? = dailyRecord_today!.questionValue2
+        let qVal3:Int? = dailyRecord_today!.questionValue3
+        
+        if currentDailyRecordSet.dailyRecordThemeName == "stoneTower_1" {
+            let prevVisualVal3 = dailyRecord_yesterday.visualValue3!
+            currentDailyRecord.visualValue3 = StoneTower_1.calculateVisualValue3(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3, prevVisualVal3) //위치
+        }
+
         
         
     }
     
     func calculateVisualValues() -> Void {
         
-        let qVal1:Int? = selectedDailyRecord.questionValue1
-        let qVal2:Int? = selectedDailyRecord.questionValue2
-        let qVal3:Int? = selectedDailyRecord.questionValue3
+        let qVal1:Int? = currentDailyRecord.questionValue1
+        let qVal2:Int? = currentDailyRecord.questionValue2
+        let qVal3:Int? = currentDailyRecord.questionValue3
         
         if currentDailyRecordSet.dailyRecordThemeName == "stoneTower_0" {
-            selectedDailyRecord.visualValue1 = StoneTower_0.calculateVisualValue1(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3)
-            selectedDailyRecord.visualValue2 = StoneTower_0.calculateVisualValue2(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3)
-            selectedDailyRecord.visualValue3 = StoneTower_0.calculateVisualValue3(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3)
+            currentDailyRecord.visualValue1 = StoneTower_0.calculateVisualValue1(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3)
+            currentDailyRecord.visualValue2 = StoneTower_0.calculateVisualValue2(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3)
+            currentDailyRecord.visualValue3 = StoneTower_0.calculateVisualValue3(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3)
         }
         else if currentDailyRecordSet.dailyRecordThemeName == "stoneTower_1" {
-            let prevVisualVal3: Int = currentDailyRecordSet.dailyRecords?.sorted(by: {$0.date < $1.date}).filter({!$0.hide && $0.visualValue3 != nil}).last?.visualValue3 ?? 0
-            selectedDailyRecord.visualValue1 = StoneTower_1.calculateVisualValue1(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3) //모양
-            selectedDailyRecord.visualValue2 = StoneTower_1.calculateVisualValue2(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3) //색
-            selectedDailyRecord.visualValue3 = StoneTower_1.calculateVisualValue3(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3, prevVisualVal3) //위치
+            
+            // prevVisualVal3 of latest,saved,unhidden dailyRecord before savingDate
+            let prevVisualVal3: Int = currentDailyRecordSet.dailyRecords?.filter({$0.date != nil && !$0.hide}).sorted(by: {$0.date! < $1.date!}).filter({$0.date! < savingDate}).last?.visualValue3 ?? 0
+            
+            currentDailyRecord.visualValue1 = StoneTower_1.calculateVisualValue1(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3) //모양
+            currentDailyRecord.visualValue2 = StoneTower_1.calculateVisualValue2(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3) //색
+            currentDailyRecord.visualValue3 = StoneTower_1.calculateVisualValue3(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3, prevVisualVal3) //위치
         }
     }
 

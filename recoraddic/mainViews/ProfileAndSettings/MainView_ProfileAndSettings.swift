@@ -322,7 +322,7 @@ struct HiddenDailyRecords: View {
                             popUp_dailyRecord.toggle()
                         })
                         {
-                            Text("\(yyyymmddFormatOf(dr.date))")
+                            Text("\(yyyymmddFormatOf(dr.date!))")
                             
                         }
                         

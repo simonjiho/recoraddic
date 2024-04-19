@@ -52,6 +52,7 @@ struct RecordInDetailView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) private var colorScheme
     
+    @Query var quests: [Quest]
     
     @Binding var popUp_recordInDetail: Bool
 //    @Binding var dailyRecordHidden: Bool
@@ -101,17 +102,20 @@ struct RecordInDetailView: View {
             let imageOrStoneWidth = record.diaryImage != nil ? geometry.size.width*0.8 : imageOrStoneHeight*1.5
             
             let questBoxWidth = geometry.size.width*0.9
-            let questBoxHeight = geometry.size.height*0.08
+            let questBoxHeight = geometry.size.height*0.07
             
             let confirmationPopUp_width = geoWidth*0.6
             let confirmationPopUp_height = confirmationPopUp_width*0.7
 
             let elementWidth = geometry.size.width*0.9
-            let diaryHeight = record.dailyTextType == DailyTextType.diary ? geometry.size.height*0.8 : 60.0
+
+            let tagSize:CGFloat = questBoxHeight*0.4
+            let spacing:CGFloat = tagSize*0.1
+
 
             let facialExpressionSize = geoWidth * 0.08
             
-            let iconWidth: CGFloat = 40
+            let iconWidth: CGFloat = 20
             let iconHeight: CGFloat = 35
             
             ZStack {
@@ -131,7 +135,7 @@ struct RecordInDetailView: View {
                                 )
                         }
                         .frame(width:facialExpressionSize, height: facialExpressionSize)
-                        Text(kor_yyyymmddFormatOf(record.date))
+                        Text(kor_yyyymmddFormatOf(record.date!))
                         //                        .frame(width: geoWidth)
                             .font(.title3)
                             .bold()
@@ -176,74 +180,71 @@ struct RecordInDetailView: View {
                                     .aspectRatio(contentMode:.fit)
                                     .frame(width: imageOrStoneWidth, height: imageOrStoneHeight)
                             }
+                            
+                            
+                            if record.dailyText != nil && record.dailyText != "" {
 
-                            if record.dailyTextType == DailyTextType.inShort {
-                                InShortView(
-                                    selectedDailyRecord: record,
-                                    inShortText: record.dailyText ?? "",
-                                    applyDailyTextRemoval: $applyDailyTextRemoval,
-                                    isEdit: $editDailyText
-                                )
-                                .frame(width:elementWidth, height: diaryHeight)
-                                .background(colorSchemeColor)
-                                .clipShape(.buttonBorder)
-                                .shadow(color:shadowColor, radius: 3)
-                            }
-                            else if record.dailyTextType == DailyTextType.diary {
-                                
-                                VStack(spacing:0.0) {
-                                    Image(systemName: "book.closed.fill")
-                                        .resizable()
-                                        .frame(width:iconWidth, height: iconHeight)
-                                        .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-                                        .padding(.vertical, 10)
+                                Group {
                                     
-                                    Text("\(record.dailyText ?? "")")
-                                        .frame(width: elementWidth*0.95)
-                                        .background(colorSchemeColor)
-                                        .padding(.bottom, 20)
-
+                                    Image(systemName: "book.closed.fill")
+                                        .foregroundStyle(getReversedColorSchemeColor(colorScheme))
                                 }
-                                .frame(width:elementWidth, alignment: .center)
-                                .background(colorSchemeColor)
-                                .clipShape(.containerRelative)
-                                .shadow(color:shadowColor.opacity(0.6), radius: 2)
-                                .border(.gray)
-//                                DiaryView_WholeContent(diaryText: record.dailyText ?? "", showWholeContent: .constant(false))
-////                                DiaryView(
-////                                    selectedDailyRecord: record,
-////                                    diaryText: record.dailyText ?? "",
-////                                    applyDiaryRemoval: $applyDailyTextRemoval,
-////                                    isEdit: $editDailyText
-////                                )
-//                                .frame(width:elementWidth, height: diaryHeight)
-//                                .background(colorSchemeColor)
-//                                .clipShape(.containerRelative)
-//                                .shadow(color:shadowColor.opacity(0.5), radius: 2)
-//                                .scrollDisabled(!diaryViewWiden) // does not work on debug mode, how about in non debug mode?
-
+                                .frame(width:elementWidth,alignment: .leading)
+                                
+                                
+                                
+                                Text(record.dailyText!)
+                                    .padding(elementWidth*0.03)
+                                    .frame(width:elementWidth)
+                                    .background(.gray.opacity(0.1))
+                                    .padding(.bottom,geoHeight*0.05)
                             }
-                            
+
 
                             
-                            Text("달성한 퀘스트:")
+                            Text("달성한 퀘스트")
                                 .padding(.top, 20)
                                 .font(.headline)
                                 .frame(width: questBoxWidth, alignment: .leading)
                             ForEach(record.dailyQuestList!, id:\.self) { questdata in
                                 
                                 let text:String = questdata.dataType != DataType.OX ? "\(questdata.questName)  \(DataType.string_unitDataToRepresentableData(data: questdata.data, dataType: questdata.dataType)) \(DataType.unitNotationOf(dataType: questdata.dataType, customDataTypeNotation: questdata.customDataTypeNotation))" : questdata.questName
-                                
-                                Text(text)
-                                    .font(.title3)
-                                    .minimumScaleFactor(0.5)
+                                HStack {
+
+                                    let purposeCount = questdata.defaultPurposes.count
+                                    let totalWidth:CGFloat = tagSize * CGFloat(purposeCount) + (purposeCount > 0 ? spacing * CGFloat(purposeCount - 1) : 0.0)
+                                    Text(text)
+                                        .font(.title3)
+                                        .minimumScaleFactor(0.5)
+                                        .lineLimit(2)
+                                        .foregroundStyle(.black)
+                                    PurposeTagsView_horizontal(purposes: questdata.defaultPurposes, tagSize: tagSize, spacing:spacing, totalWidth: totalWidth)
+                                        .frame(width:totalWidth, height: tagSize)
+                                    
+                                }
                                     .frame(width:questBoxWidth, height: questBoxHeight, alignment: .center)
-                                    .background(elementColor) // TODO: 당시 quest티어색 적용, 버닝 색도 적용 -> 그러려면 그것도 dailyRecord의 DailyQuest에 저장을 해야겠지?
+                                    .background(LinearGradient(colors: getTierColorsOf(tier: questdata.currentTier, type: 0), startPoint: .topLeading, endPoint: .bottomTrailing)) // TODO: 당시 quest티어색 적용, 버닝 색도 적용 -> 그러려면 그것도 dailyRecord의 DailyQuest에 저장을 해야겠지?
                                     .clipShape(.buttonBorder)
                                 //                                .shadow(color:shadowColor, radius: 2.0)
                                 //                                .shadow(color:shadowColor, radius: 2.0)
                                     .padding(3)
                                 //                            .border(.background)
+                            }
+                            
+                            ForEach(record.todoList!, id:\.self) { todo in
+                                let purposeCount2 = todo.purpose.count
+                                let totalWidth2:CGFloat = tagSize * CGFloat(purposeCount2) + (purposeCount2 > 0 ? spacing * CGFloat(purposeCount2 - 1) : 0.0)
+                                HStack {
+                                    Image(systemName: "checkmark.circle")
+                                    Text("\(todo.content)")
+                                        .lineLimit(3)
+                                    PurposeTagsView_horizontal(purposes: todo.purpose, tagSize: tagSize, spacing:spacing, totalWidth: totalWidth2)
+                                        .frame(width:totalWidth2, height: tagSize)
+
+                                    
+                                    
+                                }
+                                .frame(width:elementWidth, alignment: .leading)
                             }
                             
                             
@@ -297,7 +298,16 @@ struct RecordInDetailView: View {
                                 if !record.hide {
                                     recalculateVisualValues_hiddenOrDeleted(dailyRecord: record)
                                 }
-                                modelContext.delete(record)
+                                // 바로 하면 이 뷰가 사라지기 전에 record가 delete되고, hashing하고 있던 ForEach View -> hashing하는 data 자체가 사라짐 -> Error...?
+                                for quest in quests {
+                                    if quest.dailyData.keys.contains(record.date!) {
+                                        quest.dailyData.removeValue(forKey: record.date!)
+                                    }
+                                }
+
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    modelContext.delete(record)
+                                }
                             }
                             .frame(width: confirmationPopUp_width*0.5)
                             Button("아니오") {

@@ -320,7 +320,7 @@ struct RowContent: View {
                         path.addLine(to: CGPoint(x: conversionPos, y: 0))
                         path.addLine(to: CGPoint(x: endPos, y: 0))
                     }
-                        .stroke(Color.green, lineWidth: 2)
+                        .stroke(Color.gray, lineWidth: 2)
                 }
                 else if isMonthChangingRow && !containsStartAndEnd {
                     let startPos: CGFloat = isFirst ? geoWidth - elementsWidth : 0

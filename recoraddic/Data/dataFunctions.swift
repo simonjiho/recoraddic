@@ -87,7 +87,7 @@ extension Quest {
     func representingDataToString() -> String {
         let calendar = Calendar.current
         
-        let currentDate = (dailyData.isEmpty || dailyData.keys.contains(getDateOfNow())) ? getDateOfNow() : calendar.date(byAdding: .day, value: -1, to: getDateOfNow())!
+        let currentDate = (dailyData.isEmpty || dailyData.keys.contains(getStartDateOfNow())) ? getStartDateOfNow() : calendar.date(byAdding: .day, value: -1, to: getStartDateOfNow())!
         // 오늘기록완료시(get d -> 마지막기록날짜 / 기록완료 안했을 시: 전날
         
         if representingData == QuestRepresentingData.cumulativeData {
@@ -138,15 +138,19 @@ extension Quest {
     
     func returnMomentumLevel() -> Int {
         // 1. special
+
+        
+        let today: Date = getStartDateOfNow()
+        
+        if self.dailyData.count == 0 {
+            return 0
+        }
+        
+        
         let latestRecordDate: Date = self.dailyData.sorted { element1, element2 in
             element1.key < element2.key
         }.last!.key
-        
-        // 기준이 되는 날짜: 오늘 것을 기록했을 때는 오늘, 아직 기록 안했으면 어제 것 기준으로 계산
-        let todayOrYesterday: Date = latestRecordDate == getDateOfNow() ? latestRecordDate : getDateOfYesterDay()
-        
-        // 기준이 되는 날짜: 오늘 것을 기록했을 때는 오늘, 아직 기록 안했으면 어제 것 기준으로 계산
-        let unactivatedPeriod: Int = calculateDaysBetweenTwoDates(from:latestRecordDate, to: todayOrYesterday)
+        let unactivatedPeriod: Int = calculateDaysBetweenTwoDates(from:latestRecordDate, to: today)
         
         // activate here later... -> 11~31까지의 불을 다 만든 후 활성화하기
 //        if unactivatedPeriod == 0 { // try finding if there's special(extreme high) momentumLevel
@@ -228,34 +232,34 @@ extension Quest {
         
         
         // if no special level, then check normal momentum level (비율에서 다 0.001뺌 혹시 몰라서)
-        if checkMomentumLevel(ratio: 0.299, termLength: 50, latestRecordDate: latestRecordDate) {
+        if checkMomentumLevel(ratio: 0.299, termLength: 50, today: today) {
             return 10
         }
-        else if checkMomentumLevel(ratio: 0.299, termLength: 40, latestRecordDate: latestRecordDate) {
+        else if checkMomentumLevel(ratio: 0.299, termLength: 40, today: today) {
             return 9
         }
-        else if checkMomentumLevel(ratio: 0.332, termLength: 30, latestRecordDate: latestRecordDate) {
+        else if checkMomentumLevel(ratio: 0.332, termLength: 30, today: today) {
             return 8
         }
-        else if checkMomentumLevel(ratio: 0.399, termLength: 20, latestRecordDate: latestRecordDate) {
+        else if checkMomentumLevel(ratio: 0.399, termLength: 20, today: today) {
             return 7
         }
-        else if checkMomentumLevel(ratio: 0.428, termLength: 14, latestRecordDate: latestRecordDate) {
+        else if checkMomentumLevel(ratio: 0.428, termLength: 14, today: today) {
             return 6
         }
-        else if checkMomentumLevel(ratio: 0.499, termLength: 10, latestRecordDate: latestRecordDate) {
+        else if checkMomentumLevel(ratio: 0.499, termLength: 10, today: today) {
             return 5
         }
-        else if checkMomentumLevel(ratio: 0.570, termLength: 7, latestRecordDate: latestRecordDate) {
+        else if checkMomentumLevel(ratio: 0.570, termLength: 7, today: today) {
             return 4
         }
-        else if checkMomentumLevel(ratio: 0.599, termLength: 5, latestRecordDate: latestRecordDate) {
+        else if checkMomentumLevel(ratio: 0.599, termLength: 5, today: today) {
             return 3
         }
-        else if checkMomentumLevel(ratio: 0.666, termLength: 3, latestRecordDate: latestRecordDate) {
+        else if checkMomentumLevel(ratio: 0.666, termLength: 3, today: today) {
             return 2
         }
-        else if checkMomentumLevel(ratio: 1, termLength: 1, latestRecordDate: latestRecordDate) {
+        else if checkMomentumLevel(ratio: 1, termLength: 1, today: today) {
             return 1
         }
         else {
@@ -265,13 +269,12 @@ extension Quest {
 
     }
     
-    func checkMomentumLevel(ratio:CGFloat,termLength:Int, latestRecordDate: Date) -> Bool {
+    func checkMomentumLevel(ratio:CGFloat,termLength:Int, today: Date) -> Bool {
         
         // 기준이 되는 날짜: 오늘 것을 기록했을 때는 오늘, 아직 기록 안했으면 어제 것 기준으로 계산
-        let todayOrYesterday: Date = latestRecordDate == getDateOfNow() ? latestRecordDate : getDateOfYesterDay()
         
         
-        let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: todayOrYesterday)!
+        let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: today)!
         
         let numberOfRecordedDates:Int = self.dailyData.filter({ element in
             calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0

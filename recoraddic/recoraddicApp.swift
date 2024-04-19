@@ -21,7 +21,7 @@ import CloudKit
 struct recoraddicApp: App {
     
     
-    static let container = try! ModelContainer(for:Schema([Quest.self, DailyRecord.self, DefaultPurposeData.self, DailyRecordSet.self, Profile.self]), configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic))
+    static let container = try! ModelContainer(for:Schema([Quest.self, Todo.self, DailyQuest.self, DailyRecord.self, DefaultPurposeData.self, DailyRecordSet.self, Profile.self]), configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic))
 
     var syncManager: SyncManager = SyncManager()
 

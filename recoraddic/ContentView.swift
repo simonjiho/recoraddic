@@ -76,6 +76,10 @@ struct ContentView: View {
     
     @State var isNewDailyRecordAdded: Bool = false
     
+    @State var currentDailyRecord: DailyRecord?
+    
+//    @State var todayRecordExists: Bool = false
+//    @State var yesterday
     
     
     let images: [MainViewName:String] = [
@@ -141,7 +145,7 @@ struct ContentView: View {
              else {
                  
                  
-                 let recordOfToday: DailyRecord = dailyRecords.last ?? DailyRecord(date: Calendar.current.date(byAdding: .day, value: 1000, to: .now)!) // MARK: signOutErrorPrevention: 순간 개수가 0이 됨. 왜일까!
+                 let currentDailyRecord: DailyRecord = dailyRecords.first ?? DailyRecord(date: Calendar.current.date(byAdding: .day, value: 1000, to: .now)!) // MARK: signOutErrorPrevention: 순간 개수가 0이 됨. 왜일까!
                  
                  let currentDailyRecordSet: DailyRecordSet = dailyRecordSets.last ?? DailyRecordSet(start: Calendar.current.date(byAdding: .day, value: 1000, to: .now)!) // MARK: signOutErrorPrevention
 
@@ -154,24 +158,13 @@ struct ContentView: View {
                          .ignoresSafeArea(.keyboard)
                          .tag(mainViews[1])
                          MainView_checklist(
-                            recordOfToday: recordOfToday,
-                            // recordOfYesterday is nil if it is not remained one.
-                            recordOfYesterday: {  // if horizontalPosition is the 기준 of dailyRecord is yesterday's remained data.
-                                if dailyRecords.count >= 2 {
-                                    if dailyRecords[dailyRecords.count - 2].visualValue1 == nil {
-                                        return dailyRecords[dailyRecords.count - 2]
-                                    }
-                                    else {
-                                        return nil
-                                    }
-                                }
-                                else {
-                                    return nil
-                                }
-                            }(),
+                            currentDailyRecord: currentDailyRecord,
                             currentRecordSet: currentDailyRecordSet,
                             selectedView: $selectedView,
                             isNewDailyRecordAdded: $isNewDailyRecordAdded
+//                            todayRecordExists: <#T##Bool#>,
+//                            yesterdayRecordExists: <#T##Bool#>
+                            
  
                          )
                          .tabItem {
@@ -202,6 +195,29 @@ struct ContentView: View {
                          .ignoresSafeArea(.keyboard)
                          .tag(mainViews[3])
                      }
+                     .onAppear() {
+                         
+                     }
+                     .onChange(of: selectedView) { oldValue, newValue in //여기에 다양한 것 넣어주기
+                         
+                         let unSavedDailyRecords = dailyRecords.filter({$0.date == nil})
+                         print("unSavedDailyRecords.count: ",unSavedDailyRecords.count)
+                         if unSavedDailyRecords.count > 1 {
+                             var unSavedDailyRecords_sorted = unSavedDailyRecords.sorted(by: {$0.createdTime < $1.createdTime})
+                             unSavedDailyRecords_sorted.removeLast()
+                             for unSavedDailyRecord in unSavedDailyRecords_sorted {
+                                 modelContext.delete(unSavedDailyRecord)
+                             }
+                         }
+                         
+                         
+                         for quest in quests {
+                             quest.updateTier()
+                             quest.updateMomentumLevel()
+                         }
+                         
+                         
+                     }
                      
                      
 
@@ -210,8 +226,10 @@ struct ContentView: View {
                  
 //             }
          }
+    
 
      }
+        
     
 
     

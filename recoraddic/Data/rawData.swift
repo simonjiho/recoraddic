@@ -176,6 +176,7 @@ class DailyQuest: Hashable, Equatable, Identifiable {
     var dataType: Int = 1
     var defaultPurposes: Set<String> = []
     var dailyGoal: Int = 0
+    var currentTier: Int = 0
     
     var customDataTypeNotation: String?
     
@@ -198,13 +199,52 @@ class DailyQuest: Hashable, Equatable, Identifiable {
     
     
     func hash(into hasher: inout Hasher) {
-            hasher.combine(createdTime)
+        do {
+            try hasher.combine(createdTime)
+            try hasher.combine(id)
+        } catch {
+            print("hash hash")
+        }
+        
+
+
+
             // Add any other properties that should be included in the hash
     }
     
     
 }
 
+@Model
+//final class Todo {
+final class Todo: Hashable, Identifiable, Equatable {
+    var id:UUID = UUID()
+    var createdTime: Date = Date()
+
+    var index: Int = 0
+    var content: String = ""
+    var done: Bool = false
+    var purpose: Set<String> = []
+    
+    var dailyRecord: DailyRecord?
+    
+    init(dailyRecord: DailyRecord, index: Int) {
+        self.dailyRecord = dailyRecord
+        self.index = index
+    }
+    
+    static func == (lhs: Todo, rhs: Todo) -> Bool {
+            return lhs.createdTime == rhs.createdTime && lhs.index == rhs.index
+            // Add any other properties that determine equality
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(createdTime)
+        hasher.combine(index)
+            // Add any other properties that should be included in the hash
+    }
+    
+}
 
 @Model
 final class DailyRecordSet: Equatable {
@@ -242,18 +282,21 @@ final class DailyRecordSet: Equatable {
 }
 
 
+
 @Model
-final class DailyRecord: Equatable {
+final class DailyRecord: Equatable, Hashable {
+//final class DailyRecord: Equatable {
+
     
     var createdTime: Date = Date()
 
 //    @Attribute(.unique)
-    var date: Date = Date()
+    var date: Date?
     
     @Relationship(deleteRule:.cascade, inverse: \DailyQuest.dailyRecord)
     var dailyQuestList:[DailyQuest]? = []
-    
-
+    @Relationship(deleteRule:.cascade, inverse: \Todo.dailyRecord)
+    var todoList:[Todo]? = []
     
     var diaryImage: Data?
     var dailyTextType: String? // diary or inShort
@@ -285,6 +328,10 @@ final class DailyRecord: Equatable {
     
     var dailyRecordSet: DailyRecordSet?
     
+    init() {
+        
+    }
+    
     init(date:Date) {
         print("dailyRecordinitialization start")
         self.date = date
@@ -298,7 +345,11 @@ final class DailyRecord: Equatable {
             return lhs.createdTime == rhs.createdTime
             // Add any other properties that determine equality
     }
- 
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(createdTime)
+        hasher.combine(date)
+            // Add any other properties that should be included in the hash
+    }
     
 }
 

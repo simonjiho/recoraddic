@@ -29,7 +29,7 @@ struct InShortView: View {
     
 
     
-    var selectedDailyRecord: DailyRecord
+    var currentDailyRecord: DailyRecord
     
     @State var inShortText: String
     
@@ -57,7 +57,9 @@ struct InShortView: View {
 
             
             ZStack {
-                
+                Color.gray.opacity(0.1)
+                    .frame(width: isEdit ? geoWidth : geoWidth*0.9, height: geoHeight)
+                    .position(CGPoint(x: isEdit ? geoWidth/2 : geoWidth*0.55, y: geoHeight/2))
                 if !isEdit {
                     HStack {
                         Image(systemName: "book.closed.fill")
@@ -98,7 +100,7 @@ struct InShortView: View {
                         Button("완료", action:{
                             isEdit = false
                             keyBoard = false
-                            selectedDailyRecord.dailyText = inShortText
+                            currentDailyRecord.dailyText = inShortText
                         })
                         
                     }
@@ -121,7 +123,6 @@ struct InShortView: View {
                         .font(.title3)
                         .frame(height: geoHeight*0.75, alignment:.top)
 
-//                        .frame(height: geoHeight/2 <= 40 ? geoHeight/2 : 40, alignment:.top)
 
                 }
                 .padding(.top,3)
@@ -133,8 +134,8 @@ struct InShortView: View {
                 
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
-            .onChange(of: selectedDailyRecord) {
-                inShortText = selectedDailyRecord.dailyText!
+            .onChange(of: currentDailyRecord) {
+                inShortText = currentDailyRecord.dailyText!
             }
 
 
@@ -146,192 +147,6 @@ struct InShortView: View {
 
 }
 
-//struct DiaryView: View {
-//    
-//    @Environment(\.colorScheme) var colorScheme
-//    @Environment(\.modelContext) var modelContext
-//
-//    var selectedDailyRecord: DailyRecord
-//
-//    var image: Data?
-//
-//    @State var diaryText: String
-//
-//    @State var diaryViewWiden: Bool
-////    @Binding var popUp_addDiary: Bool
-//    @Binding var applyDiaryRemoval: Bool
-////    @Binding var diaryEllipsisTapped: Bool
-//    
-////    @State var isEdit: Bool
-//
-//    @Binding var isEdit: Bool
-//    @FocusState var keyBoard: Bool
-//    
-//    @State var showWholeContent:Bool = false
-//    
-//    var body: some View {
-//        GeometryReader { geometry in
-//            
-//            let geoWidth = geometry.size.width
-//            let geoHeight = geometry.size.height
-//            
-//            
-//
-//            let iconWidth: CGFloat = diaryViewWiden ? 40 : 20
-//            let imageWidth: CGFloat = image == nil ? 0.0 : (diaryViewWiden ? geometry.size.width*0.8 : geometry.size.width*0.15)
-//            let textBoxWidth: CGFloat = diaryViewWiden ? geometry.size.width*0.9 : (geometry.size.width-imageWidth-iconWidth)*0.8
-//            
-//            let iconHeight: CGFloat = diaryViewWiden ? 35 : 20
-//            let imageHeight: CGFloat = image == nil ? 0.0 : (diaryViewWiden ? geometry.size.height*0.2 : imageWidth)
-//            let textBoxHeight: CGFloat = diaryViewWiden ? (geometry.size.height - imageHeight - iconHeight - 30) : geometry.size.height*0.8
-////            let textBoxHeight: CGFloat = diaryViewWiden ? (geometry.size.height - imageHeight)*(isEdit ? 0.7 : 1.0) : geometry.size.height*0.8
-//            
-////            let iconAndDoneButtonHStackWidth:  CGFloat = iconWidth*2
-//            
-//            let text = diaryViewWiden ? diaryText : String(describing: diaryText.prefix(30))
-//            
-//            let axisWiden = geometry.size.width/2
-//            let axisNotWiden = geometry.size.height/2
-//            
-//            let iconPosition: CGPoint = diaryViewWiden ? CGPoint(x: axisWiden, y: 10 + iconHeight/2): CGPoint(x: 10 + iconWidth/2, y: axisNotWiden)
-////            let iconAndHStackPosition: CGPoint = CGPoint(x: axisWiden, y: 10 + iconHeight/2)
-//            let imagePosition: CGPoint = diaryViewWiden ? CGPoint(x: axisWiden, y: 10 + iconHeight + 10 + imageHeight/2): CGPoint(x: 10 + iconWidth + 5 + imageWidth/2 , y: axisNotWiden)
-//            let textBoxPosition: CGPoint = diaryViewWiden ? CGPoint(x: axisWiden, y: 10 + iconHeight + 10 + imageHeight + 10 + textBoxHeight/2): CGPoint(x: 10 + iconWidth + 5 + imageWidth + 10 + textBoxWidth/2 , y: axisNotWiden)
-//            
-//            let ellipsisPositon: CGPoint = CGPoint(x:geometry.size.width*0.975, y: 10)
-//            
-//            ZStack(alignment:diaryViewWiden ? .top : .leading) {
-//                
-//                Group {
-//                    
-//                    Color.clear
-//                        .background(.background)
-//                    HStack {
-//                        Image(systemName: "book.closed.fill")
-//                            .resizable()
-//                            .frame(width:iconWidth, height: iconHeight)
-//                            .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-//                        if isEdit {
-//                            Button("완료") {
-//                                isEdit = false
-//                                keyBoard = false
-//                                selectedDailyRecord.dailyText = diaryText
-//                            }
-//                            .buttonStyle(.borderedProminent)
-//                        }
-//                    }
-//                    .position(iconPosition)
-//
-//                    
-//                    
-//                    if image != nil {
-//                        Image(uiImage: UIImage(data: image!)!)
-//                            .resizable()
-//                            .aspectRatio(contentMode: .fit)
-//                            .frame(width:imageWidth, height: imageHeight)
-//                            .clipShape(.buttonBorder)
-//                            .position(imagePosition)
-//                    }
-//                    
-//                    
-//                    if isEdit {
-//                        TextEditor(text: $diaryText)
-//                            .frame(width:textBoxWidth, height: textBoxHeight, alignment: .top)
-//                            .position(textBoxPosition)
-//                            .border(.gray)
-//                            .focused($keyBoard)
-//                            .onAppear() {
-//                                diaryViewWiden = true
-//                                keyBoard = true
-//                            }
-//
-//                        
-//                    }
-//                    else {
-//                        
-//
-//                            Text("\(text)\(diaryText.count > text.count ? "..." : "")")
-//                                .lineLimit(diaryViewWiden ? 100 : 1)
-//                                .scrollDisabled(false)
-//                                .position(textBoxPosition)
-//                                .border(.gray)
-//                            
-////                        }
-////                        .scrollDisabled(!diaryViewWiden)
-//                    }
-//                }
-//                .onTapGesture {
-//                    if !isEdit {
-//                        withAnimation {
-//                            if !diaryViewWiden {
-//                                showWholeContent.toggle()
-//                            }
-//                            diaryViewWiden.toggle()
-//
-//                        }
-//                    }
-//                }
-//                .onChange(of: keyBoard) {
-//                    isEdit = keyBoard
-//                }
-//                .onChange(of: isEdit) {
-//                    keyBoard = isEdit
-//                }
-//                
-//                
-//                if !diaryViewWiden {
-//                    Menu {
-//                        
-//                        Button("수정",action: {
-//                            //                        popUp_addDiary.toggle()
-//                            //                        withAnimation {
-//                            //                            diaryViewWiden = true
-//                            //                        }
-//                            isEdit = true
-//                            keyBoard = true
-//                            
-//                        })
-//                        Button("삭제",action: {
-//                            applyDiaryRemoval.toggle()
-//                        })
-//                        //
-//                    } label: {
-//                        Image(systemName: "ellipsis")
-//                            .font(.title3)
-//                            .frame(height: geoHeight*0.75, alignment:.top)
-//                        //                        .frame(height: geoHeight/2 <= 40 ? geoHeight/2 : 40, alignment:.top)
-//                        
-//                    }
-//                    .padding(.top,3)
-//                    .frame(width:geoWidth*0.975, height: geoHeight, alignment: .topTrailing)
-//                    //                .position(ellipsisPositon)
-//                    //                .onTapGesture {
-//                    //                    diaryEllipsisTapped.toggle()
-//                    //                }
-//                    //                .me
-//                }
-//
-//            
-//                
-//                
-//            }
-//            .frame(width: geometry.size.width, height: geoHeight)
-//            .onChange(of: selectedDailyRecord) {
-//                diaryText = selectedDailyRecord.dailyText!
-//            }
-//            .fullScreenCover(isPresented: $showWholeContent, content: {
-//                DiaryView(selectedDailyRecord: selectedDailyRecord, diaryText: selectedDailyRecord.dailyText ?? "", diaryViewWiden: true, applyDiaryRemoval: .constant(false), isEdit: .constant(false))
-//            })
-//
-//
-//
-//
-//
-//        }
-//    }
-//}
-
-
 
 
 struct DiaryView: View {
@@ -339,7 +154,7 @@ struct DiaryView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.modelContext) var modelContext
 
-    var selectedDailyRecord: DailyRecord
+    var currentDailyRecord: DailyRecord
 
 
     @State var diaryText: String
@@ -382,30 +197,22 @@ struct DiaryView: View {
 //            let iconAndHStackPosition: CGPoint = CGPoint(x: axisWiden, y: 10 + iconHeight/2)
             let imagePosition: CGPoint = isEdit ? CGPoint(x: axisWiden, y: 10 + iconHeight + 10 ): CGPoint(x: 10 + iconWidth + 5 , y: axisNotWiden)
             let textBoxPosition: CGPoint = isEdit ? CGPoint(x: axisWiden, y: 10 + iconHeight + 10 + 10 + textBoxHeight/2): CGPoint(x: 10 + iconWidth + 5 + 10 + textBoxWidth/2 , y: axisNotWiden)
-            //
-//            let iconWidth: CGFloat = 20
-//            let textBoxWidth: CGFloat = (geometry.size.width-iconWidth)*0.8
-//            let iconHeight: CGFloat = 20
-//            let textBoxHeight: CGFloat = geometry.size.height*0.8
-//            let textBoxHeight: CGFloat = diaryViewWiden ? (geometry.size.height - imageHeight)*(isEdit ? 0.7 : 1.0) : geometry.size.height*0.8
-            
-//            let iconAndDoneButtonHStackWidth:  CGFloat = iconWidth*2
-            
-//            let text = String(describing: diaryText.prefix(30))
-            
-//            let axisWiden = geometry.size.width/2
-//            let axis = geometry.size.height/2
-//            
-//            let iconPosition: CGPoint = CGPoint(x: 10 + iconWidth/2, y: axis)
-//            let textBoxPosition: CGPoint = CGPoint(x: 10 + iconWidth + 5 + 10 + textBoxWidth/2 , y: axis)
-            
-            
+
             ZStack(alignment:isEdit ? .top : .leading) {
                 
+                
+                Color.gray.opacity(0.1)
+                    .frame(width: isEdit ? geoWidth : geoWidth*0.9, height: geoHeight)
+                    .position(CGPoint(x: isEdit ? geoWidth/2 : geoWidth*0.55, y: geoHeight/2))
+                    .onTapGesture {
+                        if !isEdit {
+                            showWholeContent.toggle()
+                        }
+                    }
+
                 Group {
                     
-                    Color.clear
-                        .background(.background)
+
                     HStack {
                         Image(systemName: "book.closed.fill")
                             .resizable()
@@ -417,7 +224,7 @@ struct DiaryView: View {
                                     isEdit = false
                                 }
                                 keyBoard = false
-                                selectedDailyRecord.dailyText = diaryText
+                                currentDailyRecord.dailyText = diaryText
                             }
                             .buttonStyle(.borderedProminent)
                         }
@@ -429,7 +236,9 @@ struct DiaryView: View {
                     
                     if isEdit {
                         TextEditor(text: $diaryText)
+                            .padding(.bottom,10)
                             .frame(width:textBoxWidth, height: textBoxHeight, alignment: .top)
+                            .scrollContentBackground(.hidden)
                             .position(textBoxPosition)
 //                            .border(.gray)
                             .focused($keyBoard)
@@ -463,30 +272,34 @@ struct DiaryView: View {
 //                        keyBoard = isEdit
 //                    }
 //                }
-                
-                
-                Menu {
-                    
-                    Button("수정",action: {
 
-                        withAnimation {
-                            isEdit = true
-                        }
-                        keyBoard = true
-                        
-                    })
-                    Button("삭제",action: {
-                        applyDiaryRemoval.toggle()
-                    })
-                    //
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.title3)
-                        .frame(height: geoHeight*0.75, alignment:.top)
+                
+                if !isEdit {
                     
+                    Menu {
+                        
+                        Button("수정",action: {
+                            
+                            withAnimation {
+                                isEdit = true
+                            }
+                            keyBoard = true
+                            
+                        })
+                        Button("삭제",action: {
+                            applyDiaryRemoval.toggle()
+                        })
+                        //
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .font(.title3)
+                            .frame(height: geoHeight*0.75, alignment:.top)
+                        
+                    }
+                    .padding(.top,3)
+                    .frame(width:geoWidth*0.975, height: geoHeight, alignment: .topTrailing)
                 }
-                .padding(.top,3)
-                .frame(width:geoWidth*0.975, height: geoHeight, alignment: .topTrailing)
+                
 
 
             
@@ -494,8 +307,9 @@ struct DiaryView: View {
                 
             }
             .frame(width: geometry.size.width, height: geoHeight)
-            .onChange(of: selectedDailyRecord) {
-                diaryText = selectedDailyRecord.dailyText!
+
+            .onChange(of: currentDailyRecord) {
+                diaryText = currentDailyRecord.dailyText!
             }
             .sheet(isPresented: $showWholeContent, content: {
                 GeometryReader { geometry2 in
@@ -572,15 +386,14 @@ struct DiaryView_WholeContent: View {
                             .frame(width: contentWidth*0.95)
                     }
                     .frame(width: geoWidth ,height: max(geoHeight-20-iconHeight-10, 0.0))
-                    .background(colorSchemeColor)
                     .padding(.bottom, 10)
 
                 }
                 .frame(width: geoWidth, height: geoHeight, alignment: .center)
-                .background(colorSchemeColor)
-                .clipShape(.containerRelative)
-                .shadow(color:shadowColor.opacity(0.6), radius: 2)
-                .border(.gray)
+                .background(.gray.opacity(0.1))
+//                .clipShape(.containerRelative)
+//                .shadow(color:shadowColor.opacity(0.6), radius: 2)
+//                .border(.gray)
             
 
 

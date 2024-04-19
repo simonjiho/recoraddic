@@ -200,6 +200,7 @@ struct StartNewRecordSet:View {
             }
             .frame(width: geoWidth,height: geoHeight)
 
+
         }
 
     }
@@ -211,7 +212,7 @@ struct StartNewRecordSet:View {
         if dailyRecordSets.last!.dailyRecords!.count == 0 {
             // reset current daily record set
             newDailyRecordSet = dailyRecordSets.last!
-            newDailyRecordSet.start = getDateOfNow()
+            newDailyRecordSet.start = getStartDateOfNow()
             newDailyRecordSet.dailyQuestions = []
             
             // newDailyRecordSet 생성, 설정해준 값들 넣어주기(DRThemeName, questions)
@@ -226,17 +227,17 @@ struct StartNewRecordSet:View {
         else {
             
             let prev_drs_end: Date = dailyRecordSets.last!.dailyRecords!.sorted(by: { dr1, dr2 in
-                dr1.date < dr2.date
-            }).last!.date
+                dr1.date! < dr2.date!
+            }).last!.date!
             
             dailyRecordSets.last!.end = prev_drs_end
 
             let new_drs_start: Date
-            if prev_drs_end == getDateOfNow() {//MARK: 만약 오늘저장한 dr이 이미 이전의 drs에 저장된 상태에서 새로운 drs를 만든다면?
+            if prev_drs_end == getStartDateOfNow() {//MARK: 만약 오늘저장한 dr이 이미 이전의 drs에 저장된 상태에서 새로운 drs를 만든다면?
                 new_drs_start = Calendar.current.date(byAdding: .day, value: 1, to: prev_drs_end)!
             }
             else {
-                new_drs_start = getDateOfNow()
+                new_drs_start = getStartDateOfNow()
             }
             
             newDailyRecordSet = DailyRecordSet(start: new_drs_start)

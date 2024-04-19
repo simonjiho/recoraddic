@@ -184,8 +184,6 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             .sheet(isPresented: $popUp_recordInDetail) {
                 RecordInDetailView_optional(
                     popUp_recordInDetail: $popUp_recordInDetail,
-//                    dailyRecordHidden: $dailyRecordHidden,
-//                    dailyRecordDeleted: $dailyRecordDeleted,
                     record: $selectedRecord
 
                 )
@@ -217,22 +215,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             
             selectedDailyRecordSetIndex = dailyRecordSets_notHidden.count - 1
         })
-//        .onChange(of: dailyRecordHidden) { // visualValue's Modification is done inside ThemeView, not here
-////            recalculateVisualValues_hiddenOrDeleted()
-////            let hiddenRecord: DailyRecord = selectedRecord!
-////            selectedRecord = nil
-////            hiddenRecord.isHidden = true
-//                recalculateVisualValues_hiddenOrDeleted(isHidden: true)
-//
-//        }
-//        .onChange(of: dailyRecordDeleted) {  // visualValue's Modification is done inside ThemeView, not here
-////            recalculateVisualValues_hiddenOrDeleted()
-////            let deletedRecord: DailyRecord = selectedRecord!
-////            selectedRecord = nil
-////            modelContext.delete(deletedRecord)
-//            recalculateVisualValues_hiddenOrDeleted(isDeleted: true)
-//
-//        }
+
         .onChange(of: selectedDailyRecordSet.dailyRecordThemeName) {
             
             recalculatingVisualValues_themeChanged = true

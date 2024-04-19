@@ -59,7 +59,7 @@ struct StoneTowerBackground_1:View {
                 return LinearGradient(colors: [.blue.adjust(saturation: -0.4, brightness: 0.3),.blue.adjust(saturation: -0.45, brightness: 0.4),.blue.adjust(saturation: -0.5, brightness: 0.43),.blue.adjust(saturation: -0.52, brightness: 0.47)], startPoint: .top, endPoint: .bottom)
             }
             else {
-                return LinearGradient(colors: [.blue.adjust(saturation: 0.5, brightness: -0.5),.blue.adjust(saturation: 0.7, brightness: -0.8)], startPoint: .top, endPoint: .bottom)
+                return LinearGradient(colors: [.blue.adjust(saturation: 0.5, brightness: -0.5),.blue.adjust(saturation: 0.7, brightness: -0.9)], startPoint: .top, endPoint: .bottom)
             }
                 
             }()
@@ -164,9 +164,15 @@ struct StoneTowerBackground_1:View {
                     }
                     else {
 //                        [.black,.black,.black,.black,.black,.black,.black,.black,.black,.black,.black,.black,.black,.black,.black,.black,.black,.black],
-                        let brightBlack: Color = Color.black.opacity(0.5)
-                        LinearGradient(colors: [.black, brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack], startPoint: .top, endPoint: .bottom)
-                            .opacity(0.45)
+//                        let brightBlack: Color = Color.black.opacity(0.5)
+//                        LinearGradient(colors: [.black, brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack,brightBlack], startPoint: .top, endPoint: .bottom)
+//                            .opacity(0.6)
+                        
+                        let brightBlack: Color = Color.black.opacity(0.6)
+                        let darkBlack: Color = Color.black.opacity(0.8)
+                        
+                        LinearGradient(colors: [brightBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack], startPoint: .top, endPoint: .bottom)
+                            .opacity(0.6)
                     }
 
                 }
