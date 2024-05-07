@@ -197,7 +197,8 @@ struct StoneTower_0: View {
                                             ZStack {
                                                 StoneTower_0_stone(
                                                     defaultColorIndex: defaultColorIndex,
-                                                    facialExpressionNum: record.mood
+                                                    facialExpressionNum: record.mood,
+                                                    selected: isSelectedRecord
                                                 )
                                                 .frame(width: width, height: height)
                                                 .padding(.leading, geoWidth/2 - width/2)
@@ -249,7 +250,7 @@ struct StoneTower_0: View {
                                             
                                             isEditingTermGoals = false
                                         }) {
-                                            Image(systemName: "arrowshape.left")
+                                            Image(systemName: "chevron.left")
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
                                                 .frame(width:geoWidth*0.12,height: groundHeight*0.1)
@@ -258,17 +259,13 @@ struct StoneTower_0: View {
                                         
                                         ZStack {
                                             HStack(spacing:0.0) {
-                                                if isEditingTermGoals || dailyRecordSet.termGoals.count != 0 {
-                                                    Text("목표")
-                                                        .bold()
-                                                        .font(.title3)
-                                                        .frame(width: geoWidth/5)
-                                                        .opacity(0.8)
-                                                }
-                                                else {
-                                                    Spacer()
-                                                        .frame(width: geoWidth/5)
-                                                }
+                                                Text(isEditingTermGoals ? "목표" : "\(dailyRecordSet.getTerm_string())")
+                                                    .padding(.trailing,5)
+                                                    .minimumScaleFactor(0.7)
+                                                    .lineLimit(1)
+                                                    .bold()
+                                                    .opacity(0.8)
+
 
 //                                                    .border(.red)
 
@@ -293,7 +290,7 @@ struct StoneTower_0: View {
                                                 }
 
                                             }
-                                            .frame(width:geoWidth/2,height: groundHeight*0.15)
+                                            .frame(width:geoWidth*0.75,height: groundHeight*0.15)
                                             .offset(x:isEditingTermGoals ? goalEditButtonSize/2 : 0.0)
 //                                            .frame(alignment:.center)
 //                                            .border(.black)
@@ -303,7 +300,7 @@ struct StoneTower_0: View {
                                         Button(action:{
                                             selectedDailyRecordSetIndex += 1
                                         }) {
-                                            Image(systemName: "arrowshape.right")
+                                            Image(systemName: "chevron.right")
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
                                                 .frame(width:geoWidth*0.12, height: groundHeight*0.1)
@@ -329,11 +326,12 @@ struct StoneTower_0: View {
                                                             Button(action: {
                                                                 if editTermGoals == index {
                                                                     if editTermGoals != 0 {
-                                                                        editTermGoals? -= 1
+                                                                        editTermGoals = index - 1
                                                                     }
                                                                 }
-                                                                editText.remove(at: index)
-                                                                
+                                                                DispatchQueue.main.asyncAfter(deadline: .now()+0.2) { // if done just right after, it will lead index out of range error.
+                                                                    editText.remove(at: index)
+                                                                }
                                                             }) {
                                                                 Image(systemName: "x.circle")
                                                             }
@@ -457,19 +455,24 @@ struct StoneTower_0: View {
                                 VStack(spacing:0) {
                                     StoneTower_0_stone(
                                         defaultColorIndex: defaultColorIndex,
-                                        facialExpressionNum: 3
+                                        facialExpressionNum: 3,
+                                        selected: false
                                     )
                                     .frame(width: stoneWidth, height: stoneHeight)
                                     .opacity(0.2)
                                     StoneTower_0_stone(
                                         defaultColorIndex: defaultColorIndex,
-                                        facialExpressionNum: 2
+                                        facialExpressionNum: 2,
+                                        selected: false
+
                                     )
                                     .frame(width: stoneWidth, height: stoneHeight)
                                     .opacity(0.3)
                                     StoneTower_0_stone(
                                         defaultColorIndex: defaultColorIndex,
-                                        facialExpressionNum: 1
+                                        facialExpressionNum: 1,
+                                        selected: false
+
                                     )
                                     .frame(width: stoneWidth, height: stoneHeight)
                                     .opacity(0.4)

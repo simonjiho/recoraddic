@@ -19,13 +19,16 @@ struct StoneTower_1_stone: View {
     var facialExpressionNum: Int
     
     var defaultColor:Color
+    
+    var selected: Bool
 
     
-    init(shapeNum: Int, brightness: Int, defaultColorIndex: Int, facialExpressionNum: Int) {
+    init(shapeNum: Int, brightness: Int, defaultColorIndex: Int, facialExpressionNum: Int, selected:Bool) {
         self.shapeNum = shapeNum
         self.brightness = brightness
         self.facialExpressionNum = facialExpressionNum
         self.defaultColor = StoneTower_1.getDailyRecordColor(index: defaultColorIndex)
+        self.selected = selected
     }
 
 
@@ -102,7 +105,7 @@ struct StoneTower_1_stone: View {
         //                        .frame(height: geometry.size.height*0.8)
                                 .frame(height: geometry.size.height*0.6)
                         }
-                        .opacity(0.3)
+                        .opacity(selected ? 0.7 : 0.3)
 
 
 

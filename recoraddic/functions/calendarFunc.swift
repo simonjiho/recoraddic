@@ -189,6 +189,34 @@ func nDates(from date :Date, n:Int) -> [Date] {
     
 }
 
+
+func partitionByWeek(startDate: Date, endDate: Date) -> [[Date]] {
+    var result:[[Date]] = [[Date]]()
+    var currentWeek:[Date] = []
+    var currentDate = startDate
+
+    while currentDate <= endDate {
+        let weekOfYear = Calendar.current.component(.weekOfYear, from: currentDate)
+        let weekOfYearNextDay = Calendar.current.component(.weekOfYear, from: Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate)
+
+        currentWeek.append(currentDate)
+
+        if weekOfYear != weekOfYearNextDay {
+            result.append(currentWeek)
+            currentWeek = []
+        }
+
+        currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
+    }
+
+    if !currentWeek.isEmpty {
+        result.append(currentWeek)
+    }
+
+    return result
+}
+
+
 extension Date {
     var isStartOfMonth: Bool {
         let components = Calendar.current.dateComponents([.year, .month, .day], from: self)

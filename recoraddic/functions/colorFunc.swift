@@ -45,11 +45,14 @@ func getTierColorOf(tier:Int) -> Color {
     let bronze = Color.brown.adjust(brightness: 0.0)
     let silver = Color.gray.adjust(brightness:0.2) //
     let gold = Color.brown.adjust(brightness:0.37) //
-    let platinum = Color.blue.adjust(saturation:-0.5, brightness:0.4) //
-    let diamond = Color.cyan.adjust(saturation:-0.57, brightness:0.2) //
-    let master = Color(red: 0.3, green: 0.5, blue: 1.0).adjust(brightness:0.2) //
-    let superMaster = Color(red: 0.46, green: 0.4, blue: 0.9).adjust(brightness:0.7)
-    let grandMaster = Color(red: 1.0, green: 0.5, blue: 0.5).adjust(brightness:0.3) // 무지개
+//    let platinum = Color.blue.adjust(saturation:-0.5, brightness:0.4) //
+    let platinum = Color(red:119.0/255.0 , green: 255.0/255.0, blue: 232.0/255.0) //119, 255, 232
+//    let diamond = Color.cyan.adjust(saturation:-0.57, brightness:0.2)
+    let diamond = Color(red:210.0/255.0 , green: 245.0/255.0, blue: 250.0/255.0) //rgb(210, 245, 250)
+//    let master = Color(red: 0.3, green: 0.5, blue: 1.0).adjust(brightness:0.2)
+    let master = Color(red:100.0/255.0 , green: 150.0/255.0, blue: 252.0/255.0) //100, 150, 252
+    let superMaster = Color(red: 215.0/255.0, green: 189.0/255.0, blue: 238/255.0)
+    let grandMaster = Color(red: 242.0/255.0, green: 140.0/255.0, blue: 136.0/255.0) //242, 152, 136
     
         
     switch tier/5 {
@@ -77,6 +80,40 @@ func getTierColorOf(tier:Int) -> Color {
         
 }
 
+func getDarkTierColorOf(tier:Int) -> Color {
+    
+    let tierColor: Color = getTierColorOf(tier: tier)
+    
+    switch tier/5 {
+    case 0:
+        return tierColor.adjust(brightness: -0.3)
+    case 1:
+        return tierColor.adjust(brightness: -0.5)
+    case 2:
+        return tierColor.adjust(brightness: -0.35)
+    case 3:
+        return tierColor.adjust(brightness: -0.5)
+    case 4:
+        return tierColor.adjust(brightness: -0.5)
+    case 5:
+        return tierColor.adjust(brightness: -0.5)
+    case 6:
+        return tierColor.adjust(brightness: -0.5)
+    case 7:
+//        return tierColor.adjust(brightness: -0.2)
+//        return tierColor.adjust(brightness: 0.1)
+//        return Color.purple.adjust(brightness: 0.8)
+        return tierColor.adjust(brightness: -0.5)
+
+
+    case 8:
+        return tierColor.adjust(brightness: -0.5)
+
+    default:
+        return tierColor.adjust(brightness: -0.5)
+    }
+}
+
 
 func getBrightTierColorOf(tier:Int) -> Color {
     
@@ -84,9 +121,9 @@ func getBrightTierColorOf(tier:Int) -> Color {
     
     switch tier/5 {
     case 0...2:
-        return tierColor.adjust(brightness: 0.2)
-    case 3:
         return tierColor.adjust(brightness: 0.15)
+    case 3:
+        return tierColor.adjust(brightness: 0.10)
     case 4:
         return tierColor.adjust(brightness: 0.3)
     case 5:
@@ -94,17 +131,14 @@ func getBrightTierColorOf(tier:Int) -> Color {
     case 6:
         return tierColor.adjust(brightness: 0.3)
     case 7:
-//        return tierColor.adjust(brightness: -0.2)
-//        return tierColor.adjust(brightness: 0.1)
-//        return Color.purple.adjust(brightness: 0.8)
-        return tierColor.adjust(brightness: 0.4)
+        return tierColor.adjust(brightness: 0.25)
 
 
     case 8:
         return tierColor.adjust(brightness: 0.4)
 
     default:
-        return tierColor.adjust(brightness: 0.1)
+        return tierColor.adjust(brightness: 0.05)
     }
 }
 
@@ -115,19 +149,19 @@ func getBrightTierColorOf2(tier:Int) -> Color {
     
     switch tier/5 {
     case 0...1:
-        return tierColor.adjust(brightness: 0.35)
+        return tierColor.adjust(brightness: 0.3)
     case 2...3:
         return tierColor.adjust(brightness: 0.25)
     case 4:
-        return tierColor.adjust(brightness: 0.5)
+        return tierColor.adjust(brightness: 0.8)
     case 5:
         return tierColor.adjust(brightness: 0.15)
     case 6:
-        return tierColor.adjust(brightness: 0.4)
+        return tierColor.adjust(brightness: 0.6)
     case 7:
-        return tierColor.adjust(brightness: 0.4)
+        return tierColor.adjust(brightness: 0.35)
     case 8:
-        return tierColor.adjust(brightness: 0.4)
+        return tierColor.adjust(brightness: 0.6)
 
     default:
         return tierColor.adjust(brightness: 0.1)

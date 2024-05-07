@@ -208,7 +208,7 @@ struct RecordInDetailView: View {
                                 .frame(width: questBoxWidth, alignment: .leading)
                             ForEach(record.dailyQuestList!, id:\.self) { questdata in
                                 
-                                let text:String = questdata.dataType != DataType.OX ? "\(questdata.questName)  \(DataType.string_unitDataToRepresentableData(data: questdata.data, dataType: questdata.dataType)) \(DataType.unitNotationOf(dataType: questdata.dataType, customDataTypeNotation: questdata.customDataTypeNotation))" : questdata.questName
+                                let text:String = questdata.dataType != DataType.OX ? "\(questdata.questName)  \(DataType.string_fullRepresentableNotation(data: questdata.data, dataType: questdata.dataType, customDataTypeNotation: questdata.customDataTypeNotation))" : questdata.questName
                                 HStack {
 
                                     let purposeCount = questdata.defaultPurposes.count
@@ -248,33 +248,7 @@ struct RecordInDetailView: View {
                             }
                             
                             
-                            //                        HStack {
-                            //                            Button(record.hide ? "되돌리기":"숨기기") {
-                            //                                if !record.hide {
-                            //                                    recalculateVisualValues_hiddenOrDeleted(dailyRecord: record)
-                            //                                    record.hide.toggle()
-                            //                                }
-                            //                                else {
-                            //                                    record.hide.toggle()
-                            //                                    recalculateVisualValues_unhidden(dailyRecord: record)
-                            //                                }
-                            //
-                            ////                                dailyRecordHidden.toggle()
-                            //                                popUp_recordInDetail.toggle()
-                            //                            }
-                            //
-                            //                            Button("삭제") {
-                            ////                                dailyRecordDeleted.toggle()
-                            //                                popUp_recordInDetail.toggle()
-                            //                                if !record.hide {
-                            //                                    recalculateVisualValues_hiddenOrDeleted(dailyRecord: record)
-                            //                                }
-                            //                                modelContext.delete(record)
-                            //
-                            //                            }
-                            //                        }
-                            
-                            
+
                         }//VStack
                         .frame(width: geometry.size.width, alignment: .top)
                         .padding(.vertical,10)

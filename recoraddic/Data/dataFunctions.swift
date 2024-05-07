@@ -22,19 +22,19 @@ extension Quest {
                 let minus: Int = {
                     switch i {
                     case 0...9:
-                        return 10 // 1시간
+                        return 60 // 1시간
                     case 10...14:
-                        return 60 // 6시간
+                        return 360 // 6시간
                     case 15...19:
-                        return 120 // 12시간
+                        return 720 // 12시간
                     case 20...24:
-                        return 600 // 60시간
+                        return 3600 // 60시간
                     case 25...29:
-                        return 1200 // 120시간
+                        return 7200 // 120시간
                     case 30...34:
-                        return 6000 // 600시간
+                        return 36000 // 600시간
                     case 35...39:
-                        return 12000 // 1200시간
+                        return 72000 // 1200시간
                     default:
                         return 9999999
                     }
@@ -91,7 +91,7 @@ extension Quest {
         // 오늘기록완료시(get d -> 마지막기록날짜 / 기록완료 안했을 시: 전날
         
         if representingData == QuestRepresentingData.cumulativeData {
-            return "총 \(DataType.string_unitDataToRepresentableData(data:cumulative(), dataType: self.dataType) )\(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation: customDataTypeNotation))"
+            return "누적 \(DataType.string_fullRepresentableNotation(data: cumulative(), dataType: dataType, customDataTypeNotation: self.customDataTypeNotation))"
         }
         
         else if representingData == QuestRepresentingData.recentMontlyData {

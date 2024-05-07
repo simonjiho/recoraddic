@@ -49,10 +49,8 @@
 		B2B6B1922B47F8F3006DDCBE /* defaultImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2B6B1912B47F8F3006DDCBE /* defaultImages.xcassets */; };
 		B2BA88FA2B2B0D4500A3D50E /* defaultVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA88F92B2B0D4500A3D50E /* defaultVariables.swift */; };
 		B2BA88FD2B2F171600A3D50E /* AddQuestCheckboxDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA88FC2B2F171600A3D50E /* AddQuestCheckboxDataView.swift */; };
-		B2BA88FF2B2F172200A3D50E /* AddEventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA88FE2B2F172200A3D50E /* AddEventView.swift */; };
 		B2BA89012B2F172E00A3D50E /* AddDiaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA89002B2F172E00A3D50E /* AddDiaryView.swift */; };
 		B2BA89032B30A71C00A3D50E /* QuestCheckBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA89022B30A71C00A3D50E /* QuestCheckBoxView.swift */; };
-		B2BA89052B30A73100A3D50E /* EventCheckBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA89042B30A73100A3D50E /* EventCheckBoxView.swift */; };
 		B2BA89072B32CA5600A3D50E /* textFieldMaxLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA89062B32CA5600A3D50E /* textFieldMaxLength.swift */; };
 		B2BA890A2B32E0EB00A3D50E /* DiaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA89092B32E0EB00A3D50E /* DiaryView.swift */; };
 		B2BA89102B36BDC600A3D50E /* SaveDailyRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA890F2B36BDC600A3D50E /* SaveDailyRecordView.swift */; };
@@ -122,10 +120,8 @@
 		B2B6B1912B47F8F3006DDCBE /* defaultImages.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = defaultImages.xcassets; sourceTree = "<group>"; };
 		B2BA88F92B2B0D4500A3D50E /* defaultVariables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = defaultVariables.swift; sourceTree = "<group>"; };
 		B2BA88FC2B2F171600A3D50E /* AddQuestCheckboxDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddQuestCheckboxDataView.swift; sourceTree = "<group>"; };
-		B2BA88FE2B2F172200A3D50E /* AddEventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEventView.swift; sourceTree = "<group>"; };
 		B2BA89002B2F172E00A3D50E /* AddDiaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDiaryView.swift; sourceTree = "<group>"; };
 		B2BA89022B30A71C00A3D50E /* QuestCheckBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestCheckBoxView.swift; sourceTree = "<group>"; };
-		B2BA89042B30A73100A3D50E /* EventCheckBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCheckBoxView.swift; sourceTree = "<group>"; };
 		B2BA89062B32CA5600A3D50E /* textFieldMaxLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = textFieldMaxLength.swift; sourceTree = "<group>"; };
 		B2BA89092B32E0EB00A3D50E /* DiaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryView.swift; sourceTree = "<group>"; };
 		B2BA890F2B36BDC600A3D50E /* SaveDailyRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveDailyRecordView.swift; sourceTree = "<group>"; };
@@ -348,7 +344,6 @@
 			isa = PBXGroup;
 			children = (
 				B2BA88FC2B2F171600A3D50E /* AddQuestCheckboxDataView.swift */,
-				B2BA88FE2B2F172200A3D50E /* AddEventView.swift */,
 				B2BA89002B2F172E00A3D50E /* AddDiaryView.swift */,
 				B2BA890F2B36BDC600A3D50E /* SaveDailyRecordView.swift */,
 			);
@@ -359,7 +354,6 @@
 			isa = PBXGroup;
 			children = (
 				B2BA89022B30A71C00A3D50E /* QuestCheckBoxView.swift */,
-				B2BA89042B30A73100A3D50E /* EventCheckBoxView.swift */,
 				B2BA89092B32E0EB00A3D50E /* DiaryView.swift */,
 			);
 			path = CheckListElements;
@@ -505,8 +499,6 @@
 				B220DA3A2B6261460039160C /* StoneTower_1.swift in Sources */,
 				B2102B142BA5CCCD0041C8FB /* QuestStatisticsInDetail.swift in Sources */,
 				B2CD40082BB2CE9100BECC5E /* StoneTower1_stones.swift in Sources */,
-				B2BA88FF2B2F172200A3D50E /* AddEventView.swift in Sources */,
-				B2BA89052B30A73100A3D50E /* EventCheckBoxView.swift in Sources */,
 				B2E552282BC297A400ACA5A8 /* StoneTower_0.swift in Sources */,
 				B260A3912A9B88AE00D73208 /* MainView_checklist.swift in Sources */,
 				B2BA88FD2B2F171600A3D50E /* AddQuestCheckboxDataView.swift in Sources */,

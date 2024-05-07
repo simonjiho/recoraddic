@@ -28,7 +28,6 @@ struct MainView_checklist: View {
     @Query var profiles: [Profile]
     @Query var quests: [Quest]
     @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
-//    @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
 
 
     @State var currentDailyRecord: DailyRecord
@@ -70,6 +69,10 @@ struct MainView_checklist: View {
     @State var keyboardAppeared = false
     @State var keyboardHeight: CGFloat = 0
     
+    @State var changeMood: Bool = false
+    @State var forceToChooseMood: Bool = false
+    @State var selectedClassification: String = "긍정적"
+    
     private var keyboardHeightPublisher: AnyPublisher<CGFloat, Never> {
         Publishers.Merge(
             NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
@@ -94,6 +97,8 @@ struct MainView_checklist: View {
         let linearGradient2: LinearGradient =
         LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .topLeading, endPoint: .bottomTrailing)
         
+        let bgColor: Color = currentRecordSet.getDailyRecordColor()
+        
         // currentRecord == records.last => 기간이 지났어도 currentRecord임
         GeometryReader { geometry in
 
@@ -101,46 +106,121 @@ struct MainView_checklist: View {
             let geoWidth: CGFloat = geometry.size.width
             let geoHeight: CGFloat = geometry.size.height
             
-
+            let checkListElementWidth: CGFloat = geoWidth * 0.95
             
             let buttonSize = geoWidth/13
             
             let popUp_addQuest_height = geometry.size.height*(keyboardAppeared ? 0.6 : 0.8)
             let popUp_addQuest_yPos = keyboardAppeared ? 35 + popUp_addQuest_height/2 : geometry.size.height/2
             
+            let popUp_changeMood_width = geoWidth * 0.7
+            let popUp_changeMood_height = geoHeight * 0.7
 
+            let facialExpressionSize = geoWidth*0.085
+            
             ZStack {
-//                VStack {
-//                    ZStack{
-//
-//                        ZStack {
-//                            ForEach(0..<2) { i in
-//                                linearGradient1
-//                                    .frame(width: geoWidth)
-//                                    .offset(x: (CGFloat(i) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
-//                                    .animation(Animation.linear(duration: 4).repeatForever(autoreverses: false), value: isAnimating)
-//                            }
-//                        }
-//                        .mask(
-//                            Text("\(kor_yyyymmddFormatOf(Date()))")
-//                                .font(.title3)
-//                                .bold()
-//                                .lineLimit(1)
-//                                .minimumScaleFactor(0.5)
-//                        )
-//                        .frame(width:geoWidth*0.5, height: geoHeight*0.07)
-//                        .onAppear() {
-//                            self.isAnimating = true
-//                        }
-//
-//
-//                    } // hstack
-//                    .frame(width:geoWidth, height: geoHeight*0.07, alignment: .center)
-//                    .padding(.vertical, 10)
-                    
 
-                    
+                VStack(spacing:0.0) {
 
+                    Group {
+                        if currentDailyRecord.mood == 0 {
+                            Image(systemName: "questionmark.circle")
+                                .resizable()
+                                .frame(width: facialExpressionSize, height: facialExpressionSize)
+
+                        }
+                        else {
+                            ZStack {
+                                Circle()
+                                    .stroke(lineWidth: geoWidth*0.002)
+                                    .frame(width:facialExpressionSize, height: facialExpressionSize)
+                                reversedColorSchemeColor
+                                    .frame(width:facialExpressionSize, height: facialExpressionSize)
+                                    .mask(
+                                        Image("facialExpression_\(currentDailyRecord.mood)")
+                                            .resizable()
+                                            .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
+                                    )
+                            }
+                        }
+                    }
+                    .onTapGesture {
+                        changeMood.toggle()
+                    }
+                    .popover(isPresented: $changeMood) {
+                        VStack {
+                            Spacer()
+                                .frame(height: geoHeight*0.06)
+
+                            Picker("분류", selection: $selectedClassification) {
+                                ForEach(["긍정적","부정적","중립적"],id:\.self) {
+                                    Text($0)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            ScrollView {
+                                let numList:[Int] = {
+                                    if selectedClassification == "전체" {return Array(1...125)}
+                                    else if selectedClassification == "긍정적" {return recoraddic.facialExpression_Good}
+                                    else if selectedClassification == "부정적" {return recoraddic.facialExpression_Bad}
+                                    else if selectedClassification == "중립적" {return recoraddic.facialExpression_Middle}
+                                    else { return [1]}
+                                }()
+                                let VGridSize = popUp_changeMood_width * 0.3
+                                
+                                if forceToChooseMood {
+                                    Text("하루를 표현할 표정을 선택하세요!")
+                                        .foregroundStyle(.red)
+                                        .minimumScaleFactor(0.5)
+                                }
+                                
+                                LazyVGrid(columns: [GridItem(.adaptive(minimum: VGridSize))]) {
+                                    
+                                    ForEach(numList, id: \.self) { index in
+                                        Color.black.opacity(0.6)
+                                            .mask {
+                                                Image("facialExpression_\(index)")
+                                                    .resizable()
+                                                    .blur(radius: 0.2)
+                                                    .frame(width:VGridSize*0.7, height: VGridSize*0.7)
+                                            }
+                                            .frame(width:VGridSize, height: VGridSize)
+                                            .background(bgColor.opacity(currentDailyRecord.mood == index ? 1.0 : 0.3))
+
+                                            .shadow(radius: 1)
+//                                            .border(reversedColorSchemeColor, width: /* border width */ 1)
+                                        
+
+                                            .onTapGesture {
+                                                
+                                                if currentDailyRecord.mood == index {
+                                                    currentDailyRecord.mood = 0
+                                                }
+                                                else {
+                                                    currentDailyRecord.mood = index
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                                        changeMood.toggle()
+                                                    }
+                                                }
+                                                
+                                            } // onTapGesture
+                                    }
+                                    
+                                } // LazyVGrid
+                            } // ScrollView
+                            .frame(width: popUp_changeMood_width, height: popUp_addQuest_height)
+                        }
+                        .frame(width: popUp_changeMood_width, height: popUp_addQuest_height)
+                        .presentationCompactAdaptation(.popover)
+
+
+                    }
+                    .padding(.top,geoHeight*0.035)
+                    .padding(.bottom, geoHeight*0.02)
+
+                    Color.gray
+                        .opacity(0.4)
+                        .frame(width: checkListElementWidth, height: 1)
                     ChecklistView(
                         currentDailyRecord: currentDailyRecord,
                         popUp_addQuest: $popUp_addDailyQuest,
@@ -150,8 +230,12 @@ struct MainView_checklist: View {
                         selectDiaryOption: $selectDiaryOption,
                         todoActivated: $todoActivated,
                         keyboardAppeared: $keyboardAppeared,
-                        keyboardHeight: $keyboardHeight
+                        keyboardHeight: $keyboardHeight,
+                        changeMood: $changeMood,
+                        forceToChooseMood: $forceToChooseMood
                     )
+                    .frame(height: geoHeight*0.93)
+                }
 
 //                }
 
@@ -187,29 +271,9 @@ struct MainView_checklist: View {
 
                 } label: {
 
-
-                    ZStack {
-                            ForEach(0..<2) { i in
-                                linearGradient2
-                                    .frame(width:geoWidth, height:buttonSize)
-                                    .offset(x: (CGFloat(i) - (self.isAnimating2 ? 0.0 : 1.0)) * geoWidth)
-                                    .animation(Animation.linear(duration: 6).repeatForever(autoreverses: false), value: isAnimating2)
-                                    .onAppear() {
-                                        isAnimating2 = true
-                                    }
-                            }
-                        }
-                        .mask {
-                            Image(systemName: "plus")
-                                .resizable()
-                                .frame(width:buttonSize, height:buttonSize)
-//                                .bold()
-                        }
-                        .frame(width:buttonSize, height:buttonSize)
-
-
-//                    }
-//                    .frame(width:geoWidth/10, height:geoWidth/10)
+                        Image(systemName: "plus")
+                            .resizable()
+                            .frame(width:buttonSize, height:buttonSize)
 
                 }
                 .buttonStyle(.plain)
@@ -217,14 +281,14 @@ struct MainView_checklist: View {
                 .position(x:geoWidth/2, y:geoHeight*0.95 - 10)
             
                 
-
+                let nothingToSave: Bool = currentDailyRecord.dailyText == nil && currentDailyRecord.dailyQuestList!.count == 0 && currentDailyRecord.todoList!.count == 0
                 
                 Menu {
 
                     if todayRecordExists && yesterdayRecordExists {
                         Text("어제/오늘의 기록이 모두 저장되어있습니다.")
                     }
-                    else if currentDailyRecord.dailyText == nil && currentDailyRecord.dailyQuestList!.count == 0 && currentDailyRecord.todoList!.count == 0 {
+                    else if nothingToSave {
                         Text("저장할 내용이 없습니다.")
                     }
                     else {
@@ -249,9 +313,16 @@ struct MainView_checklist: View {
                     }
                     .labelStyle(.titleAndIcon)
                     
+                    
                 }
                 .buttonStyle(.plain)
                 .position(x:geoWidth*0.85, y: geoHeight*0.95 - 10)
+                .onTapGesture {
+                    if currentDailyRecord.mood == 0 && !nothingToSave {
+                        forceToChooseMood = true
+                        changeMood.toggle()
+                    }
+                }
 
                 
                 
@@ -274,18 +345,38 @@ struct MainView_checklist: View {
                     
                 }
 
-                else if popUp_saveDailyRecord {
-                    SaveDailyRecordView(
-                        currentDailyRecordSet: currentRecordSet,
-                        currentDailyRecord: currentDailyRecord,
-                        popUp_createRecordStone: $popUp_saveDailyRecord,
-                        saveAsToday: saveAsToday,
-                        todayRecordExists: todayRecordExists,
-                        isNewDailyRecordAdded: $isNewDailyRecordAdded,
-                        selectedView: $selectedView
-                    )
-                    .popUpViewLayout(width: geometry.size.width*0.9, height: geometry.size.height*0.95, color: colorSchemeColor)
-                    .zIndex(2)
+                else if popUp_saveDailyRecord{
+                    if !doesThemeAskQuestions(currentRecordSet.dailyRecordThemeName) {
+                        SaveDailyRecordView_confirmation(
+                            currentDailyRecordSet: currentRecordSet,
+                            currentDailyRecord: currentDailyRecord,
+                            popUp_self: $popUp_saveDailyRecord,
+                            saveAsToday: saveAsToday,
+                            todayRecordExists: todayRecordExists,
+                            isNewDailyRecordAdded: $isNewDailyRecordAdded,
+                            selectedView: $selectedView,
+                            qVal1: nil,
+                            qVal2: nil,
+                            qVal3: nil
+                        )
+                        .popUpViewLayout(width: geometry.size.width*0.8, height: geometry.size.height*0.4, color: colorSchemeColor)
+                        .zIndex(2)
+                    }
+                    else {
+                        AnswerQuestions(
+                            currentDailyRecordSet: currentRecordSet,
+                            currentDailyRecord: currentDailyRecord,
+                            popUp_self: $popUp_saveDailyRecord,
+                            saveAsToday: saveAsToday,
+                            todayRecordExists: todayRecordExists,
+                            isNewDailyRecordAdded: $isNewDailyRecordAdded,
+                            selectedView: $selectedView
+                        )
+                        .popUpViewLayout(width: geometry.size.width*0.9, height: geometry.size.height*0.95, color: colorSchemeColor)
+                        .zIndex(2)
+                    }
+                        
+
 
                 }
             } // zstack
@@ -327,6 +418,11 @@ struct MainView_checklist: View {
                     dailyQuest.currentTier = quests.first(where: {$0.name == dailyQuest.questName})?.tier ?? 0
                 }
                 
+            }
+            .onChange(of: changeMood) {
+                if !changeMood && forceToChooseMood {
+                    forceToChooseMood = false
+                }
             }
             
  
@@ -399,13 +495,11 @@ struct ChecklistView: View {
     @Query var profiles: [Profile]
     @Query(sort:\DailyQuest.createdTime) var dailyQuests: [DailyQuest]
 
-//    @Query(sort:\EventCheckBoxData.createdTime) private var eventCheckBoxDatas: [EventCheckBoxData]
+
 
     var currentDailyRecord: DailyRecord
     
-//    var dailyQuests_forcurrentDailyRecord: [DailyQuest] {
-//        dailyQuests.filter({$0.dailyRecord == currentDailyRecord})
-//    }
+
     
     @Binding var popUp_addQuest: Bool
 //    @Binding var popUp_addQuest_plan: Bool
@@ -421,6 +515,9 @@ struct ChecklistView: View {
     
     @Binding var keyboardAppeared: Bool
     @Binding var keyboardHeight: CGFloat
+    
+    @Binding var changeMood: Bool
+    @Binding var forceToChooseMood: Bool
 
 
     @State var applyDailyQuestRemoval: Bool = false
@@ -472,7 +569,7 @@ struct ChecklistView: View {
             
             let questCheckBox_purposeTagsWidth = checkListElementWidth*0.1
             let questCheckBoxWidth = checkListElementWidth*0.9
-            let questCheckBoxHeight = geometry.size.height*0.07
+            let questCheckBoxHeight = geoHeight*0.07
             
             let todo_purposeTagsWidth = checkListElementWidth * 0.1
             let todo_checkBoxSize = checkListElementWidth * 0.1
@@ -484,8 +581,12 @@ struct ChecklistView: View {
             let purposeTagsHeight = geometry.size.height*0.04
             
 //            let diaryHeight = diaryViewWiden ? geometry.size.height * (editDiary ? 0.6 : 0.9) : 60
-            let diaryHeight = (currentDailyRecord.dailyTextType == DailyTextType.diary && editDiary) ? (geometry.size.height - keyboardHeight)*0.9 : questCheckBoxHeight
+            let diaryHeight = (currentDailyRecord.dailyTextType == DailyTextType.diary && editDiary) ? (geometry.size.height - keyboardHeight)*0.88 : questCheckBoxHeight
 
+            
+            let diaryExists: Bool = currentDailyRecord.dailyTextType != nil
+            let dailyQuestExists: Bool = currentDailyRecord.dailyQuestList!.count !=  0
+            let todoExists: Bool = currentDailyRecord.todoList!.count != 0
 
             ZStack {
                 ScrollViewReader { scrollProxy in
@@ -495,7 +596,7 @@ struct ChecklistView: View {
                         VStack(alignment: .center) {
                             
                             Spacer()
-                                .frame(width:geometry.size.width, height: 20)
+                                .frame(height: geoHeight*0.02)
                             
                             if selectDiaryOption {
                                 ZStack {
@@ -526,7 +627,13 @@ struct ChecklistView: View {
                                 }
                                 
                             }
-                            else if (currentDailyRecord.dailyTextType == DailyTextType.diary) {
+                            if (currentDailyRecord.dailyTextType != nil && !editDiary) {
+                                Text("일기")
+//                                    .bold()
+                                    .frame(width:checkListElementWidth, alignment:.leading)
+                            }
+                            
+                            if (currentDailyRecord.dailyTextType == DailyTextType.diary) {
                                 
                                 DiaryView(
                                     currentDailyRecord: currentDailyRecord,
@@ -552,71 +659,83 @@ struct ChecklistView: View {
                                 
                             }
                             
-                            Spacer()
-                                .frame(width:checkListElementWidth, height: geoHeight*0.05)
-                            
+
+                            if diaryExists && (dailyQuestExists || todoExists) {
+                                Color.gray
+                                    .opacity(0.4)
+                                    .frame(width: checkListElementWidth, height: 1)
+                                    .padding(.vertical, geoHeight*0.01)
+                            }
                             
                             if currentDailyRecord.dailyQuestList!.count !=  0 {
                                 Text("누적 퀘스트")
                                     .frame(width:checkListElementWidth,alignment: .leading)
                             }
-                            ForEach(currentDailyRecord.dailyQuestList!, id: \.self) { dailyQuest in
-                                
-                                
-                                HStack(spacing: 0) {
+                            VStack(spacing:questCheckBoxHeight*0.2) {
+                                ForEach(currentDailyRecord.dailyQuestList!, id: \.self) { dailyQuest in
                                     
-
-                                    
-                                    PurposeOfDailyQuestView(dailyQuest: dailyQuest, parentWidth: geoWidth, parentHeight: geoHeight)
-                                        .frame(width:questCheckBox_purposeTagsWidth, height: questCheckBoxHeight, alignment: .leading)
-                                        .opacity(0.9)
-                                    
-                                    
-                                    
-                                    
-                                    
-                                    if dailyQuest.dataType == DataType.OX {
-                                        QuestCheckBoxView_OX(
-                                            dailyQuest: dailyQuest,
-                                            themeSetName: profile.adjustedThemeSetName,
-                                            checkBoxToggle: dailyQuest.data == 1,
-                                            applyDailyQuestRemoval: $applyDailyQuestRemoval,
-                                            dailyQuestToDelete: $dailyQuestToDelete
-                                        )
-                                        .frame(width:questCheckBoxWidth, height: questCheckBoxHeight)
-                                        .opacity(0.85)
+                                    HStack(spacing: 0) {
+                                        
+                                        PurposeOfDailyQuestView(dailyQuest: dailyQuest, parentWidth: geoWidth, parentHeight: geoHeight)
+                                            .frame(width:questCheckBox_purposeTagsWidth, height: questCheckBoxHeight, alignment: .leading)
+                                            .opacity(0.9)
+                                            .zIndex(3)
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        if dailyQuest.dataType == DataType.OX {
+                                            QuestCheckBoxView_OX(
+                                                dailyQuest: dailyQuest,
+                                                themeSetName: profile.adjustedThemeSetName,
+                                                checkBoxToggle: dailyQuest.data == 1,
+                                                applyDailyQuestRemoval: $applyDailyQuestRemoval,
+                                                dailyQuestToDelete: $dailyQuestToDelete
+                                            )
+                                            .frame(width:questCheckBoxWidth, height: questCheckBoxHeight)
+                                            .opacity(0.85)
+                                            
+                                        }
+                                        else {
+                                            
+                                            let data = dailyQuest.data
+                                            let xOffset = CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal), to: 0...questCheckBoxWidth)
+                                            
+                                            // 원하는 기능
+                                            // 첫 생성 시: popUp view
+                                            // 기존 것 고를 시: 그냥 누르면 가장 최근 데이터, 프리셋 데이터 선택 시 프리셋 선택 및 추가/삭제 가능한 창
+                                            
+                                            
+                                            QuestCheckBoxView(
+                                                dailyQuest: dailyQuest,
+                                                themeSetName: profile.adjustedThemeSetName,
+                                                value: data,
+                                                xOffset: xOffset,
+                                                applyDailyQuestRemoval: $applyDailyQuestRemoval,
+                                                dailyQuestToDelete: $dailyQuestToDelete
+                                            )
+                                            .frame(width:questCheckBoxWidth, height: questCheckBoxHeight)
+                                            //                                    .shadow(color:shadowColor, radius: 3)
+                                            .opacity(0.85)
+                                            
+                                        }
                                         
                                     }
-                                    else {
-                                        
-                                        let data = dailyQuest.data
-                                        let xOffset = CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal), to: 0...questCheckBoxWidth)
-                                        
-                                        // 원하는 기능
-                                        // 첫 생성 시: popUp view
-                                        // 기존 것 고를 시: 그냥 누르면 가장 최근 데이터, 프리셋 데이터 선택 시 프리셋 선택 및 추가/삭제 가능한 창
-                                        
-                                        
-                                        QuestCheckBoxView(
-                                            dailyQuest: dailyQuest,
-                                            themeSetName: profile.adjustedThemeSetName,
-                                            value: data,
-                                            xOffset: xOffset,
-                                            applyDailyQuestRemoval: $applyDailyQuestRemoval,
-                                            dailyQuestToDelete: $dailyQuestToDelete
-                                        )
-                                        .frame(width:questCheckBoxWidth, height: questCheckBoxHeight)
-                                        //                                    .shadow(color:shadowColor, radius: 3)
-                                        .opacity(0.85)
-                                        
-                                    }
-                                    
                                 }
-                                .padding(5)
                             }
                             
-                            Spacer()
-                                .frame(width:geoWidth, height: geoHeight*0.05)
+                            
+//                            Spacer()
+//                                .frame(width:checkListElementWidth, height: dailyQuestExists ? geoHeight*0.08 : 0.0)
+                            
+                            
+                            if dailyQuestExists && todoExists {
+                                Color.gray
+                                    .opacity(0.4)
+                                    .frame(width: checkListElementWidth, height: 1)
+                                    .padding(.vertical, geoHeight*0.01)
+                            }
                             
                             
                             let todoList_sorted = currentDailyRecord.todoList!.sorted(by: {$0.index < $1.index})
@@ -624,77 +743,61 @@ struct ChecklistView: View {
                                 Text("일반 퀘스트")
                                     .frame(width:checkListElementWidth,alignment: .leading)
                             }
-                            ForEach(todoList_sorted, id:\.self) { todo in
-                                
-                                // view에 반영하는 내용은 stateVariable로 전부 대체 -> 처음 불러올 때 적용, 그리고 tapgesture on checkbox, submission(추가), 완료, x(삭제) 때만 modelContext의 데이터 변경해주기
-                                
-                                HStack(spacing:0.0) {
-                                    ////
-//                                    if todo.purpose.count == 0 {
-//                                        ////
-//                                    }
-//                                    PurposeTagsView_vertical(purposes: todo.purpose)
-//                                        .frame(width:todo_purposeTagsWidth, height: todo_height)
+                            VStack (spacing:todo_height*0.2) {
+                                ForEach(todoList_sorted, id:\.self) { todo in
                                     
-                                    PurposeOfTodoView(todo: todo, parentWidth: geoWidth, parentHeight: geoHeight)
-                                        .frame(width:todo_purposeTagsWidth, height: todo_height)
-                                    
-                                    Button(action:{
-                                        todo.done.toggle()
-                                    }) {
-                                        let checkBoxSize = min(todo_checkBoxSize, todo_height)
-                                        Image(systemName: todo.done ? "checkmark.circle" : "circle")
-                                            .resizable()
-                                            .frame(width:checkBoxSize*0.8, height: checkBoxSize*0.8)
-                                    }
-                                    .frame(width: todo_checkBoxSize, alignment: .leading)
-                                    
-                                    
-                                    textFieldView(currentDailyRecord: currentDailyRecord, todo: todo, text: todo.content, idx: $editingIndex, doneButtonPressed: $doneButtonPressed)
-                                        .frame(width:editingIndex == todo.index ? todo_textWidth*0.8 : todo_textWidth)
-                                    if editingIndex == todo.index {
-                                        Button("완료") {
-                                            doneButtonPressed.toggle()
-                                        }
-                                        .frame(width:todo_textWidth*0.2)
-                                    }
-                                    
-                                    if editingIndex == nil {
+                                    // view에 반영하는 내용은 stateVariable로 전부 대체 -> 처음 불러올 때 적용, 그리고 tapgesture on checkbox, submission(추가), 완료, x(삭제) 때만 modelContext의 데이터 변경해주기
+
+                                    HStack(spacing:0.0) {
+                                        
+                                        PurposeOfTodoView(todo: todo, parentWidth: geoWidth, parentHeight: geoHeight)
+                                            .frame(width:todo_purposeTagsWidth, height: todo_height)
+                                        
                                         Button(action:{
-                                            let targetIndex = todo.index
-                                            
-                                            modelContext.delete(todo)
-                                            
-                                            if editingIndex != nil && targetIndex < (editingIndex ?? -1) {
-                                                editingIndex! -= 1
-                                            }
-                                            else if editingIndex == targetIndex {
-                                                editingIndex = nil
-                                            }
-                                            
-                                            for todo2 in currentDailyRecord.todoList! {
-                                                if todo2.index > targetIndex {
-                                                    todo2.index -= 1
-                                                }
-                                            }
+                                            todo.done.toggle()
                                         }) {
-                                            let xmarkSize = min(todo_xmarkSize, todo_height)
-                                            Image(systemName: "xmark")
+                                            let checkBoxSize = min(todo_checkBoxSize, todo_height)
+                                            Image(systemName: todo.done ? "checkmark.circle" : "circle")
                                                 .resizable()
-                                                .frame(width:xmarkSize*0.5, height: xmarkSize*0.5)
+                                                .frame(width:checkBoxSize*0.8, height: checkBoxSize*0.8)
                                         }
-                                        .frame(width: todo_xmarkSize, alignment: .trailing)
+                                        .frame(width: todo_checkBoxSize, alignment: .leading)
+                                        .buttonStyle(.plain)
+
+                                        
+                                        textFieldView(currentDailyRecord: currentDailyRecord, todo: todo, text: todo.content, idx: $editingIndex, doneButtonPressed: $doneButtonPressed)
+                                            .frame(width:editingIndex == todo.index ? todo_textWidth*0.8 : todo_textWidth)
+                                        if editingIndex == todo.index {
+                                            Button("완료") {
+                                                doneButtonPressed.toggle()
+                                            }
+                                            .frame(width:todo_textWidth*0.2)
+                                        }
+                                        
+                                        if editingIndex == nil {
+                                            Button(action:{
+                                                let targetIndex = todo.index
+                                                
+                                                modelContext.delete(todo)
+
+                                            }) {
+                                                let xmarkSize = min(todo_xmarkSize, todo_height)
+                                                Image(systemName: "xmark")
+                                                    .resizable()
+                                                    .frame(width:xmarkSize*0.5, height: xmarkSize*0.5)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .frame(width: todo_xmarkSize, alignment: .trailing)
+                                        }
+                                        
+                                        
+                                        
                                     }
-                                    
-                                    
+                                    .frame(width: checkListElementWidth, height:todo_height)
+                                    .id(todo.index)
                                     
                                 }
-                                .frame(width: checkListElementWidth, height:todo_height)
-                                .padding(.vertical,5.0)
-                                .id(todo.index)
-
                             }
-                            
                             
                             
                             Spacer()
@@ -718,27 +821,6 @@ struct ChecklistView: View {
                 }
 //                }
                 if currentDailyRecord.dailyQuestList!.isEmpty && currentDailyRecord.dailyTextType == nil && currentDailyRecord.todoList?.count == 0 && !selectDiaryOption {
-                    VStack {
-                        let ratios = [1.0, 0.7, 0.5, 0.3, 0.1]
-                        ForEach(ratios, id:\.self) { ratio in
-                            VStack(spacing:0.0) {
-                                ZStack(alignment: .leading) {
-                                    Color.red.opacity(0.0)
-                                    Image(systemName:"questionmark.square")
-                                        .resizable()
-                                        .frame(width:purposeTagsHeight*0.7, height:purposeTagsHeight*0.7)
-                                        .foregroundStyle(reversedColorSchemeColor)
-                                }
-                                .frame(width:checkListElementWidth,height: purposeTagsHeight)
-
-                                EmptyQuestCheckBoxView(ratio:ratio)
-                                    .frame(width:checkListElementWidth, height: questCheckBoxHeight)
-                            }
-                            .opacity(0.1)
-                            .padding(5)
-                        }
-                    }
-                    .frame(width: geoWidth, height: geoHeight, alignment: .top)
                     Text("체크리스트에 내용을 추가하세요!")
                         .opacity(0.5)
                     
@@ -849,10 +931,13 @@ struct textFieldView: View {
             }
             .onChange(of: isFocused, {
 //                if isFocused && idx != todo.index {
-                if isFocused && idx == nil {
-
+//                if isFocused && idx == nil {
+//                    idx = todo.index
+//                }
+                if isFocused {
                     idx = todo.index
                 }
+                
             })
             .onAppear() {
                 if idx == todo.index {
@@ -973,53 +1058,6 @@ struct PurposeOfTodoView: View {
 }
 
 
-//struct PurposeOfDailyQuestView: View {
-//    
-//    @Environment(\.modelContext) var modelContext
-//    @Environment(\.colorScheme) var colorScheme
-//
-//    @State var popUp_changePurpose: Bool = false
-//    var dailyQuest: DailyQuest
-//    
-//    var body: some View {
-////        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-//        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
-//        
-//        GeometryReader { geometry in
-//            let geoWidth: CGFloat = geometry.size.width
-//            let geoHeight: CGFloat = geometry.size.height
-//            
-//            Group {
-//                Group {
-//                    // purpose 0개일 때는?
-//                    if dailyQuest.defaultPurposes.count == 0 {
-//                        Image(systemName:"questionmark.square")
-//                            .resizable()
-//                            .frame(width:geoHeight*0.7, height:geoHeight*0.7)
-//                            .foregroundStyle(reversedColorSchemeColor)
-//                    }
-//                    else {
-//                        PurposeTagsView_leading(purposes:dailyQuest.defaultPurposes)
-//                            .frame(width: geoWidth*0.2, height:geoHeight)
-//                    }
-//                    
-//                }
-//                .onTapGesture {
-//                    popUp_changePurpose.toggle()
-//                }
-//                //                                    .popover(isPresented: $popUp_changePurpose) {
-//                .popover(isPresented: $popUp_changePurpose) {
-//                    ChoosePurposeView2(dailyQuest: dailyQuest)
-//                        .padding(.leading,3)
-//                        .frame(width:geoWidth*0.65)
-//                        .presentationCompactAdaptation(.popover)
-//                    
-//                }
-//            }
-//        }
-//    }
-//}
-
 
 
 struct CountdownView: View {
@@ -1057,28 +1095,3 @@ struct CountdownView: View {
 
 
 
-//
-//struct ChecklistSelectionButtonStyle: ButtonStyle {
-//    
-//    var width: CGFloat
-//    var height: CGFloat
-//    @Binding var isSelected: Bool
-//    
-//    init(width: CGFloat, height: CGFloat, isSelected: Binding<Bool>) {
-//        self.width = width
-//        self.height = height
-//        self._isSelected = isSelected
-//    }
-//    
-//    func makeBody(configuration: Configuration) -> some View {
-//        configuration.label
-//            .padding(.vertical, height/10)
-//            .padding(.horizontal, width/10)
-//            .frame(width: width, height: height)
-//            .background(isSelected ? Color.black : Color.gray.adjust(brightness: 0.3))
-//            .cornerRadius(8)
-//            .foregroundStyle(.white)
-//            
-//
-//    }
-//}

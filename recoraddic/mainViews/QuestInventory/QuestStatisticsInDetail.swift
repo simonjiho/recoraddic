@@ -7,58 +7,10 @@
 
 import Foundation
 import SwiftUI
+import Charts
 
 
-//func divideByWeek(input: [Date: Int]) -> [[Date: Int]] {
-//    let sortedDates = input.keys.sorted()
-//    var result = [[Date: Int]]()
-//    var currentWeek: [Date: Int] = [:]
-//    var currentWeekOfYear: Int?
-//
-//    for date in sortedDates {
-//        let weekOfYear = Calendar.current.component(.weekOfYear, from: date)
-//        if weekOfYear != currentWeekOfYear {
-//            if !currentWeek.isEmpty {
-//                result.append(currentWeek)
-//            }
-//            currentWeek = [:]
-//            currentWeekOfYear = weekOfYear
-//        }
-//        currentWeek[date] = input[date]
-//    }
-//
-//    if !currentWeek.isEmpty {
-//        result.append(currentWeek)
-//    }
-//
-//    return result
-//}
 
-func partitionByWeek(startDate: Date, endDate: Date) -> [[Date]] {
-    var result:[[Date]] = [[Date]]()
-    var currentWeek:[Date] = []
-    var currentDate = startDate
-
-    while currentDate <= endDate {
-        let weekOfYear = Calendar.current.component(.weekOfYear, from: currentDate)
-        let weekOfYearNextDay = Calendar.current.component(.weekOfYear, from: Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate)
-
-        currentWeek.append(currentDate)
-
-        if weekOfYear != weekOfYearNextDay {
-            result.append(currentWeek)
-            currentWeek = []
-        }
-
-        currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
-    }
-
-    if !currentWeek.isEmpty {
-        result.append(currentWeek)
-    }
-
-    return result
-}
 
 
 
@@ -124,7 +76,7 @@ struct QuestStatisticsInDetail: View {
                             Text("토")
                                 .font(.subheadline)
                                 .frame(width:contentWidth3)
-                        }
+                        } // 요일
                         .padding(.vertical,geoHeight*0.02)
 
                         ScrollView {
@@ -134,16 +86,71 @@ struct QuestStatisticsInDetail: View {
                         }
                         .frame(width:contentWidth1)
 
-                    }
+                    } // 달력
                     .frame(width:contentWidth1, height: geoHeight*0.4)
                     .background(contentColor)
                     .clipShape(RoundedRectangle(cornerSize: CGSize(width: geoWidth*0.05, height: geoWidth*0.05)))
+                    
+                    if selectedQuest!.dataType != DataType.OX {
+                        GraphForDoneDays(selectedQuest: selectedQuest!)
+                            .frame(width:contentWidth1, height: geoHeight*0.2)
+                    }
+                    
+                    
+
+                    
+                    
                 }
                 .padding(.top, geoHeight*0.05)
                 .frame(width: geoWidth, height: geoHeight, alignment: .top)
             }
 
         }
+    }
+}
+
+struct GraphForDoneDays: View {
+    @Environment(\.modelContext) var modelContext
+    
+    var selectedQuest: Quest
+    
+    @State var start: Date = Date()
+    @State var end: Date = Date()
+    @State var maxValue: Int = 0
+
+    
+    @State var termOption: Int = 0
+    
+    
+    var body: some View {
+        
+        if selectedQuest.dailyData.count == 0 {
+            Spacer()
+        }
+        else {
+            let chartData:[Date:Int] = selectedQuest.dailyData.filter({$0.key >= start && $0.key <= end})
+            let maxValue:Int = selectedQuest.dailyData.values.max() ?? 0
+            
+            Chart {
+                ForEach(chartData.sorted(by: <), id:\.key) { item in
+                    LineMark(
+                        x: .value("Date", item.key),
+                        y: .value("Profit A",  item.value),
+                        series: .value("Company", "A")
+                    )
+                    .foregroundStyle(.orange)
+                }
+            }
+            .onAppear() {
+                start = selectedQuest.dailyData.keys.sorted().first ?? Date()
+                end = selectedQuest.dailyData.keys.sorted().last ?? Date()
+                print("chart appeared")
+                print(chartData)
+            }
+            
+            
+        }
+
     }
 }
 
@@ -174,7 +181,6 @@ struct SerialVisualization:View {
             let elementSize: CGFloat = geoWidth/7
             
             VStack(spacing:0.0) {
-                //            GridDemo()
                                 
                 let firstRow:[Date]? = date_partition.first
                 let lastRow:[Date]? = date_partition.last
@@ -187,10 +193,8 @@ struct SerialVisualization:View {
                 case 1:
                         
                     let doneList_firstRow: [Bool] = firstRow!.map{data.keys.contains($0)}
-//                    let doneList: [Date:Bool] = Dictionary(uniqueKeysWithValues: firstRow!.map({($0, data.keys.contains($0))}))
                     RowContent(dates:firstRow!,doneList:doneList_firstRow, isFirst: true)
                         .frame(width:elementSize*7, height: elementSize)
-//                        .border(.blue)
                     
                 default:
                     let middleRows:[[Date]] = {
@@ -199,11 +203,9 @@ struct SerialVisualization:View {
                         a.removeLast()
                         return a
                     }()
-
                     
                     
                     let doneList_firstRow: [Bool] = firstRow!.map{data.keys.contains($0)}
-//                    let doneList: [Date:Bool] = Dictionary(uniqueKeysWithValues: firstRow!.map({($0, data.keys.contains($0))}))
                     RowContent(dates:firstRow!,doneList:doneList_firstRow, isFirst: true)
                         .frame(width:elementSize*7, height: elementSize)
 
@@ -238,6 +240,9 @@ struct SerialVisualization:View {
 
 struct RowContent: View {
     
+    @Environment(\.colorScheme) var colorScheme
+
+    
     var dates: [Date]
     var doneList: [Bool]
     
@@ -245,7 +250,8 @@ struct RowContent: View {
     var isLast: Bool = false
     
     
-    let gradiant_done: LinearGradient = LinearGradient(colors: [.green.opacity(0.4),.blue.opacity(0.4)], startPoint: .topLeading, endPoint: .bottomTrailing)
+
+    let gradiant_done: LinearGradient = LinearGradient(colors: [.orange.opacity(0.4),.red.opacity(0.4)], startPoint: .topLeading, endPoint: .bottomTrailing)
     let gradiant_notDone: LinearGradient = LinearGradient(colors: [.gray.opacity(0.4)], startPoint: .topLeading, endPoint: .bottomTrailing)
     
     var body: some View {
@@ -264,6 +270,9 @@ struct RowContent: View {
         }()
         
         let containsStartAndEnd: Bool = isMonthChangingRow && startOfMonthIndexIsNonzero
+        
+        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+        let contentColor: Color = colorScheme == .light ? colorSchemeColor.adjust(brightness: -0.05) : colorSchemeColor
         
         
         GeometryReader { geometry in
@@ -320,7 +329,7 @@ struct RowContent: View {
                         path.addLine(to: CGPoint(x: conversionPos, y: 0))
                         path.addLine(to: CGPoint(x: endPos, y: 0))
                     }
-                        .stroke(Color.gray, lineWidth: 2)
+                    .stroke(contentColor, lineWidth: 2)
                 }
                 else if isMonthChangingRow && !containsStartAndEnd {
                     let startPos: CGFloat = isFirst ? geoWidth - elementsWidth : 0
@@ -330,7 +339,7 @@ struct RowContent: View {
                         path.move(to: CGPoint(x: startPos, y: 0))
                         path.addLine(to: CGPoint(x: endPos, y: 0))
                     }
-                        .stroke(Color.green, lineWidth: 2)
+                        .stroke(contentColor, lineWidth: 2)
 
 
                 }

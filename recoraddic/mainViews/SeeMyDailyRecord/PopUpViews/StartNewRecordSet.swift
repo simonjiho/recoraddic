@@ -319,7 +319,8 @@ struct DRSThemeThumbnailView: View {
                 VStack {
                     StoneTower_0_stone(
                         defaultColorIndex: 0,
-                        facialExpressionNum: 0
+                        facialExpressionNum: 0,
+                        selected: false
                     )
                     .frame(width:geoWidth*0.75, height: geoHeight*0.5)
                     Text("탑쌓기(질문x)")
@@ -334,7 +335,8 @@ struct DRSThemeThumbnailView: View {
                         shapeNum: 3,
                         brightness: 0,
                         defaultColorIndex: 0,
-                        facialExpressionNum: 0
+                        facialExpressionNum: 0,
+                        selected: false
                     )
                     .frame(width:geoWidth*0.75, height: geoHeight*0.5)
                     Text("탑쌓기(질문o)")

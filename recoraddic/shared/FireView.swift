@@ -93,8 +93,6 @@ struct Fire1: View {
                 Timer.scheduledTimer(withTimeInterval: 1.0 / 12, repeats: true) { _ in
                     frameIndex = (frameIndex + 1) % 9
                 }
-                    
-                        
             }
             .onDisappear() {
                 timer?.invalidate()

@@ -48,18 +48,10 @@ struct AddDailyQuestView: View {
     
     var body: some View {
         
-//        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-//        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+
         
         GeometryReader { geometry in
-            
-//            let textBoxWidth = geometry.size.width * 0.2
-//            let textBoxHeight = geometry.size.height * 0.15
-//            let messageBoxHeight = geometry.size.height * 0.1
-//            
-//            let contentHeight = geometry.size.height*0.9
-            
-            // 2개의 buffer 기록 -> 어제:
+
             VStack {
                 Button(action:{popUp_addDailyQuest.toggle()}) {
                     Image(systemName: "xmark")
@@ -86,7 +78,6 @@ struct AddDailyQuestView: View {
                                     }
                                 }
 
-//                                NavigationLink("새로운 퀘스트", value:newQuest)
                             }
                             .navigationDestination(for: Quest.self) { quest in
                                 SetValueForDailyQuest(recordOfToday: currentDailyRecord, selectedQuest: quest, popUp_addDailyQuest: $popUp_addDailyQuest, isDone: isDone)
@@ -280,7 +271,7 @@ struct SetValueForDailyQuest: View {
                                 HStack {
                                     Image(systemName: "checkmark")
                                         .opacity(selectedFreeSetIndex == index ? 1.0 : 0.0)
-                                    Text("\(DataType.string_unitDataToRepresentableData(data: selectedQuest.freeSetDatas[index], dataType: selectedQuest.dataType)) \(DataType.unitNotationOf(dataType: selectedQuest.dataType, customDataTypeNotation: selectedQuest.customDataTypeNotation))")
+                                    Text("\(DataType.string_fullRepresentableNotation(data: selectedQuest.freeSetDatas[index], dataType: selectedQuest.dataType, customDataTypeNotation: selectedQuest.customDataTypeNotation))")
                                         .bold(selectedFreeSetIndex == index)
 //                                        .font(selectedFreeSetIndex == index ? .callout : .subheadline)
                                 }
@@ -306,7 +297,7 @@ struct SetValueForDailyQuest: View {
                                     Image(systemName: "checkmark")
                                         .opacity(selectedFreeSetIndex == selectedQuest.freeSetDatas.count ? 1.0 : 0.0)
                                     
-                                    Text("가장 최근 달성: \(DataType.string_unitDataToRepresentableData(data: selectedQuest.recentData, dataType: selectedQuest.dataType)) \(DataType.unitNotationOf(dataType: selectedQuest.dataType, customDataTypeNotation: selectedQuest.customDataTypeNotation))")
+                                    Text("가장 최근 달성: \(DataType.string_fullRepresentableNotation(data: selectedQuest.recentData, dataType: selectedQuest.dataType, customDataTypeNotation: selectedQuest.customDataTypeNotation))")
                                         .bold(selectedFreeSetIndex == selectedQuest.freeSetDatas.count)
     //                                        .font(selectedFreeSetIndex == index ? .callout : .subheadline)
                                 }
@@ -464,8 +455,8 @@ struct TextField_addFreeSet: View {
 struct DialForHours_setValue:View {
     
     @Binding var value: Int
-    @State var naturalPart = 0
-    @State var firstDecimalPart = 0
+    @State var hour = 0
+    @State var minute = 0
     
     
     
@@ -474,7 +465,7 @@ struct DialForHours_setValue:View {
             
 //            Text("목표:")
             
-            Picker(selection: $naturalPart, label: Text("First Value")) {
+            Picker(selection: $hour, label: Text("First Value")) {
                 ForEach(0..<25) { i in
                     Text("\(i)").tag(i)
                 }
@@ -482,34 +473,34 @@ struct DialForHours_setValue:View {
             .frame(width: 50)
             .clipped()
             .pickerStyle(.wheel)
-            Text(".")
-            Picker(selection: $firstDecimalPart, label: Text("Second Value")) {
-                ForEach(0..<10) { i in
+            Text("시간  ")
+            Picker(selection: $minute, label: Text("Second Value")) {
+                ForEach(0..<60) { i in
                     Text("\(i)").tag(i)
                 }
             }
             .frame(width: 50)
             .clipped()
             .pickerStyle(.wheel)
-            Text("시간")
+            Text("분")
             
         }
-        .onChange(of: naturalPart) {
-            if naturalPart == 24 {
-                withAnimation {
-                    firstDecimalPart = 0
-                }
-            }
-            value = naturalPart*10  + firstDecimalPart
+        .onChange(of: hour) {
+//            if hour == 24 {
+//                withAnimation {
+//                    minute = 0
+//                }
+//            }
+            value = hour*60  + minute
 
         }
-        .onChange(of: firstDecimalPart) {
-            if naturalPart == 24 {
-                withAnimation {
-                    firstDecimalPart = 0
-                }
-            }
-            value = naturalPart*10  + firstDecimalPart
+        .onChange(of: minute) {
+//            if hour == 24 {
+//                withAnimation {
+//                    minute = 0
+//                }
+//            }
+            value = hour*60  + minute
 
         }
     }
@@ -524,8 +515,8 @@ struct DialForHours_addFreeSet: View {
     
 
     @State var value: Int = 0
-    @State var naturalPart = 0
-    @State var firstDecimalPart = 0
+    @State var hour = 0
+    @State var minute = 0
 
     var body: some View {
         GeometryReader { geometry in
@@ -544,7 +535,7 @@ struct DialForHours_addFreeSet: View {
                         .padding(.leading, 10)
                         .frame(width: (geometry.size.width*0.5), alignment: .leading)
                         Button("추가") {
-                            value = naturalPart*10  + firstDecimalPart
+                            value = hour*60  + minute
                             selectedQuest.freeSetDatas.append(value)
                             isEditing.toggle()
                         }
@@ -559,7 +550,7 @@ struct DialForHours_addFreeSet: View {
                 HStack(spacing:0.0) {
                     
                     
-                    Picker(selection: $naturalPart, label: Text("First Value")) {
+                    Picker(selection: $hour, label: Text("First Value")) {
                         ForEach(0..<25) { i in
                             Text("\(i)").tag(i)
                         }
@@ -567,40 +558,40 @@ struct DialForHours_addFreeSet: View {
                     .frame(width: 50)
                     .clipped()
                     .pickerStyle(.wheel)
-                    Text(".")
-                    Picker(selection: $firstDecimalPart, label: Text("Second Value")) {
-                        ForEach(0..<10) { i in
+                    Text("시간  ")
+                    Picker(selection: $minute, label: Text("Second Value")) {
+                        ForEach(0..<60) { i in
                             Text("\(i)").tag(i)
                         }
                     }
                     .frame(width: 50)
                     .clipped()
                     .pickerStyle(.wheel)
-                    Text("시간")
+                    Text("분")
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
                     
                     
                 }
             }
-            .onChange(of: naturalPart) {
-                if naturalPart == 24 {
-                    withAnimation {
-                        firstDecimalPart = 0
-                    }
-                }
-                value = naturalPart*10  + firstDecimalPart
-
-            }
-            .onChange(of: firstDecimalPart) {
-                if naturalPart == 24 {
-                    withAnimation {
-                        firstDecimalPart = 0
-                    }
-                }
-                value = naturalPart*10  + firstDecimalPart
-
-            }
+//            .onChange(of: hour) {
+//                if hour == 24 {
+//                    withAnimation {
+//                        minute = 0
+//                    }
+//                }
+//                value = hour*10  + minute
+//
+//            }
+//            .onChange(of: minute) {
+//                if hour == 24 {
+//                    withAnimation {
+//                        minute = 0
+//                    }
+//                }
+//                value = hour*10  + minute
+//
+//            }
             .frame(height: geoHeight)
             // hour아닌것도 만들기
 

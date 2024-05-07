@@ -199,17 +199,15 @@ class DailyQuest: Hashable, Equatable, Identifiable {
     
     
     func hash(into hasher: inout Hasher) {
-        do {
-            try hasher.combine(createdTime)
-            try hasher.combine(id)
-        } catch {
-            print("hash hash")
-        }
+        hasher.combine(createdTime)
+        hasher.combine(id)
+
         
-
-
-
             // Add any other properties that should be included in the hash
+    }
+    
+    func dataForDataRepresentation() -> (Int, Int, String?) {
+        return (data, dataType, customDataTypeNotation)
     }
     
     
@@ -276,6 +274,28 @@ final class DailyRecordSet: Equatable {
     static func == (lhs: DailyRecordSet, rhs: DailyRecordSet) -> Bool {
             return lhs.createdTime == rhs.createdTime
             // Add any other properties that determine equality
+    }
+    
+    
+    func getDailyRecordColor() -> Color {
+        if self.dailyRecordThemeName == "stoneTower_0" {
+            return StoneTower_0.getDailyRecordColor(index: dailyRecordColorIndex)
+        }
+        else if self.dailyRecordThemeName == "stoneTower_1" {
+            return StoneTower_1.getDailyRecordColor(index: dailyRecordColorIndex)
+        }
+        else {
+            return StoneTower_0.getDailyRecordColor(index: dailyRecordColorIndex)
+        }
+    }
+    
+    func getTerm_string() -> String {
+        if self.end != nil {
+            return "\(yymmddFormatOf(self.start)) ~ \(yymmddFormatOf(self.end!))"
+        }
+        else {
+            return "\(yymmddFormatOf(self.start)) ~ "
+        }
     }
     
     
@@ -442,6 +462,7 @@ class Quest: Equatable, Identifiable, Hashable {
     
     var representingData: Int = QuestRepresentingData.cumulativeData
     
+    var isArchived:Bool = false
     var isHidden:Bool = false // not used yet.
     var inTrashCan: Bool = false
     

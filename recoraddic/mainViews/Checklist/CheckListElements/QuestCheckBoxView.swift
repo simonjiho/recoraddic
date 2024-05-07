@@ -26,10 +26,13 @@ struct QuestCheckBoxView_OX: View {
     
     @Binding var dailyQuestToDelete: DailyQuest?
     
+    @State var isAnimating = false
 
     
     
     var body: some View {
+        let gradientColors = getTierColorsOf(tier: dailyQuest.currentTier, type:0)
+
         GeometryReader { geometry in
             
             let geoWidth = geometry.size.width
@@ -44,15 +47,37 @@ struct QuestCheckBoxView_OX: View {
             
             ZStack {
                 
+                ZStack {
+                    Rectangle()
+                        .fill(
+                            LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        .frame(width:geoWidth, height:geoHeight)
+                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                    
+                    Rectangle()
+                        .fill(
+                        LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        .frame(width:geoWidth, height:geoHeight)
+                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                }
+                .frame(width:geoWidth, height:geoHeight)
+                .opacity(dailyQuest.data == 1 ? 1.0 :0.0)
+                .onAppear() {
+                    isAnimating = true
+                }
 
 
-                Path(CGRect(x: 0, y: 0, width: geoWidth, height: geoHeight))
-                    .fill(LinearGradient(colors: getTierColorsOf(tier: dailyQuest.currentTier, type: 0), startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .opacity(dailyQuest.data == 1 ? 1.0 :0.0)
+
+
                 
                 HStack {
                     Image(systemName: dailyQuest.data == 1 ? "checkmark.square" : "square")
                         .resizable()
+                        .foregroundStyle(.black)
                         .frame(width: checkBoxSize, height: checkBoxSize)
                     Text(dailyQuest.questName)
 //                        .padding(geometry.size.height*0.05)
@@ -60,7 +85,7 @@ struct QuestCheckBoxView_OX: View {
 //                        .clipShape(.buttonBorder)
                         .frame(width: TextBoxWidth, height: TextBoxHeight)
                         .foregroundStyle(.black)
-                        .bold()
+//                        .bold()
 //                        .background(dailyQuest.data == 1 ? .white.opacity(0.9) : .white.opacity(0.4))
 
                 } // HStack
@@ -69,7 +94,7 @@ struct QuestCheckBoxView_OX: View {
 
                 
                 Menu {
-                    Button("delete", action: {
+                    Button("삭제", action: {
                         dailyQuestToDelete = dailyQuest
                         applyDailyQuestRemoval.toggle()
                     })
@@ -81,6 +106,8 @@ struct QuestCheckBoxView_OX: View {
 
                     
                 }
+                .buttonStyle(.plain)
+                .foregroundStyle(.black)
                 .frame(width: geoWidth*0.95, height: geoHeight*0.9, alignment: .topTrailing)
 
             } // ZStack
@@ -145,6 +172,8 @@ struct QuestCheckBoxView: View {
     
     @State var isEditingGoal_hours: Bool = false
     
+    @State var isAnimating = false
+
 //    @Binding var isJustCf: Bool = false
     
     var body: some View {
@@ -153,6 +182,7 @@ struct QuestCheckBoxView: View {
         let dataType = dailyQuest.dataType
         let dailyGoal = dailyQuest.dailyGoal
         let questData:Int = dailyQuest.data
+        let customDataTypeNotaion: String? = dailyQuest.customDataTypeNotation
 
         
         
@@ -175,18 +205,18 @@ struct QuestCheckBoxView: View {
             
             
             let gradientColors = getTierColorsOf(tier: dailyQuest.currentTier, type:0)
-            let adjustedGradient: [Color] = {
-                var newGradient: [Color] = []
-                for idx in 0...(gradientColors.count - 1) {
-                    if idx % 2 == 0 {
-                        newGradient.append(gradientColors[idx].adjust(brightness: brightness))
-                    }
-                    else {
-                        newGradient.append(gradientColors[idx].adjust(brightness: brightness*0.5))
-                    }
-                }
-                return newGradient
-            }()
+//            let adjustedGradient: [Color] = {
+//                var newGradient: [Color] = []
+//                for idx in 0...(gradientColors.count - 1) {
+//                    if idx % 2 == 0 {
+//                        newGradient.append(gradientColors[idx].adjust(brightness: brightness))
+//                    }
+//                    else {
+//                        newGradient.append(gradientColors[idx].adjust(brightness: brightness*0.5))
+//                    }
+//                }
+//                return newGradient
+//            }()
             
             let cornerWidth = xOffset > geoWidth/20*2 ? geoWidth/20 : 0
             let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth +  0.1) ? xOffset : 0.0, height: geoHeight), transform: nil))
@@ -194,15 +224,46 @@ struct QuestCheckBoxView: View {
 
 
             ZStack(alignment:.leading) {
-                a
-                    .fill(LinearGradient(colors: adjustedGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .shadow(color:getTierColorOf(tier: dailyQuest.currentTier).adjust(brightness: -0.1),radius:1)
+                
+                ZStack {
+                    Rectangle()
+                        .fill(
+                            LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        .frame(width:geoWidth, height:geoHeight)
+                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                    
+                    Rectangle()
+                        .fill(
+                        LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        .frame(width:geoWidth, height:geoHeight)
+                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                }
+                .frame(width:geoWidth, height:geoHeight)
+                .mask {
+                    a
+                }
+                .onAppear() {
+                    isAnimating = true
+                }
+                .onChange(of:isDragging) {
+                    isAnimating = true
+                }
 
-//                Rectangle()
-//                    .frame(width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth + 0.1) ? xOffset : 0.0, height: geoHeight)
+
+
+//                        .frame(width:geoWidth, height:geoHeight)
+                        
+                        
+//                        LinearGradient(colors: adjustedGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
+//                    .shadow(color:getTierColorOf(tier: dailyQuest.currentTier).adjust(brightness: -0.1),radius:1)
+
+
                     // MARK: 0.1을 넣지 않으면 xOffset이 geoWidth보다 커지는 상황 발생... 왤까?
-//                    .clipShape(.buttonBorder)
-//                    .foregroundStyle(LinearGradient(colors: adjustedGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
+
                     .onChange(of:brightness) {
                         print("brightness changed")
                         print(brightness)
@@ -214,33 +275,39 @@ struct QuestCheckBoxView: View {
                         .foregroundStyle(.black)
 
                         .lineLimit(1)
-                        .bold()
+//                        .bold()
                     Text(": ")
                         .foregroundStyle(.black)
-                        .bold()
+//                        .bold()
                     HStack(spacing:0.0) { // hstack for values
+                        
                         
                         if isEditingGoal {
                             
-                            Text("\(DataType.string_unitDataToRepresentableData(data: value, dataType: dataType)) / ")
-                                .bold()
-                                .foregroundStyle(.black)
 
-                            
                             if dailyQuest.dataType == DataType.HOUR {
-                                Text("\(DataType.string_unitDataToRepresentableData(data:dailyQuest.dailyGoal , dataType: dataType))")
+                                Text("\(DataType.string_fullRepresentableNotation(data: value, dataType: dataType)) / ")
+//                                    .bold()
+                                    .foregroundStyle(.black)
+                                
+                                Text("\(DataType.string_fullRepresentableNotation(data:dailyQuest.dailyGoal , dataType: dataType))")
                                     .foregroundStyle(.black)
 
 
                             }
                             else {
+//                                Text("\(DataType.string_unitDataToRepresentableData(data: value, dataType: dataType)) / ")
+                                Text("\(value) / ")
+//                                    .bold()
+                                    .foregroundStyle(.black)
                                 TextField("", text:$goalValueInText)
                                     .keyboardType(.numberPad)
                                     .frame(width:80)
                                     .foregroundStyle(.black)
 
                                     .onAppear() {
-                                        goalValueInText = DataType.string_unitDataToRepresentableData(data: dailyQuest.dailyGoal, dataType: dataType)
+//                                        goalValueInText = DataType.string_unitDataToRepresentableData(data: dailyQuest.dailyGoal, dataType: dataType)
+                                        goalValueInText = String(value)
                                     }
                                     .focused($editingGoal, equals: "editing")
                                 // use number pad
@@ -254,10 +321,11 @@ struct QuestCheckBoxView: View {
                         
                         }
                         else {
-                            Text("\(DataType.string_unitDataToRepresentableData(data: value, dataType: dataType)) \(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation:dailyQuest.customDataTypeNotation))")
+                            Text("\(DataType.string_fullRepresentableNotation(data: value, dataType: dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation))")
+//                            Text("\(DataType.string_unitDataToRepresentableData(data: value, dataType: dataType)) \(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation:dailyQuest.customDataTypeNotation))")
                                 .foregroundStyle(.black)
                                 .lineLimit(1)
-                                .bold()
+//                                .bold()
 
                         }
                         
@@ -276,7 +344,8 @@ struct QuestCheckBoxView: View {
                 if !isEditingGoal {
                     Menu {
                         Button("목표치 수정", action: {
-                            goalValueInText = DataType.string_unitDataToRepresentableData(data: dailyQuest.dailyGoal, dataType: dataType)
+//                            goalValueInText = DataType.string_unitDataToRepresentableData(data: dailyQuest.dailyGoal, dataType: dataType)
+                            goalValueInText = String(value)
                             editingGoal = "editing"
                             isEditingGoal.toggle()
                         })
@@ -290,6 +359,8 @@ struct QuestCheckBoxView: View {
                             .frame(height:geoHeight*0.75, alignment:.top)
                         //                        .border(.red)
                     }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.black)
                     .frame(width: geometry.size.width*0.975, height: geometry.size.height*0.9, alignment: .topTrailing)
                     .disabled(isEditingGoal)
                 }
@@ -399,16 +470,18 @@ struct QuestCheckBoxView: View {
             .sheet(isPresented: $isEditingGoal_hours) {
                 // code for on dismiss
             } content: {
-                let (naturalPart, firstDecimalPart): (Int, Int) = divideBy10(dailyQuest.dailyGoal)
+                let (hour, minute): (Int, Int) = divideBy60(dailyQuest.dailyGoal)
                 DialForHours(
                     questName:questName,
-                    value: $dailyQuest.dailyGoal,
+                    dailyGoal: $dailyQuest.dailyGoal,
+                    value: $value,
                     isEditing: $isEditingGoal_hours,
-                    naturalPart: naturalPart,
-                    firstDecimalPart: firstDecimalPart
+                    hour: hour,
+                    minute: minute
                 )
                     .presentationDetents([.height(300)])
                     .presentationCompactAdaptation(.none)
+
             }
 
             
@@ -428,6 +501,25 @@ struct QuestCheckBoxView: View {
 
 }
 
+
+//struct QuestCheckBoxGradient: Shape {
+//    var xOffset: CGFloat
+//    
+//    let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth +  0.1) ? xOffset : 0.0, height: geoHeight), transform: nil))
+//    
+//    func path(in rect: CGRect) -> Path {
+//        var path = Path()
+//
+//        path.move(to: CGPoint(x: 0, y: rect.maxY))
+//        path.addLine(to: CGPoint(x: insetAmount, y: rect.minY))
+//        path.addLine(to: CGPoint(x: rect.maxX - insetAmount, y: rect.minY))
+//        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+//        path.addLine(to: CGPoint(x: 0, y: rect.maxY))
+//
+//        return path
+//    }
+//
+//}
 
 
 struct EmptyQuestCheckBoxView: View {
@@ -495,11 +587,12 @@ struct DialForHours: View {
 
     var questName: String
     
+    @Binding var dailyGoal: Int
     @Binding var value: Int
     @Binding var isEditing: Bool
     
-    @State var naturalPart = 0
-    @State var firstDecimalPart = 0
+    @State var hour = 0
+    @State var minute = 0
 
     var body: some View {
         GeometryReader { geometry in
@@ -515,7 +608,10 @@ struct DialForHours: View {
                         .padding(.leading, 10)
                         .frame(width: (geometry.size.width*0.5), alignment: .leading)
                         Button("완료") {
-                            value = naturalPart*10  + firstDecimalPart
+                            dailyGoal = hour*60 + minute
+                            if dailyGoal <= value {
+                                value = dailyGoal
+                            }
                             isEditing.toggle()
                         }
                         .padding(.trailing, 10)
@@ -531,7 +627,7 @@ struct DialForHours: View {
                     
                     Text("목표:")
                     
-                    Picker(selection: $naturalPart, label: Text("First Value")) {
+                    Picker(selection: $hour, label: Text("First Value")) {
                         ForEach(0..<25) { i in
                             Text("\(i)").tag(i)
                         }
@@ -539,36 +635,36 @@ struct DialForHours: View {
                     .frame(width: 50)
                     .clipped()
                     .pickerStyle(.wheel)
-                    Text(".")
-                    Picker(selection: $firstDecimalPart, label: Text("Second Value")) {
-                        ForEach(0..<10) { i in
+                    Text("시간  ")
+                    Picker(selection: $minute, label: Text("Second Value")) {
+                        ForEach(0..<60) { i in
                             Text("\(i)").tag(i)
                         }
                     }
                     .frame(width: 50)
                     .clipped()
                     .pickerStyle(.wheel)
-                    Text("시간")
+                    Text("분")
                     
                     
                 }
             }
-            .onChange(of: naturalPart) {
-                if naturalPart == 24 {
-                    withAnimation {
-                        firstDecimalPart = 0
-                    }
-                }
-            }
-            .onChange(of: firstDecimalPart) {
-                if naturalPart == 24 {
-                    withAnimation {
-                        firstDecimalPart = 0
-                    }
-                }
-            }
-            .onDisappear() {
-            }
+//            .onChange(of: hour) {
+//                if hour == 24 {
+//                    withAnimation {
+//                        minute = 0
+//                    }
+//                }
+//            }
+//            .onChange(of: minute) {
+//                if hour == 24 {
+//                    withAnimation {
+//                        minute = 0
+//                    }
+//                }
+//            }
+//            .onDisappear() {
+//            }
         }
     }
 }

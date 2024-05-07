@@ -57,14 +57,14 @@ struct InShortView: View {
 
             
             ZStack {
-                Color.gray.opacity(0.1)
+                Color.gray.opacity(0.15)
                     .frame(width: isEdit ? geoWidth : geoWidth*0.9, height: geoHeight)
                     .position(CGPoint(x: isEdit ? geoWidth/2 : geoWidth*0.55, y: geoHeight/2))
                 if !isEdit {
                     HStack {
                         Image(systemName: "book.closed.fill")
-                            .resizable()
-                            .frame(width:iconWidth, height: iconHeight)
+//                            .resizable()
+//                            .frame(width:iconWidth, height: iconHeight)
                             .foregroundStyle(getReversedColorSchemeColor(colorScheme))
                         Text(inShortText)
                             .frame(width:geoWidth*0.85, height: geoHeight*0.9)
@@ -126,6 +126,7 @@ struct InShortView: View {
 
                 }
                 .padding(.top,3)
+                .buttonStyle(.plain)
                 .frame(width:geoWidth*0.975, height: geoHeight, alignment: .topTrailing)
                 .disabled(isEdit)
 
@@ -201,7 +202,7 @@ struct DiaryView: View {
             ZStack(alignment:isEdit ? .top : .leading) {
                 
                 
-                Color.gray.opacity(0.1)
+                Color.gray.opacity(0.15)
                     .frame(width: isEdit ? geoWidth : geoWidth*0.9, height: geoHeight)
                     .position(CGPoint(x: isEdit ? geoWidth/2 : geoWidth*0.55, y: geoHeight/2))
                     .onTapGesture {
@@ -215,8 +216,8 @@ struct DiaryView: View {
 
                     HStack {
                         Image(systemName: "book.closed.fill")
-                            .resizable()
-                            .frame(width:iconWidth, height: iconHeight)
+//                            .resizable()
+//                            .frame(width:iconWidth, height: iconHeight)
                             .foregroundStyle(getReversedColorSchemeColor(colorScheme))
                         if isEdit {
                             Button("완료") {
@@ -297,6 +298,7 @@ struct DiaryView: View {
                         
                     }
                     .padding(.top,3)
+                    .buttonStyle(.plain)
                     .frame(width:geoWidth*0.975, height: geoHeight, alignment: .topTrailing)
                 }
                 
@@ -390,7 +392,7 @@ struct DiaryView_WholeContent: View {
 
                 }
                 .frame(width: geoWidth, height: geoHeight, alignment: .center)
-                .background(.gray.opacity(0.1))
+                .background(.gray.opacity(0.15))
 //                .clipShape(.containerRelative)
 //                .shadow(color:shadowColor.opacity(0.6), radius: 2)
 //                .border(.gray)

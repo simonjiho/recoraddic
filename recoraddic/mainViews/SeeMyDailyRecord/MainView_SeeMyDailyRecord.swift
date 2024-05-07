@@ -137,6 +137,11 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     
                 }
                 
+//                Text("기록의 탑")
+//                    .frame(height: geoHeight*0.07)
+//                    .position(CGPoint(x:geoWidth/2,y:geoHeight*0.035))
+//                    .opacity(0.7)
+                
 //                if !isEditingTermGoals && selectedDailyRecordSet.termGoals.isEmpty {
 //                    Text("나만의 목표를 설정하세요!")
 //                        .opacity(0.5)

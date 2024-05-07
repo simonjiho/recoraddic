@@ -54,8 +54,8 @@ func minimumBoundary(of data: Int, byMultiplying blockValue: Int) -> CGFloat {
     return CGFloat(returnVal)
 }
 
-func divideBy10(_ value: Int) -> (Int, Int) {
-    let a: Int = value / 10
-    let b: Int = value % 10
+func divideBy60(_ value: Int) -> (Int, Int) {
+    let a: Int = value / 60
+    let b: Int = value % 60
     return (a, b)
 }

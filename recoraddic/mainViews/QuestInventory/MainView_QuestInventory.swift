@@ -32,7 +32,7 @@ struct MainView_QuestInventory: View {
     @State var popUp_questStatisticsInDetail: Bool = false
     
     @State var popUp_addNewQuest: Bool = false
-    
+    @State var popUp_help: Bool = false
     
     var body: some View {
         
@@ -46,7 +46,6 @@ struct MainView_QuestInventory: View {
             
             let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
             let shadowColor: Color = getShadowColor(colorScheme)
-//            let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
             ZStack {
                 VStack {
 //                    Picker("", selection: $statisticOption) {
@@ -54,11 +53,18 @@ struct MainView_QuestInventory: View {
 //                        Text("성향").tag(StatisticOption.defaultPurpose)
 //                    }
 //                    .frame(height: geometry.size.height*0.1)
-                    Text("퀘스트 보관함")
-                        .font(.title3)
-                        .bold()
-                        .fontDesign(.serif)
-                        .frame(height: geoHeight*0.1)
+                    HStack {
+                        Text("누적 퀘스트 목록")
+                            .bold()
+                            .fontDesign(.serif)
+                            .frame(height: geoHeight*0.07)
+                        Button("", systemImage: "questionmark.circle", action: {
+                            popUp_help.toggle()
+                        })
+                        
+            
+                        
+                    }
                     
                         ZStack {
                             ScrollView {
@@ -92,7 +98,7 @@ struct MainView_QuestInventory: View {
                                     Button(action: {
                                         popUp_addNewQuest.toggle()
                                     }) {
-                                        Image(systemName: "plus.circle")
+                                        Image(systemName: "plus.square")
                                             .resizable()
                                             .frame(width: gridItemSize*0.4, height: gridItemSize*0.4)
                                     }
@@ -143,7 +149,17 @@ struct MainView_QuestInventory: View {
                         }
                     CreateNewQuest(popUp_createNewQuest: $popUp_addNewQuest)
                         .popUpViewLayout(width: geoWidth*0.9, height: geoHeight*0.45, color: colorSchemeColor)
-                        .position(CGPoint(x: geoWidth/2, y: geoHeight/2*0.7))
+                        .position(CGPoint(x: geoWidth/2, y: geoHeight*0.45*0.7))
+                        .shadow(color:shadowColor, radius: 3.0)
+                }
+                if popUp_help {
+                    Color.gray.opacity(0.2)
+                        .onTapGesture {
+                            popUp_help.toggle()
+                        }
+                    QuestHelpView(popUp_help: $popUp_help)
+                        .popUpViewLayout(width: geoWidth*0.9, height: geoHeight*0.85, color: colorSchemeColor)
+                        .position(CGPoint(x: geoWidth/2, y: geoHeight*0.85*0.6))
                         .shadow(color:shadowColor, radius: 3.0)
                 }
             }
@@ -175,11 +191,12 @@ struct QuestTierView: View {
         
         
         let tierColor_bright:Color = getBrightTierColorOf2(tier: tier)
-        let tierColor_frame1:Color = tierColor_bright.adjust(brightness: 0.05)
-        let tierColor_frame2:Color = tierColor.adjust(brightness: -0.05)
         
-        let currentTierColor_frame:Color = tierColor.adjust(brightness: 0.1)
-        let nextTierColor_frame:Color = nextTierColor.adjust(brightness: 0.1)
+        
+        let tierColor_frame1:Color = tierColor_bright
+        let tierColor_frame2:Color = tierColor
+        let currentTierColor_frame:Color = tierColor
+        let nextTierColor_frame:Color = nextTierColor
 
         
         let colorsForGradient: [Color] = {
@@ -224,7 +241,7 @@ struct QuestTierView: View {
                     .frame(width:(geoWidth+strokeWidth*2)*1.5, height: (geoHeight+strokeWidth*2)*1.5)
                     .position(x:geoWidth/2, y:geoHeight/2)
                     .mask {
-                        RoundedRectangle(cornerSize: CGSize(width: 10, height: 10))
+                        RoundedRectangle(cornerSize: CGSize(width: geoWidth/20, height: geoHeight/20))
                             .stroke(lineWidth: strokeWidth)
                             .frame(width:geoHeight+strokeWidth/2, height: geoHeight+strokeWidth/2)
                     }
@@ -263,14 +280,16 @@ struct QuestThumbnailView: View {
             ZStack {
                 QuestTierView(tier: $quest.tier)
                     .frame(width: geoWidth, height: geoHeight)
+                    .opacity(0.85)
                 FireView(momentumLevel: quest.momentumLevel)
                 //                                        Fire6()
                     .frame(width: geoWidth/1.5, height: geoHeight/1.5)
                     .position(x:geoWidth/2,y:geoHeight/2)
+                    .opacity(0.7)
                 //                                            .opacity(0.7)
                 VStack {
                     Text("\(quest.name)")
-                        .foregroundStyle(.black)
+                        .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
                         .bold()
                         .minimumScaleFactor(0.3)
                         .lineLimit(2)
@@ -279,10 +298,11 @@ struct QuestThumbnailView: View {
                     //                                        Text(QuestRepresentingData.titleOf(representingData: quest.representingData))
                     
                     Text(quest.representingDataToString())
-                        .foregroundStyle(.black)
-                        .bold()
+                        .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
+                        .font(.caption)
                         .minimumScaleFactor(0.3)
                         .lineLimit(1)
+
                     
                 }
                 .padding(10)
@@ -453,13 +473,111 @@ struct CreateNewQuest: View {
     
 }
 
+struct QuestHelpView: View {
+    
+    @Binding var popUp_help: Bool
+    
+    let options: [String] = ["notHour", "hour"]
+    @State var selectedOption: String = "notHour"
+    
+    
+    let notHourTierGuideLines: [String] = [
+        "0회","1회", "2회", "3회", "4회",
+        "5회" , "6회", "7회", "8회", "9회",
+        "10~15회","16~21회", "22~27회", "28~33회", "34~39회",
+        "40~51회", "52~63회", "64~75회", "76~87회", "88~99회",
+        "100~159회", "160~219회", "220회~279회", "280~339회", "340~399회",
+        "400~519회", "520~639회", "640~759회", "760~879회", "880~999회",
+        "1000~1599회", "1600~2199회", "2200~2799회", "2800~3399회", "3400~3999회",
+        "4000~5199회", "5200~6399회", "6400~7599회", "7600~8799회", "8800~9999회",
+        "10000회 이상"
+    ]
+    let hourTierGuideLines: [String] = [
+        "0시간","1시간", "2시간", "3시간", "4시간",
+        "5시간" , "6시간", "7시간", "8시간", "9시간",
+        "10~15시간","16~21시간", "22~27시간", "28~33시간", "34~39시간",
+        "40~51시간", "52~63시간", "64~75시간", "76~87시간", "88~99시간",
+        "100~159시간", "160~219시간", "220시간~279시간", "280~339시간", "340~399시간",
+        "400~519시간", "520~639시간", "640~759시간", "760~879시간", "880~999시간",
+        "1000~1599시간", "1600~2199시간", "2200~2799시간", "2800~3399시간", "3400~3999시간",
+        "4000~5199시간", "5200~6399시간", "6400~7599시간", "7600~8799시간", "8800~9999시간",
+        "10000시간 이상"
+    ]
+    
+    let fireGuideLines: [String] = [
+        "최근 1일 중 1일 실행",
+        "최근 3일 중 2일 이상 실행",
+        "최근 5일 중 3일 이상 실행",
+        "최근 7일 중 4일 이상 실행",
+        "최근 10일 중 5일 이상 실행",
+        "최근 14일 중 6일 이상 실행",
+        "최근 20일 중 8일 이상 실행",
+        "최근 30일 중 10일 이상 실행",
+        "최근 40일 중 12일 이상 실행",
+        "최근 50일 중 15일 이상 실행",
+    ]
 
 
-struct PurposeInventoryView: View {
     var body: some View {
-        /*@START_MENU_TOKEN@*//*@PLACEHOLDER=Hello, world!@*/Text("Hello, world!")/*@END_MENU_TOKEN@*/
+        GeometryReader { geometry in
+            let geoWidth: CGFloat = geometry.size.width
+            let geoHeight: CGFloat = geometry.size.height
+            let tierViewSize: CGFloat = geoWidth*0.2
+            let fireViewSize: CGFloat = geoWidth*0.2
+            
+            VStack {
+                Picker("hour or times", selection: $selectedOption, content: {
+                    ForEach(options,id:\.self) { option in
+                        Text(option)
+                    }
+                })
+                .pickerStyle(.segmented)
+                HStack(alignment: .top) {
+                    ScrollView {
+                        ForEach(0...40, id:\.self) { tier in
+                            VStack {
+                                QuestTierView(tier: .constant(tier))
+                                    .frame(width:tierViewSize, height: tierViewSize)
+                                Text(selectedOption == "notHour" ?  notHourTierGuideLines[tier]: hourTierGuideLines[tier])
+                            }
+                            .frame(width: geoWidth/2)
+                            .padding(.vertical,tierViewSize*0.1)
+                        }
+                    }
+                    .frame(width:geoWidth/2)
+
+                    ScrollView {
+                        ForEach(1...10, id:\.self) { momentumLevel in
+                            
+                            VStack {
+                                FireView(momentumLevel: momentumLevel)
+                                        .frame(width:fireViewSize, height: fireViewSize)
+                                Text(fireGuideLines[momentumLevel-1])
+                                    .font(.caption)
+                            }
+                            .frame(width: geoWidth/2)
+                            .padding(.vertical,fireViewSize*0.1)
+
+                        }
+                    }
+                    .frame(width:geoWidth/2)
+
+                }
+                .frame(width:geoWidth)
+                Button(action:{
+                    popUp_help.toggle()
+                }) {
+                    Image(systemName: "xmark")
+                }
+                .padding(.vertical, geoHeight*0.02)
+
+            }
+            .frame(width: geoWidth, height: geoHeight)
+        }
     }
 }
+
+
 
 
 //let sampleQuest = {
@@ -621,9 +739,14 @@ struct RotatingGradient: View {
             default: return 1.0
             }
         }()
+
         GeometryReader { geometry in
+            let geoWidth: CGFloat = geometry.size.width
+            let geoHeight: CGFloat = geometry.size.height
+            let a = Path(ellipseIn: CGRect(x: 0, y: 0, width: geoWidth, height: geoHeight))
             
-            Circle()
+//            Circle()
+            a
                 .fill(
                     AngularGradient(gradient: Gradient(colors: colors), center: .center)
                 )

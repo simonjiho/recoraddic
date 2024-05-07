@@ -14,8 +14,8 @@ final class DataType {
 //    static let NONE = 0
     static let OX = 1
     static let REP = 2 // 최대 100000회
-    static let SEC = 3 // 최대 2시간 -> 7200초
-    static let MIN = 4 // 최대 6시간 -> 360분
+//    static let SEC = 3 // 최대 2시간 -> 7200초
+//    static let MIN = 4 // 최대 6시간 -> 360분
     static let HOUR = 5 // 최대 18시간 -> 180*6min
 //    static let MONEY = 6 // 최대 100억 -> 1억*100원
     static let CUSTOM = 7 // 최대
@@ -32,12 +32,6 @@ final class DataType {
         }
         else if dataType == DataType.REP {
             return "rep"
-        }
-        else if dataType == DataType.SEC {
-            return "sec"
-        }
-        else if dataType == DataType.MIN {
-            return "min"
         }
         else if dataType == DataType.HOUR {
             return "hour"
@@ -60,14 +54,8 @@ final class DataType {
         else if dataType == DataType.REP {
             return "횟수"
         }
-        else if dataType == DataType.SEC {
-            return "시간_초"
-        }
-        else if dataType == DataType.MIN {
-            return "시간_분"
-        }
         else if dataType == DataType.HOUR {
-            return "시간_시간\n(최소단위 0.1시간)"
+            return "시간"
         }
         else if dataType == DataType.CUSTOM {
             return "사용자 지정"
@@ -123,11 +111,6 @@ final class DataType {
         else if dataType == DataType.REP
         { return "회" }
         
-        else if dataType == DataType.SEC
-        { return "초" }
-        
-        else if dataType == DataType.MIN
-        { return "분" }
      
         else if dataType == DataType.HOUR
         { return "시간" }
@@ -158,15 +141,9 @@ final class DataType {
         else if dataType == DataType.REP
         { return 100000 }
         
-        else if dataType == DataType.SEC
-        { return 240*6*60 }
-        
-        else if dataType == DataType.MIN
-        { return 240*6 }
         
         else if dataType == DataType.HOUR
         { return 720 }
-        
         
         
         // set to get custom notation later
@@ -185,7 +162,7 @@ final class DataType {
             return primaryMaxiumUnitValue
         }
         
-        else if dataType == DataType.SEC || dataType == DataType.MIN || dataType == DataType.HOUR
+        else if dataType == DataType.HOUR
         { return primaryMaxiumUnitValue*4/3 } // -> 24hour
 
         
@@ -195,43 +172,63 @@ final class DataType {
     }
     
         
-    static func string_unitDataToRepresentableData(data: Int, dataType: Int) -> String {
-        
-        if data < 0 || dataType > DataType.CUSTOM || dataType < DataType.OX
-        { return String(format: "%g", 99999) }
-        
-        
-//        if dataType == DataType.NONE
+//    static func string_unitDataToRepresentableData(data: Int, dataType: Int) -> String {
+//        
+//        if data < 0 || dataType > DataType.CUSTOM || dataType < DataType.OX
+//        { return String(format: "%g", 99999) }
+//        
+//        
+////        if dataType == DataType.NONE
+////        { return String(format: "%d", data) }
+//        
+//        else if dataType == DataType.OX {
+//            if data != 0 && data != 1 { return String(format: "%d", 99999) }
+//            else { return String(format: "%d", data) }
+//        }
+//        
+//        else if dataType == DataType.REP
 //        { return String(format: "%d", data) }
+//     
+//        //MARK: (unit of HOUR) == 0.1 hour(6 min)
+//        else if dataType == DataType.HOUR
+//        { return String(format: "%.1f", Double(data)*0.1) }
+//        
+//        
+//        else if dataType == DataType.CUSTOM
+//        { return String(format: "%d", data) }
+//        
+//        else
+//        { return String(format: "%d", 99999) }
+//        
+//        
+//    }
+    
+    static func string_unitDataToRepresentableData_hours(data: Int) -> (String, String) {
         
-        else if dataType == DataType.OX {
-            if data != 0 && data != 1 { return String(format: "%d", 99999) }
-            else { return String(format: "%d", data) }
+        return (String(format: "%d", data/60) , String(format: "%d", data%60))
+    }
+    
+    static func string_fullRepresentableNotation(data: Int, dataType: Int, customDataTypeNotation: String? = nil) -> String {
+        if dataType == DataType.OX {
+            return "\(data)"
+        }
+        if dataType == DataType.REP {
+            return "\(data) 회"
+        }
+        if dataType == DataType.HOUR {
+            let (hours,minutes) = string_unitDataToRepresentableData_hours(data: data)
+            return "\(hours)시간 \(minutes)분"
+        }
+        if dataType == DataType.CUSTOM {
+            return "\(data) \(customDataTypeNotation ?? "customData")"
+        }
+        else {
+            return "error: string_fullRepresentableNotation"
         }
         
-        else if dataType == DataType.REP
-        { return String(format: "%d", data) }
-        
-        else if dataType == DataType.SEC
-        { return String(format: "%d", data) }
-        
-        else if dataType == DataType.MIN
-        { return String(format: "%d", data) }
-     
-        //MARK: (unit of HOUR) == 0.1 hour(6 min)
-        else if dataType == DataType.HOUR
-        { return String(format: "%.1f", Double(data)*0.1) }
-        
-        
-        else if dataType == DataType.CUSTOM
-        { return String(format: "%d", data) }
-        
-        else
-        { return String(format: "%d", 99999) }
-        
-        
-    }
 
+    }
+    
     
     static func float_unitDataToRepresentableData(data: Int, dataType: Int) -> CGFloat {
         
@@ -248,12 +245,6 @@ final class DataType {
         }
         
         else if dataType == DataType.REP
-        { return CGFloat(data) }
-        
-        else if dataType == DataType.SEC
-        { return CGFloat(data) }
-        
-        else if dataType == DataType.MIN
         { return CGFloat(data) }
      
         // (unit of HOUR) == 0.1 hour(6 min)
