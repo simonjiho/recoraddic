@@ -149,15 +149,13 @@ struct MainView_checklist: View {
                     }
                     .popover(isPresented: $changeMood) {
                         VStack {
-                            Spacer()
-                                .frame(height: geoHeight*0.06)
-
                             Picker("분류", selection: $selectedClassification) {
                                 ForEach(["긍정적","부정적","중립적"],id:\.self) {
                                     Text($0)
                                 }
                             }
                             .pickerStyle(.menu)
+//                            .frame(height:geoHeight*0.06)
                             ScrollView {
                                 let numList:[Int] = {
                                     if selectedClassification == "전체" {return Array(1...125)}
@@ -208,9 +206,10 @@ struct MainView_checklist: View {
                                     
                                 } // LazyVGrid
                             } // ScrollView
-                            .frame(width: popUp_changeMood_width, height: popUp_addQuest_height)
+                            .frame(width: popUp_changeMood_width, height: popUp_addQuest_height*0.9)
                         }
-                        .frame(width: popUp_changeMood_width, height: popUp_addQuest_height)
+                        .padding(.vertical,popUp_addQuest_height*0.02)
+                        .frame(width: popUp_changeMood_width, height: popUp_addQuest_height, alignment: .top)
                         .presentationCompactAdaptation(.popover)
 
 
@@ -961,7 +960,7 @@ struct PurposeOfDailyQuestView: View {
     var parentHeight: CGFloat
     
     var body: some View {
-//        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
         
         GeometryReader { geometry in
@@ -970,14 +969,18 @@ struct PurposeOfDailyQuestView: View {
             let tagSize = min(geoWidth*0.8,geoHeight*0.3)
 
             
-            Group {
+//            Group {
                 Group {
                     // purpose 0개일 때
                     if dailyQuest.defaultPurposes.count == 0 {
-                        Image(systemName:"questionmark.square")
-                            .resizable()
-                            .frame(width:tagSize, height:tagSize)
-                            .foregroundStyle(reversedColorSchemeColor)
+                        colorSchemeColor
+                            .overlay(
+                                Image(systemName:"questionmark.square")
+                                    .resizable()
+                                    .frame(width:tagSize, height:tagSize)
+                                    .foregroundStyle(reversedColorSchemeColor)
+                            )
+                        // MARK: 이렇게 안 하면 외부의 zIndex가 작동 안 함.
                     }
                     else {
                         PurposeTagsView_vertical(purposes:dailyQuest.defaultPurposes)
@@ -997,7 +1000,7 @@ struct PurposeOfDailyQuestView: View {
                         .presentationCompactAdaptation(.popover)
                     
                 }
-            }
+//            }
             
             
         }

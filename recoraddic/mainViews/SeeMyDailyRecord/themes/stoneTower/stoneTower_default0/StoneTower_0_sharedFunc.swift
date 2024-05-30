@@ -17,12 +17,10 @@ extension StoneTower_0 {
     }
     
     static func calculateVisualValue2(qVal1: Int?, qVal2: Int?, qVal3: Int?) -> Int { // 색
-        
         return 0
 
     }
-    
-    
+
     static func calculateVisualValue3(qVal1: Int?, qVal2: Int?, qVal3: Int?) -> Int { // 다음 포지션
         return 0
 

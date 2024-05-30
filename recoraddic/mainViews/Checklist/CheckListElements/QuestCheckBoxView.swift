@@ -236,7 +236,7 @@ struct QuestCheckBoxView: View {
                     
                     Rectangle()
                         .fill(
-                        LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                            LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
                         )
                         .frame(width:geoWidth, height:geoHeight)
                         .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)

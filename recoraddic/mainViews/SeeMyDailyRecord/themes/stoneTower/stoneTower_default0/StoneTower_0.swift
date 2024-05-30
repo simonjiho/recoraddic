@@ -73,7 +73,7 @@ struct StoneTower_0: View {
         
         let dailyRecordSet_notHidden_count: Int = dailyRecordSets.filter({!$0.isHidden}).count
         
-        let dailyRecords_savedAndNotHidden: [DailyRecord] = dailyRecordSet.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({$0.questionValue1 != nil && !$0.hide})
+        let dailyRecords_savedAndNotHidden: [DailyRecord] = dailyRecordSet.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({!$0.hide})
         
         let dailyRecords_savedAndNotHidden_withVisualValues: [DailyRecord] = dailyRecords_savedAndNotHidden.filter({$0.visualValue3 != nil})
         

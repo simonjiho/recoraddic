@@ -214,7 +214,6 @@ struct RecordInDetailView: View {
                                     let purposeCount = questdata.defaultPurposes.count
                                     let totalWidth:CGFloat = tagSize * CGFloat(purposeCount) + (purposeCount > 0 ? spacing * CGFloat(purposeCount - 1) : 0.0)
                                     Text(text)
-                                        .font(.title3)
                                         .minimumScaleFactor(0.5)
                                         .lineLimit(2)
                                         .foregroundStyle(.black)

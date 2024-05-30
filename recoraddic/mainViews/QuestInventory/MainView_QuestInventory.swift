@@ -9,15 +9,20 @@ import Foundation
 import SwiftUI
 import SwiftData
 
+enum EditOption {
+    case archive
+    case hide
+    case delete
+}
+
+
 struct MainView_QuestInventory: View {
     
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
     @Query(sort:\Quest.momentumLevel) var quests:[Quest]
     
-    var notHiddenQuests: [Quest] {
-        quests.filter({quest in !(quest.isHidden)})
-    }
+
     
 //    @State var chooseQuestToHide:Bool = false
     
@@ -26,58 +31,136 @@ struct MainView_QuestInventory: View {
         case defaultPurpose
     } // add customPurpose later
     
-    
-    
     @State var selectedQuest: Quest?
     @State var popUp_questStatisticsInDetail: Bool = false
     
     @State var popUp_addNewQuest: Bool = false
     @State var popUp_help: Bool = false
+    @State var popUp_confirmation: Bool = false
+    @State var editConfirmed: Bool = false
+    @State var isEdit: Bool = false
+    @State var selectedQuestNames: Set<String> = []
+    
+    @State var editOption: EditOption?
+    
+    // @State enum -> 보관 / 숨기기 / 휴지통 하시겠습니까? -> enum에 따른 함수 구분해서 바꿔주기
     
     var body: some View {
+        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+        
+        let quest_sorted = quests.filter({!$0.isArchived && !$0.isHidden && !$0.inTrashCan})
         
         GeometryReader { geometry in
             
             let geoWidth: CGFloat = geometry.size.width
             let geoHeight: CGFloat = geometry.size.height
 
-            let gridItemSize = geoWidth/3 * 0.78
+            let gridHorizontalPadding = geoWidth*0.04
+            let gridViewFrameWidth = geoWidth - gridHorizontalPadding*2
+            let gridSize = (gridViewFrameWidth) / 3 * 0.955
+            let gridItemSize = gridSize * 0.85
             let gridItemSpacing = gridItemSize*0.3
+            let gridVerticalSpacing = gridSize*0.08
+        
             
             let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
             let shadowColor: Color = getShadowColor(colorScheme)
             ZStack {
                 VStack {
-//                    Picker("", selection: $statisticOption) {
-//                        Text("퀘스트").tag(StatisticOption.quest)
-//                        Text("성향").tag(StatisticOption.defaultPurpose)
-//                    }
-//                    .frame(height: geometry.size.height*0.1)
-                    HStack {
-                        Text("누적 퀘스트 목록")
-                            .bold()
-                            .fontDesign(.serif)
-                            .frame(height: geoHeight*0.07)
-                        Button("", systemImage: "questionmark.circle", action: {
-                            popUp_help.toggle()
-                        })
-                        
-            
-                        
+                    ZStack {
+                        HStack(spacing:0.0) {
+//                            if !isEdit {
+                                Text("누적 퀘스트 목록")
+                                    .bold()
+                                    .fontDesign(.serif)
+                                    .frame(height: geoHeight*0.07)
+                                    .padding(.trailing, 10)
+                                Button("", systemImage: "questionmark.circle", action: {
+                                    popUp_help.toggle()
+                                })
+                                
+//                            }
+//                            else {
+//                                Button(action:{}){Image(systemName: "trash")}.foregroundStyle(.red)
+//                                    .frame(width:geoWidth*0.05)
+//                                Text("\(selectedQuestNames.count)개의 퀘스트 선택")
+//                                    .frame(width:geoWidth*0.7,alignment: .center)
+//                                Button(action:{}){Image(systemName: "archivebox")}
+//                                    .frame(width:geoWidth*0.05,alignment: .center)
+//                                    .padding()
+//                                Button(action:{}){Image(systemName: "eye.slash")}
+//                                    .frame(width:geoWidth*0.05, alignment: .center)
+//                                    .padding(.trailing, geoWidth*0.15)
+//                                    
+//                            }
+                        }
+                        Button(isEdit ? "취소" : "편집") {
+                            isEdit.toggle()
+                            resetEditData()
+                        }
+                        .frame(width: geoWidth*0.95, height: geoHeight*0.07, alignment: .trailing)
                     }
+                    .frame(width: geoWidth*0.95, height: geoHeight*0.07)
+
                     
-                        ZStack {
-                            ScrollView {
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum:gridItemSize))], spacing: gridItemSpacing) {
-                                    ForEach(notHiddenQuests,id:\.createdTime) { quest in
+                    ZStack {
+                        ScrollView {
+                            ZStack {
+                                
+                                LazyVGrid(columns: [GridItem(.adaptive(minimum: gridSize, maximum: gridSize))], spacing: gridVerticalSpacing) {
+                                    ForEach(quest_sorted,id:\.createdTime) { quest in
                                         
                                         
                                         Button(action:{
-                                            selectedQuest = quest
-                                            popUp_questStatisticsInDetail.toggle()
+                                            if !isEdit {
+                                                selectedQuest = quest
+                                                popUp_questStatisticsInDetail.toggle()
+                                            }
+                                            else {
+                                                if selectedQuestNames.contains(quest.name) {
+                                                    selectedQuestNames.remove(quest.name)
+                                                }
+                                                else {
+                                                    selectedQuestNames.insert(quest.name)
+                                                }
+                                            }
+                                            
                                         }) {
-                                            QuestThumbnailView(quest: quest)
+                                            ZStack {
+                                                ZStack {
+                                                    QuestThumbnailView(quest: quest)
+                                                        .frame(width: gridItemSize, height: gridItemSize)
+                                                    if isEdit {
+                                                        Button(action:{
+                                                            if selectedQuestNames.contains(quest.name) {
+                                                                selectedQuestNames.remove(quest.name)
+                                                            }
+                                                            else {
+                                                                selectedQuestNames.insert(quest.name)
+                                                            }
+                                                        }) {
+                                                            ZStack {
+                                                                let path: Path = Path(roundedRect: CGRect(x: 0, y: 0, width: gridItemSize, height: gridItemSize), cornerSize: CGSize(width: gridItemSize/20, height: gridItemSize/20))
+                                                                path
+                                                                    .stroke(lineWidth: gridItemSize/15)
+                                                                if selectedQuestNames.contains(quest.name) {
+                                                                    Image(systemName:"checkmark")
+                                                                        .resizable()
+                                                                        .frame(width:gridItemSize*0.6, height: gridItemSize*0.6)
+                                                                }
+                                                                
+                                                            }
+                                                            .frame(width:gridItemSize, height: gridItemSize)
+                                                            .foregroundStyle(.blue)
+                                                            
+                                                        }
+                                                    }
+                                                }
                                                 .frame(width: gridItemSize, height: gridItemSize)
+                                            }
+                                            .frame(width:gridSize, height: gridSize)
+                                            
                                         }
                                         .contextMenu(ContextMenu(menuItems: {
                                             Button("숨기기") {
@@ -87,7 +170,10 @@ struct MainView_QuestInventory: View {
                                         .onAppear() {
                                             quest.updateMomentumLevel()
                                         }
-                    
+                                        .frame(width:gridSize, height: gridSize)
+//                                        .border(.yellow)
+                                        
+                                        
                                         
                                         
                                         
@@ -95,44 +181,89 @@ struct MainView_QuestInventory: View {
                                     
                                     
                                     // TODO: plus button
-                                    Button(action: {
-                                        popUp_addNewQuest.toggle()
-                                    }) {
-                                        Image(systemName: "plus.square")
-                                            .resizable()
-                                            .frame(width: gridItemSize*0.4, height: gridItemSize*0.4)
+                                    if !isEdit {
+                                        ZStack {
+                                            Button(action: {
+                                                popUp_addNewQuest.toggle()
+                                            }) {
+                                                Image(systemName: "plus.square")
+                                                    .resizable()
+                                                    .frame(width: gridItemSize*0.4, height: gridItemSize*0.4)
+                                            }
+                                            .buttonStyle(.plain)
+                                        }
+                                        .frame(width: gridItemSize, height: gridItemSize)
                                     }
-                                    .buttonStyle(.plain)
                                     
                                     
                                     
                                 } // lazyVGrid
-                                .padding(.top, gridItemSpacing)
-                                
-                            } // ScrollView
-                            .frame(width:geometry.size.width, height: geometry.size.height*0.9)
-                            
+                                .frame(width:gridViewFrameWidth)
+//                                .border(.red)
+                                Path { path in
+                                    let items = quest_sorted.count
+                                    let size = gridViewFrameWidth/3
+                                    
+                                    let halfOfHorizontalPadding = (gridViewFrameWidth - gridSize*3)/2/2
+                                    let x1 = gridSize + halfOfHorizontalPadding
+                                    let x2 = gridSize * 2 + halfOfHorizontalPadding * 3
+                                    
+                                    path.move(to: CGPoint(x: x1, y: 0.0))
+                                    path.addLine(to: CGPoint(x: x1, y:CGFloat((items + 2) / 3) * size))
+                                    path.move(to: CGPoint(x: x2, y: 0.0))
+                                    path.addLine(to: CGPoint(x: x2, y:CGFloat((items + 1) / 3) * size))
 
-                            if quests.filter({!$0.isHidden}).isEmpty {
-                                VStack {
-                                    Text("반복적으로 해야 할 일을 퀘스트로 생성하고 ")
-                                    HStack {
-                                        Image(systemName: "checklist.checked")
-                                            .bold()
-                                        Text("체크리스트")
-                                            .bold()
-                                        Text("에 추가해보세요!")
-                                        
+                                    
+                                    let rowsNum = (items - 1) / 3
+                                    let lastRowElmNum = items % 3
+                                    let halfOfVerticalPadding = gridVerticalSpacing/2
+                                    let height = gridSize + halfOfVerticalPadding*2
+
+                                    for i in 0..<rowsNum {
+                                        let y = height * CGFloat(i + 1) - halfOfVerticalPadding
+//                                        if i != rowsNum - 1 {
+                                            path.move(to: CGPoint(x: 0, y: y))
+                                            path.addLine(to: CGPoint(x: size * 3.0, y: y))
+//                                        }
+//                                        else {
+//                                            path.move(to: CGPoint(x: 0, y: y))
+//                                            path.addLine(to: CGPoint(x: size * CGFloat(lastRowElmNum), y: y))
+//                                        }
+
                                     }
+
                                 }
-                                .foregroundStyle(.opacity(0.5))
+                                .stroke(.gray.opacity(0.7), lineWidth: 1)
                             }
-                        }
+                            .frame(width:geoWidth - gridHorizontalPadding*2)
+                            .padding(.top, gridItemSpacing)
+                            .padding(.horizontal, gridHorizontalPadding)
+                            
+                            
+                            
+                            
+                        } // ScrollView
                         .frame(width:geometry.size.width, height: geometry.size.height*0.9)
                         
-                    
 
-                    
+                        if quests.filter({!$0.isHidden}).isEmpty {
+                            VStack {
+                                Text("반복적으로 해야 할 일을 퀘스트로 생성하고 ")
+                                HStack {
+                                    Image(systemName: "checklist.checked")
+                                        .bold()
+                                    Text("체크리스트")
+                                        .bold()
+                                    Text("에 추가해보세요!")
+                                    
+                                }
+                            }
+                            .foregroundStyle(.opacity(0.5))
+                        }
+                    }
+                        .frame(width:geometry.size.width, height: geometry.size.height*0.9)
+                        
+
                 } // VStack
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
                 .sheet(isPresented: $popUp_questStatisticsInDetail, onDismiss: {selectedQuest = nil}) {
@@ -141,6 +272,8 @@ struct MainView_QuestInventory: View {
                         popUp_questStatisticsInDetail: $popUp_questStatisticsInDetail
                     )
                 }
+
+                
                 if popUp_addNewQuest {
                     Color.gray.opacity(0.2)
                         .onTapGesture {
@@ -162,6 +295,110 @@ struct MainView_QuestInventory: View {
                         .position(CGPoint(x: geoWidth/2, y: geoHeight*0.85*0.6))
                         .shadow(color:shadowColor, radius: 3.0)
                 }
+//                if popUp_confirmation {
+//                    Color.gray.opacity(0.2)
+//                        .onTapGesture {
+//                            popUp_confirmation.toggle()
+//                        }
+//                    let questName = (selectedQuestNames.count == 1) ? selectedQuestNames.first! : "\(selectedQuestNames.count)개의 퀘스트"
+//                    QuestEditConfirmationView(
+//                        questName: questName,
+//                        editOption: editOption!,
+//                        editConfirmed: $editConfirmed,
+//                        popUp_self: $popUp_confirmation
+//                    )
+//                        .popUpViewLayout(width: geoWidth*0.8, height: geoHeight*0.25, color: colorSchemeColor)
+//                        .position(CGPoint(x: geoWidth/2, y: geoHeight*0.5))
+//                        .shadow(color:shadowColor, radius: 3.0)
+//                }
+                
+            }
+            .sheet(isPresented: $isEdit) {
+//                if popUp_confirmation {
+//
+//                }
+//                else {
+                    ZStack {
+                        Text("\(selectedQuestNames.count)개의 퀘스트 선택")
+                        HStack(spacing:0.0) {
+                            Button(action:{
+                                editOption = .archive
+                                popUp_confirmation.toggle()
+                            }){Image(systemName: "archivebox")}
+                                .frame(width:geoWidth*0.12,alignment: .center)
+                                .disabled(selectedQuestNames.count == 0)
+                            Button(action:{
+                                editOption = .hide
+                                popUp_confirmation.toggle()
+                            }){Image(systemName: "eye.slash")}
+                                .frame(width:geoWidth*0.76, alignment: .leading)
+                                .disabled(selectedQuestNames.count == 0)
+                            Button(action:{
+                                editOption = .delete
+                                popUp_confirmation.toggle()
+                            }){Image(systemName: "trash")}
+                                .foregroundStyle(selectedQuestNames.count == 0 ? .gray : .red)
+                                .frame(width:geoWidth*0.12, alignment: .center)
+                                .disabled(selectedQuestNames.count == 0)
+                        }
+                        .sheet(isPresented: $popUp_confirmation) {
+                            let questName = (selectedQuestNames.count == 1) ? selectedQuestNames.first! : "\(selectedQuestNames.count)개의 퀘스트"
+                            QuestEditConfirmationView2(
+                                questName: questName,
+                                editOption: $editOption,
+                                editConfirmed: $editConfirmed,
+                                popUp_self: $popUp_confirmation
+                            )
+                            .presentationDetents([.height(editOption == .delete ? 200*1.2 : 200)])
+//                            .presentationDetents([.bar])
+                            .presentationBackground(.thickMaterial)
+                        }
+
+                    }
+                    .presentationDetents([.height(100)])
+                    .presentationCornerRadius(0.0)
+                    .presentationBackgroundInteraction(.enabled(upThrough: .height(100)))
+                    .presentationBackground(.thickMaterial)
+
+
+//                }
+            }
+
+
+            .onChange(of: editConfirmed) { oldValue, newValue in
+                if newValue == true {
+                    if editOption == .archive {
+                        for selectedQuestName in selectedQuestNames {
+                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName}).first {
+                                targetQuest.isArchived = true
+                            }
+                        }
+                    }
+                    else if editOption == .hide {
+                        for selectedQuestName in selectedQuestNames {
+                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName}).first {
+                                targetQuest.isHidden = true
+                            }
+                        }
+                    }
+                    else if editOption == .delete {
+                        for selectedQuestName in selectedQuestNames {
+                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName}).first {
+                                targetQuest.inTrashCan = true
+                            }
+                        }
+                    }
+                    
+
+                }
+            }
+            .onChange(of:popUp_confirmation) { oldValue, newValue in
+                if newValue == false {
+                    if editConfirmed {
+                        isEdit = false
+                        resetEditData()
+                    }
+                }
             }
 
         } // geometryRecord
@@ -169,6 +406,183 @@ struct MainView_QuestInventory: View {
 
     }
     
+    func resetEditData() -> Void {
+        selectedQuestNames = []
+        editOption = nil
+        editConfirmed = false
+    }
+    
+}
+
+extension PresentationDetent {
+    static let bar = Self.custom(BarDetent.self)
+    static let small = Self.height(100)
+    static let extraLarge = Self.fraction(0.75)
+}
+
+
+private struct BarDetent: CustomPresentationDetent {
+    static func height(in context: Context) -> CGFloat? {
+        max(44, context.maxDetentValue * 0.5)
+    }
+}
+
+
+struct QuestEditConfirmationView: View {
+        
+    var questName: String
+    
+    var editOption: EditOption
+    
+    @Binding var editConfirmed: Bool
+    @Binding var popUp_self: Bool
+    
+    
+    var body: some View {
+        
+        let question: String = {
+            if editOption == .archive {
+                return "\(questName) 를 보관하시겠습니까?"
+            }
+            else if editOption == .hide {
+                return "\(questName) 를 숨기시겠습니까?"
+            }
+            else if editOption == .delete {
+                return "\(questName) 를 삭제하시겠습니까?"
+            }
+            else {
+                return ""
+            }
+        }()
+        
+        let buttonName = {
+            if editOption == .archive {
+                return "보관"
+            }
+            else if editOption == .hide {
+                return "숨기기"
+            }
+            else if editOption == .delete {
+                return "삭제"
+            }
+            else {
+                return ""
+        }
+        }()
+        
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            VStack {
+                Text("\(question)")
+                if editOption == .delete {
+                    Text("(삭제한 누적퀘스트는 휴지통으로 이동됩니다.)")
+                }
+                HStack {
+                    Button("\(buttonName)") {
+                        editConfirmed.toggle()
+                        popUp_self.toggle()
+                    }
+                    .frame(width: geoWidth/2)
+                    .foregroundStyle(.red)
+                    Button("취소") {
+                        popUp_self.toggle()
+                    }
+                    .frame(width: geoWidth/2)
+                }
+                .padding(.top, geoHeight*0.1)
+            }
+            .frame(width:geoWidth, height: geoHeight)
+        }
+    }
+}
+
+
+struct QuestEditConfirmationView2: View {
+        
+    var questName: String
+    
+    @Binding var editOption: EditOption?
+    
+    @Binding var editConfirmed: Bool
+    @Binding var popUp_self: Bool
+    
+    
+    var body: some View {
+        
+        let question: String = {
+            if editOption == .archive {
+                return "\(questName) 를 보관하시겠습니까?"
+            }
+            else if editOption == .hide {
+                return "\(questName) 를 숨기시겠습니까?"
+            }
+            else if editOption == .delete {
+                return "\(questName) 를 삭제하시겠습니까?"
+            }
+            else {
+                return ""
+            }
+        }()
+        
+        let buttonName = {
+            if editOption == .archive {
+                return "보관"
+            }
+            else if editOption == .hide {
+                return "숨기기"
+            }
+            else if editOption == .delete {
+                return "삭제"
+            }
+            else {
+                return ""
+        }
+        }()
+        
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            let elementHeight = geoHeight * 0.15
+            VStack {
+                List {
+                    Section {
+                        VStack(spacing:0.0) {
+                            Text("\(question)")
+                                .frame(height:elementHeight)
+                            if editOption == .delete {
+                                Text("(삭제한 누적퀘스트는 휴지통으로 이동됩니다.)")
+                                    .frame(height:elementHeight)
+                            }
+                        }
+                        Button("\(buttonName)") {
+                            editConfirmed.toggle()
+                            popUp_self.toggle()
+                        }
+                        .foregroundStyle(.red)
+                        .frame(height:elementHeight)
+                    }
+                    Section {
+                        Button("취소") {
+                            popUp_self.toggle()
+                        }
+                        .frame(height:elementHeight)
+                    }
+                }
+                .scrollClipDisabled()
+                .scrollDisabled(true)
+                .listSectionSpacing(ListSectionSpacing.compact)
+            }
+            .frame(width:geoWidth, height: geoHeight, alignment: .bottom)
+
+
+                
+            
+//            .background(.clear)
+        }
+        
+    }
+        
 }
 
 

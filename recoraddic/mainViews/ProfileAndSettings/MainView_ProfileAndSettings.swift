@@ -279,6 +279,7 @@ struct HiddenQuests: View {
                         }
                         
                     }
+                    .padding(.top, gridItemSize*0.1)
                     
                     
                     

@@ -136,6 +136,9 @@ struct SaveDailyRecordView_confirmation: View {
         if currentDailyRecordSet.dailyRecords!.count == 0 {
             currentDailyRecordSet.start = savingDate
         }
+        if currentDailyRecordSet.start > savingDate {
+            currentDailyRecordSet.start = savingDate
+        }
 
         currentDailyRecord.dailyRecordSet = currentDailyRecordSet
         
