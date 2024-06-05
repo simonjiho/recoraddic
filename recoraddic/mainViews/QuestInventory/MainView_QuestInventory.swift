@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-enum EditOption {
+enum QuestEditOption {
     case archive
     case hide
     case delete
@@ -41,7 +41,7 @@ struct MainView_QuestInventory: View {
     @State var isEdit: Bool = false
     @State var selectedQuestNames: Set<String> = []
     
-    @State var editOption: EditOption?
+    @State var editOption: QuestEditOption?
     
     // @State enum -> 보관 / 숨기기 / 휴지통 하시겠습니까? -> enum에 따른 함수 구분해서 바꿔주기
     
@@ -49,7 +49,7 @@ struct MainView_QuestInventory: View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
         
-        let quest_sorted = quests.filter({!$0.isArchived && !$0.isHidden && !$0.inTrashCan})
+        let quest_sorted = quests.filter({$0.isVisible()})
         
         GeometryReader { geometry in
             
@@ -246,7 +246,7 @@ struct MainView_QuestInventory: View {
                         .frame(width:geometry.size.width, height: geometry.size.height*0.9)
                         
 
-                        if quests.filter({!$0.isHidden}).isEmpty {
+                        if quests.filter({$0.isVisible()}).isEmpty {
                             VStack {
                                 Text("반복적으로 해야 할 일을 퀘스트로 생성하고 ")
                                 HStack {
@@ -432,7 +432,7 @@ struct QuestEditConfirmationView: View {
         
     var questName: String
     
-    var editOption: EditOption
+    var editOption: QuestEditOption
     
     @Binding var editConfirmed: Bool
     @Binding var popUp_self: Bool
@@ -502,7 +502,7 @@ struct QuestEditConfirmationView2: View {
         
     var questName: String
     
-    @Binding var editOption: EditOption?
+    @Binding var editOption: QuestEditOption?
     
     @Binding var editConfirmed: Bool
     @Binding var popUp_self: Bool
@@ -613,7 +613,7 @@ struct QuestTierView: View {
         let nextTierColor_frame:Color = nextTierColor
 
         
-        let colorsForGradient: [Color] = {
+        let rotationGradientColors: [Color] = {
             switch tier%5 {
             case 4:
                 return [currentTierColor_frame, nextTierColor_frame, currentTierColor_frame, nextTierColor_frame, currentTierColor_frame]
@@ -649,9 +649,9 @@ struct QuestTierView: View {
             
             ZStack {
                 tierViewFrame
-                    .fill(LinearGradient(colors: getTierColorsOf(tier: tier, type:1), startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .fill(LinearGradient(colors: getGradientColorsOf(tier: tier, type:1), startPoint: .topLeading, endPoint: .bottomTrailing))
                 
-                RotatingGradient(level: tier%5, colors: colorsForGradient)
+                RotatingGradient(level: tier%5, colors: rotationGradientColors)
                     .frame(width:(geoWidth+strokeWidth*2)*1.5, height: (geoHeight+strokeWidth*2)*1.5)
                     .position(x:geoWidth/2, y:geoHeight/2)
                     .mask {
@@ -891,8 +891,8 @@ struct QuestHelpView: View {
     
     @Binding var popUp_help: Bool
     
-    let options: [String] = ["notHour", "hour"]
-    @State var selectedOption: String = "notHour"
+    let options: [String] = ["일반단위", "시간"]
+    @State var selectedOption: String = "일반단위"
     
     
     let notHourTierGuideLines: [String] = [
@@ -952,7 +952,7 @@ struct QuestHelpView: View {
                             VStack {
                                 QuestTierView(tier: .constant(tier))
                                     .frame(width:tierViewSize, height: tierViewSize)
-                                Text(selectedOption == "notHour" ?  notHourTierGuideLines[tier]: hourTierGuideLines[tier])
+                                Text(selectedOption == "일반단위" ?  notHourTierGuideLines[tier]: hourTierGuideLines[tier])
                             }
                             .frame(width: geoWidth/2)
                             .padding(.vertical,tierViewSize*0.1)

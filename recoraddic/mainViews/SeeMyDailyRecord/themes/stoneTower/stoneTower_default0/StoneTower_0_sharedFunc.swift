@@ -52,4 +52,8 @@ extension StoneTower_0 {
     }
     
     
+    static func getIntegratedDailyRecordColor(index:Int, colorScheme: ColorScheme) -> Color {
+        return Self.getDailyRecordColor(index: index).adjust(brightness: colorScheme == .light ? -0.02 : -0.25).colorExpressionIntegration()
+    }
+    
 }

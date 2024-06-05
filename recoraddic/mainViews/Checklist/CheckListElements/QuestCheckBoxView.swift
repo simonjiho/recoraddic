@@ -31,7 +31,7 @@ struct QuestCheckBoxView_OX: View {
     
     
     var body: some View {
-        let gradientColors = getTierColorsOf(tier: dailyQuest.currentTier, type:0)
+        let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
 
         GeometryReader { geometry in
             
@@ -204,19 +204,8 @@ struct QuestCheckBoxView: View {
 //            let brightness:CGFloat = percentage * 0.2
             
             
-            let gradientColors = getTierColorsOf(tier: dailyQuest.currentTier, type:0)
-//            let adjustedGradient: [Color] = {
-//                var newGradient: [Color] = []
-//                for idx in 0...(gradientColors.count - 1) {
-//                    if idx % 2 == 0 {
-//                        newGradient.append(gradientColors[idx].adjust(brightness: brightness))
-//                    }
-//                    else {
-//                        newGradient.append(gradientColors[idx].adjust(brightness: brightness*0.5))
-//                    }
-//                }
-//                return newGradient
-//            }()
+            let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
+
             
             let cornerWidth = xOffset > geoWidth/20*2 ? geoWidth/20 : 0
             let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth +  0.1) ? xOffset : 0.0, height: geoHeight), transform: nil))
@@ -452,6 +441,7 @@ struct QuestCheckBoxView: View {
                 if !isDragging { // if changed by checkbox or x2 button.. or undo buttion..
 //                    range = 0.0...minimumBoundary(of:dailyQuest.data, byMultiplying:dailyGoal)
                     xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
+                    dailyQuest.data = value
                 }
             }
             .onChange(of: range) {
@@ -673,6 +663,7 @@ struct DialForHours: View {
 
 struct QuestCheckBoxColorPreview: View {
 
+    @State var isAnimating: Bool = false
     var tier: Int
     
     var body: some View {
@@ -684,6 +675,7 @@ struct QuestCheckBoxColorPreview: View {
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
             
+            
             let a: Path = Path(CGPath(roundedRect: CGRect(x: 0, y: 0, width: geoWidth, height: geoHeight), cornerWidth: geoWidth/20, cornerHeight: geoHeight/20, transform: nil))
 
             
@@ -691,7 +683,7 @@ struct QuestCheckBoxColorPreview: View {
             let brightness:CGFloat = percentage * 0.0
             
             
-            let gradientColors = getTierColorsOf(tier: tier, type:0)
+            let gradientColors = getGradientColorsOf(tier: tier, type:0)
             let adjustedGradient: [Color] = {
                 var newGradient: [Color] = []
                 for idx in 0...(gradientColors.count - 1) {
@@ -705,16 +697,41 @@ struct QuestCheckBoxColorPreview: View {
                 return newGradient
             }()
             
-            
-            a
-                .fill(LinearGradient(colors: adjustedGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
-                .frame(width: geoWidth, height: geoHeight)
-            // MARK: 0.1을 넣지 않으면 xOffset이 geoWidth보다 커지는 상황 발생... 왤까?
 
-                .clipShape(.buttonBorder)
-                .shadow(color:getTierColorOf(tier: tier).adjust(brightness: -0.1),radius:1)
 
-//                .foregroundStyle(LinearGradient(colors: adjustedGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
+                
+            ZStack {
+                
+                ZStack {
+                    Rectangle()
+                        .fill(
+                            LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)
+                        )
+                        .frame(width:geoWidth, height:geoHeight)
+                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                    
+                    Rectangle()
+                        .fill(
+                            LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)
+                        )
+                        .frame(width:geoWidth, height:geoHeight)
+                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                }
+                .frame(width:geoWidth, height:geoHeight)
+                .mask{a}
+                .onAppear() {
+                    isAnimating = true
+                }
+                
+                
+                
+            }
+                    
+
+
+
 
         }
     }

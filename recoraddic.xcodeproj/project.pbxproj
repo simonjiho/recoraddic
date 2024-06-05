@@ -18,6 +18,7 @@
 		B220DA462B6524F50039160C /* themeNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA452B6524F50039160C /* themeNames.swift */; };
 		B2314BBF2AF4DD7400EDD5C7 /* stone_default1.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2314BBE2AF4DD7400EDD5C7 /* stone_default1.xcassets */; };
 		B247D24B2A6D1DA100E457FB /* customMathFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B247D24A2A6D1DA100E457FB /* customMathFunc.swift */; };
+		B24C298E2C283331000F3EEE /* dailyQuestionsGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */; };
 		B25BF9052B1C886E0039F1F9 /* ResizableText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B25BF9042B1C886E0039F1F9 /* ResizableText.swift */; };
 		B260A3912A9B88AE00D73208 /* MainView_checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3902A9B88AE00D73208 /* MainView_checklist.swift */; };
 		B260A3942A9B8B8F00D73208 /* MainView_QuestInventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3932A9B8B8F00D73208 /* MainView_QuestInventory.swift */; };
@@ -85,6 +86,7 @@
 		B2314BBE2AF4DD7400EDD5C7 /* stone_default1.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = stone_default1.xcassets; sourceTree = "<group>"; };
 		B234C6EC2BC564CA0031BAD7 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		B247D24A2A6D1DA100E457FB /* customMathFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customMathFunc.swift; sourceTree = "<group>"; };
+		B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dailyQuestionsGraph.swift; sourceTree = "<group>"; };
 		B25BF9042B1C886E0039F1F9 /* ResizableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizableText.swift; sourceTree = "<group>"; };
 		B2600B062A35E1FF00E00D91 /* what_I_learned.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = what_I_learned.md; sourceTree = "<group>"; };
 		B260A3902A9B88AE00D73208 /* MainView_checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_checklist.swift; sourceTree = "<group>"; };
@@ -364,6 +366,7 @@
 			children = (
 				B220DA3B2B6268260039160C /* RecordInDetailView.swift */,
 				B2D7AD072B9451920045C9EA /* StartNewRecordSet.swift */,
+				B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */,
 			);
 			path = PopUpViews;
 			sourceTree = "<group>";
@@ -523,6 +526,7 @@
 				B265D27B2B04976E002E51A8 /* themeData.swift in Sources */,
 				B2D7AD052B92E29D0045C9EA /* logger.swift in Sources */,
 				B2ABB25D2B10BBDE00870DE0 /* PopupViewLayout.swift in Sources */,
+				B24C298E2C283331000F3EEE /* dailyQuestionsGraph.swift in Sources */,
 				B2D8F96D2B75ECB800423AFC /* FireView.swift in Sources */,
 				B2ABC2652B4293680056C637 /* purposeTags.swift in Sources */,
 				B2BA89012B2F172E00A3D50E /* AddDiaryView.swift in Sources */,

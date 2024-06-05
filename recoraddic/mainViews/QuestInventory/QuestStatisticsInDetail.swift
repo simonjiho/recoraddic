@@ -24,7 +24,10 @@ struct QuestStatisticsInDetail: View {
     
     @Binding var popUp_questStatisticsInDetail: Bool
     
-    
+    @State var alert_inTrashCan: Bool = false
+    @State var alert_restore: Bool = false
+    @State var alert_delete: Bool = false
+
     
     
     var body: some View {
@@ -33,6 +36,10 @@ struct QuestStatisticsInDetail: View {
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
+            
+            let titleHeight = geoHeight*(selectedQuest?.inTrashCan ?? false ? 0.2:0.15)
+            let contentHeight = geoHeight - titleHeight
+            
             let contentWidth1 = geoWidth*0.8
             let contentWidth2 = geoWidth*0.7
             let contentWidth3 = contentWidth2/7
@@ -41,68 +48,201 @@ struct QuestStatisticsInDetail: View {
                 Spacer()
             }
             else {
-                VStack {
-                    Text(selectedQuest!.name)
-                        .font(.title)
-                    if let startDate: Date  = selectedQuest!.dailyData.keys.sorted().first {
-                        Text("시작일: \(yyyymmddFormatOf(startDate))")
-                    }
-                    Text("진행상황")
-//                        .font(.title3)
-                        .padding(.leading, contentWidth1*0.02)
-                        .frame(width:contentWidth1)
-                        .padding(.top,geoHeight*0.07)
-                    
+                VStack(spacing:0.0) {
                     VStack {
-                        HStack(spacing:0.0) {
-                            Text("일")
-                                .font(.subheadline)
-                                .frame(width:contentWidth3)
-                            Text("월")
-                                .font(.subheadline)
-                                .frame(width:contentWidth3)
-                            Text("화")
-                                .font(.subheadline)
-                                .frame(width:contentWidth3)
-                            Text("수")
-                                .font(.subheadline)
-                                .frame(width:contentWidth3)
-                            Text("목")
-                                .font(.subheadline)
-                                .frame(width:contentWidth3)
-                            Text("금")
-                                .font(.subheadline)
-                                .frame(width:contentWidth3)
-                            Text("토")
-                                .font(.subheadline)
-                                .frame(width:contentWidth3)
-                        } // 요일
-                        .padding(.vertical,geoHeight*0.02)
-
-                        ScrollView {
-                            SerialVisualization(data: selectedQuest!.dailyData)
-                                .frame(width: contentWidth2, alignment: .center)
-                            
+                        Text(selectedQuest!.name)
+                            .frame(width: geoWidth)
+                            .font(.title)
+                            .padding(.top, geoHeight*0.02)
+                        if let startDate: Date  = selectedQuest!.dailyData.keys.sorted().first {
+                            Text("시작일: \(yyyymmddFormatOf(startDate))")
                         }
-                        .frame(width:contentWidth1)
+                        
 
-                    } // 달력
-                    .frame(width:contentWidth1, height: geoHeight*0.4)
-                    .background(contentColor)
-                    .clipShape(RoundedRectangle(cornerSize: CGSize(width: geoWidth*0.05, height: geoWidth*0.05)))
-                    
-                    if selectedQuest!.dataType != DataType.OX {
-                        GraphForDoneDays(selectedQuest: selectedQuest!)
-                            .frame(width:contentWidth1, height: geoHeight*0.2)
+                        Spacer()
+                            .frame(height:geoHeight*0.02)
+                        
+                        if selectedQuest!.inTrashCan {
+                            HStack(spacing:geoWidth/4) {
+                                Button("되돌리기") {
+                                    alert_restore.toggle()
+                                }
+                                .alert("퀘스트 '\(selectedQuest?.name ?? "")' 를 복구하시겠습니까?", isPresented: $alert_restore) {
+                                    Button("복구") {
+                                        selectedQuest?.inTrashCan = false
+                                        popUp_questStatisticsInDetail.toggle()
+                                        alert_restore.toggle()
+                                    }
+                                    Button("취소") {
+                                        alert_restore.toggle()
+                                    }
+                                }
+                                Button("영구적으로 삭제") {
+                                    alert_delete.toggle()
+                                }
+                                .foregroundStyle(.red)
+                                .alert("퀘스트 '\(selectedQuest?.name ?? "")' 를 영구적으로 삭제하시겠습니까?", isPresented: $alert_delete) {
+                                    Button("영구적으로 삭제") {
+                                        
+                                        let targetQuest: Quest = selectedQuest ?? Quest(name: "tmp", dataType: 0)
+                                        selectedQuest = nil
+                                        
+                                        popUp_questStatisticsInDetail.toggle()
+                                        alert_delete.toggle()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                            modelContext.delete(targetQuest)
+                                        }
+                                    }
+                                    Button("취소") {
+                                        alert_delete.toggle()
+                                    }
+                                }
+
+                            }
+                            .padding(.bottom,geoHeight*0.01)
+
+
+                        }
+                        
+                        Spacer()
+                            .frame(width: contentWidth1, height: 1)
+                            .background(.gray.opacity(0.4))
+                        
                     }
+                    .frame(height:titleHeight, alignment: .bottom)
+//                    .border(.red)
                     
-                    
+                    ScrollView {
+                        Text("진행상황")
+                            .padding(.leading, contentWidth1*0.02)
+                            .frame(width:geoWidth)
+                            .padding(.top,geoHeight*0.02)
+                        VStack {
+                            HStack(spacing:0.0) {
+                                Text("일")
+                                    .font(.subheadline)
+                                    .frame(width:contentWidth3)
+                                Text("월")
+                                    .font(.subheadline)
+                                    .frame(width:contentWidth3)
+                                Text("화")
+                                    .font(.subheadline)
+                                    .frame(width:contentWidth3)
+                                Text("수")
+                                    .font(.subheadline)
+                                    .frame(width:contentWidth3)
+                                Text("목")
+                                    .font(.subheadline)
+                                    .frame(width:contentWidth3)
+                                Text("금")
+                                    .font(.subheadline)
+                                    .frame(width:contentWidth3)
+                                Text("토")
+                                    .font(.subheadline)
+                                    .frame(width:contentWidth3)
+                            } // 요일
+                            .padding(.top,geoHeight*0.02)
+                            //                        .padding(.bottom,geoHeight*0.005)
+                            
+                            ZStack { // for scroll
+                                ScrollView {
+                                    
+                                    let elementSize:CGFloat = contentWidth2/7
+                                    let (startDate,endDate): (Date,Date) = {
+                                        let sorted_dates: [Date] = selectedQuest!.dailyData.keys.sorted()
+                                        
+                                        if sorted_dates.isEmpty {
+                                            return (.now, .now)
+                                        }
+                                        else {
+                                            return (sorted_dates.first!, sorted_dates.last!)
+                                        }
+                                        
+                                    }()
+                                    let numberOfRows:Int = (calculateDaysBetweenTwoDates(from: startDate, to: endDate) + 7) / 7 + 1
+                                    
+                                    let scrollViewHeight:CGFloat = elementSize * CGFloat(numberOfRows)
+                                    
+                                    SerialVisualization(data: selectedQuest!.dailyData)
+                                        .frame(width: contentWidth2, height: scrollViewHeight, alignment: .center)
+                                        .padding(.horizontal, (contentWidth1-contentWidth2)/2)
+                                    
+                                }
+                                .frame(width:contentWidth1)
+                                .defaultScrollAnchor(.bottom)
+                            }
+                            
+                        } // 달력
+                        .frame(width:contentWidth1, height: geoHeight*0.4)
+                        .background(contentColor)
+                        .clipShape(RoundedRectangle(cornerSize: CGSize(width: geoWidth*0.05, height: geoWidth*0.05)))
+                        
+                        if selectedQuest!.dataType != DataType.OX {
+                            GraphForDoneDays(selectedQuest: selectedQuest!)
+                                .frame(width:contentWidth1, height: geoHeight*0.2)
+                        }
+                        
+                        Spacer()
+                            .frame(height: geoHeight*0.07)
+                        
+                        
+                        if !selectedQuest!.inTrashCan {
+                            HStack(spacing: geoWidth/4) {
+                                if !selectedQuest!.isArchived {
+                                    Button("보관",systemImage: "archivebox") {
+                                        selectedQuest?.isArchived = true
+                                        selectedQuest?.isHidden = false
+                                    }
+                                }
+                                else {
+                                    Button("되돌리기") {
+                                        selectedQuest?.isArchived = false
+                                        selectedQuest?.isHidden = false
+                                    }
+                                }
+                                if !selectedQuest!.isHidden {
+                                    Button("숨김",systemImage: "eye.slash") {
+                                        selectedQuest?.isArchived = false
+                                        selectedQuest?.isHidden = true
+                                    }
+                                }
+                                else {
+                                    Button("되돌리기") {
+                                        selectedQuest?.isArchived = false
+                                        selectedQuest?.isHidden = false
+                                    }
+                                }
+                            }
+                            .padding(.bottom, geoHeight*0.03)
+                            Button("휴지통으로 이동",systemImage: "trash") {
+                                alert_inTrashCan.toggle()
+                            }
+                            .foregroundStyle(.red)
+                            .alert("퀘스트 '\(selectedQuest?.name ?? "")' 를 삭제하시겠습니까?", isPresented: $alert_inTrashCan) {
+                                Button("휴지통으로 이동") {
+                                    selectedQuest?.isArchived = false
+                                    selectedQuest?.isHidden = false
+                                    selectedQuest?.inTrashCan = true
+                                    alert_inTrashCan.toggle()
+                                    popUp_questStatisticsInDetail.toggle()
+                                }
+                                .foregroundStyle(.red)
+                                Button("취소") {
+                                    alert_inTrashCan.toggle()
+                                }
+                            } message: {
+                                Text("삭제한 퀘스트는 휴지통으로 이동됩니다.")
+                            }
+                        }
+                        Spacer()
+                            .frame(height: geoHeight*0.05)
 
-                    
-                    
+                    }
+                    .frame(width: geoWidth, height: contentHeight, alignment: .top)
+//                    .border(.red)
                 }
-                .padding(.top, geoHeight*0.05)
                 .frame(width: geoWidth, height: geoHeight, alignment: .top)
+                
             }
 
         }
@@ -195,6 +335,7 @@ struct SerialVisualization:View {
                     let doneList_firstRow: [Bool] = firstRow!.map{data.keys.contains($0)}
                     RowContent(dates:firstRow!,doneList:doneList_firstRow, isFirst: true)
                         .frame(width:elementSize*7, height: elementSize)
+                        .zIndex(containsFirstDateOfMonth(dates: firstRow!) ? 2 : 1)
                     
                 default:
                     let middleRows:[[Date]] = {
@@ -208,17 +349,23 @@ struct SerialVisualization:View {
                     let doneList_firstRow: [Bool] = firstRow!.map{data.keys.contains($0)}
                     RowContent(dates:firstRow!,doneList:doneList_firstRow, isFirst: true)
                         .frame(width:elementSize*7, height: elementSize)
+                        .zIndex(containsFirstDateOfMonth(dates: firstRow!) ? 2 : 1)
+
 
 
                     ForEach(middleRows, id:\.self) { row in
                         let doneList: [Bool] = row.map{data.keys.contains($0)}
                         RowContent(dates:row,doneList:doneList)
                             .frame(width:elementSize*7, height: elementSize)
+                            .zIndex(containsFirstDateOfMonth(dates: row) ? 2 : 1)
+
                     }
                     
                     let doneList_lastRow: [Bool] = lastRow!.map{data.keys.contains($0)}
                     RowContent(dates:lastRow!,doneList:doneList_lastRow, isLast: true)
                         .frame(width:elementSize*7, height: elementSize)
+                        .zIndex(containsFirstDateOfMonth(dates: lastRow!) ? 2 : 1)
+
                 }
                 
                 
@@ -258,7 +405,7 @@ struct RowContent: View {
         let elementCnt: Int = dates.count
         
         let startOfMonthIndex: Int? = dates.firstIndex(where: {$0.isStartOfMonth})
-        let isMonthChangingRow: Bool = startOfMonthIndex != nil
+        let isMonthChangingRow: Bool = containsFirstDateOfMonth(dates: dates)
         
         let startOfMonthIndexIsNonzero: Bool = {
             if !isMonthChangingRow {
@@ -330,6 +477,7 @@ struct RowContent: View {
                         path.addLine(to: CGPoint(x: endPos, y: 0))
                     }
                     .stroke(contentColor, lineWidth: 2)
+
                 }
                 else if isMonthChangingRow && !containsStartAndEnd {
                     let startPos: CGFloat = isFirst ? geoWidth - elementsWidth : 0

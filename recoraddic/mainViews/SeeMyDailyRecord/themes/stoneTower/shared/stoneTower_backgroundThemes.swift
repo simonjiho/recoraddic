@@ -138,16 +138,21 @@ struct StoneTowerBackground_1:View {
                         
                         groundGradient
                         if colorScheme == .light {
-                            LinearGradient(colors: [.gray.adjust(brightness: 0.2),.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white], startPoint: .top, endPoint: .bottom)
+                            
+//                            let lightBlue = Color.blue.adjust(saturation: -0.52, brightness: 0.47).opacity(0.2)
+                            let lightBlue = Color.blue.adjust(saturation: -0.45, brightness: 0.4).opacity(0.3)
+                            
+                            LinearGradient(colors: [lightBlue,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white,.white], startPoint: .top, endPoint: .bottom)
                                 .opacity(0.45)
                         }
                         else {
                             
                             
-                            let brightBlack: Color = Color.black.opacity(0.5)
+//                            let brightBlack: Color = Color.black.opacity(0.5)
+                            let darkBlue = Color.blue.adjust(saturation: 0.7, brightness: -0.75).opacity(0.3)
                             let darkBlack: Color = Color.black.opacity(0.7)
                             
-                            LinearGradient(colors: [brightBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack], startPoint: .top, endPoint: .bottom)
+                            LinearGradient(colors: [darkBlue,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack,darkBlack], startPoint: .top, endPoint: .bottom)
                             //                            .opacity(0.6)
                         }
                         

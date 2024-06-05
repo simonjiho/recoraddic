@@ -20,8 +20,8 @@ struct StartNewRecordSet:View {
 
     
     @Binding var popUp_startNewRecordSet: Bool
-    @Binding var selectedDailyRecordSetIndex: Int
-    @Binding var updateSelectedDailyRecordSet: Bool
+//    @Binding var selectedDailyRecordSetIndex: Int
+    @Binding var newDailyRecordSetAdded: Bool
     
     @State var selectedDailyRecordThemeName:String?
     
@@ -244,7 +244,7 @@ struct StartNewRecordSet:View {
             
             modelContext.insert(newDailyRecordSet)
             
-            let dailyRecordSets_notHidden_count:Int = dailyRecordSets.filter({!$0.isHidden}).count
+            let dailyRecordSets_isVisible_count:Int = dailyRecordSets.filter({$0.isVisible()}).count
             
             // newDailyRecordSet 생성, 설정해준 값들 넣어주기(DRThemeName, questions)
             newDailyRecordSet.dailyRecordThemeName = selectedDailyRecordThemeName!
@@ -252,38 +252,14 @@ struct StartNewRecordSet:View {
             if numberOfQuestions >= 2 {newDailyRecordSet.dailyQuestions.append(question2)}
             if numberOfQuestions == 3 {newDailyRecordSet.dailyQuestions.append(question3)}
             
-            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) { // 빠르게 바꾸면, insert되어서 반영되기 전에 해당 코드가 실행된다. SwiftData의 modelContext는 독립적인 flow로 작동하기 때문에 기다려 새로운 내용이 저장되기 전에 읽으려고 하면 곧바로 작동하지 않는다.
-                selectedDailyRecordSetIndex = dailyRecordSets_notHidden_count - 1 // onChangeOf..
-            }
+            newDailyRecordSetAdded.toggle()
+//            DispatchQueue.main.asyncAfter(deadline: .now()+0.5) { // 빠르게 바꾸면, insert되어서 반영되기 전에 해당 코드가 실행된다. SwiftData의 modelContext는 독립적인 flow로 작동하기 때문에 기다려 새로운 내용이 저장되기 전에 읽으려고 하면 곧바로 작동하지 않는다.
+//                selectedDailyRecordSetIndex = dailyRecordSets_isVisible_count - 1 // onChangeOf..
+//            }
             
         }
         
-//        // newDailyRecordSet 생성, 설정해준 값들 넣어주기(DRThemeName, questions)
-//        newDailyRecordSet.dailyRecordThemeName = selectedDailyRecordThemeName!
-//        newDailyRecordSet.dailyQuestions.append(question1)
-//        if numberOfQuestions >= 2 {newDailyRecordSet.dailyQuestions.append(question2)}
-//        if numberOfQuestions == 3 {newDailyRecordSet.dailyQuestions.append(question3)}
-        
-        
-//        DispatchQueue.main.asyncAfter(deadline: .now()+0.3) { // 빠르게 바꾸면, insert되어서 반영되기 전에 해당 코드가 실행된다. SwiftData의 modelContext는 독립적인 flow로 작동하기 때문에 기다려 새로운 내용이 저장되기 전에 읽으려고 하면 곧바로 작동하지 않는다.
-//            let dailyRecordSets_notHidden_count:Int = dailyRecordSets.filter({!$0.isHidden}).count
-//            
-//
-//            if selectedDailyRecordSetIndex == dailyRecordSets_notHidden_count - 1 {
-//                updateSelectedDailyRecordSet = true
-//                print(selectedDailyRecordSetIndex)
-//                print("index didn't change")
-//            }
-//            else {
-//                selectedDailyRecordSetIndex = dailyRecordSets_notHidden_count - 1 // onChangeOf..
-//                print(selectedDailyRecordSetIndex)
-//                print("index changed")
-//            }
-//        }
-        
 
-        
-//        let newDailyRecordSet = Daily
     }
     
     func getVisualRepresentationExpression(index: Int) -> String {

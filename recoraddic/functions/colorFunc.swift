@@ -38,6 +38,12 @@ extension Color { // hue: 색조 , saturation: 채도
             return (0,0,0,0)
         }
     }
+    func colorExpressionIntegration() -> Color { //needed for color representation integration
+        let rgba: (CGFloat,CGFloat,CGFloat,CGFloat) = self.getRGBA()
+        return Color(red: rgba.0, green: rgba.1, blue: rgba.2)
+    }
+
+    
 }
 
 func getTierColorOf(tier:Int) -> Color {
@@ -115,7 +121,7 @@ func getDarkTierColorOf(tier:Int) -> Color {
 }
 
 
-func getBrightTierColorOf(tier:Int) -> Color {
+func getBrightTierColorOf(tier:Int) -> Color { // questCheckBox(bright)
     
     let tierColor: Color = getTierColorOf(tier: tier)
     
@@ -123,19 +129,19 @@ func getBrightTierColorOf(tier:Int) -> Color {
     case 0...2:
         return tierColor.adjust(brightness: 0.15)
     case 3:
-        return tierColor.adjust(brightness: 0.10)
+        return tierColor.adjust(brightness: 0.14)
     case 4:
-        return tierColor.adjust(brightness: 0.3)
+        return tierColor.adjust(brightness: 0.17)
     case 5:
-        return tierColor.adjust(brightness: 0.1)
+        return tierColor.adjust(brightness: 0.09)
     case 6:
-        return tierColor.adjust(brightness: 0.3)
+        return tierColor.adjust(brightness: 0.5)
     case 7:
-        return tierColor.adjust(brightness: 0.25)
+        return tierColor.adjust(brightness: 0.3)
 
 
     case 8:
-        return tierColor.adjust(brightness: 0.4)
+        return tierColor.adjust(brightness: 0.45)
 
     default:
         return tierColor.adjust(brightness: 0.05)
@@ -143,14 +149,16 @@ func getBrightTierColorOf(tier:Int) -> Color {
 }
 
 
-func getBrightTierColorOf2(tier:Int) -> Color {
+func getBrightTierColorOf2(tier:Int) -> Color { // questThumbnail
     
     let tierColor: Color = getTierColorOf(tier: tier)
     
     switch tier/5 {
     case 0...1:
         return tierColor.adjust(brightness: 0.3)
-    case 2...3:
+    case 2:
+        return tierColor.adjust(brightness: 0.25)
+    case 3:
         return tierColor.adjust(brightness: 0.25)
     case 4:
         return tierColor.adjust(brightness: 0.8)
@@ -162,26 +170,52 @@ func getBrightTierColorOf2(tier:Int) -> Color {
         return tierColor.adjust(brightness: 0.35)
     case 8:
         return tierColor.adjust(brightness: 0.6)
-
     default:
         return tierColor.adjust(brightness: 0.1)
-    }}
+    }
+}
 
 
+func getBrightTierColorOf3(tier:Int) -> Color { // questCheckBox(dark)
+    
+    let tierColor: Color = getTierColorOf(tier: tier)
+    
+    switch tier/5 {
+    case 0:
+        return tierColor.adjust(brightness: 0.04)
+    case 1:
+        return tierColor.adjust(brightness: 0.02)
+    case 2:
+        return tierColor.adjust(brightness: 0.04)
+    case 3:
+        return tierColor.adjust(brightness: 0.1)
+    case 4:
+        return tierColor.adjust(brightness: 0.0)
+    case 5:
+        return tierColor.adjust(brightness: 0.0)
+    case 6:
+        return tierColor.adjust(brightness: 0.1)
+    case 7:
+        return tierColor.adjust(brightness: 0.15)
+    case 8:
+        return tierColor.adjust(brightness: 0.1)
+    default:
+        return tierColor.adjust(brightness: 0.0)
+    }
+}
 
-func getTierColorsOf(tier:Int, type:Int = 0) -> [Color] {
+
+func getGradientColorsOf(tier:Int, type:Int = 0) -> [Color] { // quest checkbox
     
 
     let tierColor:Color = getTierColorOf(tier: tier)
     let tierColor_bright:Color = getBrightTierColorOf(tier: tier)
     let tierColor_bright2:Color = getBrightTierColorOf2(tier: tier)
+    let tierColor_bright3:Color = getBrightTierColorOf3(tier: tier)
 
     
-    let tierColor_frame1:Color = tierColor_bright.adjust(brightness: 0.05)
-    let tierColor_frame2:Color = tierColor.adjust(brightness: -0.05)
-    
     if type == 0 { //questCheckbox
-        return [tierColor, tierColor_bright, tierColor]
+        return [tierColor_bright3,tierColor_bright3, tierColor_bright, tierColor_bright3, tierColor_bright3]
     }
     else if type == 1 { //questThumbnail
         return [tierColor, tierColor_bright2, tierColor]
@@ -211,3 +245,5 @@ func getColorSchemeColor(_ colorScheme:ColorScheme) -> Color {
 func getReversedColorSchemeColor(_ colorScheme:ColorScheme) -> Color {
     return colorScheme == .light ? .black : .white
 }
+
+

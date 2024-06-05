@@ -73,6 +73,56 @@ extension StoneTower_1 {
 
     }
     
+    static func recalculateVisualValues(dailyRecord:DailyRecord, dailyRecords_savedAndVisible:[DailyRecord], targetIndex:Int, drCount:Int, option:DrEditOption) -> Void {
+        switch option {
+        case.visible:
+            // 1 3 6 -> 1 4 -> 1 3 6
+            // 1 3 6 10 -> 1 (3) 4 7 -> 1 3 6 10
+            let prevPos:Int = targetIndex == 0 ? 0 : dailyRecords_savedAndVisible[targetIndex-1].visualValue3!
+            let newVisualVal3:Int = StoneTower_1.calculateVisualValue3(qVal1: dailyRecord.questionValue1, qVal2: dailyRecord.questionValue2, qVal3: dailyRecord.questionValue3, prevPos)
+            dailyRecord.visualValue3 = newVisualVal3
+    //        let nextPos:Int = targetIndex == dailyRecords_savedAndUnhidden.count - 1 ? dailyRecords_savedAndUnhidden[targetIndex+1].visualValue3! : 0
+    //        let nextPox_Gap: Int =
+
+            let plusVisualValue3: Int = {
+                if targetIndex == 0 {
+                    return newVisualVal3
+                }
+                else {
+                    return newVisualVal3 - dailyRecords_savedAndVisible[targetIndex-1].visualValue3! // 음 어떻게 할까 이게 항상 같지가 않음... ㅅㅂ
+                }
+            }()
+
+            if (plusVisualValue3 == 0 || targetIndex == drCount - 1 || drCount == 1) { return }
+            else {
+                for i in (targetIndex+1)...(drCount-1) {
+                    dailyRecords_savedAndVisible[i].visualValue3! += plusVisualValue3
+                }
+            }
+        default:
+            // 1 3 6 -> 1 (3) 4
+            print("recalculate values")
+            let minusVisualValue3: Int = {
+                if targetIndex == 0 {
+                    return dailyRecords_savedAndVisible[targetIndex].visualValue3!
+                }
+                else {
+                    return dailyRecords_savedAndVisible[targetIndex].visualValue3! - dailyRecords_savedAndVisible[targetIndex-1].visualValue3!
+                }
+            }()
+            
+            if (minusVisualValue3 == 0 || targetIndex == drCount - 1 || drCount == 1) {} // NO!!!!
+            else {
+                for i in (targetIndex+1)...(drCount-1) {
+                    dailyRecords_savedAndVisible[i].visualValue3! -= minusVisualValue3
+                }
+            }
+
+
+            
+        }
+
+    }
     
     static func getDailyRecordColor(index:Int) -> Color {
         if index == 0 {
@@ -97,6 +147,12 @@ extension StoneTower_1 {
             return Color.white
         }
     }
+    
+    static func getIntegratedDailyRecordColor(index:Int, colorScheme:ColorScheme) -> Color {
+        return Self.getDailyRecordColor(index: index).adjust(brightness: colorScheme == .light ? -0.02 : -0.25).colorExpressionIntegration()
+    }
+    
+    
     
     
 }

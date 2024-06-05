@@ -217,6 +217,12 @@ func partitionByWeek(startDate: Date, endDate: Date) -> [[Date]] {
 }
 
 
+func containsFirstDateOfMonth(dates:[Date]) -> Bool {
+    let startOfMonthIndex: Int? = dates.firstIndex(where: {$0.isStartOfMonth})
+    if startOfMonthIndex != nil { return true }
+    else { return false}
+}
+
 extension Date {
     var isStartOfMonth: Bool {
         let components = Calendar.current.dateComponents([.year, .month, .day], from: self)
@@ -228,3 +234,4 @@ extension Date {
         return !Calendar.current.isDate(nextDay, equalTo: self, toGranularity: .month)
     }
 }
+

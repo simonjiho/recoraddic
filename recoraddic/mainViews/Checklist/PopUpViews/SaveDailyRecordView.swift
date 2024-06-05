@@ -237,7 +237,7 @@ struct SaveDailyRecordView_confirmation: View {
         else if currentDailyRecordSet.dailyRecordThemeName == "stoneTower_1" {
             
             // prevVisualVal3 of latest,saved,unhidden dailyRecord before savingDate
-            let prevVisualVal3: Int = currentDailyRecordSet.dailyRecords?.filter({$0.date != nil && !$0.hide}).sorted(by: {$0.date! < $1.date!}).filter({$0.date! < savingDate}).last?.visualValue3 ?? 0
+            let prevVisualVal3: Int = currentDailyRecordSet.dailyRecords?.filter({$0.date != nil && $0.isVisible()}).sorted(by: {$0.date! < $1.date!}).filter({$0.date! < savingDate}).last?.visualValue3 ?? 0
             
             currentDailyRecord.visualValue1 = StoneTower_1.calculateVisualValue1(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3) //모양
             currentDailyRecord.visualValue2 = StoneTower_1.calculateVisualValue2(qVal1: qVal1, qVal2: qVal2, qVal3: qVal3) //색

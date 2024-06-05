@@ -97,7 +97,7 @@ struct MainView_checklist: View {
         let linearGradient2: LinearGradient =
         LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .topLeading, endPoint: .bottomTrailing)
         
-        let bgColor: Color = currentRecordSet.getDailyRecordColor()
+        let bgColor: Color = currentRecordSet.getIntegratedDailyRecordColor(colorScheme: colorScheme)
         
         // currentRecord == records.last => 기간이 지났어도 currentRecord임
         GeometryReader { geometry in

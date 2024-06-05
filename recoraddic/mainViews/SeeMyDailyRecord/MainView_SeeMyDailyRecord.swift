@@ -27,8 +27,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
     
-    var dailyRecordSets_notHidden: [DailyRecordSet] {
-        dailyRecordSets.filter({!$0.isHidden})
+    var dailyRecordSets_visible: [DailyRecordSet] {
+        dailyRecordSets.filter({$0.isVisible()})
     }
     
     @State var selectedDailyRecordSetIndex: Int // it does not automatically changes selectedDailyRecordSet. you need to toggle updateSelectedDailyRecordSet to update selectedDailyRecordSet
@@ -36,6 +36,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     
 //    var navigationBarHeight: CGFloat
     
+    @Binding var isNewDailyRecordAdded: Bool
+    @Binding var selectedView: MainViewName
     
     @State var popUp_startNewRecordSet: Bool = false
     @State var popUp_recordInDetail = false
@@ -46,17 +48,19 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     @State var updateSelectedDailyRecordSet: Bool = false
     
     @State var dailyRecordHiddenOrDeleted: Bool = false
-    @State var dailyRecordHidden: Bool = false
+    @State var alert_drsHidden: Bool = false
+    @State var alert_drsInTrashCan: Bool = false
 //    @State var dailyRecordDeleted: Bool = false
 //    @State var dailyRecordUnhidden: Bool = false
     @State var hiddenOrDeletedIndex: Int = 0
     @State var recalculatingVisualValues_themeChanged: Bool = false // not used yet. Will be used to hide when calculation is on process
     
-    @State var dailyRecordSetHidden: Bool = false
+    @State var dailyRecordSetHiddenOrDeleted: Bool = false
     @State var isEditingTermGoals: Bool = false
     
-    @Binding var isNewDailyRecordAdded: Bool
-    @Binding var selectedView: MainViewName
+    @State var newDailyRecordSetAdded: Bool = false
+    @State var undoNewDRS: Bool = false
+    
     
     var body: some View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
@@ -66,7 +70,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         
         let backGroundColor:Color = getColorSchemeColor(colorScheme)
         
-        let dailyRecordSetEmpty: Bool = selectedDailyRecordSet.dailyRecords!.filter({!$0.hide}).count == 0
+        let dailyRecordSetEmpty: Bool = selectedDailyRecordSet.dailyRecords!.filter({$0.isVisible()}).count == 0
         
         GeometryReader { geometry in
             
@@ -88,9 +92,12 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                             selectedRecord: $selectedRecord,
                             popUp_startNewRecordSet: $popUp_startNewRecordSet,
                             popUp_recordInDetail: $popUp_recordInDetail,
-                            dailyRecordSetHidden: $dailyRecordSetHidden,
+                            alert_drsHidden: $alert_drsHidden,
+                            alert_drsInTrashCan: $alert_drsInTrashCan,
+//                            dailyRecordSetHiddenOrDeleted: $dailyRecordSetHiddenOrDeleted,
                             popUp_changeStyle: $popUp_changeStyle,
-                            isEditingTermGoals: $isEditingTermGoals
+                            isEditingTermGoals: $isEditingTermGoals,
+                            undoNewDRS: $undoNewDRS
                         )
                         .frame(width:geoWidth, height: geoHeight)
                     }
@@ -101,9 +108,12 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                             selectedRecord: $selectedRecord,
                             popUp_startNewRecordSet: $popUp_startNewRecordSet,
                             popUp_recordInDetail: $popUp_recordInDetail,
-                            dailyRecordSetHidden: $dailyRecordSetHidden, 
+//                            dailyRecordSetHiddenOrDeleted: $dailyRecordSetHiddenOrDeleted, 
+                            alert_drsHidden: $alert_drsHidden,
+                            alert_drsInTrashCan: $alert_drsInTrashCan,
                             popUp_changeStyle: $popUp_changeStyle,
-                            isEditingTermGoals: $isEditingTermGoals
+                            isEditingTermGoals: $isEditingTermGoals,
+                            undoNewDRS: $undoNewDRS
                         )
                         .frame(width:geoWidth, height: geoHeight)
                     }
@@ -118,9 +128,9 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     Text("변경하는 중..")
                 }
                 
-                let noSavedDailyRecords_notHidden: Bool = selectedDailyRecordSet.dailyRecords?.filter({$0.visualValue1 != nil && !$0.hide}).count == 0
+                let noSavedDailyRecords_visible: Bool = selectedDailyRecordSet.dailyRecords?.filter({$0.visualValue1 != nil && $0.isVisible()}).count == 0
                 
-                if noSavedDailyRecords_notHidden && selectedDailyRecordSetIndex == dailyRecordSets_notHidden.count - 1 && !isEditingTermGoals {
+                if noSavedDailyRecords_visible && selectedDailyRecordSetIndex == dailyRecordSets_visible.count - 1 && !isEditingTermGoals {
                     VStack {
                         HStack {
                             Text("매일매일의 기록을 저장하세요!")
@@ -134,6 +144,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                                 .font(.caption)
                         }
                     }
+                    
                     
                 }
                 
@@ -152,8 +163,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     Color.gray.opacity(0.5)
                     StartNewRecordSet(
                         popUp_startNewRecordSet: $popUp_startNewRecordSet,
-                        selectedDailyRecordSetIndex: $selectedDailyRecordSetIndex,
-                        updateSelectedDailyRecordSet: $updateSelectedDailyRecordSet
+                        newDailyRecordSetAdded: $newDailyRecordSetAdded
                     )
                         .popUpViewLayout(width: geoWidth*0.9, height: (geoHeight-statusBarHeight)*0.9, color: backGroundColor)
                         .position(x:geoWidth/2,y: statusBarHeight + (geoHeight-statusBarHeight)/2 )
@@ -185,12 +195,13 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 }
                 
                 
+                
+                
             }
             .sheet(isPresented: $popUp_recordInDetail) {
                 RecordInDetailView_optional(
                     popUp_recordInDetail: $popUp_recordInDetail,
                     record: $selectedRecord
-
                 )
                 .background(colorSchemeColor)
                 
@@ -203,24 +214,32 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         }
         .onChange(of: updateSelectedDailyRecordSet) {
             if updateSelectedDailyRecordSet {
-                selectedDailyRecordSet = dailyRecordSets_notHidden[selectedDailyRecordSetIndex]
+                selectedDailyRecordSet = dailyRecordSets_visible[selectedDailyRecordSetIndex]
                 updateSelectedDailyRecordSet = false // MARK: onChange 클로저 안에서는 본인의 변화를 detect하지 않는 것 같다. 무한 루프가 생성되지 않는다. 바꿔줘도 됨.
+                updateStartAndEnd()
                 selectedRecord = nil
             }
             
         }
-        .onChange(of: dailyRecordSetHidden) {
-            if selectedDailyRecordSetIndex > dailyRecordSets_notHidden.count - 1 {
+        .onChange(of: dailyRecordSetHiddenOrDeleted) {
+            
+            if selectedDailyRecordSetIndex > dailyRecordSets_visible.count - 1 {
                 selectedDailyRecordSetIndex -= 1
             }
             updateSelectedDailyRecordSet = true
         }
 
-        .onChange(of: isNewDailyRecordAdded, { // 
-            
-            selectedDailyRecordSetIndex = dailyRecordSets_notHidden.count - 1
-        })
-
+        .onChange(of: isNewDailyRecordAdded) { //
+            selectedDailyRecordSetIndex = dailyRecordSets_visible.count - 1
+        }
+        .onChange(of: selectedView) {
+            selectedDailyRecordSetIndex = dailyRecordSets_visible.count - 1
+        }
+        .onChange(of: newDailyRecordSetAdded) {
+            selectedDailyRecordSetIndex = dailyRecordSets_visible.count - 1
+        }
+        
+        
         .onChange(of: selectedDailyRecordSet.dailyRecordThemeName) {
             
             recalculatingVisualValues_themeChanged = true
@@ -228,15 +247,63 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             recalculatingVisualValues_themeChanged = false
             
         }
-        
+
         // index가 바뀌지 않아도 selectedDailyRecordSet가 바뀌는 경우(ex: 아무것도 안 쌓은 채로 다시 새로 dailyRecordSet 생성)
         // 그런 경우에도 selectedDailyRecordSet를 바꿔주기 위해서 이렇게 단계를 두개로 나눔.
 
     
                 
 
+        .alert("비어있는 기록의 탑을 생성 취소하고, 기존의 기록의 탑에 계속 기록하시겠습니까?",isPresented: $undoNewDRS) {
+            Button("생성 취소") {
+                let targetDRS: DailyRecordSet = selectedDailyRecordSet
+                selectedDailyRecordSetIndex -= 1
+                
+                DispatchQueue.main.asyncAfter(deadline: .now()+0.3) {
+                    modelContext.delete(targetDRS)
+                }
+
+                undoNewDRS.toggle()
+            }
+            Button("아니오") {
+                undoNewDRS.toggle()
+            }
+        } message: {
+            Text("(가장 최근의 기록의 탑은 기록이 없을 때만 삭제 가능합니다.)")
+        }
+        .alert("해당 구간기록을 숨기시겠습니까?", isPresented: $alert_drsHidden) {
+            Button("숨기기") {
+                selectedDailyRecordSet.isHidden = true
+                dailyRecordSetHiddenOrDeleted.toggle()
+                alert_drsHidden.toggle()
+            }
+            Button("아니오") {
+                alert_drsHidden.toggle()
+            }
+        }
+        .alert("해당 구간기록을 휴지통으로 이동하시겠습니까?", isPresented: $alert_drsInTrashCan) {
+            Button("휴지통으로 이동") {
+                selectedDailyRecordSet.inTrashCan = true
+                dailyRecordSetHiddenOrDeleted.toggle()
+                alert_drsInTrashCan.toggle()
+            }
+            Button("아니오") {
+                alert_drsInTrashCan.toggle()
+            }
+        }
         
         
+    }
+    
+    
+    func updateStartAndEnd() -> Void {
+        let dates: [Date] = selectedDailyRecordSet.dailyRecords!.compactMap{$0.date}.sorted()
+        if let start: Date = dates.first {
+            selectedDailyRecordSet.start = start
+        }
+        if let last: Date = dates.last {
+            selectedDailyRecordSet.end = last
+        }
     }
     
 

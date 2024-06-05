@@ -22,9 +22,6 @@ struct StoneTower_0: View {
     
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
     
-//    var dailyRecordSets_notHidden: [DailyRecordSet] { // why needed? should remove and restruct it later.
-//        dailyRecordSets.filter({!$0.isHidden})
-//    }
     
     @Binding var dailyRecordSet:DailyRecordSet
     
@@ -32,7 +29,9 @@ struct StoneTower_0: View {
     @Binding var selectedRecord: DailyRecord?
     @Binding var popUp_startNewRecordSet: Bool
     @Binding var popUp_recordInDetail: Bool
-    @Binding var dailyRecordSetHidden: Bool
+    @Binding var alert_drsHidden:Bool
+    @Binding var alert_drsInTrashCan:Bool
+//    @Binding var dailyRecordSetHiddenOrDeleted: Bool
 //    var navigationBarHeight: CGFloat
 //    @Binding var dailyRecordHidden: Bool
 //    @Binding var dailyRecordUnhidden: Bool
@@ -41,6 +40,7 @@ struct StoneTower_0: View {
     @Binding var popUp_changeStyle: Bool
     @Binding var isEditingTermGoals: Bool
     
+    @Binding var undoNewDRS: Bool
     
 //    @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
 
@@ -71,11 +71,11 @@ struct StoneTower_0: View {
     
     var body: some View {
         
-        let dailyRecordSet_notHidden_count: Int = dailyRecordSets.filter({!$0.isHidden}).count
+        let dailyRecordSet_isVisible_count: Int = dailyRecordSets.filter({$0.isVisible()}).count
         
-        let dailyRecords_savedAndNotHidden: [DailyRecord] = dailyRecordSet.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({!$0.hide})
+        let dailyRecords_savedAndVisible: [DailyRecord] = dailyRecordSet.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({$0.isVisible()})
         
-        let dailyRecords_savedAndNotHidden_withVisualValues: [DailyRecord] = dailyRecords_savedAndNotHidden.filter({$0.visualValue3 != nil})
+        let dailyRecords_savedAndNotHidden_withVisualValues: [DailyRecord] = dailyRecords_savedAndVisible.filter({$0.visualValue3 != nil})
         
         let numberOfStones: Int  = dailyRecords_savedAndNotHidden_withVisualValues.count
         
@@ -131,7 +131,7 @@ struct StoneTower_0: View {
             let scrollViewCenter_bottom:CGFloat = scrollViewCenterY + stoneHeight
             let scrollViewCenter_above:CGFloat = scrollViewCenterY - stoneHeight
             
-            let isLatestDailyRecordSet: Bool = selectedDailyRecordSetIndex == dailyRecordSet_notHidden_count - 1
+            let isLatestDailyRecordSet: Bool = selectedDailyRecordSetIndex == dailyRecordSet_isVisible_count - 1
             
             let goalEditButtonSize:CGFloat = groundHeight/10
             let plusMinusButtonSize:CGFloat = groundHeight/12
@@ -391,11 +391,17 @@ struct StoneTower_0: View {
                                         }
                                         let noSavedDailyRecords: Bool = dailyRecordSet.dailyRecords?.filter({$0.visualValue1 != nil}).count == 0
 
-                                        if dailyRecordSet_notHidden_count > 1 && !isLatestDailyRecordSet {
+                                        if dailyRecordSet_isVisible_count > 1 && !isLatestDailyRecordSet {
                                             Button("숨기기") {
-                                                dailyRecordSet.isHidden = true
-                                                dailyRecordSetHidden.toggle()
+//                                                    dailyRecordSet.isHidden = true
+                                                alert_drsHidden.toggle()
                                             }
+                                            Button("휴지통으로 이동", systemImage:"trash" ) {
+//                                                    dailyRecordSet.inTrashCan = true
+                                                alert_drsInTrashCan.toggle()
+                                                
+                                            }
+                                            .foregroundStyle(.red)
                                         }
                                         
 //                                            if noSavedDailyRecords && dailyRecordSet_notHidden_count > 1 {
@@ -405,6 +411,12 @@ struct StoneTower_0: View {
 //                                                    }
 //                                                }
 //                                            }
+                                        
+                                        if dailyRecordSet_isVisible_count > 1 && isLatestDailyRecordSet && dailyRecords_savedAndVisible.count == 0 {
+                                            Button("생성 취소") {
+                                                undoNewDRS.toggle()
+                                            }
+                                        }
                                         
                                         if isLatestDailyRecordSet {
                                             Button(action: {
@@ -579,7 +591,7 @@ struct StoneTower_0_popUp_ChangeStyleView: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 60, maximum: 60))]) {
                 ForEach(0...5,id:\.self) { index in
                     Circle()
-                        .fill(StoneTower_0.getDailyRecordColor(index: index))
+                        .fill(StoneTower_0.getIntegratedDailyRecordColor(index: index, colorScheme: colorScheme))
                         .stroke(getReversedColorSchemeColor(colorScheme), style: StrokeStyle(lineWidth: index == defaultColorIndex_tmp ? 5.0 : 1.0))
                         .padding(10)
                         .frame(width:gridSize, height: gridSize)

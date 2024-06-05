@@ -260,6 +260,7 @@ final class DailyRecordSet: Equatable {
     
     var termGoals: [String] = []
     
+//    var isArchived: Bool = false
     var isHidden: Bool = false
     var inTrashCan: Bool = false
     
@@ -277,17 +278,28 @@ final class DailyRecordSet: Equatable {
     }
     
     
-    func getDailyRecordColor() -> Color {
+    func getIntegratedDailyRecordColor(colorScheme:ColorScheme) -> Color {
         if self.dailyRecordThemeName == "stoneTower_0" {
-            return StoneTower_0.getDailyRecordColor(index: dailyRecordColorIndex)
+            return StoneTower_0.getIntegratedDailyRecordColor(
+                index: dailyRecordColorIndex,
+                colorScheme: colorScheme
+            )
         }
         else if self.dailyRecordThemeName == "stoneTower_1" {
-            return StoneTower_1.getDailyRecordColor(index: dailyRecordColorIndex)
+            return StoneTower_1.getIntegratedDailyRecordColor(
+                index: dailyRecordColorIndex,
+                colorScheme: colorScheme
+            )
         }
         else {
-            return StoneTower_0.getDailyRecordColor(index: dailyRecordColorIndex)
+            return StoneTower_0.getIntegratedDailyRecordColor(
+                index: dailyRecordColorIndex,
+                colorScheme: colorScheme
+            )
         }
     }
+    
+    
     
     func getTerm_string() -> String {
         if self.end != nil {
@@ -298,6 +310,11 @@ final class DailyRecordSet: Equatable {
         }
     }
     
+    func isVisible() -> Bool {
+//        return !isArchived && !isHidden && !inTrashCan
+        return !isHidden && !inTrashCan
+
+    }
     
 }
 
@@ -338,7 +355,8 @@ final class DailyRecord: Equatable, Hashable {
     
     var isFavorite: Bool = false
     
-    var hide: Bool = false
+//    var isArchived: Bool = false
+    var isHidden: Bool = false
     var inTrashCan: Bool = false
 
     
@@ -369,6 +387,12 @@ final class DailyRecord: Equatable, Hashable {
         hasher.combine(createdTime)
         hasher.combine(date)
             // Add any other properties that should be included in the hash
+    }
+    
+    func isVisible() -> Bool {
+//        return !isArchived && !isHidden && !inTrashCan
+        return !isHidden && !inTrashCan
+
     }
     
 }
@@ -512,7 +536,9 @@ class Quest: Equatable, Identifiable, Hashable {
 //        else {lock = true}
     }
     
-
+    func isVisible() -> Bool {
+        return !isArchived && !isHidden && !inTrashCan
+    }
     
     
  

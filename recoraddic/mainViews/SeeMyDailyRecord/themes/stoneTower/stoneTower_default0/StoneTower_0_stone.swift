@@ -23,7 +23,7 @@ struct StoneTower_0_stone: View {
     
     init(defaultColorIndex: Int, facialExpressionNum: Int, selected: Bool) {
         self.facialExpressionNum = facialExpressionNum
-        self.defaultColor = StoneTower_1.getDailyRecordColor(index: defaultColorIndex)
+        self.defaultColor = StoneTower_0.getDailyRecordColor(index: defaultColorIndex)
         self.selected = selected
     }
 

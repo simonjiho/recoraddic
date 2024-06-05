@@ -19,7 +19,7 @@ struct AddDailyQuestView: View {
     
     @Query var quests: [Quest]
     var quests_notHidden: [Quest] {
-        quests.filter({!$0.isHidden})
+        quests.filter({$0.isVisible()})
     }
     
     var currentDailyRecord: DailyRecord

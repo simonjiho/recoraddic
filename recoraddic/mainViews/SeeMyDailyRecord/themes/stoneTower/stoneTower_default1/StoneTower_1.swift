@@ -22,17 +22,16 @@ struct StoneTower_1: View {
     
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
     
-//    var dailyRecordSets_notHidden: [DailyRecordSet] { // why needed? should remove and restruct it later.
-//        dailyRecordSets.filter({!$0.isHidden})
-//    }
-    
+
     @Binding var dailyRecordSet:DailyRecordSet
     
     @Binding var selectedDailyRecordSetIndex: Int
     @Binding var selectedRecord: DailyRecord?
     @Binding var popUp_startNewRecordSet: Bool
     @Binding var popUp_recordInDetail: Bool
-    @Binding var dailyRecordSetHidden: Bool
+//    @Binding var dailyRecordSetHiddenOrDeleted: Bool
+    @Binding var alert_drsHidden: Bool
+    @Binding var alert_drsInTrashCan: Bool
 //    var navigationBarHeight: CGFloat
 //    @Binding var dailyRecordHidden: Bool
 //    @Binding var dailyRecordUnhidden: Bool
@@ -41,7 +40,7 @@ struct StoneTower_1: View {
     @Binding var popUp_changeStyle: Bool
     @Binding var isEditingTermGoals: Bool
 //    @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
-
+    @Binding var undoNewDRS: Bool
     
     @State var scrollViewCenterY: CGFloat = 0
     
@@ -64,16 +63,17 @@ struct StoneTower_1: View {
     
     @State var presentQuestions: Bool = false
     
+    @State var showDailyQuestionStatistics: Bool = false
     @FocusState var editTermGoals: Int?
     
     
     var body: some View {
         
-        let dailyRecordSet_notHidden_count: Int = dailyRecordSets.filter({!$0.isHidden}).count
+        let dailyRecordSet_isVisible_count: Int = dailyRecordSets.filter({$0.isVisible()}).count
         
-        let dailyRecords_savedAndNotHidden: [DailyRecord] = dailyRecordSet.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({$0.questionValue1 != nil && !$0.hide})
+        let dailyRecords_savedAndVisible: [DailyRecord] = dailyRecordSet.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({$0.questionValue1 != nil && $0.isVisible()})
         
-        let dailyRecords_savedAndNotHidden_withVisualValues: [DailyRecord] = dailyRecords_savedAndNotHidden.filter({$0.visualValue3 != nil})
+        let dailyRecords_savedAndNotHidden_withVisualValues: [DailyRecord] = dailyRecords_savedAndVisible.filter({$0.visualValue3 != nil})
         
         let numberOfStones: Int  = dailyRecords_savedAndNotHidden_withVisualValues.count
         
@@ -379,11 +379,27 @@ struct StoneTower_1: View {
                                             Button("스타일 변경") { // 나중에 theme, theme별 선택 가능 요소(색,배경 등등들 다 바꿀 수 있게 하기
                                                 popUp_changeStyle.toggle()
                                             }
-                                            Button("숨기기") {
-                                                dailyRecordSet.isHidden = true
-                                                dailyRecordSetHidden.toggle()
+                                            
+                                            if dailyRecordSet_isVisible_count > 1 && !isLatestDailyRecordSet {
+                                                Button("숨기기") {
+//                                                    dailyRecordSet.isHidden = true
+                                                    alert_drsHidden.toggle()
+                                                }
+                                                Button("휴지통으로 이동", systemImage:"trash" ) {
+//                                                    dailyRecordSet.inTrashCan = true
+                                                    alert_drsInTrashCan.toggle()
+                                                    
+                                                }
+                                                .foregroundStyle(.red)
                                             }
-                                            .disabled(isLatestDailyRecordSet || dailyRecordSet_notHidden_count <= 1)
+                                            
+                                            if dailyRecordSet_isVisible_count > 1 && isLatestDailyRecordSet && dailyRecords_savedAndVisible.count == 0 {
+                                                Button("생성 취소") {
+                                                    undoNewDRS.toggle()
+                                                }
+                                            }
+                                            
+
                                             if isLatestDailyRecordSet {
                                                 Button(action: {
                                                     popUp_startNewRecordSet.toggle()
@@ -462,21 +478,46 @@ struct StoneTower_1: View {
                                 .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
                             }
 
-                            Menu {
-                                ForEach(0...dailyRecordSet.dailyQuestions.count-1, id:\.self) { qIndex in
-                                    Text("질문\(qIndex+1). \(dailyRecordSet.dailyQuestions[qIndex])")
-                                    //TODO: 질문 뒤에 결정 변수 적어주기
-                                }
-                            } label: {
-                                Button(action:{presentQuestions.toggle()}) {
-                                    Image(systemName: "questionmark")
-                                        .resizable()
-                                        .frame(width:questionMarkSize, height:questionMarkSize)
-                                }
-                                .buttonStyle(.plain)
+                            
 
+                            let dailyQuestionStatisticsButtonPosition: CGPoint = CGPoint(x:questionMarkSize/2+geoWidth*0.05,y:totalSkyHeight-questionMarkSize/2-10)
+                            Button(action:{
+                                showDailyQuestionStatistics.toggle()
+                            }) {
+                                Image(systemName: "questionmark")
+                                    .resizable()
+                                    .frame(width:questionMarkSize, height:questionMarkSize)
                             }
+                            .buttonStyle(.plain)
                             .position(x:questionMarkSize/2+geoWidth*0.05,y:totalSkyHeight-questionMarkSize/2-10)
+//                            .popover(isPresented: $showDailyQuestionStatistics) {
+//                                Color.red
+//                                    .padding(.vertical,10*0.02)
+//                                    .frame(width: 100, height: 200, alignment: .top)
+//                                    .presentationCompactAdaptation(.automatic)
+//
+//                            }
+                            
+                            if showDailyQuestionStatistics {
+                                Color.gray.opacity(0.1)
+                                    .frame(width:geoWidth, height:geoHeight)
+                                    .onTapGesture {
+                                        showDailyQuestionStatistics.toggle()
+                                    }
+                            }
+                            let viewSize: CGSize = CGSize(width: geoWidth, height: 200)
+                            DailyQuestionsStatistics(
+                                selectedDRS:dailyRecordSet,
+                                selectedQuestion: dailyRecordSet.dailyQuestions.first!
+                            )
+                                .frame(width:viewSize.width, height: viewSize.height)
+//                                .frame(width:showDailyQuestionStatistics ? viewSize.width : 0.0, height: showDailyQuestionStatistics ? viewSize.height : 0.0)
+                                .scaleEffect(showDailyQuestionStatistics ? 1.0 : 0.3)
+                                .animation(.easeInOut(duration: 0.2), value: showDailyQuestionStatistics)
+                                .background(.thinMaterial)
+                                .opacity(showDailyQuestionStatistics ? 1.0 : 0.0)
+                                .position(x:geoWidth/2, y:scrollViewCenterY)
+
 
 
                             
@@ -548,7 +589,14 @@ struct StoneTower_1: View {
                     keyboardAppeared = false
                 }
             }
-    
+            
+//            for dr in dailyRecords_savedAndNotHidden_withVisualValues {
+//                print(dr.questionValue3!)
+//            }
+//            
+//            for dr in dailyRecords_savedAndNotHidden_withVisualValues {
+//                print(dr.visualValue3!)
+//            }
         }
         
 
@@ -580,7 +628,7 @@ struct StoneTower_1_popUp_ChangeStyleView: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 60, maximum: 60))]) {
                 ForEach(0...5,id:\.self) { index in
                     Circle()
-                        .fill(StoneTower_1.getDailyRecordColor(index: index))
+                        .fill(StoneTower_1.getIntegratedDailyRecordColor(index: index,colorScheme: colorScheme))
                         .stroke(getReversedColorSchemeColor(colorScheme), style: StrokeStyle(lineWidth: index == defaultColorIndex_tmp ? 5.0 : 1.0))
                         .padding(10)
                         .frame(width:gridSize, height: gridSize)
@@ -602,3 +650,51 @@ struct StoneTower_1_popUp_ChangeStyleView: View {
     }
 }
 
+
+//struct PopOutView: View {
+//    @State private var isPoppedOut = false
+//
+//    var body: some View {
+//        VStack {
+//            Spacer()
+//            
+//            // Your main content
+//            Text("Hello, SwiftUI!")
+//                .font(.largeTitle)
+//                .padding()
+//                .background(Color.blue)
+//                .foregroundColor(.white)
+//                .cornerRadius(10)
+//                .scaleEffect(isPoppedOut ? 1.2 : 1.0)
+//                .animation(.easeInOut(duration: 0.3), value: isPoppedOut)
+//                .onTapGesture {
+//                    isPoppedOut.toggle()
+//                }
+//            
+//            Spacer()
+//            
+//            // Button to trigger the pop-out effect
+//            Button(action: {
+//                isPoppedOut.toggle()
+//            }) {
+//                Text("Toggle Pop Out")
+//                    .padding()
+//                    .background(Color.green)
+//                    .foregroundColor(.white)
+//                    .cornerRadius(10)
+//            }
+//        }
+//    }
+//}
+//
+//struct ContentView2: View {
+//    var body: some View {
+//        PopOutView()
+//    }
+//}
+//
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView2()
+//    }
+//}
