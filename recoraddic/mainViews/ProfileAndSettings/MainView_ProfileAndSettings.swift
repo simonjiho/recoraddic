@@ -309,7 +309,7 @@ struct HiddenQuests: View {
                                 isPresented: $popUp_quest,
                                 content: {
                                     //
-                                    QuestStatisticsInDetail(selectedQuest: $selectedQuest, popUp_questStatisticsInDetail: $popUp_quest)
+                                    QuestInDetail(selectedQuest: $selectedQuest, popUp_questStatisticsInDetail: $popUp_quest)
                                 }
                             )
                             

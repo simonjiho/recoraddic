@@ -42,8 +42,9 @@ struct QuestCheckBoxView_OX: View {
             let TextBoxWidth = geometry.size.width*0.95 - checkBoxSize
             let TextBoxHeight = geometry.size.height*0.9
             
-//            let color1 =
-//            let color2 =
+            let tier: Int = dailyQuest.currentTier
+            let tierColor_dark = getDarkTierColorOf(tier: tier)
+
             
             ZStack {
                 
@@ -73,20 +74,14 @@ struct QuestCheckBoxView_OX: View {
 
 
 
-                
                 HStack {
                     Image(systemName: dailyQuest.data == 1 ? "checkmark.square" : "square")
                         .resizable()
-                        .foregroundStyle(.black)
                         .frame(width: checkBoxSize, height: checkBoxSize)
                     Text(dailyQuest.questName)
-//                        .padding(geometry.size.height*0.05)
-//                        .background(dailyQuest.data == 1 ? .white : .white.opacity(0.6))
-//                        .clipShape(.buttonBorder)
                         .frame(width: TextBoxWidth, height: TextBoxHeight)
-                        .foregroundStyle(.black)
-//                        .bold()
-//                        .background(dailyQuest.data == 1 ? .white.opacity(0.9) : .white.opacity(0.4))
+                        .bold()
+
 
                 } // HStack
                 .frame(width: geometry.size.width, height: geometry.size.height)      
@@ -112,9 +107,8 @@ struct QuestCheckBoxView_OX: View {
 
             } // ZStack
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
-            .background(.black.adjust(brightness:0.3))
-
-
+            .background(getTierColorOf(tier: tier))
+            .foregroundStyle(tierColor_dark)
             .clipShape(.buttonBorder)
             .onTapGesture {
                 checkBoxToggle.toggle()
@@ -138,12 +132,12 @@ struct QuestCheckBoxView_OX: View {
 // 고쳐야할 점: modelContext의 데이터를 view의 역동적 동작에 바로바로 수정하지 않고, 끝났을 때만 바꾼다.
 // state들 전부 computed property로 바꾸기
 // TODO: RecentPurpose 수정 / RecentData 수정 ( + purpose 없을 때는?
-struct QuestCheckBoxView: View {
 
+struct QuestCheckBoxView_HOUR: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
+    @StateObject private var stopwatch = Stopwatch()
 
-    
     
     @State var dailyQuest: DailyQuest
     
@@ -151,28 +145,31 @@ struct QuestCheckBoxView: View {
 
     
     @State var value: Int
+    @State var dailyGoal: Int?
+    @State var hasGoal: Bool
+    @State var hasGoal_toggle: Bool // onChangeOf(hasGoal) 과 toggle버튼에 의해서만 변경해야 함
 //    var width: CGFloat
     var range: ClosedRange<CGFloat> {
-        return 0.0...CGFloat(dailyQuest.dailyGoal)
+        return 0.0...CGFloat(dailyGoal ?? value)
     }
     @State var xOffset: CGFloat
-//    @State var lastOffset: CGFloat
-    @State var previousDragGesturePoint: CGSize = CGSize.zero
     
     @Binding var applyDailyQuestRemoval: Bool
     @Binding var dailyQuestToDelete: DailyQuest?
     
-    @State var isDragging: Bool = false
     @State var deleteDailyQuest: Bool = false
     
-    @State var isEditingGoal: Bool = false
-    @State var goalValueInText: String = ""
-
-    @FocusState var editingGoal: String?
+    @FocusState var focusedField: Field?
+    enum Field: Int, CaseIterable {
+        case value
+        case goal
+    }
     
-    @State var isEditingGoal_hours: Bool = false
+    
+    @State var isEditing_hours: Bool = false
     
     @State var isAnimating = false
+    @State var onTimer: Bool = false
 
 //    @Binding var isJustCf: Bool = false
     
@@ -180,35 +177,21 @@ struct QuestCheckBoxView: View {
 
         let questName = dailyQuest.questName
         let dataType = dailyQuest.dataType
-        let dailyGoal = dailyQuest.dailyGoal
-        let questData:Int = dailyQuest.data
-        let customDataTypeNotaion: String? = dailyQuest.customDataTypeNotation
 
-        
+        let tier: Int = dailyQuest.currentTier
+        let tierColor_dark = getDarkTierColorOf(tier: tier)
         
         GeometryReader { geometry in
             
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
-            
-            let contentWidth = geometry.size.width*0.95
-            
-            let dragGestureReducer: CGFloat = 0.7
-            let dragGestureAccelerater: CGFloat = 1.5
-            
-//            let sliderBoxHeight = geometry.size.height*0.5
-//            let sliderBoxWidth = contentWidth*0.75
-            
+
             let percentage:CGFloat = xOffset / geoWidth
-            let brightness:CGFloat = percentage * 0.0
-//            let brightness:CGFloat = percentage * 0.2
             
             
             let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
-
             
-            let cornerWidth = xOffset > geoWidth/20*2 ? geoWidth/20 : 0
-            let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth +  0.1) ? xOffset : 0.0, height: geoHeight), transform: nil))
+            let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth +  0.1) ? xOffset : geoWidth, height: geoHeight), transform: nil))
             // 0.1 없으면 끝에서 이상해짐
 
 
@@ -238,106 +221,84 @@ struct QuestCheckBoxView: View {
                 .onAppear() {
                     isAnimating = true
                 }
-                .onChange(of:isDragging) {
-                    isAnimating = true
+                if hasGoal {
+                    Spacer()
+                        .frame(width:1, height: geoHeight)
+                        .background(tierColor_dark)
+                        .offset(x:xOffset)
                 }
+                // MARK: 0.1을 넣지 않으면 xOffset이 geoWidth보다 커지는 상황 발생... 왤까?
 
-
-
-//                        .frame(width:geoWidth, height:geoHeight)
-                        
-                        
-//                        LinearGradient(colors: adjustedGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
-//                    .shadow(color:getTierColorOf(tier: dailyQuest.currentTier).adjust(brightness: -0.1),radius:1)
-
-
-                    // MARK: 0.1을 넣지 않으면 xOffset이 geoWidth보다 커지는 상황 발생... 왤까?
-
-                    .onChange(of:brightness) {
-                        print("brightness changed")
-                        print(brightness)
-                    }
-                
                 HStack(spacing: 0.0) {
-                    Text("\(questName)")
-                        .frame(alignment: .trailing)
-                        .foregroundStyle(.black)
-
-                        .lineLimit(1)
-//                        .bold()
-                    Text(": ")
-                        .foregroundStyle(.black)
-//                        .bold()
-                    HStack(spacing:0.0) { // hstack for values
-                        
-                        
-                        if isEditingGoal {
-                            
-
-                            if dailyQuest.dataType == DataType.HOUR {
-                                Text("\(DataType.string_fullRepresentableNotation(data: value, dataType: dataType)) / ")
-//                                    .bold()
-                                    .foregroundStyle(.black)
-                                
-                                Text("\(DataType.string_fullRepresentableNotation(data:dailyQuest.dailyGoal , dataType: dataType))")
-                                    .foregroundStyle(.black)
-
-
+                    if !isEditing_hours {
+                        Button("",systemImage:onTimer ? "pause" : "play") {
+                            if !onTimer {
+                                stopwatch.setTotalSec(value*60)
+                                stopwatch.start()
+                                DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
+                                    onTimer.toggle()
+                                }
                             }
                             else {
-//                                Text("\(DataType.string_unitDataToRepresentableData(data: value, dataType: dataType)) / ")
-                                Text("\(value) / ")
-//                                    .bold()
-                                    .foregroundStyle(.black)
-                                TextField("", text:$goalValueInText)
-                                    .keyboardType(.numberPad)
-                                    .frame(width:80)
-                                    .foregroundStyle(.black)
-
-                                    .onAppear() {
-//                                        goalValueInText = DataType.string_unitDataToRepresentableData(data: dailyQuest.dailyGoal, dataType: dataType)
-                                        goalValueInText = String(value)
-                                    }
-                                    .focused($editingGoal, equals: "editing")
-                                // use number pad
+                                onTimer.toggle()
+                                DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
+                                    stopwatch.stop()
+                                    value = stopwatch.getTotalSec()/60
+                                    stopwatch.setTotalSec(value*60)
+                                }
                             }
-                            
-                            Text("\(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation:dailyQuest.customDataTypeNotation))")
-                                .foregroundStyle(.black)
 
-                            
-
-                        
-                        }
-                        else {
-                            Text("\(DataType.string_fullRepresentableNotation(data: value, dataType: dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation))")
-//                            Text("\(DataType.string_unitDataToRepresentableData(data: value, dataType: dataType)) \(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation:dailyQuest.customDataTypeNotation))")
-                                .foregroundStyle(.black)
-                                .lineLimit(1)
-//                                .bold()
 
                         }
+                        .foregroundStyle(getDarkTierColorOf(tier: tier))
                         
-                        // 새로운 기록 구조: editingGoal에 따라 뒤에도 바뀜. 뒤에 바뀌면 가운데로, 고정, 당기면 올라감. 직접입력 터치시 textfield로 바뀜.
-                        // 디자인적으로 뭔가 완전 편하고 명시적이었으면 좋겠는데, 목표치를 설정하거나 수정한다는.
-
+                        Text("\(questName)")
+                            .frame(alignment: .trailing)
+                            .lineLimit(1)
+                        Text(": ")
                     }
-                    .frame(alignment: .leading)
-
-
+                    
+                    if onTimer {
+                        Text(stopwatch.timeString)
+                    }
+                    else {
+                        Group {
+                            Text("\(DataType.string_fullRepresentableNotation(data: value, dataType: dataType))")
+                            if hasGoal && isEditing_hours {
+                                Text("/ \(DataType.string_fullRepresentableNotation(data:dailyQuest.dailyGoal ?? 0 , dataType: dataType))")
+                            }
+                            //                    if !onTimer {
+//                            Button("",systemImage: "bell.slash") {
+//                                
+//                            }
+                        }
+                        .onTapGesture {
+                            isEditing_hours.toggle()
+                        }
+                    }
                 }
                 .padding(geoWidth*0.03)
                 .frame(width:geoWidth, height: geoHeight, alignment: .center)
+                .foregroundStyle(tierColor_dark)
+                .bold()
 
-                    
-                if !isEditingGoal {
+                .sheet(isPresented: $isEditing_hours) {
+                    // code for on dismiss
+                } content: {
+                    DialForHours(
+                        questName:questName,
+                        dailyGoal: $dailyGoal,
+                        value: $value,
+                        isEditing: $isEditing_hours,
+                        hasGoal_toggle: $hasGoal_toggle,
+                        dailyGoal_nonNil: dailyGoal ?? value
+                    )
+                    .presentationDetents([.height(300)])
+                    .presentationCompactAdaptation(.none)
+                }
+       
+                if !isEditing_hours {
                     Menu {
-                        Button("목표치 수정", action: {
-//                            goalValueInText = DataType.string_unitDataToRepresentableData(data: dailyQuest.dailyGoal, dataType: dataType)
-                            goalValueInText = String(value)
-                            editingGoal = "editing"
-                            isEditingGoal.toggle()
-                        })
                         Button("삭제", action: {
                             dailyQuestToDelete = dailyQuest
                             applyDailyQuestRemoval.toggle()
@@ -351,205 +312,322 @@ struct QuestCheckBoxView: View {
                     .buttonStyle(.plain)
                     .foregroundStyle(.black)
                     .frame(width: geometry.size.width*0.975, height: geometry.size.height*0.9, alignment: .topTrailing)
-                    .disabled(isEditingGoal)
                 }
-                else if dataType != DataType.HOUR {
-                    Button("완료") {
-//                                dismissingKeyboard()
-                        if dailyQuest.dataType == DataType.HOUR {
-                            goalValueInText = String(dailyQuest.dailyGoal)
-                        }
-                        if Int(goalValueInText)! <= dailyQuest.data {
-                            dailyQuest.data = Int(goalValueInText)!
-                            self.value = dailyQuest.data
-                        }
-                        if dailyQuest.dataType != DataType.HOUR {
-                            dailyQuest.dailyGoal = Int(goalValueInText)!
-                        }
 
-//                        editingGoal = nil
-                        isEditingGoal.toggle()
-                    }
-                    .buttonStyle(.bordered)
-                    .frame(width: geometry.size.width*0.975, height: geometry.size.height*0.9, alignment: .trailing)
-
-                }
-                
-                
                 
             } // zstack
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
-            .background(.black.adjust(brightness:0.3))
+            .background(getTierColorOf(tier: dailyQuest.currentTier))
             .clipShape(.buttonBorder)
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { draggedValue in
-
-                        let translation = draggedValue.translation
-                        
-                        let deltaX = translation.width - previousDragGesturePoint.width
-
-                        
-                        let dragGestureCoefficient:CGFloat =
-                        {
-                            let translation_x_abs = abs(translation.width)
-                            let deltaX_abs = abs(deltaX)
-                            if deltaX_abs > 5 { return dragGestureAccelerater}
-                            else if translation_x_abs <= 10 {return dragGestureReducer}
-                            else if translation_x_abs >= geoWidth*0.2 {
-                                print("accelerated!!")
-                                print(deltaX)
-                                return dragGestureAccelerater
-                            }
-                            else if translation_x_abs > 10 && translation_x_abs < geoWidth*0.2 {return 1.0}
-                            else if deltaX_abs < 1.5 {return dragGestureReducer}
-                            else { return 1.0}
-                        }()
-                        
-
-                        // geometric position
-                        var sliderPos = max(0, min(xOffset + deltaX*dragGestureCoefficient, geoWidth))
-
-                        // actual value (postion -> value:13.51324 -> roundValue:13.0)
-                        let sliderVal = sliderPos.map(from: 0...geoWidth, to: range)
-
-                        //TODO: 숫자 크면 5/10/50/100/500/1000/5000/10000 단위로 끊어주기
-                        
-                        // geometric position for roundValue
-                        sliderPos = CGFloat(sliderVal).map(from:range, to: 0...geoWidth)
-
-                        if sliderVal.isNormal || sliderVal.isZero {
-                            xOffset = sliderPos
-                            self.value = Int(round(sliderVal))
-                        }
-                        isDragging = true
-                        previousDragGesturePoint = translation
-                        
-                    }
-                    .onEnded { _ in
-//                        lastOffset = xOffset
-                        isDragging = false
-                        dailyQuest.data = self.value
-                        print("xOffset:\(xOffset)")
-                        print("value:\(value)")
-                        previousDragGesturePoint = CGSize.zero
-                    }
+            .onChange(of: hasGoal_toggle) {
                 
-            )
-            // MARK: This will be used if there's other button or behaviours that changes the value in other way(maybe change the value by textfield for later update)
-            .onChange(of: value) {
-                if !isDragging { // if changed by checkbox or x2 button.. or undo buttion..
-//                    range = 0.0...minimumBoundary(of:dailyQuest.data, byMultiplying:dailyGoal)
-                    xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
-                    dailyQuest.data = value
+                // 똑같을 때: hasGoal에 따라 hasGoal_toggle을 설정
+                if hasGoal_toggle != hasGoal {
+                        toggle_hour(hasGoal_toggle)
                 }
+                
+                
+            }
+            .onChange(of: value) {
+
+                xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
+                dailyQuest.data = value
+                print(xOffset)
+            }
+            .onChange(of: dailyGoal) {
+                dailyQuest.dailyGoal = dailyGoal
+                xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
             }
             .onChange(of: range) {
                 xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
             }
-            .onChange(of: isEditingGoal) {
-                if isEditingGoal && dataType == DataType.HOUR {
-                    isEditingGoal_hours = true
-                }
+            .onChange(of: hasGoal) {
+                hasGoal_toggle = hasGoal
             }
-            .onChange(of: isEditingGoal_hours) {
-                if isEditingGoal && dataType == DataType.HOUR {
-                    isEditingGoal = false
-                }
-            }
-            .sheet(isPresented: $isEditingGoal_hours) {
-                // code for on dismiss
-            } content: {
-                let (hour, minute): (Int, Int) = divideBy60(dailyQuest.dailyGoal)
-                DialForHours(
-                    questName:questName,
-                    dailyGoal: $dailyQuest.dailyGoal,
-                    value: $value,
-                    isEditing: $isEditingGoal_hours,
-                    hour: hour,
-                    minute: minute
-                )
-                    .presentationDetents([.height(300)])
-                    .presentationCompactAdaptation(.none)
-
-            }
-
-            
-
-
-
+//            .onChange(of: stopwatch.isRunning) {
+//                onTimer = stopwatch.isRunning
+//            }
 
         } // geometryReader
 
 
 
     }
-
-
-
+    
+    func toggle_hour(_ setGoal: Bool) -> Void {
+        hasGoal = hasGoal_toggle
+        if setGoal {
+            dailyGoal = (value/5+1)*5
+        }
+        else {
+            dailyGoal = nil
+        }
+    }
 
 
 }
 
+class Stopwatch: ObservableObject {
+    @Published var timeString = "00:00:00"
+    private var timer: Timer?
+    private var totalSec: Int = 0
 
-//struct QuestCheckBoxGradient: Shape {
-//    var xOffset: CGFloat
-//    
-//    let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth +  0.1) ? xOffset : 0.0, height: geoHeight), transform: nil))
-//    
-//    func path(in rect: CGRect) -> Path {
-//        var path = Path()
-//
-//        path.move(to: CGPoint(x: 0, y: rect.maxY))
-//        path.addLine(to: CGPoint(x: insetAmount, y: rect.minY))
-//        path.addLine(to: CGPoint(x: rect.maxX - insetAmount, y: rect.minY))
-//        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-//        path.addLine(to: CGPoint(x: 0, y: rect.maxY))
-//
-//        return path
-//    }
-//
-//}
+    var isRunning: Bool {
+        timer != nil
+    }
+
+    func start() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            self.totalSec += 1
+            self.updateTime()
+        }
+    }
+
+    func stop() {
+        timer?.invalidate()
+        timer = nil
+    }
+
+    func setTotalSec(_ input: Int) {
+        self.totalSec = input
+    }
+    
+    func getTotalSec() -> Int {
+        return self.totalSec
+    }
 
 
-struct EmptyQuestCheckBoxView: View {
+    private func updateTime() {
+            let hours = totalSec / 3600
+            let minutes = (totalSec % 3600) / 60
+            let seconds = totalSec % 60
+            timeString = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+}
 
+
+struct QuestCheckBoxView: View {
+
+    @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
 
     
-    var ratio: CGFloat
+    
+    @State var dailyQuest: DailyQuest
+    
+    var themeSetName: String
 
-    var body: some View {
+    
+    @State var value: Int
+    @State var dailyGoal: Int?
+    @State var hasGoal: Bool
+    @State var hasGoal_toggle: Bool // onChangeOf(hasGoal) 과 toggle버튼에 의해서만 변경해야 함
+//    var width: CGFloat
+    var range: ClosedRange<CGFloat> {
+        return 0.0...CGFloat(dailyGoal ?? value)
+    }
+    @State var xOffset: CGFloat
+    
+    @Binding var applyDailyQuestRemoval: Bool
+    @Binding var dailyQuestToDelete: DailyQuest?
+    
+    @State var deleteDailyQuest: Bool = false
+    
+    @State var isEditing: Bool = false
+    @State var valueInText: String = ""
+    @State var goalValueInText: String = ""
+
+    @FocusState var focusedField: Field?
+    enum Field: Int, CaseIterable {
+        case value
+        case goal
+    }
+    
         
+    @State var isAnimating = false
+
+//    @Binding var isJustCf: Bool = false
+    
+    var body: some View {
+
+        let questName = dailyQuest.questName
+        let dataType = dailyQuest.dataType
+//        let questData:Int = dailyQuest.data
+//        let customDataTypeNotaion: String? = dailyQuest.customDataTypeNotation
+
+        let tier: Int = dailyQuest.currentTier
+        let tierColor_dark = getDarkTierColorOf(tier: tier)
         
         GeometryReader { geometry in
             
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
             
-            var xOffset: CGFloat = max(0.0, min(geoWidth*ratio,geoWidth))
+//            let contentWidth = geometry.size.width*0.95
             
-            let percentage = xOffset / geoWidth
-            let brightness = percentage + 0.1
+            
+//            let percentage:CGFloat = xOffset / geoWidth
+            
+            
+            let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
+
+            
+            let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth +  0.1) ? xOffset : geoWidth, height: geoHeight), transform: nil))
+            // 0.1 없으면 끝에서 이상해짐
 
 
             ZStack(alignment:.leading) {
                 
-                Color.red.opacity(0.0)
-                
-                Rectangle()
-                    .frame(width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth + 0.1) ? xOffset : 0.0, height: geoHeight)
-                    // MARK: 0.1을 넣지 않으면 xOffset이 geoWidth보다 커지는 상황 발생... 왤까?
-                    .clipShape(.buttonBorder)
-                    .foregroundStyle(.black.adjust(brightness:brightness))
-                
-                
+                ZStack {
+                    Rectangle()
+                        .fill(
+                            LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        .frame(width:geoWidth, height:geoHeight)
+                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                    
+                    Rectangle()
+                        .fill(
+                            LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        .frame(width:geoWidth, height:geoHeight)
+                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                }
+                .frame(width:geoWidth, height:geoHeight)
+                .mask {
+                    a
+                }
+                .onAppear() {
+                    isAnimating = true
+                }
+                // MARK: 0.1을 넣지 않으면 xOffset이 geoWidth보다 커지는 상황 발생... 왤까?
+
+
+
+                if hasGoal && xOffset >= geoWidth {
+                    Spacer()
+                        .frame(width:1, height: geoHeight)
+                        .background(tierColor_dark)
+                        .offset(x:xOffset)
+                }
+                            
+
+                HStack(spacing: 0.0) {
+                    
+                    if !isEditing {
+//                        Button("",systemImage: "bell.slash") {
+//                            
+//                        }
+//                        .foregroundStyle(getDarkTierColorOf(tier: tier))
+                        HStack(spacing:0.0) {
+                            Text("\(questName)")
+                                .frame(alignment: .trailing)
+                                .lineLimit(1)
+                            //                        .bold()
+                            Text(": ")
+                            Text("\(value)")
+                        }
+                        .onTapGesture {
+                            edit()
+                        }
+                    }
+                    if isEditing {
+                        TextField("", text:$valueInText)
+                            .keyboardType(.numberPad)
+                            .frame(width:geoWidth/3)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                            .foregroundStyle(.black)
+                            .multilineTextAlignment(.center)
+                            .focused($focusedField, equals: .value)
+                            .toolbar {
+                                ToolbarItem(placement: .keyboard) {
+                                    HStack(spacing:0.0) {
+                                        Toggle("목표설정", isOn: $hasGoal_toggle)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.7)
+                                            .toggleStyle(.switch)
+                                            .frame(width:geoWidth*0.4)
+                                        Button("완료") {
+                                            editDone()
+                                        }
+                                        .frame(width:geoWidth*0.6, alignment: .trailing)
+                                    }
+                                }
+                            }
+                    }
+                    if hasGoal && isEditing {
+                        Text(" /")
+                        TextField("", text:$goalValueInText)
+                            .keyboardType(.numberPad)
+                            .frame(width:geoWidth/3)
+                            .multilineTextAlignment(.center)
+                            .focused($focusedField, equals: .goal)
+                        
+                        
+                    }
+                    
+                    Text("\(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation:dailyQuest.customDataTypeNotation))")
+                }
+                .padding(geoWidth*0.03)
+                .frame(width:geoWidth, height: geoHeight, alignment: .center)
+                .foregroundStyle(tierColor_dark)
+                .bold()
+
+
+
+
+                    
+                if !isEditing {
+                    Menu {
+                        Button("삭제", action: {
+                            dailyQuestToDelete = dailyQuest
+                            applyDailyQuestRemoval.toggle()
+                        })
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .font(.title3)
+                            .frame(height:geoHeight*0.75, alignment:.top)
+                        //                        .border(.red)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.black)
+                    .frame(width: geometry.size.width*0.975, height: geometry.size.height*0.9, alignment: .topTrailing)
+                }
 
                 
+                
+                
             } // zstack
-            .frame(width: geometry.size.width, height: geometry.size.height)
-            .background(.black.adjust(brightness:0.3))
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
+            .background(getTierColorOf(tier: tier))
             .clipShape(.buttonBorder)
+            .onChange(of: hasGoal_toggle) {
+                
+                // 똑같을 때: hasGoal에 따라 hasGoal_toggle을 설정
+                
+                if hasGoal_toggle != hasGoal {
+                    toggle(hasGoal_toggle)
+                }
+                
+                
+            }
+            .onChange(of: value) {
+                xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
+                dailyQuest.data = value
+            }
+            .onChange(of: dailyGoal) {
+                dailyQuest.dailyGoal = dailyGoal
+                xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
+            }
+            .onChange(of: range) {
+                xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
+            }
+            .onChange(of: hasGoal) {
+                hasGoal_toggle = hasGoal
+            }
 
 
         } // geometryReader
@@ -557,12 +635,73 @@ struct EmptyQuestCheckBoxView: View {
 
 
     }
+    
+    // below functions must contain three steps in proper order of their own functionality:
+    // - set focusField
+    // - set hasGoal
+    func editDone() -> Void { // tranform view -> change&save values
+        
+        focusedField = nil
+        isEditing = false
 
+        if let newValue:Int = Int(valueInText) { value = newValue } // save value
+        else { value = 0 }
+        
+        if let newGoalValue:Int = Int(goalValueInText) { // save dailyGoal
+            if newGoalValue == 0 {
+                hasGoal = false
+                dailyGoal = nil
+            }
+            else {
+                dailyGoal = newGoalValue
+            }
+        }
+        else {
+            hasGoal = false
+            dailyGoal = nil
+        }
+    }
+    func toggle(_ setGoal: Bool) -> Void {
+        if setGoal { // setGoal
+            // set dailyQuest.dailyGoal into non-nil, change the focus into goal
+            hasGoal = hasGoal_toggle
+            focusedField = nil
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
+                focusedField = .goal
+            }
 
+        }
+        else { // deleteGoal
+            dailyGoal = nil
+            goalValueInText = ""
+            focusedField = .value
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
+                hasGoal = hasGoal_toggle
+            }
 
+        }
+    }
+    func edit() -> Void { // set values -> transform view
+        if let goalValue = dailyGoal {
+            goalValueInText = String(goalValue)
+        }
+        else { // actually don't need it
+            goalValueInText = ""
+        }
+        
+        valueInText = String(value)
 
+        isEditing = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
+            focusedField = .value
+        }
+
+    }
 
 }
+
+
 
 
 extension CGFloat {
@@ -577,36 +716,45 @@ struct DialForHours: View {
 
     var questName: String
     
-    @Binding var dailyGoal: Int
+    @Binding var dailyGoal: Int?
     @Binding var value: Int
     @Binding var isEditing: Bool
+    @Binding var hasGoal_toggle: Bool
+
     
-    @State var hour = 0
-    @State var minute = 0
+//    @State var hour = 0
+//    @State var minute = 0
+//    @State var hour_goal = 0
+//    @State var minute_goal = 0
+    @State var dailyGoal_nonNil = 0
 
     var body: some View {
         GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            
             VStack {
                 
-                ZStack {
-                    Text(questName)
-                        .font(.title3)
-                    HStack(spacing:0.0) {
-                        Button("취소") {
-                            isEditing.toggle()
-                        }
-                        .padding(.leading, 10)
-                        .frame(width: (geometry.size.width*0.5), alignment: .leading)
+                ZStack(alignment:.top) {
+                    VStack {
+                        Text(questName)
+                            .font(.title3)
+                        Toggle("목표설정",isOn:$hasGoal_toggle)
+                            .frame(width:geoWidth/3)
+                    }
+//                    HStack(spacing:0.0) {
+//                        Button("취소") {
+//                            isEditing.toggle()
+//                        }
+//                        .padding(.leading, 10)
+//                        .frame(width: (geometry.size.width*0.5), alignment: .leading)
                         Button("완료") {
-                            dailyGoal = hour*60 + minute
-                            if dailyGoal <= value {
-                                value = dailyGoal
-                            }
+//                            save()
                             isEditing.toggle()
                         }
                         .padding(.trailing, 10)
-                        .frame(width: (geometry.size.width*0.5), alignment: .trailing)
-                    }
+                        .frame(width: (geometry.size.width*0.95), alignment: .trailing)
+//                    }
 
                 }
                 .frame(width: geometry.size.width)
@@ -615,50 +763,105 @@ struct DialForHours: View {
                 
                 HStack {
                     
-                    Text("목표:")
                     
-                    Picker(selection: $hour, label: Text("First Value")) {
-                        ForEach(0..<25) { i in
-                            Text("\(i)").tag(i)
+//                    Picker(selection: $hour, label: Text("First Value")) {
+//                        ForEach(0..<25) { i in
+//                            Text("\(i)").tag(i)
+//                        }
+//                    }
+//                    .frame(width: 50)
+//                    .clipped()
+//                    .pickerStyle(.wheel)
+                    Picker(selection: $value, label: Text("Second Value")) {
+                        ForEach(0..<60*24) { i in
+                            Text("\(DataType.string_fullRepresentableNotation(data: i, dataType: DataType.HOUR))").tag(i)
                         }
                     }
-                    .frame(width: 50)
+                    .frame(width: geoWidth/3)
                     .clipped()
                     .pickerStyle(.wheel)
-                    Text("시간  ")
-                    Picker(selection: $minute, label: Text("Second Value")) {
-                        ForEach(0..<60) { i in
-                            Text("\(i)").tag(i)
+                    
+                    if hasGoal_toggle {
+                        
+                        if let dailyGoal_nonNil:Int = dailyGoal {
+                            Picker(selection: $dailyGoal_nonNil, label: Text("Second Value")) {
+                                ForEach(0..<60*24/5) { i in
+                                    Text("\(DataType.string_fullRepresentableNotation(data: i*5, dataType: DataType.HOUR))").tag(i*5)
+                                }
+                            }
+                            .frame(width: geoWidth/3)
+                            .clipped()
+                            .pickerStyle(.wheel)
                         }
+//                        Picker(selection: $hour_goal, label: Text("First Value")) {
+//                            ForEach(0..<25) { i in
+//                                Text("\(i)").tag(i)
+//                            }
+//                        }
+//                        .frame(width: 50)
+//                        .clipped()
+//                        .pickerStyle(.wheel)
+//                        Text("시간  ")
+//                        Picker(selection: $minute_goal, label: Text("Second Value")) {
+//                            ForEach(0..<60) { i in
+//                                Text("\(i)").tag(i)
+//                            }
+//                        }
+//                        .frame(width: 50)
+//                        .clipped()
+//                        .pickerStyle(.wheel)
+//                        Text("분")
                     }
-                    .frame(width: 50)
-                    .clipped()
-                    .pickerStyle(.wheel)
-                    Text("분")
                     
                     
                 }
             }
-//            .onChange(of: hour) {
-//                if hour == 24 {
-//                    withAnimation {
-//                        minute = 0
-//                    }
+
+        }        
+        .onChange(of: dailyGoal_nonNil) {
+            dailyGoal = dailyGoal_nonNil
+        }
+        .onChange(of: dailyGoal) {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+//                if let nonNil:Int = dailyGoal {
+//                    dailyGoal_nonNil = nonNil
 //                }
 //            }
-//            .onChange(of: minute) {
-//                if hour == 24 {
-//                    withAnimation {
-//                        minute = 0
+            if dailyGoal == nil {
+                dailyGoal_nonNil = (value/5+1)*5
+            }
+        }
+//        .onChange(of: minute) {
+//            value = hour*60 + minute
+//        }
+//        .onChange(of: hour) {
+//            value = hour*60 + minute
+//        }
+//        .onChange(of: minute_goal) {
+//            dailyGoal = hour_goal*60 + minute_goal
+//        }
+//        .onChange(of: hour_goal) {
+//            dailyGoal = hour_goal*60 + minute_goal
+//        }
+        .onChange(of: hasGoal_toggle) {
+//            if hasGoal_toggle {
+//                    if let dailyGoal_nonNil: Int = dailyGoal {
+//                        hour_goal = dailyGoal_nonNil/60
+//                        minute_goal = dailyGoal_nonNil%60
 //                    }
 //                }
-//            }
-//            .onDisappear() {
 //            }
         }
     }
-}
 
+    
+    func save() -> Void {
+        //                            dailyGoal = hour*60 + minute
+        //                            if dailyGoal <= value {
+        //                                value = dailyGoal
+        //                            }
+    }
+}
 
 
 struct QuestCheckBoxColorPreview: View {
@@ -684,7 +887,7 @@ struct QuestCheckBoxColorPreview: View {
             
             
             let gradientColors = getGradientColorsOf(tier: tier, type:0)
-            let adjustedGradient: [Color] = {
+            let _: [Color] = {
                 var newGradient: [Color] = []
                 for idx in 0...(gradientColors.count - 1) {
                     if idx % 2 == 0 {

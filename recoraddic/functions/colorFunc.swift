@@ -94,26 +94,26 @@ func getDarkTierColorOf(tier:Int) -> Color {
     case 0:
         return tierColor.adjust(brightness: -0.3)
     case 1:
-        return tierColor.adjust(brightness: -0.5)
+        return tierColor.adjust(brightness: -0.4)
     case 2:
         return tierColor.adjust(brightness: -0.35)
     case 3:
-        return tierColor.adjust(brightness: -0.5)
+        return tierColor.adjust(brightness: -0.45)
     case 4:
         return tierColor.adjust(brightness: -0.5)
     case 5:
-        return tierColor.adjust(brightness: -0.5)
+        return tierColor.adjust(saturation:0.2 ,brightness: -0.4)
     case 6:
         return tierColor.adjust(brightness: -0.5)
     case 7:
 //        return tierColor.adjust(brightness: -0.2)
 //        return tierColor.adjust(brightness: 0.1)
 //        return Color.purple.adjust(brightness: 0.8)
-        return tierColor.adjust(brightness: -0.5)
+        return tierColor.adjust(brightness: -0.45)
 
 
     case 8:
-        return tierColor.adjust(brightness: -0.5)
+        return tierColor.adjust(brightness: -0.45)
 
     default:
         return tierColor.adjust(brightness: -0.5)
@@ -192,7 +192,7 @@ func getBrightTierColorOf3(tier:Int) -> Color { // questCheckBox(dark)
     case 4:
         return tierColor.adjust(brightness: 0.0)
     case 5:
-        return tierColor.adjust(brightness: 0.0)
+        return tierColor.adjust(brightness: 0.05)
     case 6:
         return tierColor.adjust(brightness: 0.1)
     case 7:
@@ -220,8 +220,8 @@ func getGradientColorsOf(tier:Int, type:Int = 0) -> [Color] { // quest checkbox
     else if type == 1 { //questThumbnail
         return [tierColor, tierColor_bright2, tierColor]
     }
-    else if type == 2 {
-        return [tierColor, tierColor_bright, tierColor, tierColor_bright, tierColor]
+    else if type == 2 { // 달력
+        return [tierColor_bright2, tierColor]
     }
     else if type == 3 {
         return [tierColor, tierColor_bright2, tierColor, tierColor_bright2, tierColor]
@@ -247,3 +247,64 @@ func getReversedColorSchemeColor(_ colorScheme:ColorScheme) -> Color {
 }
 
 
+
+#Preview(body: {
+    
+    HStack {
+        VStack {
+            getDarkTierColorOf(tier: 0)
+            getDarkTierColorOf(tier: 5)
+            getDarkTierColorOf(tier: 10)
+            getDarkTierColorOf(tier: 15)
+            getDarkTierColorOf(tier: 20)
+            getDarkTierColorOf(tier: 25)
+            getDarkTierColorOf(tier: 30)
+            getDarkTierColorOf(tier: 35)
+            getDarkTierColorOf(tier: 40)
+        } // dark
+        VStack {
+            getTierColorOf(tier: 0)
+            getTierColorOf(tier: 5)
+            getTierColorOf(tier: 10)
+            getTierColorOf(tier: 15)
+            getTierColorOf(tier: 20)
+            getTierColorOf(tier: 25)
+            getTierColorOf(tier: 30)
+            getTierColorOf(tier: 35)
+            getTierColorOf(tier: 40)
+        } // original
+        VStack {
+            getBrightTierColorOf3(tier: 0)
+            getBrightTierColorOf3(tier: 5)
+            getBrightTierColorOf3(tier: 10)
+            getBrightTierColorOf3(tier: 15)
+            getBrightTierColorOf3(tier: 20)
+            getBrightTierColorOf3(tier: 25)
+            getBrightTierColorOf3(tier: 30)
+            getBrightTierColorOf3(tier: 35)
+            getBrightTierColorOf3(tier: 40)
+        } // bright3
+        VStack {
+            getBrightTierColorOf(tier: 0)
+            getBrightTierColorOf(tier: 5)
+            getBrightTierColorOf(tier: 10)
+            getBrightTierColorOf(tier: 15)
+            getBrightTierColorOf(tier: 20)
+            getBrightTierColorOf(tier: 25)
+            getBrightTierColorOf(tier: 30)
+            getBrightTierColorOf(tier: 35)
+            getBrightTierColorOf(tier: 40)
+        } // bright
+        VStack {
+            getBrightTierColorOf2(tier: 0)
+            getBrightTierColorOf2(tier: 5)
+            getBrightTierColorOf2(tier: 10)
+            getBrightTierColorOf2(tier: 15)
+            getBrightTierColorOf2(tier: 20)
+            getBrightTierColorOf2(tier: 25)
+            getBrightTierColorOf2(tier: 30)
+            getBrightTierColorOf2(tier: 35)
+            getBrightTierColorOf2(tier: 40)
+        } // bright2
+    }
+})

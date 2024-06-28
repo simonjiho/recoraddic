@@ -591,7 +591,6 @@ struct ChecklistView: View {
                 ScrollViewReader { scrollProxy in
                     ScrollView {
                         
-                        
                         VStack(alignment: .center) {
                             
                             Spacer()
@@ -696,28 +695,44 @@ struct ChecklistView: View {
                                             .opacity(0.85)
                                             
                                         }
-                                        else {
+                                        else if dailyQuest.dataType == DataType.HOUR {
                                             
                                             let data = dailyQuest.data
-                                            let xOffset = CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal), to: 0...questCheckBoxWidth)
-                                            
-                                            // 원하는 기능
-                                            // 첫 생성 시: popUp view
-                                            // 기존 것 고를 시: 그냥 누르면 가장 최근 데이터, 프리셋 데이터 선택 시 프리셋 선택 및 추가/삭제 가능한 창
-                                            
-                                            
-                                            QuestCheckBoxView(
+                                            let xOffset = CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal ?? dailyQuest.data), to: 0...questCheckBoxWidth)
+
+                                            QuestCheckBoxView_HOUR(
                                                 dailyQuest: dailyQuest,
                                                 themeSetName: profile.adjustedThemeSetName,
                                                 value: data,
+                                                dailyGoal: dailyQuest.dailyGoal,
+                                                hasGoal: dailyQuest.dailyGoal != nil,
+                                                hasGoal_toggle: dailyQuest.dailyGoal != nil,
                                                 xOffset: xOffset,
                                                 applyDailyQuestRemoval: $applyDailyQuestRemoval,
                                                 dailyQuestToDelete: $dailyQuestToDelete
                                             )
                                             .frame(width:questCheckBoxWidth, height: questCheckBoxHeight)
-                                            //                                    .shadow(color:shadowColor, radius: 3)
                                             .opacity(0.85)
                                             
+                                        }
+                                        else {
+                                            let data = dailyQuest.data
+                                            let xOffset = CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal ?? dailyQuest.data), to: 0...questCheckBoxWidth)
+
+
+                                            QuestCheckBoxView(
+                                                dailyQuest: dailyQuest,
+                                                themeSetName: profile.adjustedThemeSetName,
+                                                value: data,
+                                                dailyGoal: dailyQuest.dailyGoal,
+                                                hasGoal: dailyQuest.dailyGoal != nil,
+                                                hasGoal_toggle: dailyQuest.dailyGoal != nil,
+                                                xOffset: xOffset,
+                                                applyDailyQuestRemoval: $applyDailyQuestRemoval,
+                                                dailyQuestToDelete: $dailyQuestToDelete
+                                            )
+                                            .frame(width:questCheckBoxWidth, height: questCheckBoxHeight)
+                                            .opacity(0.85)
                                         }
                                         
                                     }

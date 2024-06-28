@@ -204,7 +204,6 @@ final class DataType {
 //    }
     
     static func string_unitDataToRepresentableData_hours(data: Int) -> (String, String) {
-        
         return (String(format: "%d", data/60) , String(format: "%d", data%60))
     }
     
@@ -217,10 +216,19 @@ final class DataType {
         }
         if dataType == DataType.HOUR {
             let (hours,minutes) = string_unitDataToRepresentableData_hours(data: data)
-            return "\(hours)시간 \(minutes)분"
+            if hours == "0" {
+                return "\(minutes)분"
+            }
+            else if hours != "0" && minutes == "0" {
+                return "\(hours)시간"
+
+            }
+            else {
+                return "\(hours)시간 \(minutes)분"
+            }
         }
         if dataType == DataType.CUSTOM {
-            return "\(data) \(customDataTypeNotation ?? "customData")"
+            return "\(data) \(customDataTypeNotation ?? "notationError")"
         }
         else {
             return "error: string_fullRepresentableNotation"
@@ -229,37 +237,46 @@ final class DataType {
 
     }
     
-    
-    static func float_unitDataToRepresentableData(data: Int, dataType: Int) -> CGFloat {
-        
-        if data < 0 || dataType > DataType.CUSTOM || dataType < DataType.OX
-        { return 99999 }
-        
-        
-//        if dataType == DataType.NONE
-//        { return CGFloat(data) }
-        
-        else if dataType == DataType.OX {
-            if data != 0 && data != 1 { return 99999 }
-            else { return CGFloat(data) }
+    static func cumulative_integratedValueNotation(data:Int, dataType:Int) -> Int {
+        if dataType == DataType.HOUR {
+            return data/60
         }
-        
-        else if dataType == DataType.REP
-        { return CGFloat(data) }
-     
-        // (unit of HOUR) == 0.1 hour(6 min)
-        else if dataType == DataType.HOUR
-        { return CGFloat(Double(data)*0.1) }
-        
-
-        
-        else if dataType == DataType.CUSTOM
-        { return CGFloat(data) }
-        
-        else
-        { return 99999 }
-        
-        
+        else {
+            return data
+        }
     }
+    
+    
+//    static func float_unitDataToRepresentableData(data: Int, dataType: Int) -> CGFloat {
+//        
+//        if data < 0 || dataType > DataType.CUSTOM || dataType < DataType.OX
+//        { return 99999 }
+//        
+//        
+////        if dataType == DataType.NONE
+////        { return CGFloat(data) }
+//        
+//        else if dataType == DataType.OX {
+//            if data != 0 && data != 1 { return 99999 }
+//            else { return CGFloat(data) }
+//        }
+//        
+//        else if dataType == DataType.REP
+//        { return CGFloat(data) }
+//     
+//        // (unit of HOUR) == 0.1 hour(6 min)
+//        else if dataType == DataType.HOUR
+//        { return CGFloat(Double(data)*0.1) }
+//        
+//
+//        
+//        else if dataType == DataType.CUSTOM
+//        { return CGFloat(data) }
+//        
+//        else
+//        { return 99999 }
+//        
+//        
+//    }
     
 }

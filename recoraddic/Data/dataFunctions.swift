@@ -83,6 +83,33 @@ extension Quest {
             }
         }
     }
+    
+    func getNextTierCondition() -> Int {
+        // 0~4 -> 5
+        // 5~9 -> 10
+        let returnValue: Int = {
+            switch self.tier/5 {
+            case 0: return 5
+            case 1: return 10
+            case 2: return 40
+            case 3: return 100
+            case 4: return 400
+            case 5: return 1000
+            case 6: return 4000
+            case 7: return 10000
+            default: return 0
+            }
+        }()
+        
+        if self.dataType == DataType.HOUR {
+            return returnValue*60
+        }
+        else {
+            return returnValue
+        }
+
+        
+    }
 
     func representingDataToString() -> String {
         let calendar = Calendar.current
@@ -94,38 +121,40 @@ extension Quest {
             return "누적 \(DataType.string_fullRepresentableNotation(data: cumulative(), dataType: dataType, customDataTypeNotation: self.customDataTypeNotation))"
         }
         
-        else if representingData == QuestRepresentingData.recentMontlyData {
-            
-            let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: currentDate)!
-            
-            let recentData = dailyData.filter { (key: Date, value: Int) -> Bool in
-                return key >= thirtyDaysAgo
-            }
-            
-            let actualTerm:Int = {
-                if recentData.isEmpty {
-                    return 1
-                }
-                else {
-                    if recentData.keys.sorted().first! != currentDate {
-                        return calculateDaysBetweenTwoDates(from: recentData.keys.sorted().first!, to: currentDate) + 1
-                    }
-                    else {
-                        return 1
-                    }
-                }
-            }()
-            
-            
-            let numberOfDoneDates: Int = recentData.isEmpty ? 1 : recentData.count
-            
-            let averageTermOfQuest: Float = recentData.isEmpty ? 0.0 : Float(actualTerm) / Float(numberOfDoneDates)
-            
-            let averageValueOfQuest: Float = Float(sumIntArray(Array(recentData.values))) / Float(numberOfDoneDates)
-            
-            return "\(String(format:"%.1f",averageTermOfQuest)) 일마다 \(String(format:"%.1f",DataType.float_unitDataToRepresentableData(data:Int(averageValueOfQuest*10), dataType: self.dataType)/10.0 ) )\(DataType.unitNotationOf(dataType: self.dataType, customDataTypeNotation: customDataTypeNotation))"
-            
-        }
+        // not used
+//        else if representingData == QuestRepresentingData.recentMontlyData {
+//            
+//            let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: currentDate)!
+//            
+//            let recentData = dailyData.filter { (key: Date, value: Int) -> Bool in
+//                return key >= thirtyDaysAgo
+//            }
+//            
+//            let actualTerm:Int = {
+//                if recentData.isEmpty {
+//                    return 1
+//                }
+//                else {
+//                    if recentData.keys.sorted().first! != currentDate {
+//                        return calculateDaysBetweenTwoDates(from: recentData.keys.sorted().first!, to: currentDate) + 1
+//                    }
+//                    else {
+//                        return 1
+//                    }
+//                }
+//            }()
+//            
+//            
+//            let numberOfDoneDates: Int = recentData.isEmpty ? 1 : recentData.count
+//            
+//            let averageTermOfQuest: Float = recentData.isEmpty ? 0.0 : Float(actualTerm) / Float(numberOfDoneDates)
+//            
+//            let averageValueOfQuest: Float = Float(sumIntArray(Array(recentData.values))) / Float(numberOfDoneDates)
+//            
+//            return "\(String(format:"%.1f",averageTermOfQuest)) 일마다 \(String(format:"%.1f",DataType.float_unitDataToRepresentableData(data:Int(averageValueOfQuest*10), dataType: self.dataType)/10.0 ) )\(DataType.unitNotationOf(dataType: self.dataType, customDataTypeNotation: customDataTypeNotation))"
+//            
+//        }
+        
         else {
             return "questRepresentOptionError"
         }

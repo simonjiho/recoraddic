@@ -59,6 +59,15 @@ func getTomorrowOf(_ date: Date) -> Date {
 }
 
 
+func convertToDate(from dateString: String) -> Date? {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yy/MM/dd"
+//    formatter.locale = Locale(identifier: "en_US_POSIX") // Ensures consistent parsing
+    formatter.locale = Locale(identifier: "ko_KR") // Ensures consistent parsing
+    return getStartOfDate(date:formatter.date(from: dateString) ?? .now)
+    
+}
+
 //func getDateOfYesterDay() -> Date {
 //    let now = Date()
 //    var calendar = Calendar.current

@@ -62,6 +62,7 @@ struct ContentView: View {
     @Query var profiles: [Profile]
     @Query(sort:\Quest.name) var quests: [Quest]
     @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
+    @Query var dailyQuests: [DailyQuest]
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
     var dailyRecordSets_visible: [DailyRecordSet] {
         dailyRecordSets.filter({$0.isVisible()})
@@ -193,7 +194,12 @@ struct ContentView: View {
                          .tag(mainViews[3])
                      }
                      .onAppear() {
-                         
+                         // MARK: 오류일어나서 임시방편(나중에 삭제해야함
+                         for dailyQuest in dailyQuests {
+                             if dailyQuest.dataType == DataType.CUSTOM && dailyQuest.customDataTypeNotation == nil {
+                                 dailyQuest.customDataTypeNotation = "ml"
+                             }
+                         }
                      }
                      .onChange(of: selectedView) { oldValue, newValue in //여기에 다양한 것 넣어주기
                          

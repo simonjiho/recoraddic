@@ -175,7 +175,7 @@ class DailyQuest: Hashable, Equatable, Identifiable {
     var data: Int = 0
     var dataType: Int = 1
     var defaultPurposes: Set<String> = []
-    var dailyGoal: Int = 0
+    var dailyGoal: Int? = nil
     var currentTier: Int = 0
     
     var customDataTypeNotation: String?
@@ -183,7 +183,7 @@ class DailyQuest: Hashable, Equatable, Identifiable {
     var dailyRecord: DailyRecord?
     
     
-    init(createdTime: Date = .now, questName: String, data: Int, dataType: Int, defaultPurposes: Set<String>, dailyGoal: Int) {
+    init(createdTime: Date = .now, questName: String, data: Int, dataType: Int, defaultPurposes: Set<String>, dailyGoal: Int? = nil) {
         self.createdTime = createdTime
         self.questName = questName
         self.data = data

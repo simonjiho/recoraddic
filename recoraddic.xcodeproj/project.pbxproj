@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		B2030E052BCCF0F600CE0EDF /* StoneTower_0_stone.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2030E042BCCF0F600CE0EDF /* StoneTower_0_stone.swift */; };
 		B20902302B94577700B26E8B /* recalculateVisualValues_drs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B209022F2B94577700B26E8B /* recalculateVisualValues_drs.swift */; };
-		B2102B142BA5CCCD0041C8FB /* QuestStatisticsInDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2102B132BA5CCCD0041C8FB /* QuestStatisticsInDetail.swift */; };
+		B2102B142BA5CCCD0041C8FB /* QuestInDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2102B132BA5CCCD0041C8FB /* QuestInDetail.swift */; };
 		B220DA2E2B612EB60039160C /* colorFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA2D2B612EB60039160C /* colorFunc.swift */; };
 		B220DA3A2B6261460039160C /* StoneTower_1.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA392B6261460039160C /* StoneTower_1.swift */; };
 		B220DA3C2B6268260039160C /* RecordInDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA3B2B6268260039160C /* RecordInDetailView.swift */; };
@@ -19,6 +19,7 @@
 		B2314BBF2AF4DD7400EDD5C7 /* stone_default1.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2314BBE2AF4DD7400EDD5C7 /* stone_default1.xcassets */; };
 		B247D24B2A6D1DA100E457FB /* customMathFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B247D24A2A6D1DA100E457FB /* customMathFunc.swift */; };
 		B24C298E2C283331000F3EEE /* dailyQuestionsGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */; };
+		B24C29922C329B7B000F3EEE /* test.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24C29912C329B7B000F3EEE /* test.swift */; };
 		B25BF9052B1C886E0039F1F9 /* ResizableText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B25BF9042B1C886E0039F1F9 /* ResizableText.swift */; };
 		B260A3912A9B88AE00D73208 /* MainView_checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3902A9B88AE00D73208 /* MainView_checklist.swift */; };
 		B260A3942A9B8B8F00D73208 /* MainView_QuestInventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3932A9B8B8F00D73208 /* MainView_QuestInventory.swift */; };
@@ -75,7 +76,7 @@
 /* Begin PBXFileReference section */
 		B2030E042BCCF0F600CE0EDF /* StoneTower_0_stone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower_0_stone.swift; sourceTree = "<group>"; };
 		B209022F2B94577700B26E8B /* recalculateVisualValues_drs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recalculateVisualValues_drs.swift; sourceTree = "<group>"; };
-		B2102B132BA5CCCD0041C8FB /* QuestStatisticsInDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestStatisticsInDetail.swift; sourceTree = "<group>"; };
+		B2102B132BA5CCCD0041C8FB /* QuestInDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestInDetail.swift; sourceTree = "<group>"; };
 		B220DA2D2B612EB60039160C /* colorFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = colorFunc.swift; sourceTree = "<group>"; };
 		B220DA392B6261460039160C /* StoneTower_1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower_1.swift; sourceTree = "<group>"; };
 		B220DA3B2B6268260039160C /* RecordInDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordInDetailView.swift; sourceTree = "<group>"; };
@@ -87,6 +88,7 @@
 		B234C6EC2BC564CA0031BAD7 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		B247D24A2A6D1DA100E457FB /* customMathFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customMathFunc.swift; sourceTree = "<group>"; };
 		B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dailyQuestionsGraph.swift; sourceTree = "<group>"; };
+		B24C29912C329B7B000F3EEE /* test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test.swift; sourceTree = "<group>"; };
 		B25BF9042B1C886E0039F1F9 /* ResizableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizableText.swift; sourceTree = "<group>"; };
 		B2600B062A35E1FF00E00D91 /* what_I_learned.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = what_I_learned.md; sourceTree = "<group>"; };
 		B260A3902A9B88AE00D73208 /* MainView_checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_checklist.swift; sourceTree = "<group>"; };
@@ -237,7 +239,7 @@
 			isa = PBXGroup;
 			children = (
 				B260A3932A9B8B8F00D73208 /* MainView_QuestInventory.swift */,
-				B2102B132BA5CCCD0041C8FB /* QuestStatisticsInDetail.swift */,
+				B2102B132BA5CCCD0041C8FB /* QuestInDetail.swift */,
 			);
 			path = QuestInventory;
 			sourceTree = "<group>";
@@ -322,6 +324,7 @@
 				B29C70312A35C5E40046873E /* Assets.xcassets */,
 				B29C70332A35C5E40046873E /* recoraddic.entitlements */,
 				B29C70342A35C5E40046873E /* Preview Content */,
+				B24C29912C329B7B000F3EEE /* test.swift */,
 			);
 			path = recoraddic;
 			sourceTree = "<group>";
@@ -500,7 +503,7 @@
 				B2E5522F2BC29E2700ACA5A8 /* StoneTower_0_sharedFunc.swift in Sources */,
 				B2FB726F2A8762810012EBE1 /* customArrayFunc.swift in Sources */,
 				B220DA3A2B6261460039160C /* StoneTower_1.swift in Sources */,
-				B2102B142BA5CCCD0041C8FB /* QuestStatisticsInDetail.swift in Sources */,
+				B2102B142BA5CCCD0041C8FB /* QuestInDetail.swift in Sources */,
 				B2CD40082BB2CE9100BECC5E /* StoneTower1_stones.swift in Sources */,
 				B2E552282BC297A400ACA5A8 /* StoneTower_0.swift in Sources */,
 				B260A3912A9B88AE00D73208 /* MainView_checklist.swift in Sources */,
@@ -528,6 +531,7 @@
 				B2ABB25D2B10BBDE00870DE0 /* PopupViewLayout.swift in Sources */,
 				B24C298E2C283331000F3EEE /* dailyQuestionsGraph.swift in Sources */,
 				B2D8F96D2B75ECB800423AFC /* FireView.swift in Sources */,
+				B24C29922C329B7B000F3EEE /* test.swift in Sources */,
 				B2ABC2652B4293680056C637 /* purposeTags.swift in Sources */,
 				B2BA89012B2F172E00A3D50E /* AddDiaryView.swift in Sources */,
 				B262F2452A86464700868F27 /* metaData.swift in Sources */,

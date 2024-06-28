@@ -267,7 +267,7 @@ struct MainView_QuestInventory: View {
                 } // VStack
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
                 .sheet(isPresented: $popUp_questStatisticsInDetail, onDismiss: {selectedQuest = nil}) {
-                    QuestStatisticsInDetail(
+                    QuestInDetail(
                         selectedQuest: $selectedQuest,
                         popUp_questStatisticsInDetail: $popUp_questStatisticsInDetail
                     )
@@ -591,8 +591,8 @@ struct QuestTierView: View {
     @Environment (\.colorScheme) var colorScheme
 //    @Environment (\.modelContext) var modelContext
     
-    @Binding var tier: Int
-    
+//    @Binding var tier: Int
+    var tier: Int
 
     
     var body: some View {
@@ -692,7 +692,7 @@ struct QuestThumbnailView: View {
 //            let gridItemSize = geoWidth
             
             ZStack {
-                QuestTierView(tier: $quest.tier)
+                QuestTierView(tier: quest.tier)
                     .frame(width: geoWidth, height: geoHeight)
                     .opacity(0.85)
                 FireView(momentumLevel: quest.momentumLevel)
@@ -950,7 +950,7 @@ struct QuestHelpView: View {
                     ScrollView {
                         ForEach(0...40, id:\.self) { tier in
                             VStack {
-                                QuestTierView(tier: .constant(tier))
+                                QuestTierView(tier: tier)
                                     .frame(width:tierViewSize, height: tierViewSize)
                                 Text(selectedOption == "일반단위" ?  notHourTierGuideLines[tier]: hourTierGuideLines[tier])
                             }
@@ -1020,7 +1020,7 @@ struct QuestThumbnailView_forPreview: View {
 //            let gridItemSize = geoWidth
             
             ZStack {
-                QuestTierView(tier: .constant(tier))
+                QuestTierView(tier: tier)
                     .frame(width: geoWidth, height: geoHeight)
                 FireView(momentumLevel: momentumLevel)
                 //                                        Fire6()

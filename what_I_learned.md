@@ -86,7 +86,7 @@
 - .popOver : 위에서 아래로 쓸어내리면 사라지는 popUp
 - .contextMenu : 오래 누르고 있으면 나오는 메뉴
 - Form : 디바이스에 맞게 form을 자동 렌더링 해줌, textfield, picker, 등등 사용. setting에 사용 가능.
-- 왜인지 모르겠는데 tabview를 전환했다가 gritBoard 다시 들어가면 들어갈 수록 frame전환 횟수가 빨라짐
+- 왜인지 모르겠는데 tabview를 전환했다가 gritBoard 다시 들어가면 들어갈 수록 frame전환 횟수가 빨라짐 (timer를 thread에서 free함으로서 해결)
 - computed properties are really heavy. Don't use it if necessary
 - 같은 뷰 안에 Animation 트리거를 여러 뷰가 공유하면 하나밖에 적용 안됨...? (시뮬레이터 기준)
 - canvas는 simulator에서 rendering을 이상하게 한다.
