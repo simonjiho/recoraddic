@@ -91,6 +91,11 @@
 - 같은 뷰 안에 Animation 트리거를 여러 뷰가 공유하면 하나밖에 적용 안됨...? (시뮬레이터 기준)
 - canvas는 simulator에서 rendering을 이상하게 한다.
 
+
+
+# WidgetKit
+ - wigetKit에서는 timeLineProvider를 통해 주기적인 업데이트를 직접 설정해야한다. 일반적인 state variable로 컨트롤 되지 않는다.
+
 # UIKit
  - older than SwiftUI, so if not necessary, use SwiftUI as much as you can. Apple will support more on SwiftUI, not UIKit.
  - Use UIKit classes only from your app’s main thread or main dispatch queue, unless otherwise indicated in the documentation for those classes. This restriction particularly applies to classes that derive from UIResponder or that involve manipulating your app’s user interface in any way.

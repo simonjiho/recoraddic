@@ -696,11 +696,9 @@ struct QuestThumbnailView: View {
                     .frame(width: geoWidth, height: geoHeight)
                     .opacity(0.85)
                 FireView(momentumLevel: quest.momentumLevel)
-                //                                        Fire6()
                     .frame(width: geoWidth/1.5, height: geoHeight/1.5)
                     .position(x:geoWidth/2,y:geoHeight/2)
                     .opacity(0.7)
-                //                                            .opacity(0.7)
                 VStack {
                     Text("\(quest.name)")
                         .foregroundStyle(getDarkTierColorOf(tier: quest.tier))

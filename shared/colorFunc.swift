@@ -102,7 +102,8 @@ func getDarkTierColorOf(tier:Int) -> Color {
     case 4:
         return tierColor.adjust(brightness: -0.5)
     case 5:
-        return tierColor.adjust(saturation:0.2 ,brightness: -0.4)
+        return tierColor.adjust(saturation:0.2
+                                ,brightness: -0.45)
     case 6:
         return tierColor.adjust(brightness: -0.5)
     case 7:

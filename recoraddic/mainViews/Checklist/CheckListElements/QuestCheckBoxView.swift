@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 import SwiftData
-
+import ActivityKit
 
 // TODO: purpose edit
 // TODO: RecentPurpose 수정 / RecentData 수정
@@ -138,7 +138,8 @@ struct QuestCheckBoxView_HOUR: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var stopwatch = Stopwatch()
 
-    
+    @State private var activity: Activity<RecoraddicWidgetAttributes>? = nil
+
     @State var dailyQuest: DailyQuest
     
     var themeSetName: String
@@ -234,13 +235,36 @@ struct QuestCheckBoxView_HOUR: View {
                         Button("",systemImage:onTimer ? "pause" : "play") {
                             if !onTimer {
                                 stopwatch.setTotalSec(value*60)
-                                stopwatch.start()
+                                let calendar = Calendar.current
+                                let startTime: Date = calendar.date(byAdding: .minute, value: -(value), to: .now)!
+                                
+                                stopwatch.start(startTime:startTime)
+                                let attributes = RecoraddicWidgetAttributes(questName: questName, startTime:startTime, tier: tier)
+                                let initialContentState = RecoraddicWidgetAttributes.ContentState(goal: dailyGoal)
+                                do {
+                                    let activity = try Activity<RecoraddicWidgetAttributes>.request(
+                                        attributes: attributes,
+                                        content: ActivityContent(state: initialContentState, staleDate: nil),
+                                        pushType: nil
+                                    )
+                                    self.activity = activity
+                                } catch {
+                                    print("Failed to start activity: \(error.localizedDescription)")
+                                }
                                 DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
                                     onTimer.toggle()
                                 }
                             }
                             else {
                                 onTimer.toggle()
+                                guard let activity_activated = activity else {
+                                    return
+                                }
+                                let dismissalPolicy: ActivityUIDismissalPolicy = .immediate
+                                Task {
+                                    await activity_activated.end(ActivityContent(state: activity_activated.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
+                                }
+                                activity = nil
                                 DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
                                     stopwatch.stop()
                                     value = stopwatch.getTotalSec()/60
@@ -368,17 +392,20 @@ struct QuestCheckBoxView_HOUR: View {
 }
 
 class Stopwatch: ObservableObject {
+    var startTime: Date?
     @Published var timeString = "00:00:00"
     private var timer: Timer?
     private var totalSec: Int = 0
+    @Published var publish = Timer.publish(every: 1, on: .main, in: .default).autoconnect()
 
     var isRunning: Bool {
         timer != nil
     }
 
-    func start() {
+    func start(startTime: Date) {
+        self.startTime = startTime
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            self.totalSec += 1
+            self.totalSec = Int(Date().timeIntervalSince(startTime))
             self.updateTime()
         }
     }
@@ -386,10 +413,12 @@ class Stopwatch: ObservableObject {
     func stop() {
         timer?.invalidate()
         timer = nil
+        startTime = nil
     }
 
     func setTotalSec(_ input: Int) {
         self.totalSec = input
+        updateTime()
     }
     
     func getTotalSec() -> Int {
@@ -398,12 +427,14 @@ class Stopwatch: ObservableObject {
 
 
     private func updateTime() {
-            let hours = totalSec / 3600
-            let minutes = (totalSec % 3600) / 60
-            let seconds = totalSec % 60
-            timeString = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        let hours = totalSec / 3600
+        let minutes = (totalSec % 3600) / 60
+        let seconds = totalSec % 60
+        timeString = String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
 }
+
+
 
 
 struct QuestCheckBoxView: View {
