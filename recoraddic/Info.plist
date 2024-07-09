@@ -8,5 +8,9 @@
 		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.example.backgroundtask</string>
+    </array>
 </dict>
 </plist>
