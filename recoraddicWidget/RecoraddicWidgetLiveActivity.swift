@@ -99,20 +99,20 @@ struct RecoraddicWidgetLiveActivity: Widget {
             } compactLeading: {
 
                 Image(systemName:"stopwatch.fill")
-                    .foregroundStyle(getTierColorOf(tier: context.attributes.tier))
+                    .foregroundStyle(getTierColorOf(tier: context.attributes.tier).colorExpressionIntegration())
 
             } compactTrailing: {
-//                Text(context.attributes.startTime, style: .offset)
-                Text(context.attributes.startTime, style: .timer)
+                Text(context.attributes.startTime, style: .offset)
+//                Text(context.attributes.startTime, style: .timer)
 //                    .frame(width: UIScreen.mai)
 //                    .frame(width: self.window?.windowScene?.screen.bounds.width ?? 0.0)
-                    .frame(width: 60) //MARK: style을 정하면 text의 가변적인 길이를 고려하여 기본 frame길이는 넉넉하게 잡힌다. 그런데 너무 길게 잡히는 것이 문제이다. 그래서 일단 강제로 크기를 고정시켰다
+                    .frame(width: 50) //MARK: style을 정하면 text의 가변적인 길이를 고려하여 기본 frame길이는 넉넉하게 잡힌다. 그런데 너무 길게 잡히는 것이 문제이다. 그래서 일단 강제로 크기를 고정시켰다
                     .foregroundStyle(getTierColorOf(tier: context.attributes.tier))
-                    .border(.red)
+                    .minimumScaleFactor(0.8)
+//                    .border(.red)
 //                    .font(.title3)
 //                    .bold()
-                    .multilineTextAlignment(.center)
-                    .clipped()
+                    .multilineTextAlignment(.trailing)
                 
             } minimal: {
 //                Image("fire1_frame1")
