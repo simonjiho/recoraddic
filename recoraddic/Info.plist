@@ -10,7 +10,8 @@
 	</array>
     <key>BGTaskSchedulerPermittedIdentifiers</key>
     <array>
-<!--        이거 이름 이래도 되나...? 맞는 이름이어야되는거 아닌가 그런데 잘 되네. LiveActvity에 의한 backgroundTask는 알아서 잘 찾아가나 봄. 수동으로 BGTask 추가하고 관리하면 여기에 추가하면 될듯-->
+        <string>com.example.backgroundtask</string> 
+        <!--        이거 이름 이래도 되나...? 맞는 이름이어야되는거 아닌가 그런데 잘 되네. LiveActvity에 의한 backgroundTask는 알아서 잘 찾아가나 봄. 수동으로 BGTask 추가하고 관리하면 여기에 추가하면 될듯-->
     </array>
 </dict>
 </plist>
