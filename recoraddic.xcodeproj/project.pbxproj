@@ -16,6 +16,13 @@
 		B220DA422B6426880039160C /* StoneTower_1_sharedFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA412B6426880039160C /* StoneTower_1_sharedFunc.swift */; };
 		B220DA442B6519C20039160C /* stoneTower_backgroundThemes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA432B6519C20039160C /* stoneTower_backgroundThemes.swift */; };
 		B220DA462B6524F50039160C /* themeNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA452B6524F50039160C /* themeNames.swift */; };
+		B229F0152C3E895F00198445 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B229F0142C3E895F00198445 /* UserNotifications.framework */; };
+		B229F0172C3E895F00198445 /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B229F0162C3E895F00198445 /* UserNotificationsUI.framework */; };
+		B229F01A2C3E895F00198445 /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B229F0192C3E895F00198445 /* NotificationViewController.swift */; };
+		B229F01D2C3E895F00198445 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = B229F01C2C3E895F00198445 /* Base */; };
+		B229F0212C3E895F00198445 /* recoraddicNotification.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B229F0132C3E895F00198445 /* recoraddicNotification.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B229F0262C3E8AF400198445 /* notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = B229F0252C3E8AF400198445 /* notification.swift */; };
+		B229F0272C3EB11200198445 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B229F01B2C3E895F00198445 /* MainInterface.storyboard */; };
 		B2314BBF2AF4DD7400EDD5C7 /* stone_default1.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2314BBE2AF4DD7400EDD5C7 /* stone_default1.xcassets */; };
 		B247D24B2A6D1DA100E457FB /* customMathFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B247D24A2A6D1DA100E457FB /* customMathFunc.swift */; };
 		B24C298E2C283331000F3EEE /* dailyQuestionsGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */; };
@@ -87,6 +94,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B229F01F2C3E895F00198445 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B29C70222A35C5E30046873E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B229F0122C3E895F00198445;
+			remoteInfo = recoraddicNotification;
+		};
 		B2F0172C2C3D155500765EF6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B29C70222A35C5E30046873E /* Project object */;
@@ -104,6 +118,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				B2F0172E2C3D155500765EF6 /* recoraddicWidgetExtension.appex in Embed Foundation Extensions */,
+				B229F0212C3E895F00198445 /* recoraddicNotification.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -120,6 +135,13 @@
 		B220DA412B6426880039160C /* StoneTower_1_sharedFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower_1_sharedFunc.swift; sourceTree = "<group>"; };
 		B220DA432B6519C20039160C /* stoneTower_backgroundThemes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stoneTower_backgroundThemes.swift; sourceTree = "<group>"; };
 		B220DA452B6524F50039160C /* themeNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = themeNames.swift; sourceTree = "<group>"; };
+		B229F0132C3E895F00198445 /* recoraddicNotification.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = recoraddicNotification.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B229F0142C3E895F00198445 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		B229F0162C3E895F00198445 /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
+		B229F0192C3E895F00198445 /* NotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
+		B229F01C2C3E895F00198445 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		B229F01E2C3E895F00198445 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B229F0252C3E8AF400198445 /* notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = notification.swift; sourceTree = "<group>"; };
 		B2314BBA2AECD7DB00EDD5C7 /* idea&plan&simpleNote.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "idea&plan&simpleNote.md"; sourceTree = "<group>"; };
 		B2314BBE2AF4DD7400EDD5C7 /* stone_default1.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = stone_default1.xcassets; sourceTree = "<group>"; };
 		B234C6EC2BC564CA0031BAD7 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -196,6 +218,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B229F0102C3E895F00198445 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B229F0172C3E895F00198445 /* UserNotificationsUI.framework in Frameworks */,
+				B229F0152C3E895F00198445 /* UserNotifications.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B29C70272A35C5E30046873E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -240,6 +271,16 @@
 				B265D2842B049FBA002E51A8 /* theme.swift */,
 			);
 			path = tmp;
+			sourceTree = "<group>";
+		};
+		B229F0182C3E895F00198445 /* recoraddicNotification */ = {
+			isa = PBXGroup;
+			children = (
+				B229F0192C3E895F00198445 /* NotificationViewController.swift */,
+				B229F01B2C3E895F00198445 /* MainInterface.storyboard */,
+				B229F01E2C3E895F00198445 /* Info.plist */,
+			);
+			path = recoraddicNotification;
 			sourceTree = "<group>";
 		};
 		B247D2492A6D1D6400E457FB /* functions */ = {
@@ -351,6 +392,7 @@
 				B2600B062A35E1FF00E00D91 /* what_I_learned.md */,
 				B29C702C2A35C5E30046873E /* recoraddic */,
 				B2F017202C3D155400765EF6 /* recoraddicWidget */,
+				B229F0182C3E895F00198445 /* recoraddicNotification */,
 				B2F0171B2C3D155400765EF6 /* Frameworks */,
 				B29C702B2A35C5E30046873E /* Products */,
 			);
@@ -361,6 +403,7 @@
 			children = (
 				B29C702A2A35C5E30046873E /* recoraddic.app */,
 				B2F0171A2C3D155400765EF6 /* recoraddicWidgetExtension.appex */,
+				B229F0132C3E895F00198445 /* recoraddicNotification.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -380,6 +423,7 @@
 				B29C702F2A35C5E30046873E /* ContentView.swift */,
 				B2AECB862B4EDA4F0020A937 /* ExampleData.swift */,
 				B2D7AD042B92E29D0045C9EA /* logger.swift */,
+				B229F0252C3E8AF400198445 /* notification.swift */,
 				B29C70312A35C5E40046873E /* Assets.xcassets */,
 				B29C70332A35C5E40046873E /* recoraddic.entitlements */,
 				B29C70342A35C5E40046873E /* Preview Content */,
@@ -467,6 +511,8 @@
 			children = (
 				B2F0171C2C3D155400765EF6 /* WidgetKit.framework */,
 				B2F0171E2C3D155400765EF6 /* SwiftUI.framework */,
+				B229F0142C3E895F00198445 /* UserNotifications.framework */,
+				B229F0162C3E895F00198445 /* UserNotificationsUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -498,6 +544,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		B229F0122C3E895F00198445 /* recoraddicNotification */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B229F0222C3E895F00198445 /* Build configuration list for PBXNativeTarget "recoraddicNotification" */;
+			buildPhases = (
+				B229F00F2C3E895F00198445 /* Sources */,
+				B229F0102C3E895F00198445 /* Frameworks */,
+				B229F0112C3E895F00198445 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = recoraddicNotification;
+			productName = recoraddicNotification;
+			productReference = B229F0132C3E895F00198445 /* recoraddicNotification.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		B29C70292A35C5E30046873E /* recoraddic */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B29C70392A35C5E40046873E /* Build configuration list for PBXNativeTarget "recoraddic" */;
@@ -511,6 +574,7 @@
 			);
 			dependencies = (
 				B2F0172D2C3D155500765EF6 /* PBXTargetDependency */,
+				B229F0202C3E895F00198445 /* PBXTargetDependency */,
 			);
 			name = recoraddic;
 			productName = recoraddiction;
@@ -544,6 +608,9 @@
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
+					B229F0122C3E895F00198445 = {
+						CreatedOnToolsVersion = 15.4;
+					};
 					B29C70292A35C5E30046873E = {
 						CreatedOnToolsVersion = 14.3.1;
 					};
@@ -568,11 +635,21 @@
 			targets = (
 				B29C70292A35C5E30046873E /* recoraddic */,
 				B2F017192C3D155400765EF6 /* recoraddicWidgetExtension */,
+				B229F0122C3E895F00198445 /* recoraddicNotification */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B229F0112C3E895F00198445 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B229F01D2C3E895F00198445 /* Base in Resources */,
+				B229F0272C3EB11200198445 /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B29C70282A35C5E30046873E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -602,6 +679,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B229F00F2C3E895F00198445 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B229F01A2C3E895F00198445 /* NotificationViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B29C70262A35C5E30046873E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -618,6 +703,7 @@
 				B2D7AD082B9451920045C9EA /* StartNewRecordSet.swift in Sources */,
 				B27A5CEE2B14764A0042ADF6 /* dataType.swift in Sources */,
 				B2AECB892B5139F90020A937 /* DismissingKeyboard.swift in Sources */,
+				B229F0262C3E8AF400198445 /* notification.swift in Sources */,
 				B2D8F96F2B75F46A00423AFC /* dataFunctions.swift in Sources */,
 				B220DA422B6426880039160C /* StoneTower_1_sharedFunc.swift in Sources */,
 				B20902302B94577700B26E8B /* recalculateVisualValues_drs.swift in Sources */,
@@ -681,6 +767,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		B229F0202C3E895F00198445 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B229F0122C3E895F00198445 /* recoraddicNotification */;
+			targetProxy = B229F01F2C3E895F00198445 /* PBXContainerItemProxy */;
+		};
 		B2F0172D2C3D155500765EF6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B2F017192C3D155400765EF6 /* recoraddicWidgetExtension */;
@@ -688,7 +779,82 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		B229F01B2C3E895F00198445 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B229F01C2C3E895F00198445 /* Base */,
+			);
+			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
+		B229F0232C3E895F00198445 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K5V8U9HR59;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = recoraddicNotification/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = recoraddicNotification;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic.recoraddicNotification;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B229F0242C3E895F00198445 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K5V8U9HR59;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = recoraddicNotification/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = recoraddicNotification;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic.recoraddicNotification;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		B29C70372A35C5E40046873E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -973,6 +1139,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B229F0222C3E895F00198445 /* Build configuration list for PBXNativeTarget "recoraddicNotification" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B229F0232C3E895F00198445 /* Debug */,
+				B229F0242C3E895F00198445 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		B29C70252A35C5E30046873E /* Build configuration list for PBXProject "recoraddic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

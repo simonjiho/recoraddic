@@ -73,6 +73,9 @@ struct MainView_checklist: View {
     @State var forceToChooseMood: Bool = false
     @State var selectedClassification: String = "긍정적"
     
+    @StateObject private var notificationManager = NotificationManager()
+
+    
     private var keyboardHeightPublisher: AnyPublisher<CGFloat, Never> {
         Publishers.Merge(
             NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
@@ -98,6 +101,7 @@ struct MainView_checklist: View {
         LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .topLeading, endPoint: .bottomTrailing)
         
         let bgColor: Color = currentRecordSet.getIntegratedDailyRecordColor(colorScheme: colorScheme)
+        
         
         // currentRecord == records.last => 기간이 지났어도 currentRecord임
         GeometryReader { geometry in
@@ -273,9 +277,10 @@ struct MainView_checklist: View {
                         Image(systemName: "plus")
                             .resizable()
                             .frame(width:buttonSize, height:buttonSize)
+                        
 
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(CheckListButtonStyle2())
                 .frame(width:buttonSize, height:buttonSize)
                 .position(x:geoWidth/2, y:geoHeight*0.95 - 10)
             
@@ -313,8 +318,11 @@ struct MainView_checklist: View {
                     .labelStyle(.titleAndIcon)
                     
                     
+                    
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(CheckListButtonStyle())
+                .foregroundStyle(.black)
+//                .buttonBorderShape(.roundedRectangle)
                 .position(x:geoWidth*0.85, y: geoHeight*0.95 - 10)
                 .onTapGesture {
                     if currentDailyRecord.mood == 0 && !nothingToSave {
@@ -383,6 +391,7 @@ struct MainView_checklist: View {
             .onAppear {
                 
                 updateExistency()
+                updateDailyQuestAlerm()
                 startTimer()
                 setKeyboardAppearanceStateValue()
                 
@@ -404,14 +413,13 @@ struct MainView_checklist: View {
                     withAnimation { //MARK: debuger message: Bound preference ViewFrameKey tried to update multiple times per frame. May cause problem later.
                         self.keyboardHeight = value
                     }
-
-
                 }
 
             }
             .onChange(of: selectedView) { oldValue, newValue in
                 currentDailyRecord = dailyRecords.first ?? DailyRecord()
                 updateExistency()
+                updateDailyQuestAlerm()
                 
                 for dailyQuest in currentDailyRecord.dailyQuestList! {
                     dailyQuest.currentTier = quests.first(where: {$0.name == dailyQuest.questName})?.tier ?? 0
@@ -423,16 +431,40 @@ struct MainView_checklist: View {
                     forceToChooseMood = false
                 }
             }
+            .onReceive(notificationManager.$notificationData) { userInfo in
+                
+                updateDailyQuestAlerm()
+            }
+            
+            
             
  
 
         }
+        
 
 
 
     }
     
-    func updateExistency() -> Void {
+
+
+    private func updateDailyQuestAlerm() {
+        // MARK: 앱을 끈 상태에서 들어가면 잘 nil처리 됨, 킨 상태이면 안됨
+        // Your function to be executed when the app is opened via notification
+        if let dailyQuests = currentDailyRecord.dailyQuestList {
+            //            print("hallo~~~")
+            for dailyQuest in dailyQuests {
+                if let alermTime = dailyQuest.alermTime {
+                    if alermTime.isExpired {
+                        dailyQuest.alermTime = nil
+                    }
+                }
+            }
+        }
+    }
+    
+    func updateExistency() -> Void { // 오늘의 dr이 저장되어있는지, 어제의 dr이 저장되어 있는지 업데이트
         todayRecordExists = dailyRecords.contains(where: {$0.date == getStartDateOfNow()})
 
         let currentRecordSet_isEmpty: Bool = currentRecordSet.dailyRecords!.isEmpty
@@ -446,7 +478,8 @@ struct MainView_checklist: View {
         }
     }
     
-    func startTimer() {
+    func startTimer() { // 오늘의 자정에 timer 맞추기 ( 24/07/11 12:00 -> 24/07/12 00:00 에 작동하는 타이머 설정)
+        // MARK: 과연 00:00 에 작동하는가? 23:59에 작동할 가능성은?
         let date = Date()
         let calendar = Calendar.current
         let tommorow = getTomorrowOf(date)
@@ -477,6 +510,43 @@ struct MainView_checklist: View {
 
     
 
+}
+
+
+struct CheckListButtonStyle: ButtonStyle {
+    @Environment(\.colorScheme) var colorScheme
+    
+
+    init() {
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 7)
+            .padding(.horizontal,10)
+            .foregroundStyle(getReversedColorSchemeColor(colorScheme))
+            .background(getColorSchemeColor(colorScheme))
+            .clipShape(.buttonBorder)
+
+    }
+}
+
+struct CheckListButtonStyle2: ButtonStyle {
+    @Environment(\.colorScheme) var colorScheme
+    
+
+    init() {
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 7)
+            .padding(.horizontal, 7)
+            .foregroundStyle(getReversedColorSchemeColor(colorScheme))
+            .background(getColorSchemeColor(colorScheme))
+            .clipShape(.buttonBorder)
+
+    }
 }
 
 
@@ -564,11 +634,11 @@ struct ChecklistView: View {
             let geoHeight: CGFloat = geometry.size.height
 
             
-            let checkListElementWidth = geometry.size.width*0.95
+            let checkListElementWidth = geometry.size.width*0.97
             
             let questCheckBox_purposeTagsWidth = checkListElementWidth*0.1
             let questCheckBoxWidth = checkListElementWidth*0.9
-            let questCheckBoxHeight = geoHeight*0.07
+            let questCheckBoxHeight = geoHeight*0.06
             
             let todo_purposeTagsWidth = checkListElementWidth * 0.1
             let todo_checkBoxSize = checkListElementWidth * 0.1
@@ -670,7 +740,7 @@ struct ChecklistView: View {
                                     .frame(width:checkListElementWidth,alignment: .leading)
                             }
                             VStack(spacing:questCheckBoxHeight*0.2) {
-                                ForEach(currentDailyRecord.dailyQuestList!, id: \.self) { dailyQuest in
+                                ForEach(currentDailyRecord.dailyQuestList!.sorted(by: {$0.createdTime < $1.createdTime}), id: \.self) { dailyQuest in
                                     
                                     HStack(spacing: 0) {
                                         
@@ -678,64 +748,25 @@ struct ChecklistView: View {
                                             .frame(width:questCheckBox_purposeTagsWidth, height: questCheckBoxHeight, alignment: .leading)
                                             .opacity(0.9)
                                             .zIndex(3)
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        if dailyQuest.dataType == DataType.OX {
-                                            QuestCheckBoxView_OX(
-                                                dailyQuest: dailyQuest,
-                                                themeSetName: profile.adjustedThemeSetName,
-                                                checkBoxToggle: dailyQuest.data == 1,
-                                                applyDailyQuestRemoval: $applyDailyQuestRemoval,
-                                                dailyQuestToDelete: $dailyQuestToDelete
-                                            )
-                                            .frame(width:questCheckBoxWidth, height: questCheckBoxHeight)
-                                            .opacity(0.85)
-                                            
-                                        }
-                                        else if dailyQuest.dataType == DataType.HOUR {
-                                            
-                                            let data = dailyQuest.data
-                                            let xOffset = CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal ?? dailyQuest.data), to: 0...questCheckBoxWidth)
-
-                                            QuestCheckBoxView_HOUR(
-                                                dailyQuest: dailyQuest,
-                                                themeSetName: profile.adjustedThemeSetName,
-                                                value: data,
-                                                dailyGoal: dailyQuest.dailyGoal,
-                                                hasGoal: dailyQuest.dailyGoal != nil,
-                                                hasGoal_toggle: dailyQuest.dailyGoal != nil,
-                                                xOffset: xOffset,
-                                                applyDailyQuestRemoval: $applyDailyQuestRemoval,
-                                                dailyQuestToDelete: $dailyQuestToDelete
-                                            )
-                                            .frame(width:questCheckBoxWidth, height: questCheckBoxHeight)
-                                            .opacity(0.85)
-                                            
-                                        }
-                                        else {
-                                            let data = dailyQuest.data
-                                            let xOffset = CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal ?? dailyQuest.data), to: 0...questCheckBoxWidth)
 
 
-                                            QuestCheckBoxView(
-                                                dailyQuest: dailyQuest,
-                                                themeSetName: profile.adjustedThemeSetName,
-                                                value: data,
-                                                dailyGoal: dailyQuest.dailyGoal,
-                                                hasGoal: dailyQuest.dailyGoal != nil,
-                                                hasGoal_toggle: dailyQuest.dailyGoal != nil,
-                                                xOffset: xOffset,
-                                                applyDailyQuestRemoval: $applyDailyQuestRemoval,
-                                                dailyQuestToDelete: $dailyQuestToDelete
-                                            )
+                                        let data = dailyQuest.data
+                                        let xOffset = CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal ?? dailyQuest.data), to: 0...questCheckBoxWidth)
+
+
+                                        QuestCheckBoxView(
+                                            dailyQuest: dailyQuest,
+                                            targetDailyQuest: $dailyQuestToDelete, 
+                                            deleteTarget: $applyDailyQuestRemoval,
+                                            value: data,
+                                            xOffset: xOffset
+                                        )
                                             .frame(width:questCheckBoxWidth, height: questCheckBoxHeight)
                                             .opacity(0.85)
-                                        }
+//                                        }
                                         
                                     }
+                                    .frame(width: checkListElementWidth, alignment:.leading)
                                 }
                             }
                             
@@ -773,14 +804,21 @@ struct ChecklistView: View {
                                             let checkBoxSize = min(todo_checkBoxSize, todo_height)
                                             Image(systemName: todo.done ? "checkmark.circle" : "circle")
                                                 .resizable()
-                                                .frame(width:checkBoxSize*0.8, height: checkBoxSize*0.8)
+                                                .frame(width: questCheckBoxWidth*0.1*0.65, height: questCheckBoxWidth*0.1*0.65)
+//                                                .bold()
+//                                                .frame(width:checkBoxSize*0.8, height: checkBoxSize*0.8)
                                         }
-                                        .frame(width: todo_checkBoxSize, alignment: .leading)
+                                        .frame(width: questCheckBoxWidth*0.1, alignment: .center)
                                         .buttonStyle(.plain)
+//                                        .border(.red)
 
+                                        HStack(spacing:0.0) {
+                                            textFieldView(currentDailyRecord: currentDailyRecord, todo: todo, text: todo.content, idx: $editingIndex, doneButtonPressed: $doneButtonPressed)
+                                                .frame(width:editingIndex == todo.index ? todo_textWidth*0.8 : todo_textWidth)
+                                        }
+                                        .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
+//                                        .border(.red)
                                         
-                                        textFieldView(currentDailyRecord: currentDailyRecord, todo: todo, text: todo.content, idx: $editingIndex, doneButtonPressed: $doneButtonPressed)
-                                            .frame(width:editingIndex == todo.index ? todo_textWidth*0.8 : todo_textWidth)
                                         if editingIndex == todo.index {
                                             Button("완료") {
                                                 doneButtonPressed.toggle()
@@ -797,17 +835,23 @@ struct ChecklistView: View {
                                             }) {
                                                 let xmarkSize = min(todo_xmarkSize, todo_height)
                                                 Image(systemName: "xmark")
-                                                    .resizable()
-                                                    .frame(width:xmarkSize*0.5, height: xmarkSize*0.5)
+//                                                    .resizable()
+//                                                    .frame(width: questCheckBoxWidth*0.1*0.65, height: questCheckBoxWidth*0.1*0.65)
+//                                                    .frame(width:xmarkSize*0.5, height: xmarkSize*0.5)
                                             }
+//                                            .border(.yellow)
                                             .buttonStyle(.plain)
-                                            .frame(width: todo_xmarkSize, alignment: .trailing)
+//                                            .frame(width: todo_xmarkSize, alignment: .trailing)
+//                                            .frame(width: questCheckBoxWidth*0.1, alignment:.leading)
+                                            .frame(width: questCheckBoxWidth*0.1)
+//                                            .border(.red)
                                         }
                                         
                                         
                                         
                                     }
-                                    .frame(width: checkListElementWidth, height:todo_height)
+                                    .frame(width: checkListElementWidth, height:todo_height, alignment:.leading)
+                                    
                                     .id(todo.index)
                                     
                                 }
@@ -816,6 +860,9 @@ struct ChecklistView: View {
                             
                             Spacer()
                                 .frame(width: geometry.size.width, height: keyboardAppeared ? keyboardHeight*1.1 : geometry.size.height*0.2)
+                            
+//                            TestNotificationView()
+                            
                             
                             
                         } // VStack
@@ -851,6 +898,9 @@ struct ChecklistView: View {
                 diaryViewWiden = false
                 
             })
+            .refreshable {
+                // when refreshed?
+            }
             
 
             
@@ -909,12 +959,19 @@ struct textFieldView: View {
         
         let todos = currentDailyRecord.todoList!.sorted(by: {$0.index < $1.index})
         
-        TextField("할 일을 입력하세요",text: $text, axis:.horizontal)
-            .focused($isFocused)
-            .onSubmit { // only when return button pressed.
-                todo.content = text
-                
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
 
+            
+            TextField("할 일을 입력하세요",text: $text, axis:.horizontal)
+                .padding(.leading, 5)
+                .frame(width:geoWidth, height: geoHeight)
+                .focused($isFocused)
+                .onSubmit { // only when return button pressed.
+                    todo.content = text
+                    
+                    
                     for todo2 in todos {
                         if todo2.index > todo.index {
                             todo2.index += 1
@@ -922,44 +979,44 @@ struct textFieldView: View {
                     }
                     modelContext.insert(Todo(dailyRecord:currentDailyRecord, index: todo.index + 1))
                     idx = todo.index + 1
-//                }
-//                else {
-//                    doneButtonPressed = false
-//                }
-            }
-            .onChange(of: doneButtonPressed, {
-//                if idx == todo.index {
+                    //                }
+                    //                else {
+                    //                    doneButtonPressed = false
+                    //                }
+                }
+                .onChange(of: doneButtonPressed, {
+                    //                if idx == todo.index {
                     todo.content = text
                     idx = nil
-//                }
-                isFocused = false
-                
-            })
-            .onChange(of: idx) {
-                if idx == todo.index {
-                    isFocused = true
-                }
-                else {
+                    //                }
                     isFocused = false
+                    
+                })
+                .onChange(of: idx) {
+                    if idx == todo.index {
+                        isFocused = true
+                    }
+                    else {
+                        isFocused = false
+                    }
                 }
-            }
-            .onChange(of: isFocused, {
-//                if isFocused && idx != todo.index {
-//                if isFocused && idx == nil {
-//                    idx = todo.index
-//                }
-                if isFocused {
-                    idx = todo.index
+                .onChange(of: isFocused, {
+                    //                if isFocused && idx != todo.index {
+                    //                if isFocused && idx == nil {
+                    //                    idx = todo.index
+                    //                }
+                    if isFocused {
+                        idx = todo.index
+                    }
+                    
+                })
+                .onAppear() {
+                    if idx == todo.index {
+                        isFocused = true
+                    }
                 }
-                
-            })
-            .onAppear() {
-                if idx == todo.index {
-                    isFocused = true
-                }
-            }
-
-        
+            
+        }
 
     }
 }
@@ -1113,3 +1170,26 @@ struct CountdownView: View {
 
 
 
+
+//struct TestNotificationView: View {
+//    @State private var selectedDate = Date()
+//    
+//    var body: some View {
+//        VStack {
+//            DatePicker("Select time", selection: $selectedDate, displayedComponents: [.hourAndMinute])
+//                .datePickerStyle(WheelDatePickerStyle())
+//                .labelsHidden()
+//            
+//            Button(action: {
+//                scheduleNotification(at: selectedDate)
+//            }) {
+//                Text("Schedule Notification")
+//                    .padding()
+//                    .background(Color.blue)
+//                    .foregroundColor(.white)
+//                    .cornerRadius(8)
+//            }
+//        }
+//        .padding()
+//    }
+//}

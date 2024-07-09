@@ -16,10 +16,14 @@
 import SwiftUI
 import SwiftData
 import CloudKit
+import UserNotifications
+
 
 @main
 struct recoraddicApp: App {
     
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     
     static let container = try! ModelContainer(for:Schema([Quest.self, Todo.self, DailyQuest.self, DailyRecord.self, DefaultPurposeData.self, DailyRecordSet.self, Profile.self]), configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic))
 
@@ -44,3 +48,49 @@ struct recoraddicApp: App {
 
     }
 }
+
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+//    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+//            if granted {
+//                print("Permission granted")
+//                self.setupNotificationCategories()
+//            } else if let error = error {
+//                print("Error: \(error.localizedDescription)")
+//            }
+//        }
+//        return true
+//    }
+//    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        UNUserNotificationCenter.current().delegate = self
+        
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if granted {
+                print("Permission granted")
+                self.setupNotificationCategories()
+            } else if let error = error {
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+        return true
+    }
+
+    private func setupNotificationCategories() {
+        let customCategory = UNNotificationCategory(
+            identifier: "customNotificationCategory",
+            actions: [],
+            intentIdentifiers: [],
+            options: .customDismissAction
+        )
+        UNUserNotificationCenter.current().setNotificationCategories([customCategory])
+    }
+    
+    // Handle notification response
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
+        NotificationCenter.default.post(name: Notification.Name("NotificationReceived"), object: nil, userInfo: userInfo)
+        completionHandler()
+    }
+}
+

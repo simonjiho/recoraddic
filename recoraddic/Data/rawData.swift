@@ -177,7 +177,7 @@ class DailyQuest: Hashable, Equatable, Identifiable {
     var defaultPurposes: Set<String> = []
     var dailyGoal: Int? = nil
     var currentTier: Int = 0
-    
+    var alermTime: Date? = nil
     var customDataTypeNotation: String?
     
     var dailyRecord: DailyRecord?

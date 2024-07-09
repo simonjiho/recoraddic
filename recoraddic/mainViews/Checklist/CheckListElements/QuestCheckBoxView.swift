@@ -3,354 +3,236 @@
 //  recoraddic
 //
 //  Created by 김지호 on 12/19/23.
-//
+// TODO: 공통 요소들 extract해서 이용하기
 
 import Foundation
 import SwiftUI
 import SwiftData
 import ActivityKit
 
-// TODO: purpose edit
-// TODO: RecentPurpose 수정 / RecentData 수정
-struct QuestCheckBoxView_OX: View {
+enum DayOption: String, CaseIterable, Identifiable {
     
-    @Environment(\.modelContext) var modelContext
+    case today
+    case tomorrow
+    case dayAfterTomorrow
     
-    var dailyQuest: DailyQuest
-    
-    var themeSetName: String
-    
-    @State var checkBoxToggle: Bool
-
-    @Binding var applyDailyQuestRemoval: Bool
-    
-    @Binding var dailyQuestToDelete: DailyQuest?
-    
-    @State var isAnimating = false
-
+    var id: String { self.rawValue }
     
     
-    var body: some View {
-        let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
+    static let dayOption_kor:[DayOption:String] = [.today:"오늘",.tomorrow:"내일",.dayAfterTomorrow:"모레"]
 
-        GeometryReader { geometry in
-            
-            let geoWidth = geometry.size.width
-            let geoHeight = geometry.size.height
-            
-            let checkBoxSize = geometry.size.height * 0.75
-            let TextBoxWidth = geometry.size.width*0.95 - checkBoxSize
-            let TextBoxHeight = geometry.size.height*0.9
-            
-            let tier: Int = dailyQuest.currentTier
-            let tierColor_dark = getDarkTierColorOf(tier: tier)
-
-            
-            ZStack {
-                
-                ZStack {
-                    Rectangle()
-                        .fill(
-                            LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                        )
-                        .frame(width:geoWidth, height:geoHeight)
-                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
-                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
-                    
-                    Rectangle()
-                        .fill(
-                        LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                        )
-                        .frame(width:geoWidth, height:geoHeight)
-                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
-                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
-                }
-                .frame(width:geoWidth, height:geoHeight)
-                .opacity(dailyQuest.data == 1 ? 1.0 :0.0)
-                .onAppear() {
-                    isAnimating = true
-                }
-
-
-
-
-                HStack {
-                    Image(systemName: dailyQuest.data == 1 ? "checkmark.square" : "square")
-                        .resizable()
-                        .frame(width: checkBoxSize, height: checkBoxSize)
-                    Text(dailyQuest.questName)
-                        .frame(width: TextBoxWidth, height: TextBoxHeight)
-                        .bold()
-
-
-                } // HStack
-                .frame(width: geometry.size.width, height: geometry.size.height)      
-
-
-                
-                Menu {
-                    Button("삭제", action: {
-                        dailyQuestToDelete = dailyQuest
-                        applyDailyQuestRemoval.toggle()
-                    })
-                    
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.title3)
-                        .frame(height:geoHeight*0.4, alignment:.top)
-
-                    
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.black)
-                .frame(width: geoWidth*0.95, height: geoHeight*0.9, alignment: .topTrailing)
-
-            } // ZStack
-            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
-            .background(getTierColorOf(tier: tier))
-            .foregroundStyle(tierColor_dark)
-            .clipShape(.buttonBorder)
-            .onTapGesture {
-                checkBoxToggle.toggle()
-                if checkBoxToggle == true {
-                    dailyQuest.data = 0
-                    
-                }
-                else {
-                    dailyQuest.data = 1
-                }
-            }
-            
-
-            
-        }
-
-
+}
+func getDayOption(at date: Date) -> DayOption {
+    let today = Date()
+    let tomorrow = getTomorrowOf(today)
+    let dayAfterTomorrow = getTomorrowOf(getTomorrowOf(today))
+    if date < tomorrow {
+        return .today
     }
+    else if date < dayAfterTomorrow {
+        return .tomorrow
+    }
+    else {
+        return .dayAfterTomorrow
+    }
+
 }
 
-// 고쳐야할 점: modelContext의 데이터를 view의 역동적 동작에 바로바로 수정하지 않고, 끝났을 때만 바꾼다.
-// state들 전부 computed property로 바꾸기
-// TODO: RecentPurpose 수정 / RecentData 수정 ( + purpose 없을 때는?
-
-struct QuestCheckBoxView_HOUR: View {
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.colorScheme) var colorScheme
-    @StateObject private var stopwatch = Stopwatch()
-
-    @State private var activity: Activity<RecoraddicWidgetAttributes>? = nil
-
-    @State var dailyQuest: DailyQuest
+func getNotificationTimeString(from date: Date?) -> String {
+    if let date_nonNil = date {
+        let dayOption: DayOption = getDayOption(at: date_nonNil)
+        return (DayOption.dayOption_kor[dayOption] ?? "unexpectedValue") + " " + date_nonNil.hhmmTimeString
+    } else {
+        return "no alermTime"
+    }
     
-    var themeSetName: String
+}
 
+
+// TODO: purpose edit
+// TODO: RecentPurpose 수정 / RecentData 수정
+
+
+
+struct QuestCheckBoxView: View {
+    @Environment(\.modelContext) var modelContext
+    var dailyQuest: DailyQuest
+    
+    @Binding var targetDailyQuest: DailyQuest?
+    @Binding var deleteTarget: Bool
     
     @State var value: Int
     @State var dailyGoal: Int?
-    @State var hasGoal: Bool
-    @State var hasGoal_toggle: Bool // onChangeOf(hasGoal) 과 toggle버튼에 의해서만 변경해야 함
-//    var width: CGFloat
     var range: ClosedRange<CGFloat> {
         return 0.0...CGFloat(dailyGoal ?? value)
     }
     @State var xOffset: CGFloat
     
-    @Binding var applyDailyQuestRemoval: Bool
-    @Binding var dailyQuestToDelete: DailyQuest?
+    @State var showMenu: Bool = false
+//    @State var isDragging: Bool = false
+    @State var isAnimating: Bool = false
     
-    @State var deleteDailyQuest: Bool = false
-    
-    @FocusState var focusedField: Field?
-    enum Field: Int, CaseIterable {
-        case value
-        case goal
-    }
-    
-    
-    @State var isEditing_hours: Bool = false
-    
-    @State var isAnimating = false
-    @State var onTimer: Bool = false
+//    let menuSize:CGFloat = UIScreen.main.bounds.width * 0.2
+    @State private var offset: CGFloat = 0
 
-//    @Binding var isJustCf: Bool = false
-    
+
     var body: some View {
 
-        let questName = dailyQuest.questName
-        let dataType = dailyQuest.dataType
-
-        let tier: Int = dailyQuest.currentTier
-        let tierColor_dark = getDarkTierColorOf(tier: tier)
-        
         GeometryReader { geometry in
-            
+        
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
-
-            let percentage:CGFloat = xOffset / geoWidth
-            
-            
-            let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
+            let menuSize:CGFloat = geoWidth * 0.2
             
             let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth +  0.1) ? xOffset : geoWidth, height: geoHeight), transform: nil))
-            // 0.1 없으면 끝에서 이상해짐
-
-
-            ZStack(alignment:.leading) {
+            let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
+            
+            HStack(spacing:0.0) {
                 
-                ZStack {
-                    Rectangle()
-                        .fill(
-                            LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                        )
-                        .frame(width:geoWidth, height:geoHeight)
-                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
-                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
-                    
-                    Rectangle()
-                        .fill(
-                            LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                        )
-                        .frame(width:geoWidth, height:geoHeight)
-                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
-                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                HStack(spacing:0.0) {
+                    QuestCheckBoxContentView(
+                        dailyQuest: dailyQuest,
+                        value: $value,
+                        dailyGoal: $dailyGoal
+                    )
+                    .frame(width:geoWidth*0.9, height: geoHeight)
+                    .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
+                    .bold()
+//                    .border(.red)
+
+                    NotificationButton(
+                        dailyQuest: dailyQuest,
+                        popOverWidth: geoWidth,
+                        popOverHeight: geoHeight,
+                        sheetHeight: geoHeight*8
+                    )
+                    .frame(width: geoWidth*0.1, height: geoHeight)
+                    .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
                 }
-                .frame(width:geoWidth, height:geoHeight)
-                .mask {
-                    a
-                }
+                .frame(width:geoWidth, height: geoHeight)
+                .background(
+                    ZStack {
+                        Rectangle()
+                            .fill(
+                                LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                            )
+                            .frame(width:geoWidth, height:geoHeight)
+                            .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                            .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                        
+                        Rectangle()
+                            .fill(
+                                LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                            )
+                            .frame(width:geoWidth, height:geoHeight)
+                            .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                            .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                    }
+                    .frame(width:geoWidth, height:geoHeight)
+                    .mask {
+                        a
+                    }
+                    .background(getTierColorOf(tier: dailyQuest.currentTier))
+
+                )
+                .offset(x: offset, y:0)
                 .onAppear() {
                     isAnimating = true
                 }
-                if hasGoal {
+                
+                HStack(spacing:0.0) {
+                    Image(systemName: "trash")
+                        .frame(width: menuSize, height:geoHeight)
                     Spacer()
-                        .frame(width:1, height: geoHeight)
-                        .background(tierColor_dark)
-                        .offset(x:xOffset)
+                        .frame(width: menuSize*2, height:geoHeight)
                 }
-                // MARK: 0.1을 넣지 않으면 xOffset이 geoWidth보다 커지는 상황 발생... 왤까?
+                .frame(width: menuSize*3, height:geoHeight)
+                .background(.red)
+                .offset(x: offset, y:0)
+                .onTapGesture {
+                    deleteTarget.toggle()
+                }
 
-                HStack(spacing: 0.0) {
-                    if !isEditing_hours {
-                        Button("",systemImage:onTimer ? "pause" : "play") {
-                            if !onTimer {
-                                stopwatch.setTotalSec(value*60)
-                                let calendar = Calendar.current
-                                let startTime: Date = calendar.date(byAdding: .minute, value: -(value), to: .now)!
-                                
-                                stopwatch.start(startTime:startTime)
-                                let attributes = RecoraddicWidgetAttributes(questName: questName, startTime:startTime, tier: tier)
-                                let initialContentState = RecoraddicWidgetAttributes.ContentState(goal: dailyGoal)
-                                do {
-                                    let activity = try Activity<RecoraddicWidgetAttributes>.request(
-                                        attributes: attributes,
-                                        content: ActivityContent(state: initialContentState, staleDate: nil),
-                                        pushType: nil
-                                    )
-                                    self.activity = activity
-                                } catch {
-                                    print("Failed to start activity: \(error.localizedDescription)")
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
-                                    onTimer.toggle()
-                                }
+                    
+            }
+            .frame(width:geoWidth, height: geoHeight, alignment: .leading)
+            .clipShape(.buttonBorder)
+            .clipped()
+
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+
+                        targetDailyQuest = nil
+
+                        if showMenu {
+                            if value.translation.width < 0 {
+                                let delta = log10(10 - value.translation.width*0.1)
+                                offset = (-menuSize) * (delta)
+                            }
+                            else if value.translation.width > menuSize {
+                                let delta = log10(1 + (value.translation.width - menuSize)*0.01)
+                                offset = (menuSize) * (delta)
                             }
                             else {
-                                onTimer.toggle()
-                                guard let activity_activated = activity else {
-                                    return
-                                }
-                                let dismissalPolicy: ActivityUIDismissalPolicy = .immediate
-                                Task {
-                                    await activity_activated.end(ActivityContent(state: activity_activated.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
-                                }
-                                activity = nil
-                                DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
-                                    stopwatch.stop()
-                                    value = stopwatch.getTotalSec()/60
-                                    stopwatch.setTotalSec(value*60)
-                                }
+                                offset = -menuSize + value.translation.width
+                                
+                            }
+                        } else {
+                            if value.translation.width < -menuSize {
+                                let delta = log10(10 - (value.translation.width + menuSize)*0.1)
+                                offset = (-menuSize) * (delta)
+                            }
+                            else if value.translation.width > 0 {
+                            }
+                            else {
+                                offset = value.translation.width
                             }
 
-
                         }
-                        .foregroundStyle(getDarkTierColorOf(tier: tier))
-                        
-                        Text("\(questName)")
-                            .frame(alignment: .trailing)
-                            .lineLimit(1)
-                        Text(": ")
+
+
                     }
-                    
-                    if onTimer {
-                        Text(stopwatch.timeString)
-                    }
-                    else {
-                        Group {
-                            Text("\(DataType.string_fullRepresentableNotation(data: value, dataType: dataType))")
-                            if hasGoal && isEditing_hours {
-                                Text("/ \(DataType.string_fullRepresentableNotation(data:dailyQuest.dailyGoal ?? 0 , dataType: dataType))")
+                    .onEnded { value in
+                        if !(value.translation.width > 0 && !showMenu) {
+                            if value.translation.width < -geoWidth*0.05 {
+                                targetDailyQuest = dailyQuest
+                                withAnimation {
+                                    offset = -menuSize
+                                }
+                                showMenu = true
+                                
+                            } else {
+                                targetDailyQuest = nil
+                                showMenu = false
+                                withAnimation {
+                                    offset = 0
+                                }
                             }
-                            //                    if !onTimer {
-//                            Button("",systemImage: "bell.slash") {
-//                                
-//                            }
                         }
-                        .onTapGesture {
-                            isEditing_hours.toggle()
-                        }
+
+                    }
+            )
+            .onChange(of: targetDailyQuest) { oldValue, newValue in
+//                let selfToNil = oldValue == idx && newValue == nil
+                let nilToSelf = oldValue == nil && newValue == dailyQuest
+//                let nilToOther = oldValue == nil && newValue != idx
+//                let OtherToNil = oldValue != idx && newValue == nil
+//                let selfToSelf = oldValue == idx && newValue == idx
+                
+                if nilToSelf {
+                    withAnimation {
+                        offset = -menuSize
                     }
                 }
-                .padding(geoWidth*0.03)
-                .frame(width:geoWidth, height: geoHeight, alignment: .center)
-                .foregroundStyle(tierColor_dark)
-                .bold()
-
-                .sheet(isPresented: $isEditing_hours) {
-                    // code for on dismiss
-                } content: {
-                    DialForHours(
-                        questName:questName,
-                        dailyGoal: $dailyGoal,
-                        value: $value,
-                        isEditing: $isEditing_hours,
-                        hasGoal_toggle: $hasGoal_toggle,
-                        dailyGoal_nonNil: dailyGoal ?? value
-                    )
-                    .presentationDetents([.height(300)])
-                    .presentationCompactAdaptation(.none)
-                }
-       
-                if !isEditing_hours {
-                    Menu {
-                        Button("삭제", action: {
-                            dailyQuestToDelete = dailyQuest
-                            applyDailyQuestRemoval.toggle()
-                        })
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .font(.title3)
-                            .frame(height:geoHeight*0.75, alignment:.top)
-                        //                        .border(.red)
+//                else if selfToSelf {
+//                }
+                else {
+                    withAnimation {
+                        offset = 0
                     }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(.black)
-                    .frame(width: geometry.size.width*0.975, height: geometry.size.height*0.9, alignment: .topTrailing)
                 }
 
-                
-            } // zstack
-            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
-            .background(getTierColorOf(tier: dailyQuest.currentTier))
-            .clipShape(.buttonBorder)
-            .onChange(of: hasGoal_toggle) {
-                
-                // 똑같을 때: hasGoal에 따라 hasGoal_toggle을 설정
-                if hasGoal_toggle != hasGoal {
-                        toggle_hour(hasGoal_toggle)
-                }
-                
-                
             }
             .onChange(of: value) {
 
@@ -365,18 +247,281 @@ struct QuestCheckBoxView_HOUR: View {
             .onChange(of: range) {
                 xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
             }
+        }
+    }
+    func calculateOffset(dragAmount: CGFloat, lastOffset: CGFloat, boundary: CGFloat) -> CGFloat {
+//        let boundary: CGFloat = 100.0
+        let scalingFactor: CGFloat = 0.1
+        
+        let newOffset = lastOffset + dragAmount
+        
+        if newOffset > boundary {
+            return boundary + log(newOffset - boundary + 1) / scalingFactor
+//            return lastOffset
+            
+        } else if newOffset < -boundary {
+            return -boundary - log(-newOffset - boundary + 1) / scalingFactor
+//            return lastOffset
+        } else {
+            return newOffset
+        }
+    }
+
+
+}
+
+
+struct QuestCheckBoxContentView: View {
+    @Environment(\.modelContext) var modelContext
+    var dailyQuest: DailyQuest
+    @Binding var value: Int
+    @Binding var dailyGoal: Int?
+
+    var body: some View {
+        
+        GeometryReader { geometry in
+            
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            
+            if dailyQuest.dataType == DataType.OX {
+                QuestCheckBoxContent_OX(
+                    dailyQuest:dailyQuest,
+                    value: $value
+                )
+                .frame(width: geoWidth,height: geoHeight)
+
+            } else if dailyQuest.dataType == DataType.HOUR {
+                QuestCheckBoxContent_HOUR(
+                    dailyQuest:dailyQuest,
+                    value: $value,
+                    dailyGoal: $dailyGoal,
+                    hasGoal: dailyQuest.dailyGoal != nil,
+                    hasGoal_toggle: dailyQuest.dailyGoal != nil
+                )
+                .frame(width: geoWidth,height: geoHeight)
+
+            } else {
+                QuestCheckBoxContent_CUSTOM(
+                    dailyQuest:dailyQuest,
+                    value: $value,
+                    dailyGoal: $dailyGoal,
+                    hasGoal: dailyQuest.dailyGoal != nil,
+                    hasGoal_toggle: dailyQuest.dailyGoal != nil
+                )
+                .frame(width: geoWidth,height: geoHeight)
+
+            }
+        }
+    }
+}
+
+struct QuestCheckBoxContent_OX:View {
+    
+    @Environment(\.modelContext) var modelContext
+    var dailyQuest: DailyQuest
+    @Binding var value: Int
+
+    
+    var body: some View {
+        GeometryReader { geometry in
+            
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            
+            HStack(spacing:0.0) {
+                Button(action:{dailyQuest.data = dailyQuest.data == 1 ? 0 : 1}) {
+                    Image(systemName: dailyQuest.data == 1 ? "checkmark.square" : "square")
+                        .resizable()
+                        .frame(width: geoWidth*1/9*0.75, height: geoWidth*1/9*0.75)
+                }
+                .frame(width: geoWidth*1/9, height: geoHeight)
+//                .border(.red)
+                .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
+
+
+                Text(dailyQuest.questName)
+                    .frame(width: geoWidth*8/9, height: geoHeight)
+                    .bold()
+            }
+            .frame(width: geoWidth,height: geoHeight)
+        }
+    }
+}
+struct QuestCheckBoxContent_HOUR:View {
+    @Environment(\.modelContext) var modelContext
+    var dailyQuest: DailyQuest
+    
+    @Binding var value: Int
+    @Binding var dailyGoal: Int?
+    @State var hasGoal: Bool
+    @State var hasGoal_toggle: Bool // onChangeOf(hasGoal) 과 toggle버튼에 의해서만 변경해야 함
+    
+    @State var onTimer: Bool = false
+    @State var isEditing_hours: Bool = false
+    @State var showQuestName: Bool = false
+    @State var showValue: Bool = false
+    @StateObject private var stopwatch = Stopwatch()
+    @State private var activity: Activity<RecoraddicWidgetAttributes>? = nil
+
+
+    
+    
+    var body: some View {
+        
+        let questName = dailyQuest.questName
+        let dataType = dailyQuest.dataType
+        let customDataTypeNotation = dailyQuest.customDataTypeNotation
+
+        let tier: Int = dailyQuest.currentTier
+        let tierColor_dark = getDarkTierColorOf(tier: tier)
+        
+        GeometryReader { geometry in
+            
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            
+            HStack(spacing:0.0) {
+                if onTimer {
+                    Button(action: {
+                        onTimer.toggle()
+                        guard let activity_activated = activity else {
+                            return
+                        }
+                        let dismissalPolicy: ActivityUIDismissalPolicy = .immediate
+                        Task {
+                            await activity_activated.end(ActivityContent(state: activity_activated.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
+                        }
+                        activity = nil
+                        DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
+                            stopwatch.stop()
+                            value = stopwatch.getTotalSec()/60
+                            stopwatch.setTotalSec(value*60)
+                        }
+                    }) {
+                        Image(systemName: "pause")
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(width: geoWidth*1/9*0.75, height: geoWidth*1/9*0.75)
+                            
+                    }
+                    .frame(width: geoWidth*1/9, alignment: .center)
+                    
+                    Text(stopwatch.timeString)
+                        .frame(width:geoWidth*8/9)
+                        .onTapGesture {
+                            showQuestName.toggle()
+                        }
+                        .popover(isPresented: $showQuestName) {
+                            Text("\(questName)")
+                                .padding()
+                                .frame(width:geoWidth*9/8)
+                                .foregroundStyle(getBrightTierColorOf(tier: tier))
+                                .background(getDarkTierColorOf(tier: dailyQuest.currentTier)) // 크기 유지를 위해(없으면 자동 조정됨)
+                                .presentationCompactAdaptation(.popover)
+                                .presentationBackground(getDarkTierColorOf(tier: dailyQuest.currentTier))
+                        }
+                }
+                else {
+                    Button(action: {
+                        
+                        stopwatch.setTotalSec(value*60)
+                        let calendar = Calendar.current
+                        let startTime: Date = calendar.date(byAdding: .minute, value: -(value), to: .now)!
+                        
+                        stopwatch.start(startTime:startTime)
+                        let attributes = RecoraddicWidgetAttributes(questName: questName, startTime:startTime, tier: tier)
+                        let initialContentState = RecoraddicWidgetAttributes.ContentState(goal: dailyGoal)
+                        do {
+                            let activity = try Activity<RecoraddicWidgetAttributes>.request(
+                                attributes: attributes,
+                                content: ActivityContent(state: initialContentState, staleDate: nil),
+                                pushType: nil
+                            )
+                            self.activity = activity
+                        } catch {
+                            print("Failed to start activity: \(error.localizedDescription)")
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
+                            onTimer.toggle()
+                            
+                        }
+                        
+                    }) {
+                        Image(systemName: "play")
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(width: geoWidth*1/9*0.75, height: geoWidth*1/9*0.75)
+//                            .bold(false)
+
+                    }
+                    .frame(width: geoWidth*1/9, alignment: .center)
+
+                    Text("\(questName)")
+                        .frame(width: geoWidth*8/9, height: geoHeight)
+                        .lineLimit(1)
+                        .onTapGesture {
+                            showValue.toggle()
+                        }
+                }
+            }
+
+            .frame(width: geoWidth,height: geoHeight)
+            .foregroundStyle(getDarkTierColorOf(tier: tier))
+            .popover(isPresented: $showValue) {
+                HStack {
+                    Text("\(DataType.string_fullRepresentableNotation(data: value, dataType: dataType, customDataTypeNotation: customDataTypeNotation))")
+                    if hasGoal {
+                        Text("/ \(DataType.string_fullRepresentableNotation(data:dailyQuest.dailyGoal ?? 0 , dataType: dataType, customDataTypeNotation: customDataTypeNotation))")
+                    }
+                    Button(action:{
+                        showValue.toggle()
+                        isEditing_hours.toggle()
+                    }) {
+                        Image(systemName: "square.and.pencil")
+                    }
+                }
+                .frame(width:geoWidth*9/8)
+                .foregroundStyle(getBrightTierColorOf(tier: tier))
+                .background(getDarkTierColorOf(tier: dailyQuest.currentTier)) // 크기 유지를 위해(없으면 자동 조정됨)
+                .presentationCompactAdaptation(.popover)
+                .presentationBackground(getDarkTierColorOf(tier: dailyQuest.currentTier))
+
+            }
+            .sheet(isPresented: $isEditing_hours) {
+                // code for on dismiss
+            } content: {
+                DialForHours(
+                    questName:questName,
+                    dailyGoal: $dailyGoal,
+                    value: $value,
+                    isEditing: $isEditing_hours,
+                    hasGoal_toggle: $hasGoal_toggle,
+                    tier: tier,
+                    dailyGoal_nonNil: dailyGoal ?? value
+                )
+                .presentationDetents([.height(geoHeight*8)])
+                .presentationCompactAdaptation(.none)
+                .presentationBackground(getDarkTierColorOf(tier: tier))
+
+            }
+            .onChange(of: hasGoal_toggle) {
+
+                // 똑같을 때: hasGoal에 따라 hasGoal_toggle을 설정
+                if hasGoal_toggle != hasGoal {
+                        toggle_hour(hasGoal_toggle)
+                }
+
+
+            }
+
             .onChange(of: hasGoal) {
                 hasGoal_toggle = hasGoal
             }
-//            .onChange(of: stopwatch.isRunning) {
-//                onTimer = stopwatch.isRunning
-//            }
 
-        } // geometryReader
-
-
-
+        }
     }
+    
     
     func toggle_hour(_ setGoal: Bool) -> Void {
         hasGoal = hasGoal_toggle
@@ -388,8 +533,195 @@ struct QuestCheckBoxView_HOUR: View {
         }
     }
 
+}
+struct QuestCheckBoxContent_CUSTOM:View {
+    @Environment(\.modelContext) var modelContext
+    var dailyQuest: DailyQuest
+    
+    @Binding var value: Int
+    @Binding var dailyGoal: Int?
+    @State var hasGoal: Bool
+    @State var hasGoal_toggle: Bool // onChangeOf(hasGoal) 과 toggle버튼에 의해서만 변경해야 함
+    
+    @State var isEditing: Bool = false
+    @State var valueInText: String = ""
+    @State var goalValueInText: String = ""
+
+    @FocusState var focusedField: Field?
+    enum Field: Int, CaseIterable {
+        case value
+        case goal
+    }
+    
+    @State var showValue: Bool = false
+
+    var body: some View {
+        
+        let questName = dailyQuest.questName
+        let dataType = dailyQuest.dataType
+        let tier: Int = dailyQuest.currentTier
+        let customDataTypeNotation = dailyQuest.customDataTypeNotation
+        let tierColor_dark = getDarkTierColorOf(tier: tier)
+        
+        GeometryReader { geometry in
+            
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            
+            HStack(spacing:0.0) {
+                Spacer()
+                    .frame(width: geoWidth*1/9, height: geoWidth*0.1)
+                if isEditing {
+                    TextField("", text:$valueInText)
+                        .keyboardType(.numberPad)
+                        .frame(width:geoWidth/3)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .foregroundStyle(.black)
+                        .multilineTextAlignment(.center)
+                        .focused($focusedField, equals: .value)
+                        .toolbar {
+                            ToolbarItem(placement: .keyboard) {
+                                HStack(spacing:0.0) {
+                                    Toggle("목표설정", isOn: $hasGoal_toggle)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.7)
+                                        .toggleStyle(.switch)
+                                        .frame(width:geoWidth*0.4)
+                                    Button("완료") {
+                                        editDone()
+                                    }
+                                    .frame(width:geoWidth*0.6, alignment: .trailing)
+                                }
+                            }
+                        }
+                    if hasGoal  {
+                        Text(" /")
+                        TextField("", text:$goalValueInText)
+                            .keyboardType(.numberPad)
+                            .frame(width:geoWidth/3)
+                            .multilineTextAlignment(.center)
+                            .focused($focusedField, equals: .goal)
+                        Text(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation: customDataTypeNotation))
+                    }
+                }
+                else {
+                    Text(dailyQuest.questName)
+                        .frame(width: geoWidth*8/9, height: geoHeight)
+                        .bold()
+                        .lineLimit(1)
+                        .onTapGesture {
+                            showValue.toggle()
+                        }
+                        .popover(isPresented: $showValue) {
+                            HStack {
+                                Text("\(DataType.string_fullRepresentableNotation(data: value, dataType: dataType, customDataTypeNotation: customDataTypeNotation))")
+                                if hasGoal {
+                                    Text("/ \(DataType.string_fullRepresentableNotation(data:dailyQuest.dailyGoal ?? 0 , dataType: dataType, customDataTypeNotation: customDataTypeNotation))")
+                                }
+                                Button(action:  {
+                                    showValue.toggle()
+                                    edit()
+//                                    isEditing.toggle()
+                                }) {
+                                    Image(systemName: "square.and.pencil")
+                                }
+                            }
+                            .frame(width:geoWidth*9/8)
+                            .foregroundStyle(getBrightTierColorOf(tier: tier))
+                            .background(getDarkTierColorOf(tier: dailyQuest.currentTier)) // 크기 유지를 위해(없으면 자동 조정됨)
+                            .presentationCompactAdaptation(.popover)
+                            .presentationBackground(getDarkTierColorOf(tier: dailyQuest.currentTier))
+                        }
+                }
+                
+
+            }
+            .frame(width: geoWidth,height: geoHeight)
+            .onChange(of: hasGoal_toggle) {
+                // 똑같을 때: hasGoal에 따라 hasGoal_toggle을 설정
+                if hasGoal_toggle != hasGoal {
+                    toggle(hasGoal_toggle)
+                }
+            }
+            .onChange(of: hasGoal) {
+                hasGoal_toggle = hasGoal
+            }
+
+            
+        }
+    }
+    
+    // below functions must contain three steps in proper order of their own functionality:
+    // - set focusField
+    // - set hasGoal
+    func editDone() -> Void { // tranform view -> change&save values
+
+        focusedField = nil
+        isEditing = false
+
+        if let newValue:Int = Int(valueInText) { value = newValue } // save value
+        else { value = 0 }
+
+        if let newGoalValue:Int = Int(goalValueInText) { // save dailyGoal
+            if newGoalValue == 0 {
+                hasGoal = false
+                dailyGoal = nil
+            }
+            else {
+                dailyGoal = newGoalValue
+            }
+        }
+        else {
+            hasGoal = false
+            dailyGoal = nil
+        }
+    }
+    func toggle(_ setGoal: Bool) -> Void {
+        if setGoal { // setGoal
+            // set dailyQuest.dailyGoal into non-nil, change the focus into goal
+            hasGoal = hasGoal_toggle
+            focusedField = nil
+            goalValueInText = String(format: "%d", value)
+            dailyGoal = value
+            
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
+                focusedField = .goal
+            }
+
+        }
+        else { // deleteGoal
+            dailyGoal = nil
+            goalValueInText = ""
+            focusedField = .value
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
+                hasGoal = hasGoal_toggle
+            }
+
+        }
+    }
+    func edit() -> Void { // set values -> transform view
+        if let goalValue = dailyGoal {
+            goalValueInText = String(goalValue)
+        }
+        else { // actually don't need it
+            goalValueInText = ""
+        }
+
+        valueInText = String(value)
+
+        isEditing = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
+            focusedField = .value
+        }
+
+    }
+    
+    
 
 }
+
 
 class Stopwatch: ObservableObject {
     var startTime: Date?
@@ -437,320 +769,20 @@ class Stopwatch: ObservableObject {
 
 
 
-struct QuestCheckBoxView: View {
 
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.colorScheme) var colorScheme
-
-    
-    
-    @State var dailyQuest: DailyQuest
-    
-    var themeSetName: String
-
-    
-    @State var value: Int
-    @State var dailyGoal: Int?
-    @State var hasGoal: Bool
-    @State var hasGoal_toggle: Bool // onChangeOf(hasGoal) 과 toggle버튼에 의해서만 변경해야 함
-//    var width: CGFloat
-    var range: ClosedRange<CGFloat> {
-        return 0.0...CGFloat(dailyGoal ?? value)
-    }
-    @State var xOffset: CGFloat
-    
-    @Binding var applyDailyQuestRemoval: Bool
-    @Binding var dailyQuestToDelete: DailyQuest?
-    
-    @State var deleteDailyQuest: Bool = false
-    
-    @State var isEditing: Bool = false
-    @State var valueInText: String = ""
-    @State var goalValueInText: String = ""
-
-    @FocusState var focusedField: Field?
-    enum Field: Int, CaseIterable {
-        case value
-        case goal
-    }
-    
-        
-    @State var isAnimating = false
-
-//    @Binding var isJustCf: Bool = false
-    
-    var body: some View {
-
-        let questName = dailyQuest.questName
-        let dataType = dailyQuest.dataType
-//        let questData:Int = dailyQuest.data
-//        let customDataTypeNotaion: String? = dailyQuest.customDataTypeNotation
-
-        let tier: Int = dailyQuest.currentTier
-        let tierColor_dark = getDarkTierColorOf(tier: tier)
-        
-        GeometryReader { geometry in
-            
-            let geoWidth = geometry.size.width
-            let geoHeight = geometry.size.height
-            
-//            let contentWidth = geometry.size.width*0.95
-            
-            
-//            let percentage:CGFloat = xOffset / geoWidth
-            
-            
-            let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
-
-            
-            let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= geoWidth +  0.1) ? xOffset : geoWidth, height: geoHeight), transform: nil))
-            // 0.1 없으면 끝에서 이상해짐
-
-
-            ZStack(alignment:.leading) {
-                
-                ZStack {
-                    Rectangle()
-                        .fill(
-                            LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                        )
-                        .frame(width:geoWidth, height:geoHeight)
-                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
-                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
-                    
-                    Rectangle()
-                        .fill(
-                            LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                        )
-                        .frame(width:geoWidth, height:geoHeight)
-                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
-                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
-                }
-                .frame(width:geoWidth, height:geoHeight)
-                .mask {
-                    a
-                }
-                .onAppear() {
-                    isAnimating = true
-                }
-                // MARK: 0.1을 넣지 않으면 xOffset이 geoWidth보다 커지는 상황 발생... 왤까?
-
-
-
-                if hasGoal && xOffset >= geoWidth {
-                    Spacer()
-                        .frame(width:1, height: geoHeight)
-                        .background(tierColor_dark)
-                        .offset(x:xOffset)
-                }
-                            
-
-                HStack(spacing: 0.0) {
-                    
-                    if !isEditing {
-//                        Button("",systemImage: "bell.slash") {
-//                            
-//                        }
-//                        .foregroundStyle(getDarkTierColorOf(tier: tier))
-                        HStack(spacing:0.0) {
-                            Text("\(questName)")
-                                .frame(alignment: .trailing)
-                                .lineLimit(1)
-                            //                        .bold()
-                            Text(": ")
-                            Text("\(value)")
-                        }
-                        .onTapGesture {
-                            edit()
-                        }
-                    }
-                    if isEditing {
-                        TextField("", text:$valueInText)
-                            .keyboardType(.numberPad)
-                            .frame(width:geoWidth/3)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
-                            .foregroundStyle(.black)
-                            .multilineTextAlignment(.center)
-                            .focused($focusedField, equals: .value)
-                            .toolbar {
-                                ToolbarItem(placement: .keyboard) {
-                                    HStack(spacing:0.0) {
-                                        Toggle("목표설정", isOn: $hasGoal_toggle)
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.7)
-                                            .toggleStyle(.switch)
-                                            .frame(width:geoWidth*0.4)
-                                        Button("완료") {
-                                            editDone()
-                                        }
-                                        .frame(width:geoWidth*0.6, alignment: .trailing)
-                                    }
-                                }
-                            }
-                    }
-                    if hasGoal && isEditing {
-                        Text(" /")
-                        TextField("", text:$goalValueInText)
-                            .keyboardType(.numberPad)
-                            .frame(width:geoWidth/3)
-                            .multilineTextAlignment(.center)
-                            .focused($focusedField, equals: .goal)
-                        
-                        
-                    }
-                    
-                    Text("\(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation:dailyQuest.customDataTypeNotation))")
-                }
-                .padding(geoWidth*0.03)
-                .frame(width:geoWidth, height: geoHeight, alignment: .center)
-                .foregroundStyle(tierColor_dark)
-                .bold()
-
-
-
-
-                    
-                if !isEditing {
-                    Menu {
-                        Button("삭제", action: {
-                            dailyQuestToDelete = dailyQuest
-                            applyDailyQuestRemoval.toggle()
-                        })
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .font(.title3)
-                            .frame(height:geoHeight*0.75, alignment:.top)
-                        //                        .border(.red)
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(.black)
-                    .frame(width: geometry.size.width*0.975, height: geometry.size.height*0.9, alignment: .topTrailing)
-                }
-
-                
-                
-                
-            } // zstack
-            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
-            .background(getTierColorOf(tier: tier))
-            .clipShape(.buttonBorder)
-            .onChange(of: hasGoal_toggle) {
-                
-                // 똑같을 때: hasGoal에 따라 hasGoal_toggle을 설정
-                
-                if hasGoal_toggle != hasGoal {
-                    toggle(hasGoal_toggle)
-                }
-                
-                
-            }
-            .onChange(of: value) {
-                xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
-                dailyQuest.data = value
-            }
-            .onChange(of: dailyGoal) {
-                dailyQuest.dailyGoal = dailyGoal
-                xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
-            }
-            .onChange(of: range) {
-                xOffset = CGFloat(value).map(from:range, to: 0...geoWidth)
-            }
-            .onChange(of: hasGoal) {
-                hasGoal_toggle = hasGoal
-            }
-
-
-        } // geometryReader
-
-
-
-    }
-    
-    // below functions must contain three steps in proper order of their own functionality:
-    // - set focusField
-    // - set hasGoal
-    func editDone() -> Void { // tranform view -> change&save values
-        
-        focusedField = nil
-        isEditing = false
-
-        if let newValue:Int = Int(valueInText) { value = newValue } // save value
-        else { value = 0 }
-        
-        if let newGoalValue:Int = Int(goalValueInText) { // save dailyGoal
-            if newGoalValue == 0 {
-                hasGoal = false
-                dailyGoal = nil
-            }
-            else {
-                dailyGoal = newGoalValue
-            }
-        }
-        else {
-            hasGoal = false
-            dailyGoal = nil
-        }
-    }
-    func toggle(_ setGoal: Bool) -> Void {
-        if setGoal { // setGoal
-            // set dailyQuest.dailyGoal into non-nil, change the focus into goal
-            hasGoal = hasGoal_toggle
-            focusedField = nil
-            DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
-                focusedField = .goal
-            }
-
-        }
-        else { // deleteGoal
-            dailyGoal = nil
-            goalValueInText = ""
-            focusedField = .value
-            DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
-                hasGoal = hasGoal_toggle
-            }
-
-        }
-    }
-    func edit() -> Void { // set values -> transform view
-        if let goalValue = dailyGoal {
-            goalValueInText = String(goalValue)
-        }
-        else { // actually don't need it
-            goalValueInText = ""
-        }
-        
-        valueInText = String(value)
-
-        isEditing = true
-        
-        DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
-            focusedField = .value
-        }
-
-    }
-
-}
-
-
-
-
-extension CGFloat {
-    func map(from source: ClosedRange<CGFloat>, to target: ClosedRange<CGFloat>) -> CGFloat {
-
-        return target.lowerBound + (self - source.lowerBound) * (target.upperBound - target.lowerBound) / (source.upperBound - source.lowerBound)
-    }
-}
 
 
 struct DialForHours: View {
 
+    @Environment(\.colorScheme) var colorScheme
+    
     var questName: String
     
     @Binding var dailyGoal: Int?
     @Binding var value: Int
     @Binding var isEditing: Bool
     @Binding var hasGoal_toggle: Bool
+    var tier: Int
 
     
 //    @State var hour = 0
@@ -769,9 +801,11 @@ struct DialForHours: View {
                 ZStack(alignment:.top) {
                     VStack {
                         Text(questName)
-                            .font(.title3)
+                            .font(.title2)
+                            .bold()
                         Toggle("목표설정",isOn:$hasGoal_toggle)
                             .frame(width:geoWidth/3)
+                            .buttonBorderShape(.automatic)
                     }
 //                    HStack(spacing:0.0) {
 //                        Button("취소") {
@@ -790,9 +824,9 @@ struct DialForHours: View {
                 }
                 .frame(width: geometry.size.width)
                 .padding(.top, 10)
-//                .border(.red)
-                
-                HStack {
+                .padding(.bottom, geoHeight*0.1)
+
+                HStack(spacing:0.0) {
                     
                     
 //                    Picker(selection: $hour, label: Text("First Value")) {
@@ -803,27 +837,50 @@ struct DialForHours: View {
 //                    .frame(width: 50)
 //                    .clipped()
 //                    .pickerStyle(.wheel)
-                    Picker(selection: $value, label: Text("Second Value")) {
-                        ForEach(0..<60*24) { i in
-                            Text("\(DataType.string_fullRepresentableNotation(data: i, dataType: DataType.HOUR))").tag(i)
+                    VStack {
+                        Text("달성")
+                            .bold()
+                        Picker(selection: $value, label: Text("Second Value")) {
+                            ForEach(0..<60*24) { i in
+                                Text("\(DataType.string_fullRepresentableNotation(data: i, dataType: DataType.HOUR))")
+                                    .foregroundStyle(getDarkTierColorOf(tier: tier))
+
+                            }
                         }
+                        
+                        .frame(width: geoWidth/3)
+                        .clipped()
+                        .pickerStyle(.wheel)
+                        .background(getBrightTierColorOf(tier: tier))
+                        .clipShape(.buttonBorder)
                     }
-                    .frame(width: geoWidth/3)
-                    .clipped()
-                    .pickerStyle(.wheel)
+                    .frame(width: geoWidth/2)
+
+
+                    
+                    
                     
                     if hasGoal_toggle {
-                        
-                        if let dailyGoal_nonNil:Int = dailyGoal {
+                        VStack {
+                            Text("목표")
+                                .bold()
                             Picker(selection: $dailyGoal_nonNil, label: Text("Second Value")) {
                                 ForEach(0..<60*24/5) { i in
-                                    Text("\(DataType.string_fullRepresentableNotation(data: i*5, dataType: DataType.HOUR))").tag(i*5)
+                                    Text("\(DataType.string_fullRepresentableNotation(data: (i+1)*5, dataType: DataType.HOUR))")
+                                        .tag((i+1)*5)
+                                        .foregroundStyle(getDarkTierColorOf(tier: tier))
                                 }
                             }
                             .frame(width: geoWidth/3)
                             .clipped()
                             .pickerStyle(.wheel)
+                            .background(getBrightTierColorOf(tier: tier))
+                            .clipShape(.buttonBorder)
+                            
                         }
+                        .frame(width: geoWidth/2)
+
+
 //                        Picker(selection: $hour_goal, label: Text("First Value")) {
 //                            ForEach(0..<25) { i in
 //                                Text("\(i)").tag(i)
@@ -847,6 +904,8 @@ struct DialForHours: View {
                     
                 }
             }
+            .foregroundStyle(getBrightTierColorOf(tier: tier))
+
 
         }        
         .onChange(of: dailyGoal_nonNil) {
@@ -874,15 +933,12 @@ struct DialForHours: View {
 //        .onChange(of: hour_goal) {
 //            dailyGoal = hour_goal*60 + minute_goal
 //        }
-        .onChange(of: hasGoal_toggle) {
+//        .onChange(of: hasGoal_toggle) {
 //            if hasGoal_toggle {
-//                    if let dailyGoal_nonNil: Int = dailyGoal {
-//                        hour_goal = dailyGoal_nonNil/60
-//                        minute_goal = dailyGoal_nonNil%60
-//                    }
-//                }
+//                dailyGoal_nonNil = (value/5+1)*5
 //            }
-        }
+//        }
+        
     }
 
     
@@ -971,6 +1027,328 @@ struct QuestCheckBoxColorPreview: View {
     }
 }
 
+struct NotificationButton: View {
+    
+    @Environment(\.modelContext) var modelContext
+    var dailyQuest: DailyQuest
+    var popOverWidth: CGFloat
+    var popOverHeight: CGFloat
+    var sheetHeight: CGFloat
+    
+    
+    @State var showNotficationTime: Bool = false
+    @State var editNotificationTime: Bool = false
+//    @State var
+    
+//    let popOverWidth2:CGFloat = UIScreen.main.bounds.width
+    let popOverWidth2:CGFloat = UIScreen.main.bounds.width*2
+    
+    
+    var body: some View {
+
+        let setAlready:Bool = dailyQuest.alermTime != nil
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            
+//            Button("",systemImage: setAlready ? "bell" : "bell.slash") {
+//                if setAlready {
+//                    showNotficationTime.toggle()
+//                } else {
+//                    editNotificationTime.toggle()
+//                }
+//            }
+            Button(action: {
+                if setAlready {
+                    showNotficationTime.toggle()
+                } else {
+                    editNotificationTime.toggle()
+                }
+
+            }) {
+                Image(systemName: setAlready ? "bell" : "bell.slash")
+            }
+            .bold(setAlready)
+//            .border(.yellow)
+            .frame(width: geoWidth, height: geoHeight)
+//            .border(.red)
+            .popover(isPresented: $showNotficationTime, attachmentAnchor: .point(.topLeading)) {
+                HStack {
+                    Text(getNotificationTimeString(from: dailyQuest.alermTime))
+                        .padding(.horizontal)
+                    Button("수정") {
+                        showNotficationTime.toggle()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            editNotificationTime.toggle()
+                        }
+                    }
+                    .buttonStyle(NotificationButtonStyle(dailyQuest.currentTier))
+
+                    Button("해제") {
+                        if let previousAlermTime = dailyQuest.alermTime {
+                            removeNotification(at: previousAlermTime, for: dailyQuest.questName) // MARK: questName 변경 시 지울 수 없음
+                        }
+                        showNotficationTime.toggle()
+                        dailyQuest.alermTime = nil
+                    }
+                    .buttonStyle(NotificationButtonStyle_red(dailyQuest.currentTier))
+
+
+                }
+                .frame(width:popOverWidth2)
+//                .frame(width:.greatestFiniteMagnitude, alignment: .center)
+//                .frame(width:popOverWidth, height: popOverHeight)
+                .foregroundStyle(getBrightTierColorOf(tier: dailyQuest.currentTier))
+                .background(getDarkTierColorOf(tier: dailyQuest.currentTier)) // 크기 유지를 위해(없으면 자동 조정됨)
+                .presentationCompactAdaptation(.popover)
+                .presentationBackground(getDarkTierColorOf(tier: dailyQuest.currentTier))
+//                .border(.red)
+
+            }
+            .sheet(isPresented: $editNotificationTime) {
+                EditNotificationTimeView(
+                    dailyQuest: dailyQuest,
+                    selectedTime: dailyQuest.alermTime ?? Date(),
+                    selectedDay: getDayOption(at: dailyQuest.alermTime ?? Date()),
+                    editNotificationTime: $editNotificationTime
+                )
+                .presentationDetents([.height(sheetHeight)])
+//                .frame(width: popOverWidth, height: popOverHeight, alignment: .center)
+                .foregroundStyle(getBrightTierColorOf(tier: dailyQuest.currentTier))
+                .background(getDarkTierColorOf(tier: dailyQuest.currentTier))
+                .presentationDragIndicator(.visible)
+//                .preferredColorScheme(.dark)
+
+                
+            }
+        }
+//        .onChange(of: selectedTime, { oldValue, newValue in
+//            dailyQuest.alermTime = selectedTime
+//        })
+//        .onChange(of: dailyQuest.alermTime) { oldValue, newValue in
+////            selectedTime = dailyQuest.alermTime
+//        }
+    }
+}
+
+struct NotificationButtonStyle: ButtonStyle {
+    @Environment(\.colorScheme) var colorScheme
+
+    var tier:Int
+    
+
+    init(_ tier: Int) {
+        self.tier = tier
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 7)
+            .padding(.horizontal,10)
+            .foregroundStyle(getDarkTierColorOf(tier: tier))
+            .background(getBrightTierColorOf(tier: tier))
+            .clipShape(.buttonBorder)
+
+    }
+}
+
+struct NotificationButtonStyle_red: ButtonStyle {
+    @Environment(\.colorScheme) var colorScheme
+
+    var tier:Int
+    
+
+    init(_ tier: Int) {
+        self.tier = tier
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 7)
+            .padding(.horizontal,10)
+//            .foregroundStyle(colorScheme == .dark ? .white : .black)
+            .foregroundStyle(getDarkTierColorOf(tier: tier))
+            .background(.red)
+            .clipShape(.buttonBorder)
+//            .opacity(0.95)
+
+    }
+}
+
+
+struct QuestNameView:View {
+    @Environment(\.modelContext) var modelContext
+    var dailyQuest: DailyQuest
+    
+    @Binding var value: Int
+    @Binding var dailyGoal: Int?
+    
+    var sheetHeight: CGFloat
+    
+    @State var showValueAndGoal: Bool = false
+    @State var editDataAndGoal: Bool = false
+    @State var hasGoal: Bool = false
+    @State var hasGoal_toggleButton: Bool = false
+    
+    var body: some View {
+        let tier: Int = dailyQuest.currentTier
+        let questName = dailyQuest.questName
+        let dataType = dailyQuest.dataType
+        let customDataTypeNotation = dailyQuest.customDataTypeNotation
+        
+        Text(dailyQuest.questName)
+            .onTapGesture {
+                showValueAndGoal.toggle()
+            }
+            .popover(isPresented: $showValueAndGoal) {
+                HStack {
+                    Text(DataType.string_fullRepresentableNotation(data: value, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation))
+                    if let dailyGoal_nonNil = dailyGoal {
+                        Text("/")
+                        Text(DataType.string_fullRepresentableNotation(data: dailyGoal_nonNil, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation))
+                    }
+                }
+            }
+            .sheet(isPresented: $editDataAndGoal) {
+                if dataType == DataType.HOUR {
+                    DialForHours(
+                        questName:questName,
+                        dailyGoal: $dailyGoal,
+                        value: $value,
+                        isEditing: $editDataAndGoal,
+                        hasGoal_toggle: $hasGoal_toggleButton,
+                        tier: tier,
+                        dailyGoal_nonNil: dailyGoal ?? value
+                    )
+                    .presentationDetents([.height(sheetHeight)])
+                    .presentationCompactAdaptation(.none)
+                    .presentationBackground(getDarkTierColorOf(tier: tier))
+                }
+                else {
+                    
+                }
+            
+            }
+        
+        
+        
+    }
+    
+    
+}
+
+//struct QuestStartButton: View {
+//    
+//}
+
+
+struct EditNotificationTimeView: View {
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.modelContext) var modelContext
+    var dailyQuest: DailyQuest
+    @State var selectedTime: Date
+    @State var selectedDay:DayOption
+    
+    @Binding var editNotificationTime: Bool
+    
+    
+
+    var body: some View {
+        let setAlready:Bool = dailyQuest.alermTime != nil
+        let notModifiedYet:Bool = setAlready && (dailyQuest.alermTime ?? selectedTime) == selectedTime
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            VStack {
+                Text(selectedTime,format: .dateTime)
+                    .font(.title3)
+                    .bold()
+//                    .minimumScaleFactor(0.7)
+//                    .frame(width:geoWidth)
+                    .padding(.top)
+                //                if let alermTime = dailyQuest.alermTime {
+                ////                    HStack(spacing:0.0) {
+                //                        Text(alermTime,format: .dateTime)
+                ////                    }
+                //                }
+                Picker("", selection: $selectedDay) {
+                    ForEach(DayOption.allCases, id:\.self) { dayOption in
+                        Text(DayOption.dayOption_kor[dayOption] ?? "optionErr") // MARK: foreground, backgroundstyle adjustment not avaialable(xcode15), reported at 24/07/12
+
+                        
+                    }
+
+                }
+                .pickerStyle(.segmented)
+                
+                
+                DatePicker("Select time", selection: $selectedTime, displayedComponents: [.hourAndMinute])
+                    .frame(height: geoHeight*0.4)
+                    .datePickerStyle(WheelDatePickerStyle())
+                    .invertColorInLightMode()
+                    .clipped()
+                    .labelsHidden()
+                    .contentShape(Rectangle())
+                    .zIndex(-1)
+                    .padding()
+                    
+                
+                //                Text("현재 이후의 시간으로만 알림설정이 가능합니다.")
+                //                    .foregroundStyle(.red)
+                //                    .font(.caption)
+                HStack(spacing:0.0) {
+
+                    Button("취소") {
+                        editNotificationTime.toggle()
+                    }
+                    .frame(width: geoWidth/2)
+                    .foregroundStyle(.red)
+                    .buttonStyle(NotificationButtonStyle(dailyQuest.currentTier))
+                    
+                    
+                    //                    Button((dailyQuest.alermTime ?? selectedTime) == selectedTime ? "취소" : (dailyQuest.alermTime == nil ? "알림 설정" : "알림 수정") ) {
+                    Button(dailyQuest.alermTime == nil ? "알림 설정" : "알림 수정") {
+                        if let previousAlermTime = dailyQuest.alermTime {
+                            removeNotification(at: previousAlermTime, for: dailyQuest.questName) // MARK: questName 변경 시 지울 수 없음
+                        }
+                        dailyQuest.alermTime = selectedTime
+                        scheduleNotification(at: selectedTime, for: dailyQuest.questName, goal: dailyQuest.dailyGoal, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation
+                        )
+                        editNotificationTime.toggle()
+                    }
+                    .frame(width: geoWidth/2)
+                    .disabled(notModifiedYet)
+                    .opacity(notModifiedYet ? 0.3 : 1.0)
+                    .buttonStyle(NotificationButtonStyle(dailyQuest.currentTier))
+                    
+                }
+                .padding()
+                
+            }
+            .padding()
+            .frame(width:geoWidth, height: geoHeight)
+            .onAppear() {
+                if selectedDay == .today && getStartOfDate(date:selectedTime) != getStartDateOfNow() {
+                    selectedTime = Date()
+                }
+            }
+            .onChange(of: selectedDay) { oldValue, newValue in
+                let calendar = Calendar.current
+                switch (oldValue, newValue) {
+                    //                case ("today":"today"),("tomorrow":"tomorrow"), ("dayAftertomorrow":"dayAftertomorrow"): break
+                case (.tomorrow,.today),(.dayAfterTomorrow,.tomorrow): selectedTime = calendar.date(byAdding: .day, value: -1, to: selectedTime) ?? Date()
+                case (.today,.tomorrow),(.tomorrow,.dayAfterTomorrow): selectedTime = calendar.date(byAdding: .day, value: 1, to: selectedTime) ?? Date()
+                case (.dayAfterTomorrow,.today): selectedTime = calendar.date(byAdding: .day, value: -2, to: selectedTime) ?? Date()
+                case (.today,.dayAfterTomorrow): selectedTime = calendar.date(byAdding: .day, value: 2, to: selectedTime) ?? Date()
+                    
+                default: break
+                }
+            }
+        }
+    }
+}
+
+
 #Preview(body: {
     VStack {
         QuestCheckBoxColorPreview(tier: 0)
@@ -995,3 +1373,4 @@ struct QuestCheckBoxColorPreview: View {
     }
 
 })
+

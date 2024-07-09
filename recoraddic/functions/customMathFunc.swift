@@ -59,3 +59,11 @@ func divideBy60(_ value: Int) -> (Int, Int) {
     let b: Int = value % 60
     return (a, b)
 }
+
+
+extension CGFloat {
+    func map(from source: ClosedRange<CGFloat>, to target: ClosedRange<CGFloat>) -> CGFloat {
+
+        return target.lowerBound + (self - source.lowerBound) * (target.upperBound - target.lowerBound) / (source.upperBound - source.lowerBound)
+    }
+}

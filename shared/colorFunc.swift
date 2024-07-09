@@ -309,3 +309,23 @@ func getReversedColorSchemeColor(_ colorScheme:ColorScheme) -> Color {
         } // bright2
     }
 })
+
+
+
+struct InvertColorInLightMode: ViewModifier {
+    @Environment(\.colorScheme) var colorScheme
+
+    func body(content: Content) -> some View {
+        if colorScheme == .light {
+            content.colorInvert()
+        } else {
+            content
+        }
+    }
+}
+
+extension View {
+    func invertColorInLightMode() -> some View {
+        self.modifier(InvertColorInLightMode())
+    }
+}

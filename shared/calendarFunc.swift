@@ -226,6 +226,8 @@ func partitionByWeek(startDate: Date, endDate: Date) -> [[Date]] {
 }
 
 
+
+
 func containsFirstDateOfMonth(dates:[Date]) -> Bool {
     let startOfMonthIndex: Int? = dates.firstIndex(where: {$0.isStartOfMonth})
     if startOfMonthIndex != nil { return true }
@@ -242,5 +244,62 @@ extension Date {
         let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: self)!
         return !Calendar.current.isDate(nextDay, equalTo: self, toGranularity: .month)
     }
+    
+    
+    var isExpired: Bool {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        // Compare the components of the date up to the minute
+        let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+        let inputDateComponents = calendar.dateComponents(components, from: self)
+        let nowDateComponents = calendar.dateComponents(components, from: now)
+        
+        // Create dates truncated to the minute
+        guard let inputDate = calendar.date(from: inputDateComponents),
+              let nowDate = calendar.date(from: nowDateComponents) else {
+            return false
+        }
+        
+        return inputDate <= nowDate
+    }
+    var hhmmTimeString: String {
+        // Get the current date and time
+        
+        // Create a DateFormatter
+        let formatter = DateFormatter()
+        
+        // Set the locale to the current locale of the device
+        formatter.locale = Locale.current
+        
+        // Set the time style to short (00:00)
+        formatter.timeStyle = .short
+        
+        // Format the current date to a string
+        let timeString = formatter.string(from: self)
+        
+        return timeString
+    }
+    
 }
 
+
+
+
+//func isDateExpired(date:Date) -> Bool {
+//    let calendar = Calendar.current
+//    let now = Date()
+//    
+//    // Compare the components of the date up to the minute
+//    let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+//    let inputDateComponents = calendar.dateComponents(components, from: date)
+//    let nowDateComponents = calendar.dateComponents(components, from: now)
+//    
+//    // Create dates truncated to the minute
+//    guard let inputDate = calendar.date(from: inputDateComponents),
+//          let nowDate = calendar.date(from: nowDateComponents) else {
+//        return false
+//    }
+//    
+//    return inputDate <= nowDate
+//}

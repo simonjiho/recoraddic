@@ -49,6 +49,8 @@ class NetworkMonitor: ObservableObject {
     }
 }
 
+
+
 struct ContentView: View {
     
     @Environment(\.modelContext) var modelContext
@@ -57,11 +59,12 @@ struct ContentView: View {
     @AppStorage("shouldBlockTheView") var shouldBlockTheView: Bool = true
     @AppStorage("iCloudAvailable") var iCloudAvailable: Bool = false
     @StateObject var netWorkMonitor: NetworkMonitor = NetworkMonitor()
-    
+//    @StateObject private var notificationManager = NotificationManager()
+
     
     @Query var profiles: [Profile]
     @Query(sort:\Quest.name) var quests: [Quest]
-    @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
+    @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord] // currentDailyRecord -> date = nil -> thus it places on first on sorted array
     @Query var dailyQuests: [DailyQuest]
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
     var dailyRecordSets_visible: [DailyRecordSet] {
@@ -221,6 +224,18 @@ struct ContentView: View {
                          
                          
                      }
+//                     .onReceive(notificationManager.$notificationData) { userInfo in
+//                         print("halo~~")
+//                         
+//                         updateDailyQuestAlerm()
+//                         do {
+//         //                    modelContext.
+//                             try modelContext.save()
+//                         } catch {
+//                             print("wow")
+//
+//                         }
+//                     }
                      
                      
 
@@ -232,6 +247,47 @@ struct ContentView: View {
     
 
      }
+    
+    
+//    private func updateDailyQuestAlerm() {
+//        // MARK: 앱을 끈 상태에서 들어가면 잘 nil처리 됨, 킨 상태이면 안됨
+//        // Your function to be executed when the app is opened via notification
+////        print("Performing action because app was opened via notification")
+//        
+//        print("\nupdateDailyQuestAlerm")
+//        let currentDailyRecord: DailyRecord = dailyRecords.first ?? DailyRecord(date: Calendar.current.date(byAdding: .day, value: 1000, to: .now)!) // MARK: signOutErrorPrevention: 순간 개수가 0이 됨. 왜일까!
+//
+//        if let dailyQuests = currentDailyRecord.dailyQuestList {
+//            
+//            for dailyQuest in dailyQuests {
+//                if dailyQuest.questName == "Workout" {
+//                    print("checking Workout1")
+//                    print("now: \(String(describing:Date()))")
+//                    print("alermTime: \(String(describing:dailyQuest.alermTime))")
+//                }
+//                if let alermTime = dailyQuest.alermTime {
+////                    if dailyQuest.questName == "Workout" {
+////                        print("checking Workout2")
+////                        print("now: \(String(describing:Date()))")
+////                        print("alermTime: \(String(describing:alermTime))")
+////                    }
+//                    if isDateExpired(date: alermTime) {
+//                        print("expired!")
+//                        print("now: \(String(describing:Date()))")
+//                        print("alermTime: \(String(describing:alermTime))")
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+//                            dailyQuest.alermTime = nil
+//                        }
+//                    }
+//                }
+//
+//            }
+//        }
+//        
+//        print("\n")
+//        
+//    }
+    
         
     
 

@@ -17,6 +17,8 @@ struct RecoraddicLiveActivityView: View {
     var tier: Int
     var goal: Int?
     
+    
+    
     var body: some View {
         VStack(alignment:.center) {
             Text(questName)
@@ -84,7 +86,6 @@ struct RecoraddicWidgetLiveActivity: Widget {
                 goal: goal
             )
             .activityBackgroundTint(getTierColorOf(tier: tier))
-//            .activitySystemActionForegroundColor(getDarkTierColorOf(tier: tier))
 
         } dynamicIsland: { context in
 
