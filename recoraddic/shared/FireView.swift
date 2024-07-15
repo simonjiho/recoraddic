@@ -86,6 +86,7 @@ struct Fire1: View {
         GeometryReader { geometry in
             Image("fire1_frame\(frameIndex+1)")
                 .resizable()
+                .scaledToFit()
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
 //                .blur(radius: 1)
             .position(x:geometry.size.width/2, y:geometry.size.height/2)
@@ -118,8 +119,9 @@ struct Fire2: View {
         GeometryReader { geometry in
             Image("fire2_frame\(frameIndex+1)")
                 .resizable()
+                .scaledToFit()
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
-                .position(x:geometry.size.width/2, y:geometry.size.height/2)            
+                .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
                     Timer.scheduledTimer(withTimeInterval: 1.0 / 12, repeats: true) { _ in
                         frameIndex = (frameIndex + 1) % 9
@@ -149,8 +151,10 @@ struct Fire3: View {
         GeometryReader { geometry in
             Image("fire3_frame\(frameIndex+1)")
                 .resizable()
+                .scaledToFit()
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
-                .position(x:geometry.size.width/2, y:geometry.size.height/2)                        .onAppear() {
+                .position(x:geometry.size.width/2, y:geometry.size.height/2)
+                .onAppear() {
                     Timer.scheduledTimer(withTimeInterval: 1.0 / 12, repeats: true) { _ in
                         frameIndex = (frameIndex + 1) % 9
                     }
@@ -178,9 +182,10 @@ struct Fire4: View {
         GeometryReader { geometry in
             Image("fire4_frame\(frameIndex+1)")
                 .resizable()
+                .scaledToFit()
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
-//                .blur(radius: 1)
-                .position(x:geometry.size.width/2, y:geometry.size.height/2)                       .onAppear() {
+                .position(x:geometry.size.width/2, y:geometry.size.height/2)
+                .onAppear() {
                         Timer.scheduledTimer(withTimeInterval: 1.0 / 15, repeats: true) { _ in
                             frameIndex = (frameIndex + 1) % 9
                     }
@@ -209,8 +214,10 @@ struct Fire5: View {
         GeometryReader { geometry in
             Image("fire5_frame\(frameIndex+1)")
                 .resizable()
+                .scaledToFit()
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
-                .position(x:geometry.size.width/2, y:geometry.size.height/2)                       .onAppear() {
+                .position(x:geometry.size.width/2, y:geometry.size.height/2)
+                .onAppear() {
                         Timer.scheduledTimer(withTimeInterval: 1.0 / 15, repeats: true) { _ in
                             frameIndex = (frameIndex + 1) % 6
                     }
@@ -240,8 +247,9 @@ struct Fire6: View {
         
             Image("fire6_frame\(frameIndex+1)")
                 .resizable()
+                .scaledToFit()
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
-                .blur(radius: 0.3)
+//                .blur(radius: 0.3)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)                
                 .onAppear() {
                     timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 20, repeats: true) { _ in
@@ -272,6 +280,7 @@ struct Fire7: View {
         GeometryReader { geometry in
             Image("fire7_frame\(frameIndex+1)")
                 .resizable()
+                .scaledToFit()
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
@@ -302,6 +311,7 @@ struct Fire8: View {
         GeometryReader { geometry in
             Image("fire8_frame\(frameIndex+1)")
                 .resizable()
+                .scaledToFit()
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
@@ -330,6 +340,7 @@ struct Fire9: View {
         GeometryReader { geometry in
             Image("fire9_frame\(frameIndex+1)")
                 .resizable()
+                .scaledToFit()
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
@@ -356,6 +367,7 @@ struct Fire10: View {
         GeometryReader { geometry in
             Image("fire10_frame\(frameIndex+1)")
                 .resizable()
+                .scaledToFit()
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .onAppear() {
                         Timer.scheduledTimer(withTimeInterval: 1.0 / 120, repeats: true) { _ in

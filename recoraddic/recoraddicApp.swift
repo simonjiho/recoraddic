@@ -25,7 +25,7 @@ struct recoraddicApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     
-    static let container = try! ModelContainer(for:Schema([Quest.self, Todo.self, DailyQuest.self, DailyRecord.self, DefaultPurposeData.self, DailyRecordSet.self, Profile.self]), configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic))
+    static let container = try! ModelContainer(for:Schema([Quest.self, Todo.self, DailyQuest.self, DailyRecord.self, DefaultPurposeData.self, DailyRecordSet.self, Profile.self, Todo_preset.self]), configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic))
 
     var syncManager: SyncManager = SyncManager()
 
@@ -50,18 +50,7 @@ struct recoraddicApp: App {
 }
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
-//    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-//            if granted {
-//                print("Permission granted")
-//                self.setupNotificationCategories()
-//            } else if let error = error {
-//                print("Error: \(error.localizedDescription)")
-//            }
-//        }
-//        return true
-//    }
-//    
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         

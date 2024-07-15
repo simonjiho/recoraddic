@@ -141,7 +141,7 @@ struct QuestCheckBoxView: View {
                 }
                 
                 HStack(spacing:0.0) {
-                    Image(systemName: "trash")
+                    Image(systemName: "xmark")
                         .frame(width: menuSize, height:geoHeight)
                     Spacer()
                         .frame(width: menuSize*2, height:geoHeight)
@@ -595,6 +595,7 @@ struct QuestCheckBoxContent_CUSTOM:View {
                                 }
                             }
                         }
+                    Text(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation: customDataTypeNotation))
                     if hasGoal  {
                         Text(" /")
                         TextField("", text:$goalValueInText)
@@ -603,7 +604,10 @@ struct QuestCheckBoxContent_CUSTOM:View {
                             .multilineTextAlignment(.center)
                             .focused($focusedField, equals: .goal)
                         Text(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation: customDataTypeNotation))
+
                     }
+
+                    
                 }
                 else {
                     Text(dailyQuest.questName)

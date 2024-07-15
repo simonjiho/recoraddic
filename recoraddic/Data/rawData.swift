@@ -183,12 +183,13 @@ class DailyQuest: Hashable, Equatable, Identifiable {
     var dailyRecord: DailyRecord?
     
     
-    init(createdTime: Date = .now, questName: String, data: Int, dataType: Int, defaultPurposes: Set<String>, dailyGoal: Int? = nil) {
+    init(createdTime: Date = .now, questName: String, data: Int, dataType: Int, defaultPurposes: Set<String>, customDataTypeNotation:String? = nil, dailyGoal: Int? = nil) {
         self.createdTime = createdTime
         self.questName = questName
         self.data = data
         self.dataType = dataType
         self.defaultPurposes = defaultPurposes
+        self.customDataTypeNotation = customDataTypeNotation
         self.dailyGoal = dailyGoal
     }
     
@@ -231,6 +232,15 @@ final class Todo: Hashable, Identifiable, Equatable {
         self.index = index
     }
     
+    init() {
+        self.index = -1
+    }
+    
+    init(content: String) {
+        self.index = -1
+        self.content = content
+    }
+    
     static func == (lhs: Todo, rhs: Todo) -> Bool {
             return lhs.createdTime == rhs.createdTime && lhs.index == rhs.index
             // Add any other properties that determine equality
@@ -243,6 +253,37 @@ final class Todo: Hashable, Identifiable, Equatable {
     }
     
 }
+
+
+@Model
+//final class Todo {
+final class Todo_preset: Hashable, Identifiable, Equatable {
+    var id:UUID = UUID()
+    var createdTime: Date = Date()
+
+    var content: String = ""
+    var purpose: Set<String> = []
+        
+    init(content: String) {
+        self.content = content
+    }
+    
+    static func == (lhs: Todo_preset, rhs: Todo_preset) -> Bool {
+            return lhs.createdTime == rhs.createdTime && lhs.content == rhs.content && lhs.id == rhs.id
+            // Add any other properties that determine equality
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(createdTime)
+        hasher.combine(content)
+            // Add any other properties that should be included in the hash
+    }
+    
+}
+
+
+
 
 @Model
 final class DailyRecordSet: Equatable {

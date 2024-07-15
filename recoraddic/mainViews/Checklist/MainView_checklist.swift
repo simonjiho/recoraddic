@@ -126,97 +126,113 @@ struct MainView_checklist: View {
 
                 VStack(spacing:0.0) {
 
-                    Group {
-                        if currentDailyRecord.mood == 0 {
-                            Image(systemName: "questionmark.circle")
-                                .resizable()
-                                .frame(width: facialExpressionSize, height: facialExpressionSize)
-
-                        }
-                        else {
-                            ZStack {
-                                Circle()
-                                    .stroke(lineWidth: geoWidth*0.002)
-                                    .frame(width:facialExpressionSize, height: facialExpressionSize)
-                                reversedColorSchemeColor
-                                    .frame(width:facialExpressionSize, height: facialExpressionSize)
-                                    .mask(
-                                        Image("facialExpression_\(currentDailyRecord.mood)")
-                                            .resizable()
-                                            .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
-                                    )
+                    HStack(spacing:0.0) {
+                        if currentDailyRecord.dailyText == nil {
+                            Button(action:{selectDiaryOption = true}) {
+                                Image(systemName:"book.closed.fill")
                             }
+                            .frame(width:geoWidth*0.15)
+                            .buttonStyle(.plain)
+//                            .border(.red)
+                        } else {
+                            Spacer().frame(width:geoWidth*0.15)
                         }
-                    }
-                    .onTapGesture {
-                        changeMood.toggle()
-                    }
-                    .popover(isPresented: $changeMood) {
-                        VStack {
-                            Picker("분류", selection: $selectedClassification) {
-                                ForEach(["긍정적","부정적","중립적"],id:\.self) {
-                                    Text($0)
+                        
+                        Group {
+                            if currentDailyRecord.mood == 0 {
+                                Image(systemName: "questionmark.circle")
+                                    .resizable()
+                                    .frame(width: facialExpressionSize, height: facialExpressionSize)
+                                
+                            }
+                            else {
+                                ZStack {
+                                    Circle()
+                                        .stroke(lineWidth: geoWidth*0.002)
+                                        .frame(width:facialExpressionSize, height: facialExpressionSize)
+                                    reversedColorSchemeColor
+                                        .frame(width:facialExpressionSize, height: facialExpressionSize)
+                                        .mask(
+                                            Image("facialExpression_\(currentDailyRecord.mood)")
+                                                .resizable()
+                                                .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
+                                        )
                                 }
                             }
-                            .pickerStyle(.menu)
-//                            .frame(height:geoHeight*0.06)
-                            ScrollView {
-                                let numList:[Int] = {
-                                    if selectedClassification == "전체" {return Array(1...125)}
-                                    else if selectedClassification == "긍정적" {return recoraddic.facialExpression_Good}
-                                    else if selectedClassification == "부정적" {return recoraddic.facialExpression_Bad}
-                                    else if selectedClassification == "중립적" {return recoraddic.facialExpression_Middle}
-                                    else { return [1]}
-                                }()
-                                let VGridSize = popUp_changeMood_width * 0.3
-                                
-                                if forceToChooseMood {
-                                    Text("하루를 표현할 표정을 선택하세요!")
-                                        .foregroundStyle(.red)
-                                        .minimumScaleFactor(0.5)
+                        }
+                        .frame(width:geoWidth*0.7)
+                        .onTapGesture {
+                            changeMood.toggle()
+                        }
+                        .popover(isPresented: $changeMood) {
+                            VStack {
+                                Picker("분류", selection: $selectedClassification) {
+                                    ForEach(["긍정적","부정적","중립적"],id:\.self) {
+                                        Text($0)
+                                    }
                                 }
-                                
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum: VGridSize))]) {
+                                .pickerStyle(.menu)
+                                //                            .frame(height:geoHeight*0.06)
+                                ScrollView {
+                                    let numList:[Int] = {
+                                        if selectedClassification == "전체" {return Array(1...125)}
+                                        else if selectedClassification == "긍정적" {return recoraddic.facialExpression_Good}
+                                        else if selectedClassification == "부정적" {return recoraddic.facialExpression_Bad}
+                                        else if selectedClassification == "중립적" {return recoraddic.facialExpression_Middle}
+                                        else { return [1]}
+                                    }()
+                                    let VGridSize = popUp_changeMood_width * 0.3
                                     
-                                    ForEach(numList, id: \.self) { index in
-                                        Color.black.opacity(0.6)
-                                            .mask {
-                                                Image("facialExpression_\(index)")
-                                                    .resizable()
-                                                    .blur(radius: 0.2)
-                                                    .frame(width:VGridSize*0.7, height: VGridSize*0.7)
-                                            }
-                                            .frame(width:VGridSize, height: VGridSize)
-                                            .background(bgColor.opacity(currentDailyRecord.mood == index ? 1.0 : 0.3))
-
-                                            .shadow(radius: 1)
-//                                            .border(reversedColorSchemeColor, width: /* border width */ 1)
-                                        
-
-                                            .onTapGesture {
-                                                
-                                                if currentDailyRecord.mood == index {
-                                                    currentDailyRecord.mood = 0
-                                                }
-                                                else {
-                                                    currentDailyRecord.mood = index
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                                        changeMood.toggle()
-                                                    }
-                                                }
-                                                
-                                            } // onTapGesture
+                                    if forceToChooseMood {
+                                        Text("하루를 표현할 표정을 선택하세요!")
+                                            .foregroundStyle(.red)
+                                            .minimumScaleFactor(0.5)
                                     }
                                     
-                                } // LazyVGrid
-                            } // ScrollView
-                            .frame(width: popUp_changeMood_width, height: popUp_addQuest_height*0.9)
+                                    LazyVGrid(columns: [GridItem(.adaptive(minimum: VGridSize))]) {
+                                        
+                                        ForEach(numList, id: \.self) { index in
+                                            Color.black.opacity(0.6)
+                                                .mask {
+                                                    Image("facialExpression_\(index)")
+                                                        .resizable()
+                                                        .blur(radius: 0.2)
+                                                        .frame(width:VGridSize*0.7, height: VGridSize*0.7)
+                                                }
+                                                .frame(width:VGridSize, height: VGridSize)
+                                                .background(bgColor.opacity(currentDailyRecord.mood == index ? 1.0 : 0.3))
+                                            
+                                                .shadow(radius: 1)
+                                            //                                            .border(reversedColorSchemeColor, width: /* border width */ 1)
+                                            
+                                            
+                                                .onTapGesture {
+                                                    
+                                                    if currentDailyRecord.mood == index {
+                                                        currentDailyRecord.mood = 0
+                                                    }
+                                                    else {
+                                                        currentDailyRecord.mood = index
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                                            changeMood.toggle()
+                                                        }
+                                                    }
+                                                    
+                                                } // onTapGesture
+                                        }
+                                        
+                                    } // LazyVGrid
+                                } // ScrollView
+                                .frame(width: popUp_changeMood_width, height: popUp_addQuest_height*0.9)
+                            }
+                            .padding(.vertical,popUp_addQuest_height*0.02)
+                            .frame(width: popUp_changeMood_width, height: popUp_addQuest_height, alignment: .top)
+                            .presentationCompactAdaptation(.popover)
+                            
+                            
                         }
-                        .padding(.vertical,popUp_addQuest_height*0.02)
-                        .frame(width: popUp_changeMood_width, height: popUp_addQuest_height, alignment: .top)
-                        .presentationCompactAdaptation(.popover)
-
-
+                        
+                        Spacer().frame(width: geoWidth*0.15)
                     }
                     .padding(.top,geoHeight*0.035)
                     .padding(.bottom, geoHeight*0.02)
@@ -242,43 +258,51 @@ struct MainView_checklist: View {
 
 //                }
 
-                Menu {
-
-
-
-
-                    if currentDailyRecord.todoList!.count == 0 {
-                        Button("일반 퀘스트", systemImage:"checkmark.circle") {
-                            todoActivated = true
-                            modelContext.insert(Todo(dailyRecord: currentDailyRecord, index: 0))
-                        }
-                    }
-                    
-                    Button("누적 퀘스트",systemImage:"checkmark.square", action:{
-                        popUp_addDailyQuest.toggle()
-                        selectDiaryOption = false
-                    })
-                    .labelStyle(.iconOnly)
-                    .buttonStyle(.borderedProminent)
-                    
-                    if currentDailyRecord.dailyText == nil {
-                        Button("일기",systemImage:"book.closed.fill", action:{
-                            selectDiaryOption = true
-
-                        })
-                        .labelStyle(.iconOnly)
-                        .buttonStyle(.borderedProminent)
-                        .disabled(currentDailyRecord.dailyTextType != nil)
-                    }
-
-
-                } label: {
-
-                        Image(systemName: "plus")
-                            .resizable()
-                            .frame(width:buttonSize, height:buttonSize)
-                        
-
+//                Menu {
+//
+//
+//
+//
+//                    if currentDailyRecord.todoList!.count == 0 {
+//                        Button("일반 퀘스트", systemImage:"checkmark.circle") {
+//                            todoActivated = true
+//                            modelContext.insert(Todo(dailyRecord: currentDailyRecord, index: 0))
+//                        }
+//                    }
+//                    
+//                    Button("누적 퀘스트",systemImage:"checkmark.square", action:{
+//                        popUp_addDailyQuest.toggle()
+//                        selectDiaryOption = false
+//                    })
+//                    .labelStyle(.iconOnly)
+//                    .buttonStyle(.borderedProminent)
+//                    
+//                    if currentDailyRecord.dailyText == nil {
+//                        Button("일기",systemImage:"book.closed.fill", action:{
+//                            selectDiaryOption = true
+//
+//                        })
+//                        .labelStyle(.iconOnly)
+//                        .buttonStyle(.borderedProminent)
+//                        .disabled(currentDailyRecord.dailyTextType != nil)
+//                    }
+//
+//
+//                } label: {
+//
+//                        Image(systemName: "plus")
+//                            .resizable()
+//                            .frame(width:buttonSize, height:buttonSize)
+//                        
+//
+//                }
+                Button(action:{
+                    popUp_addDailyQuest.toggle()
+                    selectDiaryOption = false // ??
+                }) {
+                    Image(systemName: "plus")
+                        .resizable()
+                        .frame(width:buttonSize, height:buttonSize)
                 }
                 .buttonStyle(CheckListButtonStyle2())
                 .frame(width:buttonSize, height:buttonSize)
@@ -340,17 +364,17 @@ struct MainView_checklist: View {
                 }
                 
 
-                if popUp_addDailyQuest {
-                    AddDailyQuestView(
-                        currentDailyRecord: currentDailyRecord,
-                        popUp_addDailyQuest: $popUp_addDailyQuest,
-                        selectedView:$selectedView,
-                        isDone: saveAsToday ? false : true
-                    )
-                    .popUpViewLayout(width: geometry.size.width*0.9, height: popUp_addQuest_height, color: colorSchemeColor)
-                    .position(x: geometry.size.width/2, y: popUp_addQuest_yPos)
-                    
-                }
+//                if popUp_addDailyQuest {
+//                    AddDailyQuestView(
+//                        currentDailyRecord: currentDailyRecord,
+//                        popUp_addDailyQuest: $popUp_addDailyQuest,
+//                        selectedView:$selectedView,
+//                        isDone: saveAsToday ? false : true
+//                    )
+//                    .popUpViewLayout(width: geometry.size.width*0.9, height: popUp_addQuest_height, color: colorSchemeColor)
+//                    .position(x: geometry.size.width/2, y: popUp_addQuest_yPos)
+//                    
+//                }
 
                 else if popUp_saveDailyRecord{
                     if !doesThemeAskQuestions(currentRecordSet.dailyRecordThemeName) {
@@ -434,6 +458,17 @@ struct MainView_checklist: View {
             .onReceive(notificationManager.$notificationData) { userInfo in
                 
                 updateDailyQuestAlerm()
+            }
+            .popover(isPresented: $popUp_addDailyQuest) {
+                EditCheckListView(
+                    currentDailyRecord: currentDailyRecord,
+                    popUp_self: $popUp_addDailyQuest,
+                    selectedView: $selectedView,
+                    todoIsEmpty: currentDailyRecord.todoList?.isEmpty ?? true
+                )
+                .presentationCompactAdaptation(.fullScreenCover)
+                .ignoresSafeArea(.keyboard)
+
             }
             
             
@@ -693,13 +728,14 @@ struct ChecklistView: View {
                                     }
                                     .frame(width:checkListElementWidth, alignment:.trailing)
                                 }
+                                .padding()
                                 
                             }
-                            if (currentDailyRecord.dailyTextType != nil && !editDiary) {
-                                Text("일기")
-//                                    .bold()
-                                    .frame(width:checkListElementWidth, alignment:.leading)
-                            }
+//                            if (currentDailyRecord.dailyTextType != nil && !editDiary) {
+//                                Text("일기")
+////                                    .bold()
+//                                    .frame(width:checkListElementWidth, alignment:.leading)
+//                            }
                             
                             if (currentDailyRecord.dailyTextType == DailyTextType.diary) {
                                 
@@ -735,10 +771,10 @@ struct ChecklistView: View {
                                     .padding(.vertical, geoHeight*0.01)
                             }
                             
-                            if currentDailyRecord.dailyQuestList!.count !=  0 {
-                                Text("누적 퀘스트")
-                                    .frame(width:checkListElementWidth,alignment: .leading)
-                            }
+//                            if currentDailyRecord.dailyQuestList!.count !=  0 {
+//                                Text("누적 퀘스트")
+//                                    .frame(width:checkListElementWidth,alignment: .leading)
+//                            }
                             VStack(spacing:questCheckBoxHeight*0.2) {
                                 ForEach(currentDailyRecord.dailyQuestList!.sorted(by: {$0.createdTime < $1.createdTime}), id: \.self) { dailyQuest in
                                     
@@ -784,10 +820,10 @@ struct ChecklistView: View {
                             
                             
                             let todoList_sorted = currentDailyRecord.todoList!.sorted(by: {$0.index < $1.index})
-                            if todoList_sorted.count != 0 {
-                                Text("일반 퀘스트")
-                                    .frame(width:checkListElementWidth,alignment: .leading)
-                            }
+//                            if todoList_sorted.count != 0 {
+//                                Text("일반 퀘스트")
+//                                    .frame(width:checkListElementWidth,alignment: .leading)
+//                            }
                             VStack (spacing:todo_height*0.2) {
                                 ForEach(todoList_sorted, id:\.self) { todo in
                                     
@@ -867,13 +903,14 @@ struct ChecklistView: View {
                             
                         } // VStack
                         .onChange(of: editingIndex) {
+//                            print("changed!!!")
                             if editingIndex != nil {
                                 withAnimation {
                                     scrollProxy.scrollTo(editingIndex,anchor: .center)
                                 }
                             }
                         }
-                        
+
                     } // scroll view
                     .frame(width:geometry.size.width, height: geometry.size.height)
                     .position(x:geometry.size.width/2, y:geometry.size.height/2)
@@ -900,6 +937,10 @@ struct ChecklistView: View {
             })
             .refreshable {
                 // when refreshed?
+                // 아래로 당기면?
+            }
+            .onTapGesture {
+                dailyQuestToDelete = nil
             }
             
 
