@@ -571,74 +571,78 @@ struct QuestCheckBoxContent_CUSTOM:View {
             HStack(spacing:0.0) {
                 Spacer()
                     .frame(width: geoWidth*1/9, height: geoWidth*0.1)
-                if isEditing {
-                    TextField("", text:$valueInText)
-                        .keyboardType(.numberPad)
-                        .frame(width:geoWidth/3)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                        .foregroundStyle(.black)
-                        .multilineTextAlignment(.center)
-                        .focused($focusedField, equals: .value)
-                        .toolbar {
-                            ToolbarItem(placement: .keyboard) {
-                                HStack(spacing:0.0) {
-                                    Toggle("목표설정", isOn: $hasGoal_toggle)
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.7)
-                                        .toggleStyle(.switch)
-                                        .frame(width:geoWidth*0.4)
-                                    Button("완료") {
-                                        editDone()
-                                    }
-                                    .frame(width:geoWidth*0.6, alignment: .trailing)
-                                }
-                            }
-                        }
-                    Text(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation: customDataTypeNotation))
-                    if hasGoal  {
-                        Text(" /")
-                        TextField("", text:$goalValueInText)
+                HStack(spacing:0.0) {
+                    if isEditing {
+                        TextField("", text:$valueInText)
                             .keyboardType(.numberPad)
                             .frame(width:geoWidth/3)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
                             .multilineTextAlignment(.center)
-                            .focused($focusedField, equals: .goal)
-                        Text(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation: customDataTypeNotation))
-
-                    }
-
-                    
-                }
-                else {
-                    Text(dailyQuest.questName)
-                        .frame(width: geoWidth*8/9, height: geoHeight)
-                        .bold()
-                        .lineLimit(1)
-                        .onTapGesture {
-                            showValue.toggle()
-                        }
-                        .popover(isPresented: $showValue) {
-                            HStack {
-                                Text("\(DataType.string_fullRepresentableNotation(data: value, dataType: dataType, customDataTypeNotation: customDataTypeNotation))")
-                                if hasGoal {
-                                    Text("/ \(DataType.string_fullRepresentableNotation(data:dailyQuest.dailyGoal ?? 0 , dataType: dataType, customDataTypeNotation: customDataTypeNotation))")
-                                }
-                                Button(action:  {
-                                    showValue.toggle()
-                                    edit()
-//                                    isEditing.toggle()
-                                }) {
-                                    Image(systemName: "square.and.pencil")
+                            .focused($focusedField, equals: .value)
+                            .toolbar {
+                                ToolbarItem(placement: .keyboard) {
+                                    HStack(spacing:0.0) {
+                                        Toggle("목표설정", isOn: $hasGoal_toggle)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.7)
+                                            .toggleStyle(.switch)
+                                            .frame(width:geoWidth*0.4)
+                                            .foregroundStyle(.blue)
+                                        Button("완료") {
+                                            editDone()
+                                        }
+                                        .frame(width:geoWidth*0.6, alignment: .trailing)
+                                        .foregroundStyle(.blue)
+                                    }
                                 }
                             }
-                            .frame(width:geoWidth*9/8)
-                            .foregroundStyle(getBrightTierColorOf(tier: tier))
-                            .background(getDarkTierColorOf(tier: dailyQuest.currentTier)) // 크기 유지를 위해(없으면 자동 조정됨)
-                            .presentationCompactAdaptation(.popover)
-                            .presentationBackground(getDarkTierColorOf(tier: dailyQuest.currentTier))
+                        Text(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation: customDataTypeNotation))
+                        if hasGoal  {
+                            Text(" / ")
+                            TextField("", text:$goalValueInText)
+                                .keyboardType(.numberPad)
+                                .frame(width:geoWidth/3)
+                                .multilineTextAlignment(.center)
+                                .focused($focusedField, equals: .goal)
+                            Text(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation: customDataTypeNotation))
+                            
                         }
+                        
+                        
+                    }
+                    else {
+                        Text(dailyQuest.questName)
+                            .frame(width: geoWidth*8/9, height: geoHeight)
+                            .bold()
+                            .lineLimit(1)
+                            .onTapGesture {
+                                showValue.toggle()
+                            }
+                            .popover(isPresented: $showValue) {
+                                HStack {
+                                    Text("\(DataType.string_fullRepresentableNotation(data: value, dataType: dataType, customDataTypeNotation: customDataTypeNotation))")
+                                    if hasGoal {
+                                        Text("/ \(DataType.string_fullRepresentableNotation(data:dailyQuest.dailyGoal ?? 0 , dataType: dataType, customDataTypeNotation: customDataTypeNotation))")
+                                    }
+                                    Button(action:  {
+                                        showValue.toggle()
+                                        edit()
+                                        //                                    isEditing.toggle()
+                                    }) {
+                                        Image(systemName: "square.and.pencil")
+                                    }
+                                }
+                                .frame(width:geoWidth*9/8)
+                                .foregroundStyle(getBrightTierColorOf(tier: tier))
+                                .background(getDarkTierColorOf(tier: dailyQuest.currentTier)) // 크기 유지를 위해(없으면 자동 조정됨)
+                                .presentationCompactAdaptation(.popover)
+                                .presentationBackground(getDarkTierColorOf(tier: dailyQuest.currentTier))
+                            }
+                    }
                 }
-                
+                .frame(width: geoWidth*8/9, height: geoWidth*0.1)
+
 
             }
             .frame(width: geoWidth,height: geoHeight)

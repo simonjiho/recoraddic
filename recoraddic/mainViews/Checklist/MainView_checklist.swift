@@ -339,13 +339,18 @@ struct MainView_checklist: View {
 
                     Button("저장",systemImage: "map.fill") {
                     }
+                    .frame(height:buttonSize)
                     .labelStyle(.titleAndIcon)
+                    .background(.white.opacity(0.0))
+                    .buttonStyle(.plain)
+
                     
                     
                     
                 }
                 .buttonStyle(CheckListButtonStyle())
-                .foregroundStyle(.black)
+//                .buttonStyle(CheckListButtonStyle())
+//                .foregroundStyle(.black)
 //                .buttonBorderShape(.roundedRectangle)
                 .position(x:geoWidth*0.85, y: geoHeight*0.95 - 10)
                 .onTapGesture {
@@ -376,7 +381,7 @@ struct MainView_checklist: View {
 //                    
 //                }
 
-                else if popUp_saveDailyRecord{
+                if popUp_saveDailyRecord{
                     if !doesThemeAskQuestions(currentRecordSet.dailyRecordThemeName) {
                         SaveDailyRecordView_confirmation(
                             currentDailyRecordSet: currentRecordSet,
@@ -560,7 +565,8 @@ struct CheckListButtonStyle: ButtonStyle {
             .padding(.vertical, 7)
             .padding(.horizontal,10)
             .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-            .background(getColorSchemeColor(colorScheme))
+//            .background(getColorSchemeColor(colorScheme))
+            .background(.thinMaterial)
             .clipShape(.buttonBorder)
 
     }
@@ -578,7 +584,8 @@ struct CheckListButtonStyle2: ButtonStyle {
             .padding(.vertical, 7)
             .padding(.horizontal, 7)
             .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-            .background(getColorSchemeColor(colorScheme))
+//            .background(getColorSchemeColor(colorScheme))
+            .background(.thinMaterial)
             .clipShape(.buttonBorder)
 
     }
@@ -673,7 +680,7 @@ struct ChecklistView: View {
             
             let questCheckBox_purposeTagsWidth = checkListElementWidth*0.1
             let questCheckBoxWidth = checkListElementWidth*0.9
-            let questCheckBoxHeight = geoHeight*0.06
+            let questCheckBoxHeight = geoHeight*0.075
             
             let todo_purposeTagsWidth = checkListElementWidth * 0.1
             let todo_checkBoxSize = checkListElementWidth * 0.1
@@ -798,7 +805,7 @@ struct ChecklistView: View {
                                             xOffset: xOffset
                                         )
                                             .frame(width:questCheckBoxWidth, height: questCheckBoxHeight)
-                                            .opacity(0.85)
+                                            .opacity(0.7)
 //                                        }
                                         
                                     }
@@ -859,7 +866,7 @@ struct ChecklistView: View {
                                             Button("완료") {
                                                 doneButtonPressed.toggle()
                                             }
-                                            .frame(width:todo_textWidth*0.2)
+                                            .frame(width:questCheckBoxWidth*0.1)
                                         }
                                         
                                         if editingIndex == nil {
@@ -1086,7 +1093,7 @@ struct PurposeOfDailyQuestView: View {
                 Group {
                     // purpose 0개일 때
                     if dailyQuest.defaultPurposes.count == 0 {
-                        colorSchemeColor
+                        Color.white.opacity(0.01)
                             .overlay(
                                 Image(systemName:"questionmark.square")
                                     .resizable()

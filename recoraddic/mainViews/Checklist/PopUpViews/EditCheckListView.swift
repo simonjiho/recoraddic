@@ -79,21 +79,23 @@ struct EditCheckListView: View {
                     })
                         .labelsHidden()
                         .pickerStyle(.segmented)
-                    if quests_notHidden.isEmpty {
-                        Button(action:{
-                            popUp_self.toggle()
-                            selectedView = .gritBoardAndStatistics}){
-                            // TODO: 바로 새로운 퀘스트 누른 것처럼 만들기
-                            Text("새로운 누적 퀘스트 만들기")
-                                    .padding()
-                        }
-                            .padding()
 
-                    }
                         
-                    else {
-                        ScrollView {
-                            if appendOption == .quest {
+                    
+                    ScrollView {
+                        if appendOption == .quest {
+                            if quests_notHidden.isEmpty {
+                                Button(action:{
+                                    popUp_self.toggle()
+                                    selectedView = .gritBoardAndStatistics}){
+                                    // TODO: 바로 새로운 퀘스트 누른 것처럼 만들기
+                                    Text("새로운 누적 퀘스트 만들기")
+                                            .padding()
+                                }
+                                    .padding()
+
+                            }
+                            else {
                                 
                                 ForEach(quests_notHidden) { quest in
                                     
@@ -129,125 +131,128 @@ struct EditCheckListView: View {
                                     
                                 }
                             }
-                            else if appendOption == .todo {
+                        }
+                        else if appendOption == .todo {
+                            Group {
+                                
                                 Group {
+                                    ZStack {
+                                        Button(action:{
+                                            addEmptyTodo = true
+                                            todos_tmp = []
+                                        }) {
+                                            Text("비어있는 일반 퀘스트")
+                                                .frame(width:elmWidth, height: todoPresetElmHeight)
+                                                .background(.gray.opacity(0.5))
+                                                .clipShape(.buttonBorder)
+                                            
+                                        }
+                                        .buttonStyle(.plain)
+                                        .disabled(!todoIsEmpty)
+                                        
+                                        Button(action:{
+                                            showHelp.toggle()
+                                        }) {
+                                            Image(systemName:"questionmark.circle")
+                                        }
+                                        .padding()
+                                        .frame(width:elmWidth, height: todoPresetElmHeight, alignment:.trailing)
+                                        .popover(isPresented: $showHelp) {
+                                            Text("일반 퀘스트가 하나 이상 존재하면 이 버튼을 사용할 수 없습니다. 이미 존재하는 일반 퀘스트를 클릭한 후 엔터키를 입력해보세요.")
+                                                .padding()
+                                                .font(.caption)
+                                                .presentationCompactAdaptation(.popover)
+                                        }
+                                        
+                                        
+                                        
+                                        
+                                        
+                                    }
+                                    .frame(width:elmWidth, height: todoPresetElmHeight)
                                     
-                                    Group {
-                                        ZStack {
+                                    
+                                    
+                                    ForEach(todos_preset) { todo_preset in
+                                        HStack(spacing:0.0) {
                                             Button(action:{
-                                                addEmptyTodo = true
-                                                todos_tmp = []
+                                                let newTodo_tmp = Todo(content: todo_preset.content)
+                                                newTodo_tmp.purpose = todo_preset.purpose
+                                                todos_tmp.append(newTodo_tmp)
                                             }) {
-                                                Text("비어있는 일반 퀘스트")
-                                                    .frame(width:elmWidth, height: todoPresetElmHeight)
-                                                    .background(.gray.opacity(0.5))
-                                                    .clipShape(.buttonBorder)
+                                                
+                                                HStack(spacing:0.0) {
+                                                    Text(todo_preset.content)
+                                                        .padding()
+                                                        .frame(width:elmWidth*0.8, alignment:.leading)
+                                                        .multilineTextAlignment(.leading)
+                                                    Image(systemName: "plus")
+                                                        .frame(width:elmWidth*0.07)
+                                                    
+                                                }
+                                                .frame(width:elmWidth*0.9, height:todoPresetElmHeight)
+                                                .background(.gray.opacity(0.5))
+                                                .clipShape(.buttonBorder)
                                                 
                                             }
                                             .buttonStyle(.plain)
-                                            .disabled(!todoIsEmpty)
                                             
-                                            Button(action:{
-                                                showHelp.toggle()
+                                            Button (action: {
+                                                modelContext.delete(todo_preset)
                                             }) {
-                                                Image(systemName:"questionmark.circle")
+                                                Image(systemName: "xmark")
                                             }
-                                            .padding()
-                                            .frame(width:elmWidth, height: todoPresetElmHeight, alignment:.trailing)
-                                            .popover(isPresented: $showHelp) {
-                                                Text("일반 퀘스트가 하나 이상 존재하면 이 버튼을 사용할 수 없습니다. 이미 존재하는 일반 퀘스트를 클릭한 후 엔터키를 입력해보세요.")
-                                                    .padding()
-                                                    .font(.caption)
-                                                    .presentationCompactAdaptation(.popover)
-                                            }
-                                            
-                                            
-                                            
-                                            
+                                            .frame(width:elmWidth*0.1)
                                             
                                         }
-                                        .frame(width:elmWidth, height: todoPresetElmHeight)
+                                        
+                                        .frame(width:elmWidth, height:todoPresetElmHeight)
                                         
                                         
                                         
-                                        ForEach(todos_preset) { todo_preset in
-                                            HStack(spacing:0.0) {
-                                                Button(action:{
-                                                    todos_tmp.append(Todo(content: todo_preset.content))
-                                                }) {
-                                                    
-                                                    HStack(spacing:0.0) {
-                                                        Text(todo_preset.content)
-                                                            .padding()
-                                                            .frame(width:elmWidth*0.8, alignment:.leading)
-                                                            .multilineTextAlignment(.leading)
-                                                        Image(systemName: "plus")
-                                                            .frame(width:elmWidth*0.07)
-                                                        
-                                                    }
-                                                    .frame(width:elmWidth*0.9, height:todoPresetElmHeight)
-                                                    .background(.gray.opacity(0.5))
-                                                    .clipShape(.buttonBorder)
-                                                    
-                                                }
-                                                .buttonStyle(.plain)
-                                                
-                                                Button (action: {
-                                                    modelContext.delete(todo_preset)
-                                                }) {
-                                                    Image(systemName: "xmark")
-                                                }
-                                                .frame(width:elmWidth*0.1)
-                                                
-                                            }
-                                            
-                                            .frame(width:elmWidth, height:todoPresetElmHeight)
-                                            
-                                            
-                                            
-                                        }
-                                    }
-                                    .disabled(createNewPreset)
-                                    if createNewPreset {
-                                        TextField("자주 사용하는 일일퀘스트를 생성하세요.", text: $newTodoPresetName)
-                                            .padding()
-                                            .frame(width:elmWidth, height:todoPresetElmHeight)
-                                            .onSubmit {
-                                                focusField.toggle()
-                                                if newTodoPresetName != "" {
-                                                    modelContext.insert(Todo_preset(content: newTodoPresetName))
-                                                    newTodoPresetName = ""
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                                    }
-                                                }
-                                                createNewPreset.toggle()
-                                                
-                                            }
-                                            .focused($focusField)
-                                            .keyboardShortcut(.end)
-                                        
-                                    }
-                                    else {
-                                        
-                                        Button(action:{
-                                            createNewPreset.toggle()
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                                focusField = true
-                                            }
-                                        }) {
-                                            Image(systemName: "plus")
-                                        }
-                                        .padding()
                                     }
                                 }
-                                .disabled(addEmptyTodo)
-                                
+                                .disabled(createNewPreset)
+                                if createNewPreset {
+                                    TextField("자주 사용하는 일일퀘스트를 생성하세요.", text: $newTodoPresetName)
+                                        .padding()
+                                        .frame(width:elmWidth, height:todoPresetElmHeight)
+                                        .onSubmit {
+                                            focusField.toggle()
+                                            if newTodoPresetName != "" {
+                                                modelContext.insert(Todo_preset(content: newTodoPresetName))
+                                                newTodoPresetName = ""
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                                }
+                                            }
+                                            createNewPreset.toggle()
+                                            
+                                        }
+                                        .focused($focusField)
+                                        .keyboardShortcut(.end)
+                                    
+                                }
+                                else {
+                                    
+                                    Button(action:{
+                                        createNewPreset.toggle()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                            focusField = true
+                                        }
+                                    }) {
+                                        Image(systemName: "plus")
+                                    }
+                                    .padding()
+                                }
                             }
-                            else {
-                                // later, add dailyPreset
-                            }
+                            .disabled(addEmptyTodo)
+                            
+                        }
+                        else {
+                            // later, add dailyPreset
                         }
                     }
+                    
                 }
                 .padding()
                 .frame(width: geoWidth*0.95, height: geoHeight*0.4, alignment: .top)
@@ -347,7 +352,7 @@ struct EditCheckListView: View {
                             Text("추가")
                         }
                         .frame(width: geoWidth*0.4, alignment: .trailing)
-                        .disabled(dailyQuests_tmp.isEmpty && todos_tmp.isEmpty)
+                        .disabled(dailyQuests_tmp.isEmpty && todos_tmp.isEmpty && !addEmptyTodo)
                     }
 
                 }

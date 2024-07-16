@@ -508,6 +508,7 @@ class Quest: Equatable, Identifiable, Hashable {
     var name: String = ""
     var subName: String? //MARK: 아직 사용하지는 않지만, 일단 만들어둠. 쓸까 말까..
     var dataType: Int = 1
+    var pastCumulatve: Int = 0
     var dailyData: [Date:Int] = [:]
     
     var recentData: Int = 0 // DailyQuest 새로 생성 및 수정 시 새로이 수정

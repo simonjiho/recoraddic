@@ -105,7 +105,7 @@ final class DataType {
         
         // set to get O / X later
         else if dataType == DataType.OX {
-            return ""
+            return "회"
         }
         
         else if dataType == DataType.REP

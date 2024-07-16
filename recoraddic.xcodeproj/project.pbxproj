@@ -57,7 +57,6 @@
 		B2B28DBD2AC5D69D0071531B /* MainView_ProfileAndSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B28DB22AC5D69D0071531B /* MainView_ProfileAndSettings.swift */; };
 		B2B6B1922B47F8F3006DDCBE /* defaultImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2B6B1912B47F8F3006DDCBE /* defaultImages.xcassets */; };
 		B2BA88FA2B2B0D4500A3D50E /* defaultVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA88F92B2B0D4500A3D50E /* defaultVariables.swift */; };
-		B2BA88FD2B2F171600A3D50E /* AddQuestCheckboxDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA88FC2B2F171600A3D50E /* AddQuestCheckboxDataView.swift */; };
 		B2BA89032B30A71C00A3D50E /* QuestCheckBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA89022B30A71C00A3D50E /* QuestCheckBoxView.swift */; };
 		B2BA89072B32CA5600A3D50E /* textFieldMaxLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA89062B32CA5600A3D50E /* textFieldMaxLength.swift */; };
 		B2BA890A2B32E0EB00A3D50E /* DiaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA89092B32E0EB00A3D50E /* DiaryView.swift */; };
@@ -76,6 +75,8 @@
 		B2E5522B2BC2989000ACA5A8 /* stoneTower_shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E5522A2BC2989000ACA5A8 /* stoneTower_shared.swift */; };
 		B2E5522F2BC29E2700ACA5A8 /* StoneTower_0_sharedFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E5522E2BC29E2700ACA5A8 /* StoneTower_0_sharedFunc.swift */; };
 		B2E6C6372C4674220082B000 /* EditCheckListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E6C6362C4674210082B000 /* EditCheckListView.swift */; };
+		B2E6C6392C47A8C20082B000 /* SolarCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E6C6382C47A8C20082B000 /* SolarCalculator.swift */; };
+		B2E6C63B2C47AA1B0082B000 /* SunriseSunsetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E6C63A2C47AA1B0082B000 /* SunriseSunsetViewModel.swift */; };
 		B2F0171D2C3D155400765EF6 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2F0171C2C3D155400765EF6 /* WidgetKit.framework */; };
 		B2F0171F2C3D155400765EF6 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2F0171E2C3D155400765EF6 /* SwiftUI.framework */; };
 		B2F017222C3D155400765EF6 /* recoraddicWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F017212C3D155400765EF6 /* recoraddicWidgetBundle.swift */; };
@@ -182,7 +183,6 @@
 		B2B28DB22AC5D69D0071531B /* MainView_ProfileAndSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainView_ProfileAndSettings.swift; sourceTree = "<group>"; };
 		B2B6B1912B47F8F3006DDCBE /* defaultImages.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = defaultImages.xcassets; sourceTree = "<group>"; };
 		B2BA88F92B2B0D4500A3D50E /* defaultVariables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = defaultVariables.swift; sourceTree = "<group>"; };
-		B2BA88FC2B2F171600A3D50E /* AddQuestCheckboxDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddQuestCheckboxDataView.swift; sourceTree = "<group>"; };
 		B2BA89022B30A71C00A3D50E /* QuestCheckBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestCheckBoxView.swift; sourceTree = "<group>"; };
 		B2BA89062B32CA5600A3D50E /* textFieldMaxLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = textFieldMaxLength.swift; sourceTree = "<group>"; };
 		B2BA89092B32E0EB00A3D50E /* DiaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryView.swift; sourceTree = "<group>"; };
@@ -201,6 +201,8 @@
 		B2E5522A2BC2989000ACA5A8 /* stoneTower_shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stoneTower_shared.swift; sourceTree = "<group>"; };
 		B2E5522E2BC29E2700ACA5A8 /* StoneTower_0_sharedFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower_0_sharedFunc.swift; sourceTree = "<group>"; };
 		B2E6C6362C4674210082B000 /* EditCheckListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCheckListView.swift; sourceTree = "<group>"; };
+		B2E6C6382C47A8C20082B000 /* SolarCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolarCalculator.swift; sourceTree = "<group>"; };
+		B2E6C63A2C47AA1B0082B000 /* SunriseSunsetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunriseSunsetViewModel.swift; sourceTree = "<group>"; };
 		B2F0171A2C3D155400765EF6 /* recoraddicWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = recoraddicWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2F0171C2C3D155400765EF6 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		B2F0171E2C3D155400765EF6 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -291,6 +293,8 @@
 				B265D26B2B032D30002E51A8 /* randomColorFunc.swift */,
 				B265D27C2B0497D0002E51A8 /* callTheme.swift */,
 				B27CBB582BA41E6C00CD6CD3 /* recalculateVisualValues_dr.swift */,
+				B2E6C6382C47A8C20082B000 /* SolarCalculator.swift */,
+				B2E6C63A2C47AA1B0082B000 /* SunriseSunsetViewModel.swift */,
 			);
 			path = functions;
 			sourceTree = "<group>";
@@ -451,7 +455,6 @@
 		B2BA88FB2B2F16FB00A3D50E /* PopUpViews */ = {
 			isa = PBXGroup;
 			children = (
-				B2BA88FC2B2F171600A3D50E /* AddQuestCheckboxDataView.swift */,
 				B2BA890F2B36BDC600A3D50E /* SaveDailyRecordView.swift */,
 				B2E6C6362C4674210082B000 /* EditCheckListView.swift */,
 			);
@@ -697,6 +700,7 @@
 				B265D2852B049FBA002E51A8 /* theme.swift in Sources */,
 				B220DA2E2B612EB60039160C /* colorFunc.swift in Sources */,
 				B2E5522B2BC2989000ACA5A8 /* stoneTower_shared.swift in Sources */,
+				B2E6C6392C47A8C20082B000 /* SolarCalculator.swift in Sources */,
 				B2030E052BCCF0F600CE0EDF /* StoneTower_0_stone.swift in Sources */,
 				B2E1AB712B24D6E300EBF359 /* TextFieldForHour.swift in Sources */,
 				B283397D2AFB97E9009AEB2A /* calendarFunc.swift in Sources */,
@@ -717,7 +721,6 @@
 				B2CD40082BB2CE9100BECC5E /* StoneTower1_stones.swift in Sources */,
 				B2E552282BC297A400ACA5A8 /* StoneTower_0.swift in Sources */,
 				B260A3912A9B88AE00D73208 /* MainView_checklist.swift in Sources */,
-				B2BA88FD2B2F171600A3D50E /* AddQuestCheckboxDataView.swift in Sources */,
 				B29C702E2A35C5E30046873E /* recoraddicApp.swift in Sources */,
 				B2BA89102B36BDC600A3D50E /* SaveDailyRecordView.swift in Sources */,
 				B265D26C2B032D30002E51A8 /* randomColorFunc.swift in Sources */,
@@ -734,6 +737,7 @@
 				B2BA88FA2B2B0D4500A3D50E /* defaultVariables.swift in Sources */,
 				B265D2812B049DF9002E51A8 /* dailyRecordStoneAction.swift in Sources */,
 				B2B28DBD2AC5D69D0071531B /* MainView_ProfileAndSettings.swift in Sources */,
+				B2E6C63B2C47AA1B0082B000 /* SunriseSunsetViewModel.swift in Sources */,
 				B2FB22002B1367DC00AB17FA /* buttonsView.swift in Sources */,
 				B220DA442B6519C20039160C /* stoneTower_backgroundThemes.swift in Sources */,
 				B2E6C6372C4674220082B000 /* EditCheckListView.swift in Sources */,

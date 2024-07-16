@@ -14,7 +14,9 @@ struct SaveDailyRecordView_confirmation: View {
     @Environment(\.colorScheme) var colorScheme
     
     @Query var quests: [Quest]
+    @Query var todo_presets: [Todo_preset]
     @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
+    
     
     var currentDailyRecordSet: DailyRecordSet
     var currentDailyRecord: DailyRecord
@@ -169,21 +171,10 @@ struct SaveDailyRecordView_confirmation: View {
             modelContext.delete(emptyTodo)
         }
 
-        for questData in currentDailyRecord.dailyQuestList! {
-            let quest: Quest? = quests.first(where: {quest in quest.name == questData.questName})
-            if quest != nil {
-                if quest!.dailyData.keys.contains(savingDate) {
-                    quest!.dailyData[savingDate]! += questData.data
-                }
-                else {
-                    quest!.dailyData[savingDate] = questData.data
-                }
-                quest!.updateTier()
-                quest!.updateMomentumLevel()
-                quest!.recentPurpose = questData.defaultPurposes
-                quest!.recentData = questData.data
-            }
-        }
+        
+        updateQuest()
+        updateTodoPreset()
+
         
         var dateComponents = DateComponents()
         dateComponents.day = 1
@@ -203,6 +194,33 @@ struct SaveDailyRecordView_confirmation: View {
         isNewDailyRecordAdded.toggle()
         
     }
+    
+    func updateQuest() -> Void {
+        for questData in currentDailyRecord.dailyQuestList! {
+            
+            if let quest: Quest = quests.first(where: {quest in quest.name == questData.questName}) {
+                if quest.dailyData.keys.contains(savingDate) {
+                    quest.dailyData[savingDate]! += questData.data
+                }
+                else {
+                    quest.dailyData[savingDate] = questData.data
+                }
+                quest.updateTier()
+                quest.updateMomentumLevel()
+                quest.recentPurpose = questData.defaultPurposes
+                quest.recentData = questData.data
+            }
+        }
+    }
+    func updateTodoPreset() -> Void {
+        for todo in currentDailyRecord.todoList! {
+            if let todo_preset: Todo_preset = todo_presets.first(where: {todo_preset in todo_preset.content == todo.content}) {
+                todo_preset.purpose = todo.purpose
+            }
+        }
+    }
+    
+    
     func recalculateVisualValuesOfToday() -> Void { // 어제의 기록을 올리는데 이미 오늘의 기록이 있을 때
         
         // savingDate is yesterday in this case

@@ -91,9 +91,11 @@ struct Fire1: View {
 //                .blur(radius: 1)
             .position(x:geometry.size.width/2, y:geometry.size.height/2)
             .onAppear() {
-                Timer.scheduledTimer(withTimeInterval: 1.0 / 12, repeats: true) { _ in
+                timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 12, repeats: true) { _ in
                     frameIndex = (frameIndex + 1) % 9
                 }
+                RunLoop.current.add(timer!, forMode: .common)
+
             }
             .onDisappear() {
                 timer?.invalidate()
@@ -123,9 +125,11 @@ struct Fire2: View {
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
-                    Timer.scheduledTimer(withTimeInterval: 1.0 / 12, repeats: true) { _ in
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 12, repeats: true) { _ in
                         frameIndex = (frameIndex + 1) % 9
                     }
+                    RunLoop.current.add(timer!, forMode: .common)
+
                 }
                 .onDisappear() {
                     timer?.invalidate()
@@ -186,9 +190,11 @@ struct Fire4: View {
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
-                        Timer.scheduledTimer(withTimeInterval: 1.0 / 15, repeats: true) { _ in
-                            frameIndex = (frameIndex + 1) % 9
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 15, repeats: true) { _ in
+                        frameIndex = (frameIndex + 1) % 9
                     }
+                    RunLoop.current.add(timer!, forMode: .common)
+
                 }
                 .onDisappear() {
                     timer?.invalidate()
@@ -218,9 +224,12 @@ struct Fire5: View {
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
-                        Timer.scheduledTimer(withTimeInterval: 1.0 / 15, repeats: true) { _ in
-                            frameIndex = (frameIndex + 1) % 6
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 15, repeats: true) { _ in
+                        frameIndex = (frameIndex + 1) % 6
                     }
+                    RunLoop.current.add(timer!, forMode: .common)
+
+                    
                 }
                 .onDisappear() {
                     timer?.invalidate()
@@ -255,6 +264,10 @@ struct Fire6: View {
                     timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 20, repeats: true) { _ in
                         frameIndex = (frameIndex + 1) % 6
                     }
+                    RunLoop.current.add(timer!, forMode: .common)
+//                    withAnimation(Animation.linear(duration: 1.0 / 20).repeatForever(autoreverses: false)) {
+//                        frameIndex = (frameIndex + 1) % 6
+//                    }
                 }
                 .onDisappear() {
                     timer?.invalidate()
@@ -284,9 +297,11 @@ struct Fire7: View {
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
-                        Timer.scheduledTimer(withTimeInterval: 1.0 / 25, repeats: true) { _ in
-                            frameIndex = (frameIndex + 1) % 6
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 25, repeats: true) { _ in
+                        frameIndex = (frameIndex + 1) % 6
                     }
+                    RunLoop.current.add(timer!, forMode: .common)
+
                 }
                 .onDisappear() {
                     timer?.invalidate()
@@ -315,9 +330,11 @@ struct Fire8: View {
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
-                        Timer.scheduledTimer(withTimeInterval: 1.0 / 40, repeats: true) { _ in
-                            frameIndex = (frameIndex + 1) % 6
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 40, repeats: true) { _ in
+                        frameIndex = (frameIndex + 1) % 6
                     }
+                    RunLoop.current.add(timer!, forMode: .common)
+
                 }
                 .onDisappear() {
                     timer?.invalidate()
@@ -344,9 +361,11 @@ struct Fire9: View {
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
-                        Timer.scheduledTimer(withTimeInterval: 1.0 / 40, repeats: true) { _ in
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 40, repeats: true) { _ in
                             frameIndex = (frameIndex + 1) % 3
                     }
+                    RunLoop.current.add(timer!, forMode: .common)
+
                 }
                 .onDisappear() {
                     timer?.invalidate()
@@ -370,9 +389,48 @@ struct Fire10: View {
                 .scaledToFit()
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .onAppear() {
-                        Timer.scheduledTimer(withTimeInterval: 1.0 / 120, repeats: true) { _ in
-                            frameIndex = (frameIndex + 1) % 4
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 120, repeats: true) { _ in
+                        frameIndex = (frameIndex + 1) % 4
                     }
+                    RunLoop.current.add(timer!, forMode: .common)
+
+                }
+                .onDisappear() {
+                    timer?.invalidate()
+                    timer = nil
+                
+                }
+        }
+
+    }
+}
+
+
+struct Fire6_forContentViewBackground: View {
+    
+    @State var frameIndex: Int = 0
+    @State var timer: Timer?
+    
+    var body: some View {
+        
+//        var timer: Timer?
+        
+        GeometryReader { geometry in
+        
+            Image("fire6_frame\(frameIndex+1)")
+                .resizable()
+//                .scaledToFill()
+                .frame(width: geometry.size.width, height: geometry.size.height)
+//                .blur(radius: 0.3)
+                .position(x:geometry.size.width/2, y:geometry.size.height/2)
+                .onAppear() {
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 6, repeats: true) { _ in
+                        frameIndex = (frameIndex + 1) % 6
+                    }
+                    RunLoop.current.add(timer!, forMode: .common)
+//                    withAnimation(Animation.linear(duration: 1.0 / 20).repeatForever(autoreverses: false)) {
+//                        frameIndex = (frameIndex + 1) % 6
+//                    }
                 }
                 .onDisappear() {
                     timer?.invalidate()

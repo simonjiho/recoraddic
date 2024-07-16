@@ -9,7 +9,7 @@ import Foundation
 
 extension Quest {
     func cumulative() -> Int {
-        return sumIntArray(Array(self.dailyData.values))
+        return sumIntArray(Array(self.dailyData.values)) + self.pastCumulatve
     }
     
     func updateTier() -> Void {
