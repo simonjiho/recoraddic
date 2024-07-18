@@ -156,6 +156,9 @@ struct ContentView: View {
                      
                      TabView(selection: $selectedView){
                          MainView_QuestInventory()
+
+                             
+                         
                          .tabItem {
                              Image(systemName: images[mainViews[1]]!)
                          }
@@ -168,16 +171,32 @@ struct ContentView: View {
                             isNewDailyRecordAdded: $isNewDailyRecordAdded
  
                          )
-                         .background(
-                            Fire6_forContentViewBackground()
-                                .opacity(0.3)
-                                .blur(radius: 30)
-                                .frame(width:1000,height: 2000)
-                                .offset(x:0,y:-150)
-//                                .background(colorScheme == .dark ? .black : .orange.opacity(0.7))
-                                .background(.orange.opacity(colorScheme == .dark ? 0.4 : 0.6))
+                         .background(.quaternary)
+//                         .background(.quaternary)
+
+//                         .background(
+//                            Color.red.opacity(0.35)
+//                                .ignoresSafeArea()
+//                                .background(.orange.opacity(0.7))
+//                         )
+                            
+//                            Fire6_forContentViewBackground()
+//                            FireBackgroundView()
+////                                .opacity(0.3)
+////                                .blur(radius: 35)
+////                                .frame(width:1250,height: 2500)
+////                                .offset(x:-20,y:-100)
+////                                .background(.orange.opacity(colorScheme == .dark ? 0.4 : 0.7))
+////                                .opacity(0.5)
+//                                .blur(radius: 30)
+//                                .frame(width:1200,height: 2000)
+//                                .offset(x:-15,y:-200)
+////                                .background(colorScheme == .dark ? .black : .orange.opacity(0.7))
+//                                .background(.orange.opacity(colorScheme == .dark ? 0.4 : 0.8))
+//                                .opacity(0.6)
+//                                .background(.red.opacity(colorScheme == .dark ? 0.4 : 0.4))
+                            
                                 
-                         )
                          .tabItem {
                              Image(systemName: images[mainViews[0]]!)
                          }

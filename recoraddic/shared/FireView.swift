@@ -224,8 +224,8 @@ struct Fire5: View {
                 .frame(width: geometry.size.width*ratio, height: geometry.size.height*ratio)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
-                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 15, repeats: true) { _ in
-                        frameIndex = (frameIndex + 1) % 6
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60, repeats: true) { _ in
+                        frameIndex = (frameIndex + 1) % 24
                     }
                     RunLoop.current.add(timer!, forMode: .common)
 
@@ -389,7 +389,7 @@ struct Fire10: View {
                 .scaledToFit()
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .onAppear() {
-                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 120, repeats: true) { _ in
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60, repeats: true) { _ in
                         frameIndex = (frameIndex + 1) % 4
                     }
                     RunLoop.current.add(timer!, forMode: .common)
@@ -424,7 +424,7 @@ struct Fire6_forContentViewBackground: View {
 //                .blur(radius: 0.3)
                 .position(x:geometry.size.width/2, y:geometry.size.height/2)
                 .onAppear() {
-                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 6, repeats: true) { _ in
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 15, repeats: true) { _ in
                         frameIndex = (frameIndex + 1) % 6
                     }
                     RunLoop.current.add(timer!, forMode: .common)
@@ -441,3 +441,47 @@ struct Fire6_forContentViewBackground: View {
 
     }
 }
+
+struct FireBackgroundView: View {
+    
+    @State var timer: Timer?
+
+
+    @State var num: Int = 0
+    @State var num_str: String = "00"
+
+    var body: some View {
+    
+        GeometryReader { geometry in
+            
+            Image("00000\(num_str)")
+                .resizable()
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .position(x:geometry.size.width/2, y:geometry.size.height/2)
+                .onAppear() {
+                    
+                    timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0 , repeats: true) { _ in
+                        num = (num + 1) % 96
+                        if num < 10 {
+                            num_str = "0" + String(num)
+                        }
+                        else {
+                            num_str = String(num)
+                        }
+                    }
+                    
+                    RunLoop.current.add(timer!, forMode: .common)
+                    
+                    
+                    
+                }
+                .onDisappear() {
+                    timer?.invalidate()
+                    timer = nil
+                    
+                }
+            
+        }
+    }
+}
+

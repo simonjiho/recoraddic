@@ -279,15 +279,16 @@ struct MainView_QuestInventory: View {
                         
                     } // VStack
                     .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
-                    .background(
-                       Fire6_forContentViewBackground()
-                           .opacity(0.35)
-                           .blur(radius: 30)
-                           .frame(width:1000,height: 2000)
-                           .offset(x:0,y:-150)
-//                                .background(colorScheme == .dark ? .black : .orange.opacity(0.7))
-                           .background(.orange.opacity(colorScheme == .dark ? 0.4 : 0.6))
-                    )
+                    .background(.quaternary)
+//                    .background(
+//                       Fire6_forContentViewBackground()
+//                           .opacity(0.35)
+//                           .blur(radius: 30)
+//                           .frame(width:1000,height: 2000)
+//                           .offset(x:0,y:-150)
+////                                .background(colorScheme == .dark ? .black : .orange.opacity(0.7))
+//                           .background(.orange.opacity(colorScheme == .dark ? 0.4 : 0.6))
+//                    )
                     .sheet(isPresented: $popUp_questStatisticsInDetail, onDismiss: {selectedQuest = nil}) {
                         QuestInDetail(
                             selectedQuest: $selectedQuest,

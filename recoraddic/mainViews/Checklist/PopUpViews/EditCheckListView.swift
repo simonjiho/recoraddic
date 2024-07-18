@@ -101,7 +101,6 @@ struct EditCheckListView: View {
                                     
                                     Button(action:{
                                         let newDailyQuest_tmp = DailyQuest(questName: quest.name, data: 0, dataType: quest.dataType, defaultPurposes: quest.recentPurpose, customDataTypeNotation: quest.customDataTypeNotation)
-                                        newDailyQuest_tmp.dailyRecord = currentDailyRecord
                                         newDailyQuest_tmp.currentTier = quest.tier
                                         dailyQuests_tmp.append(newDailyQuest_tmp)
                                     }) {
