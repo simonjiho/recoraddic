@@ -217,14 +217,14 @@ final class DataType {
         if dataType == DataType.HOUR {
             let (hours,minutes) = string_unitDataToRepresentableData_hours(data: data)
             if hours == "0" {
-                return "\(minutes)분"
+                return "\(minutes)min"
             }
             else if hours != "0" && minutes == "0" {
-                return "\(hours)시간"
+                return "\(hours)hr"
 
             }
             else {
-                return "\(hours)시간 \(minutes)분"
+                return "\(hours)h \(minutes)m"
             }
         }
         if dataType == DataType.CUSTOM {

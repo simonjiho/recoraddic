@@ -56,8 +56,9 @@ struct MainView_QuestInventory: View {
             let geoWidth: CGFloat = geometry.size.width
             let geoHeight: CGFloat = geometry.size.height
 
-            let gridHorizontalPadding = geoWidth*0.04
-            let gridViewFrameWidth = geoWidth - gridHorizontalPadding*2
+            let gridHorizontalPadding = geoWidth*0.02
+            let gridInnerPadding = geoWidth * 0.02
+            let gridViewFrameWidth = geoWidth - gridHorizontalPadding*2 - gridInnerPadding*2
             let gridSize = (gridViewFrameWidth) / 3 * 0.955
             let gridItemSize = gridSize * 0.85
             let gridItemSpacing = gridItemSize*0.3
@@ -107,156 +108,126 @@ struct MainView_QuestInventory: View {
                         
                         ZStack {
                             ScrollView {
-                                ZStack {
+                                
                                     
-                                    LazyVGrid(columns: [GridItem(.adaptive(minimum: gridSize, maximum: gridSize))], spacing: gridVerticalSpacing) {
-                                        ForEach(quest_sorted,id:\.createdTime) { quest in
-                                            
-                                            
-                                            Button(action:{
-                                                if !isEdit {
-                                                    selectedQuest = quest
-                                                    popUp_questStatisticsInDetail.toggle()
+                                LazyVGrid(columns: [GridItem(.adaptive(minimum: gridSize, maximum: gridSize))], spacing: gridVerticalSpacing) {
+                                    ForEach(quest_sorted,id:\.createdTime) { quest in
+                                        
+                                        
+                                        Button(action:{
+                                            if !isEdit {
+                                                selectedQuest = quest
+                                                popUp_questStatisticsInDetail.toggle()
+                                            }
+                                            else {
+                                                if selectedQuestNames.contains(quest.name) {
+                                                    selectedQuestNames.remove(quest.name)
                                                 }
                                                 else {
-                                                    if selectedQuestNames.contains(quest.name) {
-                                                        selectedQuestNames.remove(quest.name)
-                                                    }
-                                                    else {
-                                                        selectedQuestNames.insert(quest.name)
-                                                    }
+                                                    selectedQuestNames.insert(quest.name)
                                                 }
-                                                
-                                            }) {
+                                            }
+                                            
+                                        }) {
+                                            ZStack {
                                                 ZStack {
-                                                    ZStack {
-                                                        QuestThumbnailView(quest: quest)
-                                                            .frame(width: gridItemSize, height: gridItemSize)
-                                                        if isEdit {
-                                                            Button(action:{
+                                                    QuestThumbnailView(quest: quest)
+                                                        .frame(width: gridItemSize, height: gridItemSize)
+                                                    if isEdit {
+                                                        Button(action:{
+                                                            if selectedQuestNames.contains(quest.name) {
+                                                                selectedQuestNames.remove(quest.name)
+                                                            }
+                                                            else {
+                                                                selectedQuestNames.insert(quest.name)
+                                                            }
+                                                        }) {
+                                                            ZStack {
+                                                                let path: Path = Path(roundedRect: CGRect(x: 0, y: 0, width: gridItemSize, height: gridItemSize), cornerSize: CGSize(width: gridItemSize/20, height: gridItemSize/20))
+                                                                path
+                                                                    .stroke(lineWidth: gridItemSize/15)
                                                                 if selectedQuestNames.contains(quest.name) {
-                                                                    selectedQuestNames.remove(quest.name)
+                                                                    Image(systemName:"checkmark")
+                                                                        .resizable()
+                                                                        .frame(width:gridItemSize*0.6, height: gridItemSize*0.6)
                                                                 }
-                                                                else {
-                                                                    selectedQuestNames.insert(quest.name)
-                                                                }
-                                                            }) {
-                                                                ZStack {
-                                                                    let path: Path = Path(roundedRect: CGRect(x: 0, y: 0, width: gridItemSize, height: gridItemSize), cornerSize: CGSize(width: gridItemSize/20, height: gridItemSize/20))
-                                                                    path
-                                                                        .stroke(lineWidth: gridItemSize/15)
-                                                                    if selectedQuestNames.contains(quest.name) {
-                                                                        Image(systemName:"checkmark")
-                                                                            .resizable()
-                                                                            .frame(width:gridItemSize*0.6, height: gridItemSize*0.6)
-                                                                    }
-                                                                    
-                                                                }
-                                                                .frame(width:gridItemSize, height: gridItemSize)
-                                                                .foregroundStyle(.blue)
                                                                 
                                                             }
+                                                            .frame(width:gridItemSize, height: gridItemSize)
+                                                            .foregroundStyle(.blue)
+                                                            
                                                         }
                                                     }
-                                                    .frame(width: gridItemSize, height: gridItemSize)
                                                 }
-                                                .frame(width:gridSize, height: gridSize)
-                                                
-                                            }
-                                            .contextMenu(ContextMenu(menuItems: {
-                                                Button("숨기기") {
-                                                    quest.isHidden = true
-                                                }
-                                            }))
-                                            .onAppear() {
-                                                quest.updateMomentumLevel()
+                                                .frame(width: gridItemSize, height: gridItemSize)
                                             }
                                             .frame(width:gridSize, height: gridSize)
-                                            //                                        .border(.yellow)
-                                            
-                                            
-                                            
-                                            
                                             
                                         }
-                                        
-                                        
-                                        // TODO: plus button
-                                        if !isEdit {
-                                            ZStack {
-                                                
-                                                NavigationLink(destination: CreateNewQuest(popUp_createNewQuest: $popUp_addNewQuest)
-) {
-                                                    Image(systemName: "plus.square")
-                                                        .resizable()
-                                                        .frame(width: gridItemSize*0.4, height: gridItemSize*0.4)
-                                                    
-                                                }
-                                                .buttonStyle(.plain)
-                                                
-                                                
-                                                
-                                                //                                            Button(action: {
-                                                //                                                popUp_addNewQuest.toggle()
-                                                //                                            }) {
-                                                //                                                Image(systemName: "plus.square")
-                                                //                                                    .resizable()
-                                                //                                                    .frame(width: gridItemSize*0.4, height: gridItemSize*0.4)
-                                                //                                            }
-                                                //                                            .buttonStyle(.plain)
+                                        .contextMenu(ContextMenu(menuItems: {
+                                            Button("숨기기") {
+                                                quest.isHidden = true
                                             }
-                                            .frame(width: gridItemSize, height: gridItemSize)
+                                        }))
+                                        .onAppear() {
+                                            quest.updateMomentumLevel()
                                         }
+                                        .frame(width:gridSize, height: gridSize)
+                                        //                                        .border(.yellow)
                                         
                                         
                                         
-                                    } // lazyVGrid
-                                    .frame(width:gridViewFrameWidth)
-                                    //                                .border(.red)
-                                    Path { path in
-                                        let items = quest_sorted.count
-                                        let size = gridViewFrameWidth/3
                                         
-                                        let halfOfHorizontalPadding = (gridViewFrameWidth - gridSize*3)/2/2
-                                        let x1 = gridSize + halfOfHorizontalPadding
-                                        let x2 = gridSize * 2 + halfOfHorizontalPadding * 3
-                                        
-                                        path.move(to: CGPoint(x: x1, y: 0.0))
-                                        path.addLine(to: CGPoint(x: x1, y:CGFloat((items + 2) / 3) * size))
-                                        path.move(to: CGPoint(x: x2, y: 0.0))
-                                        path.addLine(to: CGPoint(x: x2, y:CGFloat((items + 1) / 3) * size))
-                                        
-                                        
-                                        let rowsNum = (items - 1) / 3
-                                        let lastRowElmNum = items % 3
-                                        let halfOfVerticalPadding = gridVerticalSpacing/2
-                                        let height = gridSize + halfOfVerticalPadding*2
-                                        
-                                        for i in 0..<rowsNum {
-                                            let y = height * CGFloat(i + 1) - halfOfVerticalPadding
-                                            //                                        if i != rowsNum - 1 {
-                                            path.move(to: CGPoint(x: 0, y: y))
-                                            path.addLine(to: CGPoint(x: size * 3.0, y: y))
-                                            //                                        }
-                                            //                                        else {
-                                            //                                            path.move(to: CGPoint(x: 0, y: y))
-                                            //                                            path.addLine(to: CGPoint(x: size * CGFloat(lastRowElmNum), y: y))
-                                            //                                        }
-                                            
-                                        }
                                         
                                     }
-                                    .stroke(.gray.opacity(0.7), lineWidth: 1)
-                                }
-                                .frame(width:geoWidth - gridHorizontalPadding*2)
-                                .padding(.top, gridItemSpacing)
+                                    
+                                    
+                                    // TODO: plus button
+                                    if !isEdit {
+                                        ZStack {
+                                            
+                                            NavigationLink(destination: CreateNewQuest(popUp_createNewQuest: $popUp_addNewQuest)
+) {
+                                                Image(systemName: "plus.square")
+                                                    .resizable()
+                                                    .frame(width: gridItemSize*0.4, height: gridItemSize*0.4)
+                                                
+                                            }
+                                            .buttonStyle(.plain)
+                                            
+                                            
+                                            
+                                            //                                            Button(action: {
+                                            //                                                popUp_addNewQuest.toggle()
+                                            //                                            }) {
+                                            //                                                Image(systemName: "plus.square")
+                                            //                                                    .resizable()
+                                            //                                                    .frame(width: gridItemSize*0.4, height: gridItemSize*0.4)
+                                            //                                            }
+                                            //                                            .buttonStyle(.plain)
+                                        }
+                                        .frame(width: gridItemSize, height: gridItemSize)
+                                    }
+                                    
+                                    
+                                    
+                                } // lazyVGrid
+                                .frame(width:gridViewFrameWidth)
+                                .padding(gridInnerPadding)
+                                .background(.quaternary)
+                                .clipShape(.rect(cornerRadius: gridItemSize/20))
+//                                .padding(.top, gridItemSpacing)
                                 .padding(.horizontal, gridHorizontalPadding)
+                                    
+
                                 
+ 
                                 
                                 
                                 
                             } // ScrollView
                             .frame(width:geometry.size.width, height: geometry.size.height*0.9)
+//                            .border(.red)
                             
                             
                             if quests.filter({$0.isVisible()}).isEmpty {
@@ -280,15 +251,7 @@ struct MainView_QuestInventory: View {
                     } // VStack
                     .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
                     .background(.quaternary)
-//                    .background(
-//                       Fire6_forContentViewBackground()
-//                           .opacity(0.35)
-//                           .blur(radius: 30)
-//                           .frame(width:1000,height: 2000)
-//                           .offset(x:0,y:-150)
-////                                .background(colorScheme == .dark ? .black : .orange.opacity(0.7))
-//                           .background(.orange.opacity(colorScheme == .dark ? 0.4 : 0.6))
-//                    )
+
                     .sheet(isPresented: $popUp_questStatisticsInDetail, onDismiss: {selectedQuest = nil}) {
                         QuestInDetail(
                             selectedQuest: $selectedQuest,
@@ -296,19 +259,7 @@ struct MainView_QuestInventory: View {
                         )
                     }
                 }
-                
-                
-//                if popUp_addNewQuest {
-//                    Color.gray.opacity(0.2)
-//                        .onTapGesture {
-//                            popUp_addNewQuest.toggle()
-//                            
-//                        }
-//                    CreateNewQuest(popUp_createNewQuest: $popUp_addNewQuest)
-//                        .popUpViewLayout(width: geoWidth*0.9, height: geoHeight*0.45, color: colorSchemeColor)
-//                        .position(CGPoint(x: geoWidth/2, y: geoHeight*0.45*0.7))
-//                        .shadow(color:shadowColor, radius: 3.0)
-//                }
+
                 if popUp_help {
                     Color.gray.opacity(0.2)
                         .onTapGesture {
@@ -319,23 +270,7 @@ struct MainView_QuestInventory: View {
                         .position(CGPoint(x: geoWidth/2, y: geoHeight*0.85*0.6))
                         .shadow(color:shadowColor, radius: 3.0)
                 }
-                //                if popUp_confirmation {
-                //                    Color.gray.opacity(0.2)
-                //                        .onTapGesture {
-                //                            popUp_confirmation.toggle()
-                //                        }
-                //                    let questName = (selectedQuestNames.count == 1) ? selectedQuestNames.first! : "\(selectedQuestNames.count)개의 퀘스트"
-                //                    QuestEditConfirmationView(
-                //                        questName: questName,
-                //                        editOption: editOption!,
-                //                        editConfirmed: $editConfirmed,
-                //                        popUp_self: $popUp_confirmation
-                //                    )
-                //                        .popUpViewLayout(width: geoWidth*0.8, height: geoHeight*0.25, color: colorSchemeColor)
-                //                        .position(CGPoint(x: geoWidth/2, y: geoHeight*0.5))
-                //                        .shadow(color:shadowColor, radius: 3.0)
-                //                }
-                
+
             }
             
             .sheet(isPresented: $isEdit) {
@@ -603,7 +538,6 @@ struct QuestEditConfirmationView2: View {
 
                 
             
-//            .background(.clear)
         }
         
     }
@@ -689,8 +623,7 @@ struct QuestTierView: View {
                 
             }
             .frame(width: geoWidth, height: geoHeight)
-//            .shadow(color: shadowColor, radius: 1)
-//            .shadow(color: getTierColorOf(tier: tier).adjust(brightness: -0.3), radius: 1)
+
 
 
 
@@ -753,162 +686,6 @@ struct QuestThumbnailView: View {
     }
 }
 
-//struct CreateNewQuest: View {
-//    
-//    @Environment(\.modelContext) private var modelContext
-//    @Environment(\.colorScheme) var colorScheme
-//
-//    
-//    @Query var quests: [Quest]
-//        
-//    @Binding var popUp_createNewQuest: Bool
-//    // isPlan, popUp
-//    
-//    @State var questNameToAppend = ""
-//    @State var questDataTypeToAppend = DataType.OX
-//    @State var customDataTypeNotation: String?
-//    @State var customDataTypeNotation_textField: String = ""
-//    
-//    @FocusState var initialInputPos: Bool
-//    
-//    var body: some View {
-//        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-//        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
-//        GeometryReader { geometry in
-//            
-//            
-//            
-//            let textBoxWidth = geometry.size.width * 0.3
-//            let textBoxHeight = geometry.size.height * 0.15
-//            let messageBoxHeight = geometry.size.height * 0.1
-//            
-//            let contentHeight = geometry.size.height*0.9
-//            
-//            
-//            ZStack {
-//                VStack(alignment: .leading) {
-//                    Button(action:{
-//                        popUp_createNewQuest.toggle()
-//                    }) {
-//                        Image(systemName: "xmark")
-//                    }
-//                        .frame(width:geometry.size.width*0.975, alignment: .trailing)
-//                    Text("새로운 퀘스트")
-//                        .frame(width:geometry.size.width, alignment: .center)
-//                        .font(.title3)
-//                        .padding(.vertical,10)
-//                    
-//                    HStack {
-//                        Text("이름:")
-//                            .frame(width:textBoxWidth,alignment: .trailing)
-//                        TextField("새로운 퀘스트 이름", text:$questNameToAppend)
-//                            .maxLength(30, text: $questNameToAppend)
-//                            .focused($initialInputPos)
-////                            .shadow(radius: 1)
-//                        
-//                    }
-//                    //                                .frame(height: textBoxHeight)
-//                    
-//                    HStack {
-//                        Spacer()
-//                            .frame(width:textBoxWidth)
-//                        
-//                        if questNameToAppend == "" {
-//                            Text("퀘스트 이름을 입력하세요")
-//                                .foregroundStyle(.red)
-//                                .font(.caption)
-//                            
-//                        }
-//                        else if quests.contains(where: {quest in quest.name == questNameToAppend}) {
-//                            ResizableText_Width(text:"퀘스트 이름이 이미 존재합니다.", width:geometry.size.width*0.5)
-//                                .foregroundStyle(.red)
-//                                .font(.caption)
-//                            
-//                        }
-//                    }
-//                    
-//                    HStack {
-//                        Text("단위:")
-//                            .frame(width:textBoxWidth,alignment: .trailing)
-//                        Picker("", selection: $questDataTypeToAppend) {
-//                            ForEach(recoraddic.defaultDataTypes, id:\.self) {
-//                                Text(DataType.kor_stringOf(dataType: $0))
-//                                    .lineLimit(1)
-//                                    .minimumScaleFactor(0.5)
-//                            }
-//                        }
-//
-//                    }
-//                    // MARK: 계획수치 또는 달성수치
-//
-//                    if questDataTypeToAppend == DataType.CUSTOM {
-//                        HStack {
-//                            VStack {
-//                                
-//                            }
-//                            Text("사용자 지정 단위:")
-//                                .lineLimit(1)
-//                                .minimumScaleFactor(0.5)
-//                                .frame(width:textBoxWidth,alignment: .trailing)
-//                            TextField("ex: 물 마신 양 기록 -> mL",text: $customDataTypeNotation_textField)
-//                                .onChange(of: customDataTypeNotation_textField) {
-//                                    customDataTypeNotation = customDataTypeNotation_textField
-//                                }
-//                        }
-//                    }
-//
-//                            
-//                            
-//                            
-//                    
-//                    
-//                    // MARK: 목적
-//                    
-//                    Button(action: {
-//                        createNewQuest()
-//                        popUp_createNewQuest.toggle()
-//
-//                    } ) {
-//                        Text("생성")
-//                    }
-//                    .buttonStyle(.bordered)
-//                    .padding(.top,10)
-//                    .disabled(
-//                        (
-//                            quests.contains(where: {quest in quest.name == questNameToAppend}) || (questDataTypeToAppend == DataType.CUSTOM && (customDataTypeNotation == "" || customDataTypeNotation == nil)) ||
-//                            questNameToAppend == "")
-//                        
-//                    )
-//                    .frame(width:geometry.size.width, alignment: .center)
-//                    
-//                    
-//                } // Vstack
-//                .frame(width:geometry.size.width, height:contentHeight, alignment: .top)
-//                
-//                
-//                
-//
-//                
-//                
-//            }// Zstack
-//            .frame(width:geometry.size.width, height: contentHeight)
-//            .onAppear() {
-//                initialInputPos = true
-//            }
-//            
-//        }
-//    }
-//    
-//    func createNewQuest() -> Void {
-//        let newQuest = Quest(name: questNameToAppend, dataType: questDataTypeToAppend)
-//        if questDataTypeToAppend == DataType.CUSTOM {
-//            newQuest.customDataTypeNotation = customDataTypeNotation
-//        }
-//        modelContext.insert(newQuest)
-//    }
-//    
-//    
-//}
 
 struct CreateNewQuest: View {
     

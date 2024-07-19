@@ -211,6 +211,13 @@ class DailyQuest: Hashable, Equatable, Identifiable {
         return (data, dataType, customDataTypeNotation)
     }
     
+    func getName() -> String {
+        if let subName = self.questSubName {
+            return subName
+        } else {
+            return self.questName
+        }
+    }
     
 }
 
@@ -584,6 +591,13 @@ class Quest: Equatable, Identifiable, Hashable {
     
     
  
+    func getName() -> String {
+        if let subName = self.subName {
+            return subName
+        } else {
+            return self.name
+        }
+    }
 }
 
 

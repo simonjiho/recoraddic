@@ -16,6 +16,7 @@ import Combine
 
 
 
+
 // this view controls all the other part of ChecklistView. ChecklistView only visualizes data and provide simpleMenus for each data.
 // MainView_checklist와 CheckㅣistView의 역할 분배가 관리하기 쉽게 이루어졌는지 나중에 검토 필요(24.03.07)
 // 그냥 합칠까??????????????????????????????????????????????? 
@@ -36,6 +37,7 @@ struct MainView_checklist: View {
 
     @Binding var selectedView: MainViewName
     @Binding var isNewDailyRecordAdded: Bool
+    
     
     @State var todayRecordExists: Bool = false
     @State var yesterdayRecordExists: Bool = false
@@ -602,7 +604,7 @@ struct ChecklistView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
-//    @Query(sort:\recordOfToday.date) var recordOfTodays: [recordOfToday]
+
     @Query var profiles: [Profile]
     @Query(sort:\DailyQuest.createdTime) var dailyQuests: [DailyQuest]
 
@@ -645,7 +647,6 @@ struct ChecklistView: View {
     
 //    @State var todoText: [String] = []
 //    @State var todoDone: [Bool] = []
-//    @State var todoPurpose: [Set<String>] = []
     
     
     @State var diaryViewWiden: Bool = false
@@ -680,7 +681,11 @@ struct ChecklistView: View {
             
             let questCheckBox_purposeTagsWidth = checkListElementWidth*0.1
             let questCheckBoxWidth = checkListElementWidth*0.9
-            let questCheckBoxHeight = geoHeight*0.075
+//            let questCheckBoxHeight = geoHeight*0.075
+            let questCheckBoxHeight:CGFloat = 55.0
+//            let questCheckBoxHeight_hours: CGFloat = 70.0
+//            let questCheckBoxHeight_custom: CGFloat = 60.0
+//            let questCheckBoxHeight_ox: CGFloat = 45.0
             
             let todo_purposeTagsWidth = checkListElementWidth * 0.1
             let todo_checkBoxSize = checkListElementWidth * 0.1
@@ -738,11 +743,12 @@ struct ChecklistView: View {
                                 .padding()
                                 
                             }
-//                            if (currentDailyRecord.dailyTextType != nil && !editDiary) {
-//                                Text("일기")
-////                                    .bold()
-//                                    .frame(width:checkListElementWidth, alignment:.leading)
-//                            }
+                            //                            if (currentDailyRecord.dailyTextType != nil && !editDiary) {
+                            //                                Text("일기")
+                            ////                                    .bold()
+                            //                                    .frame(width:checkListElementWidth, alignment:.leading)
+                            //                            }
+                        
                             
                             if (currentDailyRecord.dailyTextType == DailyTextType.diary) {
                                 
@@ -796,17 +802,18 @@ struct ChecklistView: View {
                                         let data = dailyQuest.data
                                         let xOffset = CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal ?? dailyQuest.data), to: 0...questCheckBoxWidth)
 
-
                                         QuestCheckBoxView(
                                             dailyQuest: dailyQuest,
                                             targetDailyQuest: $dailyQuestToDelete, 
                                             deleteTarget: $applyDailyQuestRemoval,
                                             value: data,
-                                            xOffset: xOffset
+                                            dailyGoal: dailyQuest.dailyGoal,
+                                            xOffset: xOffset,
+                                            width: questCheckBoxWidth
                                         )
-                                            .frame(width:questCheckBoxWidth, height: questCheckBoxHeight)
-                                            .opacity(0.7)
-//                                        }
+                                        .opacity(0.7)
+
+//
                                         
                                     }
                                     .frame(width: checkListElementWidth, alignment:.leading)
@@ -818,7 +825,7 @@ struct ChecklistView: View {
 //                                .frame(width:checkListElementWidth, height: dailyQuestExists ? geoHeight*0.08 : 0.0)
                             
                             
-                            if dailyQuestExists && todoExists {
+                            if dailyQuestExists {
                                 Color.gray
                                     .opacity(0.4)
                                     .frame(width: checkListElementWidth, height: 1)
@@ -832,6 +839,40 @@ struct ChecklistView: View {
 //                                    .frame(width:checkListElementWidth,alignment: .leading)
 //                            }
                             VStack (spacing:todo_height*0.2) {
+                                if todoList_sorted.isEmpty {
+                                    HStack(spacing:0.0) {
+                                        let tagSize = min(todo_purposeTagsWidth*0.8,todo_height*0.3)
+                                        HStack {
+                                            Image(systemName:"questionmark.square")
+                                                .resizable()
+                                                .frame(width:tagSize, height:tagSize)
+                                                .foregroundStyle(reversedColorSchemeColor)
+                                        }
+                                        .frame(width: todo_purposeTagsWidth)
+
+                                        HStack {
+                                            Image(systemName: "checkmark.circle")
+                                                .resizable()
+                                                .frame(width: questCheckBoxWidth*0.1*0.65, height: questCheckBoxWidth*0.1*0.65)
+                                        }
+                                        .frame(width: questCheckBoxWidth*0.1, alignment: .center)
+
+                                        HStack(spacing:0.0) {
+                                            Text("클릭하여 당장 생각나는 할 일 적기")
+                                        }
+                                        .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
+                                        
+                                        Spacer()
+                                            .frame(width:questCheckBoxWidth*0.1)
+                                    }
+                                    .frame(width: checkListElementWidth, height:todo_height, alignment:.leading)
+                                    .opacity(0.5)
+                                    .onTapGesture {
+                                        let firstTodo = Todo(dailyRecord: currentDailyRecord, index: 0)
+                                        modelContext.insert(firstTodo)
+                                    }
+                                    
+                                }
                                 ForEach(todoList_sorted, id:\.self) { todo in
                                     
                                     // view에 반영하는 내용은 stateVariable로 전부 대체 -> 처음 불러올 때 적용, 그리고 tapgesture on checkbox, submission(추가), 완료, x(삭제) 때만 modelContext의 데이터 변경해주기
@@ -898,6 +939,17 @@ struct ChecklistView: View {
                                     .id(todo.index)
                                     
                                 }
+                                
+                                if editingIndex != nil {
+                                    HStack {
+                                        Image(systemName: "return")
+                                        Text("엔터 키를 통해 계속 입력 가능")
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.5)
+                                    }
+                                    .frame(width:checkListElementWidth)
+                                    .opacity(0.7)
+                                }
                             }
                             
                             
@@ -950,6 +1002,7 @@ struct ChecklistView: View {
                 dailyQuestToDelete = nil
             }
             
+            
 
             
             
@@ -963,6 +1016,9 @@ struct ChecklistView: View {
     }
     
     
+//    func updateQuestCheckBowHeight() -> Void {
+//        
+//    }
 
 
 
@@ -970,7 +1026,9 @@ struct ChecklistView: View {
 
     func removeDailyQuest() -> Void {
         
-        modelContext.delete(dailyQuestToDelete!)
+        if let dailyQuest = dailyQuestToDelete {
+            modelContext.delete(dailyQuest)
+        }
         dailyQuestToDelete = nil
 
         // dailyGoal에서 제외
@@ -990,6 +1048,7 @@ struct ChecklistView: View {
 
 }
 
+
 struct textFieldView: View {
     
     @Environment(\.modelContext) var modelContext
@@ -1005,64 +1064,66 @@ struct textFieldView: View {
     // MARK: 오류발생 -> 실제로 일어날 확률이 적지만, 엄청빠른 속도로 todo를 생성 시 focus된 textfield가 여러개
     var body: some View {
         
+        
         let todos = currentDailyRecord.todoList!.sorted(by: {$0.index < $1.index})
         
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
 
-            
             TextField("할 일을 입력하세요",text: $text, axis:.horizontal)
-                .padding(.leading, 5)
-                .frame(width:geoWidth, height: geoHeight)
-                .focused($isFocused)
-                .onSubmit { // only when return button pressed.
-                    todo.content = text
-                    
-                    
-                    for todo2 in todos {
-                        if todo2.index > todo.index {
-                            todo2.index += 1
-                        }
+            .padding(.leading, 5)
+            .frame(width:geoWidth, height: geoHeight)
+            .focused($isFocused)
+            .onSubmit { // only when return button pressed.
+                todo.content = text
+                
+                
+                for todo2 in todos {
+                    if todo2.index > todo.index {
+                        todo2.index += 1
                     }
-                    modelContext.insert(Todo(dailyRecord:currentDailyRecord, index: todo.index + 1))
-                    idx = todo.index + 1
-                    //                }
-                    //                else {
-                    //                    doneButtonPressed = false
-                    //                }
                 }
-                .onChange(of: doneButtonPressed, {
-                    //                if idx == todo.index {
-                    todo.content = text
-                    idx = nil
-                    //                }
+                modelContext.insert(Todo(dailyRecord:currentDailyRecord, index: todo.index + 1))
+                idx = todo.index + 1
+                //                }
+                //                else {
+                //                    doneButtonPressed = false
+                //                }
+            }
+            .onChange(of: doneButtonPressed, {
+                //                if idx == todo.index {
+                todo.content = text
+                idx = nil
+                //                }
+                isFocused = false
+                
+            })
+            .onChange(of: idx) {
+                if idx == todo.index {
+                    isFocused = true
+                }
+                else {
                     isFocused = false
-                    
-                })
-                .onChange(of: idx) {
-                    if idx == todo.index {
-                        isFocused = true
-                    }
-                    else {
-                        isFocused = false
-                    }
                 }
-                .onChange(of: isFocused, {
-                    //                if isFocused && idx != todo.index {
-                    //                if isFocused && idx == nil {
-                    //                    idx = todo.index
-                    //                }
-                    if isFocused {
-                        idx = todo.index
-                    }
-                    
-                })
-                .onAppear() {
-                    if idx == todo.index {
-                        isFocused = true
-                    }
+            }
+            .onChange(of: isFocused, {
+                //                if isFocused && idx != todo.index {
+                //                if isFocused && idx == nil {
+                //                    idx = todo.index
+                //                }
+                if isFocused {
+                    idx = todo.index
                 }
+                
+            })
+            .onAppear() {
+                if idx == todo.index {
+                    isFocused = true
+                }
+            }
+                
+
             
         }
 

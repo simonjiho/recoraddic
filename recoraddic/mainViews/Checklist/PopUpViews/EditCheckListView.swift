@@ -63,9 +63,10 @@ struct EditCheckListView: View {
             let contentWidth = geoWidth*0.95
             let boxHeight = geoHeight*0.4
             let elmWidth = contentWidth*0.9
-            let questElmHeight = geoHeight*0.05
-            let todoPresetElmHeight = geoHeight*0.04
-            let todoElmHeight = geoHeight*0.03
+//            let questElmHeight = geoHeight*0.05
+            let questElmHeight:CGFloat = 45.0
+            let todoPresetElmHeight:CGFloat = 40.0
+            let todoElmHeight:CGFloat = 35.0
 
             
             VStack {
@@ -79,6 +80,8 @@ struct EditCheckListView: View {
                     })
                         .labelsHidden()
                         .pickerStyle(.segmented)
+                        .padding(.bottom, 10)
+                        .disabled(createNewPreset)
 
                         
                     
@@ -102,17 +105,24 @@ struct EditCheckListView: View {
                                     Button(action:{
                                         let newDailyQuest_tmp = DailyQuest(questName: quest.name, data: 0, dataType: quest.dataType, defaultPurposes: quest.recentPurpose, customDataTypeNotation: quest.customDataTypeNotation)
                                         newDailyQuest_tmp.currentTier = quest.tier
+                                        newDailyQuest_tmp.questSubName = quest.subName
+                                        
                                         dailyQuests_tmp.append(newDailyQuest_tmp)
                                     }) {
                                         
                                         HStack(spacing:0.0) {
                                             //                                        FireView(momentumLevel: quest.momentumLevel)
-                                            FireView(momentumLevel: quest.momentumLevel)
-                                                .frame(width:elmWidth*0.09, height: elmWidth*0.85)
-                                            Text(quest.name)
-                                                .frame(width:elmWidth*0.75)
                                             Image(systemName: "plus")
                                                 .frame(width:elmWidth*0.09)
+                                            
+                                            Text(quest.getName())
+                                                .frame(width:elmWidth*0.75)
+
+
+                                            FireView(momentumLevel: quest.momentumLevel)
+                                                .frame(width:elmWidth*0.09,height:questElmHeight*0.9)
+                                            
+
                                         }
                                         .padding()
                                         .frame(width:elmWidth, height:questElmHeight)
@@ -135,42 +145,13 @@ struct EditCheckListView: View {
                             Group {
                                 
                                 Group {
-                                    ZStack {
-                                        Button(action:{
-                                            addEmptyTodo = true
-                                            todos_tmp = []
-                                        }) {
-                                            Text("비어있는 일반 퀘스트")
-                                                .frame(width:elmWidth, height: todoPresetElmHeight)
-                                                .background(.gray.opacity(0.5))
-                                                .clipShape(.buttonBorder)
-                                            
-                                        }
-                                        .buttonStyle(.plain)
-                                        .disabled(!todoIsEmpty)
-                                        
-                                        Button(action:{
-                                            showHelp.toggle()
-                                        }) {
-                                            Image(systemName:"questionmark.circle")
-                                        }
-                                        .padding()
-                                        .frame(width:elmWidth, height: todoPresetElmHeight, alignment:.trailing)
-                                        .popover(isPresented: $showHelp) {
-                                            Text("일반 퀘스트가 하나 이상 존재하면 이 버튼을 사용할 수 없습니다. 이미 존재하는 일반 퀘스트를 클릭한 후 엔터키를 입력해보세요.")
-                                                .padding()
-                                                .font(.caption)
-                                                .presentationCompactAdaptation(.popover)
-                                        }
-                                        
-                                        
-                                        
-                                        
-                                        
+
+                                    if (!createNewPreset && todos_preset.isEmpty) {
+                                        Text("자주 사용하는 일일퀘스트가 있다면")
+                                            .opacity(0.5)
+                                        Text("하단의 + 버튼을 눌러 생성하세요!")
+                                            .opacity(0.5)
                                     }
-                                    .frame(width:elmWidth, height: todoPresetElmHeight)
-                                    
-                                    
                                     
                                     ForEach(todos_preset) { todo_preset in
                                         HStack(spacing:0.0) {
@@ -181,14 +162,18 @@ struct EditCheckListView: View {
                                             }) {
                                                 
                                                 HStack(spacing:0.0) {
-                                                    Text(todo_preset.content)
-                                                        .padding()
-                                                        .frame(width:elmWidth*0.8, alignment:.leading)
-                                                        .multilineTextAlignment(.leading)
                                                     Image(systemName: "plus")
-                                                        .frame(width:elmWidth*0.07)
+                                                        .frame(width:elmWidth*0.08)
+                                                    Text(todo_preset.content)
+                                                        .padding(.leading, 5)
+                                                        .frame(width:elmWidth*0.78, alignment:.leading)
+                                                        .lineLimit(2)
+                                                        .minimumScaleFactor(0.7)
+                                                        .multilineTextAlignment(.leading)
+
                                                     
                                                 }
+                                                .padding(.horizontal)
                                                 .frame(width:elmWidth*0.9, height:todoPresetElmHeight)
                                                 .background(.gray.opacity(0.5))
                                                 .clipShape(.buttonBorder)
@@ -240,6 +225,7 @@ struct EditCheckListView: View {
                                         }
                                     }) {
                                         Image(systemName: "plus")
+                                            .bold()
                                     }
                                     .padding()
                                 }
@@ -251,6 +237,7 @@ struct EditCheckListView: View {
                             // later, add dailyPreset
                         }
                     }
+                    .scrollIndicators(.visible)
                     
                 }
                 .padding()
@@ -270,7 +257,7 @@ struct EditCheckListView: View {
 
                             
                             HStack(spacing:0.0) {
-                                Text(dailyQuest.questName)
+                                Text(dailyQuest.getName())
                                     .padding()
                                     .frame(width:elmWidth*0.9, height:questElmHeight)
                                     .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
@@ -299,10 +286,8 @@ struct EditCheckListView: View {
                         
                         if addEmptyTodo {
                             HStack(spacing:0.0) {
-                                Image(systemName: "circle")
-                                    .frame(width:elmWidth*0.1)
                                 Text("비어있는 일반 퀘스트")
-                                    .frame(width:elmWidth*0.8, alignment:.leading)
+                                    .frame(width:elmWidth*0.9, alignment:.leading)
                                     .multilineTextAlignment(.leading)
                                 Button (action: {
                                     addEmptyTodo.toggle()
@@ -331,6 +316,7 @@ struct EditCheckListView: View {
                                 }
                                 .frame(width:elmWidth*0.1)
                             }
+//                            .frame(width:elmWidth, height: todoElmHeight)
                             .frame(width:elmWidth)
                             .padding(.bottom, 3)
                             // 새로운 todo_preset은 어떻게 추가하는 것이 좋을까.....??????
@@ -396,8 +382,9 @@ struct EditCheckListView: View {
             dataType: quest.dataType,
             defaultPurposes: quest.recentPurpose
         )
-        
+        dailyQuest.questSubName = quest.subName
         dailyQuest.customDataTypeNotation = quest.customDataTypeNotation
+        dailyQuest.currentTier = quest.tier
         modelContext.insert(dailyQuest)
         
         

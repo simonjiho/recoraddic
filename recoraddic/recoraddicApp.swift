@@ -19,10 +19,12 @@ import CloudKit
 import UserNotifications
 
 
+
 @main
 struct recoraddicApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+//    @StateObject private var activityManager = ActivityManager()
 
     
     static let container = try! ModelContainer(for:Schema([Quest.self, Todo.self, DailyQuest.self, DailyRecord.self, DefaultPurposeData.self, DailyRecordSet.self, Profile.self, Todo_preset.self]), configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic))
@@ -35,6 +37,7 @@ struct recoraddicApp: App {
         
         WindowGroup {
             ContentView()
+//                .environmentObject(activityManager)
                 .onAppear() {
                     print("App started")
 
