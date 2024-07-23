@@ -29,7 +29,7 @@ enum MainViewName {
     
 }
 
-let sampleData: Bool = true
+let sampleData: Bool = false
 
 
 // MARK: cloud 연결확인 코드 후보3

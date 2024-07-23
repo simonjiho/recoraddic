@@ -948,7 +948,7 @@ struct ChecklistView: View {
                                             .minimumScaleFactor(0.5)
                                     }
                                     .frame(width:checkListElementWidth)
-                                    .opacity(0.7)
+                                    .opacity(0.5)
                                 }
                             }
                             

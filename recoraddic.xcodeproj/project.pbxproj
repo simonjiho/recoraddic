@@ -52,13 +52,12 @@
 		B2ABB25D2B10BBDE00870DE0 /* PopupViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2ABB25C2B10BBDE00870DE0 /* PopupViewLayout.swift */; };
 		B2ABC2652B4293680056C637 /* purposeTags.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2ABC2642B4293680056C637 /* purposeTags.swift */; };
 		B2ABC2672B42A2C50056C637 /* purposeImage.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2ABC2662B42A2C50056C637 /* purposeImage.xcassets */; };
-		B2ADCD012C4FC46900D9DE99 /* backup_QuestCheckBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2ADCD002C4FC46900D9DE99 /* backup_QuestCheckBoxView.swift */; };
+		B2ADCD012C4FC46900D9DE99 /* QuestCheckBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2ADCD002C4FC46900D9DE99 /* QuestCheckBoxView.swift */; };
 		B2AECB872B4EDA4F0020A937 /* ExampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AECB862B4EDA4F0020A937 /* ExampleData.swift */; };
 		B2AECB892B5139F90020A937 /* DismissingKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AECB882B5139F90020A937 /* DismissingKeyboard.swift */; };
 		B2B28DBD2AC5D69D0071531B /* MainView_ProfileAndSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B28DB22AC5D69D0071531B /* MainView_ProfileAndSettings.swift */; };
 		B2B6B1922B47F8F3006DDCBE /* defaultImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2B6B1912B47F8F3006DDCBE /* defaultImages.xcassets */; };
 		B2BA88FA2B2B0D4500A3D50E /* defaultVariables.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA88F92B2B0D4500A3D50E /* defaultVariables.swift */; };
-		B2BA89032B30A71C00A3D50E /* QuestCheckBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA89022B30A71C00A3D50E /* QuestCheckBoxView.swift */; };
 		B2BA89072B32CA5600A3D50E /* textFieldMaxLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA89062B32CA5600A3D50E /* textFieldMaxLength.swift */; };
 		B2BA890A2B32E0EB00A3D50E /* DiaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA89092B32E0EB00A3D50E /* DiaryView.swift */; };
 		B2BA89102B36BDC600A3D50E /* SaveDailyRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA890F2B36BDC600A3D50E /* SaveDailyRecordView.swift */; };
@@ -180,13 +179,12 @@
 		B2ABB25C2B10BBDE00870DE0 /* PopupViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupViewLayout.swift; sourceTree = "<group>"; };
 		B2ABC2642B4293680056C637 /* purposeTags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = purposeTags.swift; sourceTree = "<group>"; };
 		B2ABC2662B42A2C50056C637 /* purposeImage.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = purposeImage.xcassets; sourceTree = "<group>"; };
-		B2ADCD002C4FC46900D9DE99 /* backup_QuestCheckBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = backup_QuestCheckBoxView.swift; sourceTree = "<group>"; };
+		B2ADCD002C4FC46900D9DE99 /* QuestCheckBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestCheckBoxView.swift; sourceTree = "<group>"; };
 		B2AECB862B4EDA4F0020A937 /* ExampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleData.swift; sourceTree = "<group>"; };
 		B2AECB882B5139F90020A937 /* DismissingKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissingKeyboard.swift; sourceTree = "<group>"; };
 		B2B28DB22AC5D69D0071531B /* MainView_ProfileAndSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainView_ProfileAndSettings.swift; sourceTree = "<group>"; };
 		B2B6B1912B47F8F3006DDCBE /* defaultImages.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = defaultImages.xcassets; sourceTree = "<group>"; };
 		B2BA88F92B2B0D4500A3D50E /* defaultVariables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = defaultVariables.swift; sourceTree = "<group>"; };
-		B2BA89022B30A71C00A3D50E /* QuestCheckBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestCheckBoxView.swift; sourceTree = "<group>"; };
 		B2BA89062B32CA5600A3D50E /* textFieldMaxLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = textFieldMaxLength.swift; sourceTree = "<group>"; };
 		B2BA89092B32E0EB00A3D50E /* DiaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryView.swift; sourceTree = "<group>"; };
 		B2BA890F2B36BDC600A3D50E /* SaveDailyRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveDailyRecordView.swift; sourceTree = "<group>"; };
@@ -469,8 +467,7 @@
 		B2BA89082B32E0CD00A3D50E /* CheckListElements */ = {
 			isa = PBXGroup;
 			children = (
-				B2BA89022B30A71C00A3D50E /* QuestCheckBoxView.swift */,
-				B2ADCD002C4FC46900D9DE99 /* backup_QuestCheckBoxView.swift */,
+				B2ADCD002C4FC46900D9DE99 /* QuestCheckBoxView.swift */,
 				B2BA89092B32E0EB00A3D50E /* DiaryView.swift */,
 			);
 			path = CheckListElements;
@@ -711,7 +708,7 @@
 				B2030E052BCCF0F600CE0EDF /* StoneTower_0_stone.swift in Sources */,
 				B2E1AB712B24D6E300EBF359 /* TextFieldForHour.swift in Sources */,
 				B283397D2AFB97E9009AEB2A /* calendarFunc.swift in Sources */,
-				B2ADCD012C4FC46900D9DE99 /* backup_QuestCheckBoxView.swift in Sources */,
+				B2ADCD012C4FC46900D9DE99 /* QuestCheckBoxView.swift in Sources */,
 				B2D7AD082B9451920045C9EA /* StartNewRecordSet.swift in Sources */,
 				B27A5CEE2B14764A0042ADF6 /* dataType.swift in Sources */,
 				B2AECB892B5139F90020A937 /* DismissingKeyboard.swift in Sources */,
@@ -737,7 +734,6 @@
 				B27CBB592BA41E6C00CD6CD3 /* recalculateVisualValues_dr.swift in Sources */,
 				B262F2432A86460E00868F27 /* rawData.swift in Sources */,
 				B247D24B2A6D1DA100E457FB /* customMathFunc.swift in Sources */,
-				B2BA89032B30A71C00A3D50E /* QuestCheckBoxView.swift in Sources */,
 				B25BF9052B1C886E0039F1F9 /* ResizableText.swift in Sources */,
 				B265D27D2B0497D0002E51A8 /* callTheme.swift in Sources */,
 				B262F2492A86467E00868F27 /* simpleMetaData.swift in Sources */,
