@@ -57,7 +57,11 @@ struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
     
     @AppStorage("shouldBlockTheView") var shouldBlockTheView: Bool = true
-    @AppStorage("iCloudAvailable") var iCloudAvailable: Bool = false
+    @AppStorage("iCloudAvailable_forTheFirstTime") var iCloudAvailable: Bool = false
+    @AppStorage("initialization") var initialization: Bool = true
+    @AppStorage("fetchDone") var fetchDone: Bool = false
+
+
     @StateObject var netWorkMonitor: NetworkMonitor = NetworkMonitor()
 //    @StateObject private var notificationManager = NotificationManager()
 
@@ -98,177 +102,109 @@ struct ContentView: View {
     
     
      var body: some View {
-         if !netWorkMonitor.isConnected && (!iCloudAvailable || shouldBlockTheView) { // 처음 실행 시 네트워크 연결 안되있을 때
-             Text("네트워크 연결 필요")
-         }
-         else if !iCloudAvailable {
-             Text("기기가 AppleID 로그인 되어있지 않거나\nICloud 권한이 막혀있지 않은지 확인하세요.")
-// 네트워크 에러 때는?
 
+         if initialization {
+             Text("초기화 중")
+             .onAppear() {
+                 print("initializing")
+                 initialize()
+             }
          }
-         else if shouldBlockTheView {
-             Text("데이터 가져오는 중...")
-         }
-
-         
          else {
              
-             // MARK: 이렇게 하지 말고, 시작 단계에서 CKRecord를 직접확인하고 없으면 CKContainer에 직접 추가해주기
+             // MARK: 나중에
              if profiles.count == 0 || dailyRecords.count == 0 || defaultPurposeDatas.count == 0 || dailyRecordSets.count == 0 {
                  // MARK: 설치 후 로그인하면 fetch 완료 후에도 local에 제대로 저장이 되지 않는 경우가 존재
                  VStack {
                      Text("새로 시작중")
-                         .onAppear() {        // initialization of data(초기 설정 이후에는 여기로 들어올 가능성 0)
-
-                             try! modelContext.save() //MARK: 강제 저장을 통해 해결(그러나 modelContext.hasChanges = false로 나타남, swiftData또는 CKSyncEngine 자체의 문제인 것으로 추정(24.03.02))
-                                 
-                             if profiles.count == 0 {
-                                 modelContext.insert(Profile())
-                             }
-                             if dailyRecords.count == 0 || dailyRecordSets.count == 0 {
-                                 // put functions that you wanna set as default data for debug
-                                 if sampleData {
-                                     situation_YesterdayDataRemains()
-                                 }
-                                 else {
-                                     defaultInitialization()
-                                 }
-                             }
-                             if defaultPurposeDatas.count == 0 {
-                                 for defaultPurpose in recoraddic.defaultPurposes {
-                                     modelContext.insert(DefaultPurposeData(name: defaultPurpose))
-                                 }
-                             }
-                             
-                             // 일반적인 상황은 아니지만, cloudData가 전부 삭제되고, local에 데이터가 남아있으면 여기 갇힘...(24.03.03)
-                            // 일단 chatGPT 말로는 cloudData에 직접 접근해서 기존에 존재하는 앱 데이터를 외부에서나, 사용자가 직접 다 지우는 것이 불가능하기에, 위의 언급한 문제는 벌어지지 않을 가능성이 높다.
-                         }
                  }
                  
              }
              else {
                  
-                 
-                 let currentDailyRecord: DailyRecord = dailyRecords.first ?? DailyRecord(date: Calendar.current.date(byAdding: .day, value: 1000, to: .now)!) // MARK: signOutErrorPrevention: 순간 개수가 0이 됨. 왜일까!
-                 
-                 let currentDailyRecordSet: DailyRecordSet = dailyRecordSets.last ?? DailyRecordSet(start: Calendar.current.date(byAdding: .day, value: 1000, to: .now)!) // MARK: signOutErrorPrevention
+                 let currentDailyRecordSet: DailyRecordSet = dailyRecordSets.filter({$0.start < .now}).last ?? DailyRecordSet(start: Calendar.current.date(byAdding: .day, value: 1000, to: .now)!) // MARK: signOutErrorPrevention
 
                      
-                     TabView(selection: $selectedView){
-                         MainView_QuestInventory()
+                 TabView(selection: $selectedView){
+                     MainView_checklist(
+//                        currentRecordSet: currentDailyRecordSet,
+                        selectedView: $selectedView
+                     )
+                     .background(.quaternary)
+                     .tabItem {
+                         Image(systemName: images[mainViews[0]]!)
+                     }
+                     .tag(mainViews[0])
+                     .ignoresSafeArea(.keyboard)
+                     
+                     MainView_QuestInventory()
+                     .tabItem {
+                         Image(systemName: images[mainViews[1]]!)
+                     }
+                     .ignoresSafeArea(.keyboard)
+                     .tag(mainViews[1])
 
-                             
-                         
-                         .tabItem {
-                             Image(systemName: images[mainViews[1]]!)
-                         }
-                         .ignoresSafeArea(.keyboard)
-                         .tag(mainViews[1])
-                         MainView_checklist(
-                            currentDailyRecord: currentDailyRecord,
-                            currentRecordSet: currentDailyRecordSet,
-                            selectedView: $selectedView,
-                            isNewDailyRecordAdded: $isNewDailyRecordAdded
- 
-                         )
-                         .background(.quaternary)
-//                         .background(.quaternary)
-
-//                         .background(
-//                            Color.red.opacity(0.35)
-//                                .ignoresSafeArea()
-//                                .background(.orange.opacity(0.7))
-//                         )
-                            
-//                            Fire6_forContentViewBackground()
-//                            FireBackgroundView()
-////                                .opacity(0.3)
-////                                .blur(radius: 35)
-////                                .frame(width:1250,height: 2500)
-////                                .offset(x:-20,y:-100)
-////                                .background(.orange.opacity(colorScheme == .dark ? 0.4 : 0.7))
-////                                .opacity(0.5)
-//                                .blur(radius: 30)
-//                                .frame(width:1200,height: 2000)
-//                                .offset(x:-15,y:-200)
-////                                .background(colorScheme == .dark ? .black : .orange.opacity(0.7))
-//                                .background(.orange.opacity(colorScheme == .dark ? 0.4 : 0.8))
-//                                .opacity(0.6)
-//                                .background(.red.opacity(colorScheme == .dark ? 0.4 : 0.4))
-                            
-                                
-                         .tabItem {
-                             Image(systemName: images[mainViews[0]]!)
-                         }
-                         .tag(mainViews[0])
-                         .ignoresSafeArea(.keyboard)
-
-                         MainView_SeeMyDailyRecord(
-                            selectedDailyRecordSetIndex: dailyRecordSets_visible.count-1,
-                            selectedDailyRecordSet: currentDailyRecordSet,
-                            isNewDailyRecordAdded: $isNewDailyRecordAdded,
-                            selectedView: $selectedView
+                     
+                     let index = dailyRecordSets.filter({$0.start < .now}).count > 0 ? dailyRecordSets.filter({$0.start < .now}).count-1 : 0
+                     MainView_SeeMyDailyRecord(
+                        selectedDailyRecordSetIndex: index,
+                        selectedDailyRecordSet: currentDailyRecordSet,
+                        isNewDailyRecordAdded: $isNewDailyRecordAdded,
+                        selectedView: $selectedView
 //                            navigationBarHeight: navigationBarHeight
-                         )
-                         .tabItem {
-                             Image(systemName: images[mainViews[2]]!)
-                         }
-                         .ignoresSafeArea(edges:.top)
-                         .ignoresSafeArea(.keyboard)
+                     )
+                     .tabItem {
+                         Image(systemName: images[mainViews[2]]!)
+                     }
+                     .ignoresSafeArea(edges:.top)
+                     .ignoresSafeArea(.keyboard)
 
 
-                         .tag(mainViews[2])
-                         MainView_ProfileAndSettings()
-                         .tabItem {
-                             Image(systemName: images[mainViews[3]]!)
-                         }
-                         .ignoresSafeArea(.keyboard)
-                         .tag(mainViews[3])
+                     .tag(mainViews[2])
+                     MainView_ProfileAndSettings()
+                     .tabItem {
+                         Image(systemName: images[mainViews[3]]!)
                      }
-                     .onAppear() {
-                         // MARK: 오류일어나서 임시방편(나중에 삭제해야함
-                         for dailyQuest in dailyQuests {
-                             if dailyQuest.dataType == DataType.CUSTOM && dailyQuest.customDataTypeNotation == nil {
-                                 dailyQuest.customDataTypeNotation = "ml"
-                             }
-                         }
-                     }
-                     .onChange(of: selectedView) { oldValue, newValue in //여기에 다양한 것 넣어주기
-                         
-                         let unSavedDailyRecords = dailyRecords.filter({$0.date == nil})
-                         print("unSavedDailyRecords.count: ",unSavedDailyRecords.count)
-                         if unSavedDailyRecords.count > 1 {
-                             var unSavedDailyRecords_sorted = unSavedDailyRecords.sorted(by: {$0.createdTime < $1.createdTime})
-                             unSavedDailyRecords_sorted.removeLast()
-                             for unSavedDailyRecord in unSavedDailyRecords_sorted {
-                                 modelContext.delete(unSavedDailyRecord)
-                             }
-                         }
-                         
-                         
-                         for quest in quests {
-                             quest.updateTier()
-                             quest.updateMomentumLevel()
-                         }
-                         
-                         
-                     }
-//                     .onReceive(notificationManager.$notificationData) { userInfo in
-//                         print("halo~~")
-//                         
-//                         updateDailyQuestAlerm()
-//                         do {
-//         //                    modelContext.
-//                             try modelContext.save()
-//                         } catch {
-//                             print("wow")
-//
-//                         }
-//                     }
-                     
-                     
-
+                     .ignoresSafeArea(.keyboard)
+                     .tag(mainViews[3])
                  }
+                 .onAppear() {
+                     NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "fetchDone"), object: nil, queue: .main) { _ in
+                         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                             print("merge datas")
+                             reorganizeDailyRecord()
+                             mergeDuplicatedDRS()
+                             mergeDuplicatedDR()
+                             try? modelContext.save()
+                         }
+                     }
+                 }
+                 .onChange(of: selectedView) { oldValue, newValue in //여기에 다양한 것 넣어주기
+                     
+                     let unSavedDailyRecords = dailyRecords.filter({$0.date == nil})
+                     print("unSavedDailyRecords.count: ",unSavedDailyRecords.count)
+                     if unSavedDailyRecords.count > 1 {
+                         var unSavedDailyRecords_sorted = unSavedDailyRecords.sorted(by: {$0.createdTime < $1.createdTime})
+                         unSavedDailyRecords_sorted.removeLast()
+                         for unSavedDailyRecord in unSavedDailyRecords_sorted {
+                             modelContext.delete(unSavedDailyRecord)
+                         }
+                     }
+                     
+                     
+                     for quest in quests {
+                         quest.updateTier()
+                         quest.updateMomentumLevel()
+                     }
+                     
+                     
+                 }
+
+                     
+                     
+
+            }
+
                  
                  
 //             }
@@ -278,132 +214,221 @@ struct ContentView: View {
      }
     
     
-//    private func updateDailyQuestAlerm() {
-//        // MARK: 앱을 끈 상태에서 들어가면 잘 nil처리 됨, 킨 상태이면 안됨
-//        // Your function to be executed when the app is opened via notification
-////        print("Performing action because app was opened via notification")
-//        
-//        print("\nupdateDailyQuestAlerm")
-//        let currentDailyRecord: DailyRecord = dailyRecords.first ?? DailyRecord(date: Calendar.current.date(byAdding: .day, value: 1000, to: .now)!) // MARK: signOutErrorPrevention: 순간 개수가 0이 됨. 왜일까!
-//
-//        if let dailyQuests = currentDailyRecord.dailyQuestList {
-//            
-//            for dailyQuest in dailyQuests {
-//                if dailyQuest.questName == "Workout" {
-//                    print("checking Workout1")
-//                    print("now: \(String(describing:Date()))")
-//                    print("alermTime: \(String(describing:dailyQuest.alermTime))")
-//                }
-//                if let alermTime = dailyQuest.alermTime {
-////                    if dailyQuest.questName == "Workout" {
-////                        print("checking Workout2")
-////                        print("now: \(String(describing:Date()))")
-////                        print("alermTime: \(String(describing:alermTime))")
-////                    }
-//                    if isDateExpired(date: alermTime) {
-//                        print("expired!")
-//                        print("now: \(String(describing:Date()))")
-//                        print("alermTime: \(String(describing:alermTime))")
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-//                            dailyQuest.alermTime = nil
+    func initialize() -> Void {
+        // Usage example
+        checkiCloudAccountStatus { (status, error) in
+            switch status {
+            case .available:
+                print("iCloud available")
+                UserDefaults.standard.setValue(true,forKey: "iCloudAvailable_forTheFirstTime")
+                Task {
+                    
+                    print("waiting for fetchDone")
+                    while !fetchDone {
+                        // Wait for a short interval before checking again
+                        try? await Task.sleep(nanoseconds: UInt64(0.5 * Double(NSEC_PER_SEC)))
+                    }
+                    print("waiting for extra fetch process")
+                    try? await Task.sleep(nanoseconds: UInt64(6.0 * Double(NSEC_PER_SEC))) // TODO: fetchDone이 되어도 실제로 데이터에 적용이 안되있었다. 그래서 좀 더 기다리니 확실하게 적용되었다. 나중엔 좀 더 정확한 기준이 필요함.
+                    
+                    initializeDatas()
+                    UserDefaults.standard.setValue(false,forKey: "initialization")
+                }
+
+//            case .couldNotDetermine, .restricted, .noAccount, .temporarilyUnavailable:
+//                print("Unknown iCloud status")
+
+
+            default:
+                print("Unknown iCloud status")
+                initializeDatas()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    UserDefaults.standard.setValue(false,forKey: "initialization")
+                }
+                
+            }
+            
+            
+            if let error = error {
+                print("Error checking iCloud account status: \(error.localizedDescription)")
+            }
+        }
+        
+        
+        
+    }
+    
+    func mergeDuplicatedDRS() -> Void {
+        print("mergingDuplicatedDRS")
+        let drsDates:[Date] = dailyRecordSets.map({$0.start})
+        for date in drsDates {
+            var dupDRS:[DailyRecordSet] = dailyRecordSets.filter({$0.start == date})
+            if dupDRS.count > 1 {
+                if let mainDRS = dupDRS.sorted(by: {$0.createdTime <= $1.createdTime}).first {
+                    dupDRS.removeFirst()
+                    for drs in dupDRS {
+                        for dr in drs.dailyRecords! {
+                            if let mainDR = mainDRS.dailyRecords!.first(where:{$0.date == dr.date}) {
+                                mainDR.dailyQuestList! += dr.dailyQuestList!
+                                mainDR.todoList! += dr.todoList!
+                                if mainDR.dailyText != nil && dr.dailyText != nil {
+                                    mainDR.dailyText! += dr.dailyText!
+                                }
+                                modelContext.delete(dr)
+                            } else {
+                                dr.dailyRecordSet = mainDRS
+                            }
+                        }
+                        modelContext.delete(drs)
+                    }
+                }
+                
+            }
+        }
+        
+    }
+    
+    func mergeDuplicatedDR() -> Void {
+        print("mergingDuplicatedDR")
+        let drDates:[Date] = dailyRecords.compactMap({$0.date})
+        for date in drDates {
+            var dupDR:[DailyRecord] = dailyRecords.filter({$0.date == date})
+            if dupDR.count > 1 {
+                if let mainDR = dupDR.sorted(by: {$0.createdTime <= $1.createdTime}).first {
+                    dupDR.removeFirst()
+                    for dr in dupDR {
+                        mainDR.dailyQuestList! += dr.dailyQuestList!
+                        mainDR.todoList! += dr.todoList!
+                        if mainDR.dailyText != nil && dr.dailyText != nil {
+                            mainDR.dailyText! += dr.dailyText!
+                        }
+                        modelContext.delete(dr)
+                    }
+                }
+                
+            }
+
+        }
+    }
+    
+    func reorganizeDailyRecord() -> Void {
+        print("reorganizingDailyRecord")
+//        var dr_noTargetDRS: [DailyRecord] = []
+        for dailyRecord in dailyRecords {
+            if let date = dailyRecord.date {
+                if let nearestDRS:DailyRecordSet = dailyRecordSets.filter({$0.start <= date}).last {
+                    if nearestDRS.start != dailyRecord.dailyRecordSet?.start {
+                        dailyRecord.dailyRecordSet = nearestDRS
+                    }
+                } 
+//                else {
+//                    if let firstDRS = dailyRecordSets.first {
+//                        if calculateDaysBetweenTwoDates(from:date, to: firstDRS.start) < 10 {
+//                        
 //                        }
 //                    }
+//                    dr_noTargetDRS.append(dailyRecord)
 //                }
-//
+
+            }
+        }
+//        if let startDate = dr_noTargetDRS.compactMap({$0.date}).sorted().first {
+//            let newDailyRecordSet:DailyRecordSet = DailyRecordSet(start: startDate)
+//            modelContext.insert(newDailyRecordSet)
+//            for dr in dr_noTargetDRS {
+//                dr.dailyRecordSet = newDailyRecordSet
 //            }
 //        }
-//        
-//        print("\n")
-//        
-//    }
-    
-        
-    
-
-    
-}
-
-
-
-//struct MainButtonStyle: ButtonStyle {
-//    @Environment(\.colorScheme) var colorScheme
-//    
-//    var size:CGFloat
-//    
-//
-//
-//    
-//    init(_ size: CGFloat) {
-//        self.size = size
-//    }
-//    
-//    func makeBody(configuration: Configuration) -> some View {
-//        configuration.label
-//            .padding(size/5)
-//            .frame(width: size, height: size)
-//            .foregroundStyle(getColorSchemeColor(colorScheme))
-//            .background(getReversedColorSchemeColor(colorScheme).opacity(configuration.isPressed ? 0.7 : 1))
-//            .cornerRadius(8)
-//
-//    }
-//}
-
-
-struct MainButtonStyle2: ButtonStyle {
-    
-    @Environment(\.colorScheme) var colorScheme
-
-    
-    var width:CGFloat
-    var height:CGFloat
-    
-    
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .padding(.vertical, height/8)
-            .padding(.horizontal, width/8)
-            .frame(width: width, height: height)
-            .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-            .background(getColorSchemeColor(colorScheme).opacity(configuration.isPressed ? 0.7 : 1))
-            .cornerRadius(8)
-
     }
-}
-
-struct MainButtonStyle3: ButtonStyle {
     
-
-    @Environment(\.colorScheme) var colorScheme
-
+    
+    
+    
+    
+    
+    
+    
+//    private func checkForChanges(after delay: TimeInterval) async {
+//        // Wait for the specified delay
+//        try? await Task.sleep(nanoseconds: UInt64(delay * Double(NSEC_PER_SEC)))
+//        
+//        // Check if there are changes and wait until there are no changes
+//        await waitForNoChanges()
+//        
+//
+//
+//    }
+//    
+//    private func waitForNoChanges() async {
+//        // Assuming you have a model container instance
+////        
+//        while !modelContext.insertedModelsArray.isEmpty {
+//            // Wait for a short interval before checking again
+//            try? await Task.sleep(nanoseconds: UInt64(0.5 * Double(NSEC_PER_SEC)))
+//        }
+//        
+//        
+//        UserDefaults.standard.setValue(false, forKey: "shouldBlockTheView") // MARK: 너무 빨리 풀면 query가 적용이 안됨...swiftData와 cloudSyncEngine의 문제인가? 로그인 후 설치는 괜찮지만 설치 후 로그인은 문제가 됨.... ㅅㅂ?
+//        try! modelContext.save() //MARK: 강제 저장을 통해 해결(그러나 modelContext.hasChanges = false로 나타남, swiftData또는 CKSyncEngine 자체의 문제인 것으로 추정(24.03.02))
+//        
+//        
+//        
+//        
+//        if profiles.count == 0 {
+//            modelContext.insert(Profile())
+//        }
+//        if dailyRecords.count == 0 || dailyRecordSets.count == 0 {
+//            // put functions that you wanna set as default data for debug
+//            if sampleData {
+//                situation_YesterdayDataRemains()
+//            }
+//            else {
+//                defaultInitialization()
+//            }
+//        }
+//        if defaultPurposeDatas.count == 0 {
+//            for defaultPurpose in recoraddic.defaultPurposes {
+//                modelContext.insert(DefaultPurposeData(name: defaultPurpose))
+//            }
+//        }
+//        // Perform any actions you need to take once there are no pending changes
+//        print("No pending changes in the model container.")
+//    }
 
     
-    func makeBody(configuration: Configuration) -> some View {
+    
         
-        GeometryReader { geometry in
-            let geoWidth = geometry.size.width
-            let goeHeight = geometry.size.height
-            
-            configuration.label
-                .padding(.vertical, goeHeight/8)
-                .padding(.horizontal, geoWidth/8)
-                .frame(width: geoWidth, height: goeHeight)
-                .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-                .background(getReversedColorSchemeColor(colorScheme).opacity(configuration.isPressed ? 0.7 : 1))
-                .cornerRadius(8)
+    func initializeDatas() -> Void {
+        if profiles.count == 0 {
+            modelContext.insert(Profile())
         }
-
+        if dailyRecords.count == 0 || dailyRecordSets.count == 0 {
+            // put functions that you wanna set as default data for debug
+            if sampleData {
+                situation_YesterdayDataRemains()
+            }
+            else {
+                defaultInitialization()
+            }
+        }
+        if defaultPurposeDatas.count == 0 {
+            for defaultPurpose in recoraddic.defaultPurposes {
+                modelContext.insert(DefaultPurposeData(name: defaultPurpose))
+            }
+        }
     }
+
+    
 }
 
-
-
-class AppDelegate_forOrientationLock: NSObject, UIApplicationDelegate {
-    static var orientationLock = UIInterfaceOrientationMask.all
-
-    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-        return Self.orientationLock
+func checkiCloudAccountStatus(completion: @escaping (CKAccountStatus, Error?) -> Void) {
+    let container = CKContainer.default()
+    
+    container.accountStatus { (status, error) in
+        DispatchQueue.main.async {
+            completion(status, error)
+        }
     }
 }
-
 
 

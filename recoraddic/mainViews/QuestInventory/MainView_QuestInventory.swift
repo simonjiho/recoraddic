@@ -700,7 +700,7 @@ struct CreateNewQuest: View {
     // isPlan, popUp
     
     @State var questNameToAppend = ""
-    @State var questDataTypeToAppend = DataType.OX
+    @State var questDataTypeToAppend: DataType = .ox
     @State var customDataTypeNotation: String?
     @State var customDataTypeNotation_textField: String = ""
     @State var additionalInfo: Bool = false
@@ -784,7 +784,7 @@ struct CreateNewQuest: View {
 //                        .padding(.horizontal)
                             
                         Picker("", selection: $questDataTypeToAppend) {
-                            ForEach(recoraddic.defaultDataTypes, id:\.self) {
+                            ForEach(DataType.allCases, id:\.self) {
                                 Text(DataType.kor_stringOf(dataType: $0))
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.5)
@@ -799,7 +799,7 @@ struct CreateNewQuest: View {
                     // MARK: 계획수치 또는 달성수치
                     
 
-                    if questDataTypeToAppend == DataType.CUSTOM {
+                    if questDataTypeToAppend == DataType.custom {
                         HStack(spacing:0.0) {
 //                            Spacer()
 //                                .frame(width:checkBoxWidth)
@@ -949,7 +949,7 @@ struct CreateNewQuest: View {
                     .padding(.top,10)
                     .disabled(
                         (
-                            quests.contains(where: {quest in quest.name == questNameToAppend}) || (questDataTypeToAppend == DataType.CUSTOM && (customDataTypeNotation == "" || customDataTypeNotation == nil)) ||
+                            quests.contains(where: {quest in quest.name == questNameToAppend}) || (questDataTypeToAppend == .custom && (customDataTypeNotation == "" || customDataTypeNotation == nil)) ||
                             questNameToAppend == "")
                         
                     )
@@ -983,8 +983,8 @@ struct CreateNewQuest: View {
     }
     
     func createNewQuest() -> Void {
-        let newQuest = Quest(name: questNameToAppend, dataType: questDataTypeToAppend)
-        if questDataTypeToAppend == DataType.CUSTOM {
+        let newQuest = Quest(name: questNameToAppend, dataType: questDataTypeToAppend.rawValue)
+        if questDataTypeToAppend == .custom {
             newQuest.customDataTypeNotation = customDataTypeNotation
         }
         if addSubName && questSubnameToAppend != "" {
@@ -992,7 +992,7 @@ struct CreateNewQuest: View {
         }
         if addPastCumulative {
             if let pastCumulatve = Int(pastCumulative_str) {
-                if questDataTypeToAppend == DataType.HOUR {
+                if questDataTypeToAppend == .hour {
                     newQuest.pastCumulatve = pastCumulatve * 60
                 }
                 else {

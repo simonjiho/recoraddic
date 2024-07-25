@@ -16,7 +16,7 @@ extension Quest {
         
         if self.tier == 40 { return }
         
-        if dataType == DataType.HOUR {
+        if dataType == DataType.hour.rawValue {
             var cumulative = cumulative()
             for i in 0...40 {
                 let minus: Int = {
@@ -101,7 +101,7 @@ extension Quest {
             }
         }()
         
-        if self.dataType == DataType.HOUR {
+        if self.dataType == DataType.hour.rawValue {
             return returnValue*60
         }
         else {
@@ -118,7 +118,7 @@ extension Quest {
         // 오늘기록완료시(get d -> 마지막기록날짜 / 기록완료 안했을 시: 전날
         
         if representingData == QuestRepresentingData.cumulativeData {
-            return "누적 \(DataType.string_fullRepresentableNotation(data: cumulative(), dataType: dataType, customDataTypeNotation: self.customDataTypeNotation))"
+            return "누적 \(DataType.string_fullRepresentableNotation(data: cumulative(), dataType: dataTypeFrom(dataType), customDataTypeNotation: self.customDataTypeNotation))"
         }
         
         // not used

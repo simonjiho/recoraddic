@@ -41,36 +41,7 @@ struct RecordInDetailView_optional: View {
                 record: record!
 
             )
-            .alert("해당 구간기록을 영구적으로 삭제하시겠습니까?", isPresented: $alert_deleteRecordConfirmation) {
-                Button("Ok") {
-                    adjustDailyRecordChanges(dailyRecord: record!, option: .delete)
-                    let targetDr: DailyRecord = record!
-                    record = nil
 
-                    if calculateDaysBetweenTwoDates(from: targetDr.date!, to: getStartOfDate(date:.now)) < 2 { //다시 저장할 수 있는 날짜라면 quest에 기록 된 것 지워야 하므로
-                        for quest in quests {
-                            if quest.dailyData.keys.contains(targetDr.date!) {
-                                quest.dailyData.removeValue(forKey: targetDr.date!)
-                            }
-                        }
-                    }
-                    
-                    
-                    alert_deleteRecordConfirmation.toggle()
-                    popUp_recordInDetail.toggle()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { // 없으면 ㅈ댐
-                        modelContext.delete(targetDr)
-                    }
-
-                    
-                    // 뭔가 이상하다.. recalculation이!
-
-                }
-                Button("no..") {alert_deleteRecordConfirmation.toggle()}
-            } message: {
-                Text("(당일, 전날의 일일기록을 제외하고는 퀘스트의 기록에 영향을 끼치지 않습니다.)")
-            }
-            
         }
     }
     
@@ -164,39 +135,7 @@ struct RecordInDetailView: View {
                         //                        .frame(width: geoWidth)
                             .font(.title3)
                             .bold()
-                        Menu {
-                            
 
-                            Button(!record.isVisible() ? "되돌리기":"숨기기") {
-                                if record.isVisible() {
-                                    adjustDailyRecordChanges(dailyRecord: record, option:.hide)
-                                }
-                                else {
-                                    adjustDailyRecordChanges(dailyRecord: record, option:.visible)
-                                }
-                                
-                                //                                dailyRecordHidden.toggle()
-                                popUp_recordInDetail.toggle()
-                            }
-                            
-                            if (!record.inTrashCan) {
-                                Button("휴지통으로 이동") {
-                                    popUp_inTrashCanConfirmation.toggle()
-//                                    adjustDailyRecordChanges(dailyRecord: record, option:.trashCan)
-//                                    popUp_recordInDetail.toggle()
-                                }
-                            }
-                            else {
-                                Button("영구적으로 삭제") {
-                                    alert_deleteRecordConfirmation.toggle()
-                                }
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis")
-                                .font(.title3)
-                                .frame(width:facialExpressionSize, height: facialExpressionSize)
-
-                        }
                         
                     }
                     .padding(.top,30)
@@ -239,7 +178,7 @@ struct RecordInDetailView: View {
                             ForEach(record.dailyQuestList!, id:\.self) { questdata in
                                 
                                 if !questNames_hidden.contains(questdata.questName) {
-                                    let text:String = questdata.dataType != DataType.OX ? "\(questdata.questName)  \(DataType.string_fullRepresentableNotation(data: questdata.data, dataType: questdata.dataType, customDataTypeNotation: questdata.customDataTypeNotation))" : questdata.questName
+                                    let text:String = dataTypeFrom(questdata.dataType) != DataType.ox ? "\(questdata.questName)  \(DataType.string_fullRepresentableNotation(data: questdata.data, dataType: dataTypeFrom(questdata.dataType), customDataTypeNotation: questdata.customDataTypeNotation))" : questdata.questName
                                     HStack {
                                         
                                         let purposeCount = questdata.defaultPurposes.count
@@ -288,63 +227,27 @@ struct RecordInDetailView: View {
                     .frame(width: geometry.size.width, height: geometry.size.height*0.8)
                 } // VStack
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
-                .alert("해당 일일기록을 삭제하시겠습니까?", isPresented: $popUp_inTrashCanConfirmation) {
-                    Button("Ok") {
-                        adjustDailyRecordChanges(dailyRecord: record, option: .trashCan)
-                        popUp_inTrashCanConfirmation.toggle()
-                        popUp_recordInDetail.toggle()
-                    }
-                    Button("no..") {popUp_inTrashCanConfirmation.toggle()}
-                } message: {
-                    Text("(삭제한 일일기록은 휴지통으로 이동됩니다.)")
-                }
+//                .alert("해당 일일기록을 삭제하시겠습니까?", isPresented: $popUp_inTrashCanConfirmation) {
+//                    Button("Ok") {
+//                        adjustDailyRecordChanges(dailyRecord: record, option: .trashCan)
+//                        popUp_inTrashCanConfirmation.toggle()
+//                        popUp_recordInDetail.toggle()
+//                    }
+//                    Button("no..") {popUp_inTrashCanConfirmation.toggle()}
+//                } message: {
+//                    Text("(삭제한 일일기록은 휴지통으로 이동됩니다.)")
+//                }
                             
                 
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
 
-//            .overlay {
-//
-//
-//            }
-//            
+
         }//geometryReader
         
     }
     
-    
-//    func recalculateVisualValues_unhidden() -> Void {
-//        
-//        if selectedDailyRecord!.dailyRecordSet!.dailyRecordThemeName == "stoneTower_1" {
-//            // 1 3 6 -> 1 4 -> 1 3 6
-//            // 1 3 6 10 -> 1 (3) 4 7 -> 1 (3)
-//            
-//            let targetIndex: Int = dailyRecords_saved.firstIndex(of: selectedDailyRecord!)!
-//            let drCount: Int = dailyRecords_saved.count
-//            let plusVisualValue3: Int = {
-//                if targetIndex == 0 {
-//                    return dailyRecords_saved[targetIndex].visualValue3!
-//                }
-//                else {
-//                    return dailyRecords_saved[targetIndex].visualValue3! - dailyRecords[targetIndex-1].visualValue3! // 음 어떻게 할까 이게 항상 같지가 않음... ㅅㅂ
-//                }
-//            }()
-//
-//            if (plusVisualValue3 == 0 || targetIndex == drCount - 1 || drCount == 1) { return }
-//            else {
-//                for i in (targetIndex+1)...(drCount-1) {
-//                    dailyRecords_saved[i].visualValue3! += plusVisualValue3
-//                }
-//            }
-//
-//        }
-//        else {
-//            print("error: failed to recalculate visual values")
-//        }
-//        
-//        selectedDailyRecord = nil
-//
-//    }
+
     
     
 }

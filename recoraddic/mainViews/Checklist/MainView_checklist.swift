@@ -29,48 +29,24 @@ struct MainView_checklist: View {
     @Query var profiles: [Profile]
     @Query var quests: [Quest]
     @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
+    @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
 
-
-    @State var currentDailyRecord: DailyRecord
+//    var currentRecordSet: DailyRecordSet
     
-    var currentRecordSet: DailyRecordSet
-
     @Binding var selectedView: MainViewName
-    @Binding var isNewDailyRecordAdded: Bool
     
+    @State var currentDailyRecord: DailyRecord = DailyRecord()
     
-    @State var todayRecordExists: Bool = false
-    @State var yesterdayRecordExists: Bool = false
-    
+    @State var selectedDate: Date = getStartDateOfNow()
     @State var popUp_addDailyQuest: Bool = false
-//    @State var popUp_addDailyQuest_done: Bool = false
-    @State var popUp_addDiary: Bool = false
-    @State var popUp_saveDailyRecord: Bool = false
     @State var popUp_changePurpose: Bool = false
-    
-    @State var selectDiaryOption = false
-    
-    @State var selectedDailyQuest: DailyQuest? = nil
-    
-    
     @State var editDiary = false
-    
-    @State var yesterdayRecordDeleted:Bool = false
-    
-    @State var isAnimating = false
-    @State var isAnimating2 = false
-    @State var isAnimating3 = false
-
-    @State var saveAsToday = true
-    
+    @State var selectDiaryOption = false
+    @State var selectedDailyQuest: DailyQuest? = nil
     @State private var timer: Timer? = nil
-
     @State var todoActivated: Bool = false
-
-    
     @State var keyboardAppeared = false
     @State var keyboardHeight: CGFloat = 0
-    
     @State var changeMood: Bool = false
     @State var forceToChooseMood: Bool = false
     @State var selectedClassification: String = "긍정적"
@@ -89,6 +65,34 @@ struct MainView_checklist: View {
     }
 
 
+//    init(currentRecordSet: DailyRecordSet, selectedView: Binding<MainViewName>) {
+//        self._profiles = Query()
+//        self._quests = Query()
+//        self._dailyRecords = Query(sort:\DailyRecord.date)
+//        self.currentRecordSet = currentRecordSet
+//        self._selectedView = selectedView
+//        self.currentDailyRecord = {
+//            let dailyRecords_tmp = Query(sort:\DailyRecord.date).wrappedValue
+//            if let targetDailyRecord:DailyRecord = dailyRecords_tmp.first(where: {$0.date == getStartOfDate(date: getStartDateOfNow())}) {
+//                return targetDailyRecord
+//            } else if let nilDailyRecord: DailyRecord = dailyRecords_tmp.first(where: {$0.date == nil}) {
+//                nilDailyRecord.date = getStartOfDate(date: selectedDate)
+//                nilDailyRecord.dailyRecordSet = currentRecordSet
+//                let newNilDailyRecord: DailyRecord = DailyRecord()
+//                modelContext.insert(newNilDailyRecord)
+//                return nilDailyRecord
+//            } else {
+//                let newNilDailyRecord: DailyRecord = DailyRecord()
+//                newNilDailyRecord.date = getStartOfDate(date: selectedDate)
+//                newNilDailyRecord.dailyRecordSet = currentRecordSet
+//                modelContext.insert(newNilDailyRecord)
+//                return newNilDailyRecord
+//            }
+////            dailyRecords.first(where: {$0.date == getStartDateOfNow()})
+//        }()
+//
+//    }
+    
     var body: some View {
 
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
@@ -102,7 +106,7 @@ struct MainView_checklist: View {
         let linearGradient2: LinearGradient =
         LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .topLeading, endPoint: .bottomTrailing)
         
-        let bgColor: Color = currentRecordSet.getIntegratedDailyRecordColor(colorScheme: colorScheme)
+        let bgColor: Color = currentDailyRecord.dailyRecordSet?.getIntegratedDailyRecordColor(colorScheme: colorScheme) ?? Color.gray
         
         
         // currentRecord == records.last => 기간이 지났어도 currentRecord임
@@ -132,13 +136,24 @@ struct MainView_checklist: View {
                         if currentDailyRecord.dailyText == nil {
                             Button(action:{selectDiaryOption = true}) {
                                 Image(systemName:"book.closed.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: facialExpressionSize*0.7, height: facialExpressionSize*0.7)
+
                             }
-                            .frame(width:geoWidth*0.15)
+                            .padding(.leading)
+                            .frame(width:geoWidth*0.2, alignment: .leading)
                             .buttonStyle(.plain)
 //                            .border(.red)
                         } else {
-                            Spacer().frame(width:geoWidth*0.15)
+                            Spacer()
+                                .frame(width:geoWidth*0.2)
                         }
+                        
+                        
+                        DatePicker(selection: $selectedDate,displayedComponents: [.date]) {}
+                        .labelsHidden()
+                        .frame(width: geoWidth*0.6)
                         
                         Group {
                             if currentDailyRecord.mood == 0 {
@@ -162,7 +177,8 @@ struct MainView_checklist: View {
                                 }
                             }
                         }
-                        .frame(width:geoWidth*0.7)
+                        .padding(.trailing)
+                        .frame(width:geoWidth*0.2,alignment: .trailing)
                         .onTapGesture {
                             changeMood.toggle()
                         }
@@ -234,7 +250,7 @@ struct MainView_checklist: View {
                             
                         }
                         
-                        Spacer().frame(width: geoWidth*0.15)
+                        // use "in:" to add date range
                     }
                     .padding(.top,geoHeight*0.035)
                     .padding(.bottom, geoHeight*0.02)
@@ -244,9 +260,6 @@ struct MainView_checklist: View {
                         .frame(width: checkListElementWidth, height: 1)
                     ChecklistView(
                         currentDailyRecord: currentDailyRecord,
-                        popUp_addQuest: $popUp_addDailyQuest,
-                        popUp_addDiary: $popUp_addDiary,
-                        popUp_createRecordStone: $popUp_saveDailyRecord,
                         editDiary: $editDiary,
                         selectDiaryOption: $selectDiaryOption,
                         todoActivated: $todoActivated,
@@ -258,46 +271,7 @@ struct MainView_checklist: View {
                     .frame(height: geoHeight*0.93)
                 }
 
-//                }
 
-//                Menu {
-//
-//
-//
-//
-//                    if currentDailyRecord.todoList!.count == 0 {
-//                        Button("일반 퀘스트", systemImage:"checkmark.circle") {
-//                            todoActivated = true
-//                            modelContext.insert(Todo(dailyRecord: currentDailyRecord, index: 0))
-//                        }
-//                    }
-//                    
-//                    Button("누적 퀘스트",systemImage:"checkmark.square", action:{
-//                        popUp_addDailyQuest.toggle()
-//                        selectDiaryOption = false
-//                    })
-//                    .labelStyle(.iconOnly)
-//                    .buttonStyle(.borderedProminent)
-//                    
-//                    if currentDailyRecord.dailyText == nil {
-//                        Button("일기",systemImage:"book.closed.fill", action:{
-//                            selectDiaryOption = true
-//
-//                        })
-//                        .labelStyle(.iconOnly)
-//                        .buttonStyle(.borderedProminent)
-//                        .disabled(currentDailyRecord.dailyTextType != nil)
-//                    }
-//
-//
-//                } label: {
-//
-//                        Image(systemName: "plus")
-//                            .resizable()
-//                            .frame(width:buttonSize, height:buttonSize)
-//                        
-//
-//                }
                 Button(action:{
                     popUp_addDailyQuest.toggle()
                     selectDiaryOption = false // ??
@@ -313,115 +287,16 @@ struct MainView_checklist: View {
                 
                 let nothingToSave: Bool = currentDailyRecord.dailyText == nil && currentDailyRecord.dailyQuestList!.count == 0 && currentDailyRecord.todoList!.count == 0
                 
-                Menu {
 
-                    if todayRecordExists && yesterdayRecordExists {
-                        Text("어제/오늘의 기록이 모두 저장되어있습니다.")
-                    }
-                    else if nothingToSave {
-                        Text("저장할 내용이 없습니다.")
-                    }
-                    else {
-                        if !yesterdayRecordExists {
-                            Button("어제로 저장") {
-                                saveAsToday = false
-                                popUp_saveDailyRecord.toggle()
-                            }
-                        }
-                        if !todayRecordExists {
-                            Button("오늘로 저장") {
-                                saveAsToday = true
-                                popUp_saveDailyRecord.toggle()
-                            }
-                        }
-                    }
-                    
-                    
-                } label: {
 
-                    Button("저장",systemImage: "map.fill") {
-                    }
-                    .frame(height:buttonSize)
-                    .labelStyle(.titleAndIcon)
-                    .background(.white.opacity(0.0))
-                    .buttonStyle(.plain)
-
-                    
-                    
-                    
-                }
-                .buttonStyle(CheckListButtonStyle())
-//                .buttonStyle(CheckListButtonStyle())
-//                .foregroundStyle(.black)
-//                .buttonBorderShape(.roundedRectangle)
-                .position(x:geoWidth*0.85, y: geoHeight*0.95 - 10)
-                .onTapGesture {
-                    if currentDailyRecord.mood == 0 && !nothingToSave {
-                        forceToChooseMood = true
-                        changeMood.toggle()
-                    }
-                }
 
                 
-                
-                if popUp_addDailyQuest || popUp_addDiary || popUp_saveDailyRecord {
-                    Color.gray.opacity(0.6)
-                        .ignoresSafeArea(.all)
-
-                }
-                
-
-//                if popUp_addDailyQuest {
-//                    AddDailyQuestView(
-//                        currentDailyRecord: currentDailyRecord,
-//                        popUp_addDailyQuest: $popUp_addDailyQuest,
-//                        selectedView:$selectedView,
-//                        isDone: saveAsToday ? false : true
-//                    )
-//                    .popUpViewLayout(width: geometry.size.width*0.9, height: popUp_addQuest_height, color: colorSchemeColor)
-//                    .position(x: geometry.size.width/2, y: popUp_addQuest_yPos)
-//                    
-//                }
-
-                if popUp_saveDailyRecord{
-                    if !doesThemeAskQuestions(currentRecordSet.dailyRecordThemeName) {
-                        SaveDailyRecordView_confirmation(
-                            currentDailyRecordSet: currentRecordSet,
-                            currentDailyRecord: currentDailyRecord,
-                            popUp_self: $popUp_saveDailyRecord,
-                            saveAsToday: saveAsToday,
-                            todayRecordExists: todayRecordExists,
-                            isNewDailyRecordAdded: $isNewDailyRecordAdded,
-                            selectedView: $selectedView,
-                            qVal1: nil,
-                            qVal2: nil,
-                            qVal3: nil
-                        )
-                        .popUpViewLayout(width: geometry.size.width*0.8, height: geometry.size.height*0.4, color: colorSchemeColor)
-                        .zIndex(2)
-                    }
-                    else {
-                        AnswerQuestions(
-                            currentDailyRecordSet: currentRecordSet,
-                            currentDailyRecord: currentDailyRecord,
-                            popUp_self: $popUp_saveDailyRecord,
-                            saveAsToday: saveAsToday,
-                            todayRecordExists: todayRecordExists,
-                            isNewDailyRecordAdded: $isNewDailyRecordAdded,
-                            selectedView: $selectedView
-                        )
-                        .popUpViewLayout(width: geometry.size.width*0.9, height: geometry.size.height*0.95, color: colorSchemeColor)
-                        .zIndex(2)
-                    }
-                        
-
-
-                }
             } // zstack
             .frame(width:geometry.size.width, height: geometry.size.height)
             .onAppear {
                 
-                updateExistency()
+//                updateExistency()
+                changeDailyRecord()
                 updateDailyQuestAlerm()
                 startTimer()
                 setKeyboardAppearanceStateValue()
@@ -448,8 +323,8 @@ struct MainView_checklist: View {
 
             }
             .onChange(of: selectedView) { oldValue, newValue in
-                currentDailyRecord = dailyRecords.first ?? DailyRecord()
-                updateExistency()
+//                currentDailyRecord = dailyRecords.first ?? DailyRecord()
+//                updateExistency()
                 updateDailyQuestAlerm()
                 
                 for dailyQuest in currentDailyRecord.dailyQuestList! {
@@ -478,7 +353,15 @@ struct MainView_checklist: View {
 
             }
             
-            
+            .onChange(of: selectedDate) { oldValue, newValue in
+                
+                selectedDate = getStartOfDate(date: newValue) // No worry of infinite onChangeCall
+                
+                if oldValue < getStartDateOfYesterday() {
+                    removeEmptyDailyQuests()
+                }
+                changeDailyRecord()
+            }
             
  
 
@@ -491,6 +374,7 @@ struct MainView_checklist: View {
     
 
 
+    
     private func updateDailyQuestAlerm() {
         // MARK: 앱을 끈 상태에서 들어가면 잘 nil처리 됨, 킨 상태이면 안됨
         // Your function to be executed when the app is opened via notification
@@ -506,19 +390,19 @@ struct MainView_checklist: View {
         }
     }
     
-    func updateExistency() -> Void { // 오늘의 dr이 저장되어있는지, 어제의 dr이 저장되어 있는지 업데이트
-        todayRecordExists = dailyRecords.contains(where: {$0.date == getStartDateOfNow()})
-
-        let currentRecordSet_isEmpty: Bool = currentRecordSet.dailyRecords!.isEmpty
-        print("currentRecordSet_isEmpty: ", currentRecordSet_isEmpty)
-        
-        if todayRecordExists && currentRecordSet_isEmpty {
-            yesterdayRecordExists = true
-        }
-        else {
-            yesterdayRecordExists = dailyRecords.contains(where: {$0.date == getStartDateOfYesterday()})
-        }
-    }
+//    func updateExistency() -> Void { // 오늘의 dr이 저장되어있는지, 어제의 dr이 저장되어 있는지 업데이트
+//        todayRecordExists = dailyRecords.contains(where: {$0.date == getStartDateOfNow()})
+//
+//        let currentRecordSet_isEmpty: Bool = currentRecordSet.dailyRecords!.isEmpty
+//        print("currentRecordSet_isEmpty: ", currentRecordSet_isEmpty)
+//        
+//        if todayRecordExists && currentRecordSet_isEmpty {
+//            yesterdayRecordExists = true
+//        }
+//        else {
+//            yesterdayRecordExists = dailyRecords.contains(where: {$0.date == getStartDateOfYesterday()})
+//        }
+//    }
     
     func startTimer() { // 오늘의 자정에 timer 맞추기 ( 24/07/11 12:00 -> 24/07/12 00:00 에 작동하는 타이머 설정)
         // MARK: 과연 00:00 에 작동하는가? 23:59에 작동할 가능성은?
@@ -527,9 +411,9 @@ struct MainView_checklist: View {
         let tommorow = getTomorrowOf(date)
         let timeInterval = tommorow.timeIntervalSince(date)
 
-        timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { _ in
-            updateExistency()
-        }
+//        timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { _ in
+//            updateExistency()
+//        }
     }
     
     func setKeyboardAppearanceStateValue() -> Void {
@@ -540,6 +424,8 @@ struct MainView_checklist: View {
             }
         }
         
+
+        
         NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
             withAnimation {
                 keyboardAppeared = false
@@ -548,7 +434,67 @@ struct MainView_checklist: View {
     }
     
     
+    func changeDailyRecord() -> Void {
+        if let targetDailyRecord:DailyRecord = dailyRecords.first(where: {$0.date == getStartOfDate(date: selectedDate)}) { // found target
+            currentDailyRecord = targetDailyRecord
+//            currentDailyRecord.dailyRecordSet = currentRecordSet
+        } else if let nilDailyRecord: DailyRecord = dailyRecords.first(where: {$0.date == nil}) { // use buffer dailyRecord
+            nilDailyRecord.date = getStartOfDate(date: selectedDate)
+            currentDailyRecord = nilDailyRecord
+            currentDailyRecord.dailyRecordSet = findDailyRecordSet(selectedDate)
+            let newNilDailyRecord: DailyRecord = DailyRecord()
+            modelContext.insert(newNilDailyRecord)
+            print("no!!!!")
+        } else { // no buffer dailyRecord
+            print("no!!!!!!!")
+            let newDailyRecord: DailyRecord = DailyRecord(date: selectedDate)
+            currentDailyRecord = newDailyRecord
+            currentDailyRecord.dailyRecordSet = findDailyRecordSet(selectedDate)
+            modelContext.insert(newDailyRecord)
+            let newNilDailyRecord2: DailyRecord = DailyRecord()
+            modelContext.insert(newNilDailyRecord2)
+        }
+    }
     
+    func findDailyRecordSet(_ date: Date) -> DailyRecordSet?  {
+        return dailyRecordSets.filter({$0.start <= date}).last
+//        if let dailyRecordSet = dailyRecordSets.filter({$0.start <= date}).last {
+//            return dailyRecordSet
+//        }
+//        else { // will not be executed in most normal situations
+//            let newDailyRecordSet = DailyRecordSet(start: date)
+//            modelContext.insert(newDailyRecordSet)
+//            return newDailyRecordSet
+//        }
+    }
+    
+    func removeEmptyDailyQuests() -> Void {
+            
+        for dailyQuest in currentDailyRecord.dailyQuestList! {
+            if dailyQuest.data == 0 {
+                modelContext.delete(dailyQuest)
+
+            }
+        }
+        
+        for todo in currentDailyRecord.todoList! {
+            if todo.content == "" || !todo.done {
+                modelContext.delete(todo)
+            }
+        }
+        
+//        DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
+        if !currentDailyRecord.hasContent {
+            currentDailyRecord.dailyRecordSet?.updateDailyRecordsMomentum()
+        }
+            
+//        }
+        
+    }
+    
+    func cleanUpDailyRecords() -> Void { // 1. keep dailyRecord whose date is nil be unique  / 2. delete empty DailyRecords that's been not used for a long
+        
+    }
 
     
 
@@ -607,28 +553,17 @@ struct ChecklistView: View {
 
     @Query var profiles: [Profile]
     @Query(sort:\DailyQuest.createdTime) var dailyQuests: [DailyQuest]
-
+    @Query var quests: [Quest]
 
 
     var currentDailyRecord: DailyRecord
     
 
-    
-    @Binding var popUp_addQuest: Bool
-//    @Binding var popUp_addQuest_plan: Bool
-//    @Binding var popUp_addQuest_done: Bool
-    @Binding var popUp_addDiary: Bool
-    @Binding var popUp_createRecordStone: Bool
-    
-    
     @Binding var editDiary: Bool
-    
     @Binding var selectDiaryOption: Bool
     @Binding var todoActivated: Bool
-    
     @Binding var keyboardAppeared: Bool
     @Binding var keyboardHeight: CGFloat
-    
     @Binding var changeMood: Bool
     @Binding var forceToChooseMood: Bool
 
@@ -720,6 +655,9 @@ struct ChecklistView: View {
                                             editDiary = true // 아래하고 순서 바뀌면 안됨
                                             currentDailyRecord.dailyTextType = DailyTextType.inShort
                                             currentDailyRecord.dailyText = ""
+                                            if currentDailyRecord.singleElm_diary {
+                                                currentDailyRecord.dailyRecordSet?.updateDailyRecordsMomentum()
+                                            }
                                             selectDiaryOption = false
                                         })
                                         .buttonStyle(.bordered)
@@ -728,6 +666,9 @@ struct ChecklistView: View {
                                             //                            popUp_addDiary.toggle()
                                             currentDailyRecord.dailyTextType = DailyTextType.diary
                                             currentDailyRecord.dailyText = ""
+                                            if currentDailyRecord.singleElm_diary {
+                                                currentDailyRecord.dailyRecordSet?.updateDailyRecordsMomentum()
+                                            }
                                             selectDiaryOption = false
                                             
                                         })
@@ -811,7 +752,7 @@ struct ChecklistView: View {
                                             xOffset: xOffset,
                                             width: questCheckBoxWidth
                                         )
-                                        .opacity(0.7)
+                                        .opacity(0.85)
 
 //
                                         
@@ -915,6 +856,9 @@ struct ChecklistView: View {
                                                 let targetIndex = todo.index
                                                 
                                                 modelContext.delete(todo)
+                                                if !currentDailyRecord.hasContent {
+                                                    currentDailyRecord.dailyRecordSet?.updateDailyRecordsMomentum()
+                                                }
 
                                             }) {
                                                 let xmarkSize = min(todo_xmarkSize, todo_height)
@@ -1027,21 +971,49 @@ struct ChecklistView: View {
     func removeDailyQuest() -> Void {
         
         if let dailyQuest = dailyQuestToDelete {
+            updateQuest_onDelete(for: dailyQuest)
             modelContext.delete(dailyQuest)
         }
         dailyQuestToDelete = nil
-
+        
+//        DispatchQueue.main.asyncAfter(deadline: .now()+0.5) {
+        if !currentDailyRecord.hasContent {
+            currentDailyRecord.dailyRecordSet?.updateDailyRecordsMomentum()
+        }
+//        }
         // dailyGoal에서 제외
     }
+    
+    func updateQuest_onDelete(for dailyQuest: DailyQuest) -> Void {
+        if let date = currentDailyRecord.date {
+            if let targetQuest = findQuest(dailyQuest.questName) {
+                targetQuest.dailyData.removeValue(forKey: date)
+                targetQuest.updateTier()
+                targetQuest.updateMomentumLevel()
+            }
+        }
+    }
+
     
     func removeDailyText() -> Void {
         currentDailyRecord.dailyText = nil
         currentDailyRecord.dailyTextType = nil
         currentDailyRecord.diaryImage = nil
+        if !currentDailyRecord.hasContent {
+            currentDailyRecord.dailyRecordSet?.updateDailyRecordsMomentum()
+        }
         editDiary = false
         diaryViewWiden = false
     }
     
+    
+        
+        
+        
+    
+    func findQuest(_ name: String) -> Quest? {
+        return quests.first(where: {$0.name == name})
+    }
     
 
 
@@ -1135,6 +1107,8 @@ struct PurposeOfDailyQuestView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
 
+    @Query var quests: [Quest]
+    
     @State var popUp_changePurpose: Bool = false
     var dailyQuest: DailyQuest
     var parentWidth: CGFloat
@@ -1179,6 +1153,11 @@ struct PurposeOfDailyQuestView: View {
                     ChoosePurposeView3(dailyQuest: dailyQuest)
                         .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
                         .presentationCompactAdaptation(.popover)
+                        .onDisappear() {
+                            if let quest = quests.first(where:{$0.name == dailyQuest.questName}) {
+                                quest.recentPurpose = dailyQuest.defaultPurposes
+                            }
+                        }
                     
                 }
 //            }
@@ -1193,6 +1172,8 @@ struct PurposeOfTodoView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
 
+    @Query var todos_preset: [Todo_preset]
+    
     @State var popUp_changePurpose: Bool = false
     var todo: Todo
     var parentWidth: CGFloat
@@ -1233,6 +1214,11 @@ struct PurposeOfTodoView: View {
                     ChoosePurposeView4(todo: todo)
                         .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
                         .presentationCompactAdaptation(.popover)
+                        .onDisappear() {
+                            if let todo_preset = todos_preset.first(where:{$0.content == todo.content}) {
+                                todo_preset.purpose = todo.purpose
+                            }
+                        }
                     
                 }
             }

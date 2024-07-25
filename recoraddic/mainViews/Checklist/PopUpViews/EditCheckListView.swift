@@ -99,9 +99,10 @@ struct EditCheckListView: View {
 
                             }
                             else {
-                                
-                                ForEach(quests_notHidden) { quest in
-                                    
+                                let dailyQuestsNowAndWill: [DailyQuest] = currentDailyRecord.dailyQuestList! + dailyQuests_tmp
+                                let quests_notAdded: [Quest] = quests_notHidden.filter({quest in !(dailyQuestsNowAndWill.map({dailyQuest in dailyQuest.questName}).contains(quest.name)) })
+//                                ForEach(quests_notHidden) { quest in
+                                ForEach(quests_notAdded) { quest in
                                     Button(action:{
                                         let newDailyQuest_tmp = DailyQuest(questName: quest.name, data: 0, dataType: quest.dataType, defaultPurposes: quest.recentPurpose, customDataTypeNotation: quest.customDataTypeNotation)
                                         newDailyQuest_tmp.currentTier = quest.tier
@@ -153,6 +154,7 @@ struct EditCheckListView: View {
                                             .opacity(0.5)
                                     }
                                     
+                                    let todos_preset_notAdded:[Todo_preset] = todos_preset.filter({todo_preset in currentDailyRecord.todoList!.map({todo in todo.content}).contains(todo_preset.content)})
                                     ForEach(todos_preset) { todo_preset in
                                         HStack(spacing:0.0) {
                                             Button(action:{
@@ -373,6 +375,7 @@ struct EditCheckListView: View {
                 modelContext.insert(todo)
             }
         }
+        
     }
     
     func addDailyQuest(_ quest: Quest) -> Void {

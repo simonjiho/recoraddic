@@ -85,8 +85,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                         // MARK: 없으면 drs바뀔 때 이전 drs의 theme이 바뀐 drs에 적용되는 경우가 생김 -> 에러 가능성 up (실제로 질문 없는 DRS에 질문있는 theme이 적용되면 에러 발생)
                         // TODO: 변경 시 눈에 안보일 정도로 빠르게 지나가지만 오래걸린다면? -> 자연스러운 view로 바꾸기
                     }
-                    else if selectedDailyRecordSet.dailyRecordThemeName == "stoneTower_0" {
-                        StoneTower_0(
+                    else if selectedDailyRecordSet.dailyRecordThemeName == "StoneTower" {
+                        StoneTower(
                             dailyRecordSet: $selectedDailyRecordSet,
                             selectedDailyRecordSetIndex: $selectedDailyRecordSetIndex,
                             selectedRecord: $selectedRecord,
@@ -99,24 +99,10 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                             isEditingTermGoals: $isEditingTermGoals,
                             undoNewDRS: $undoNewDRS
                         )
+//                        Text("")
                         .frame(width:geoWidth, height: geoHeight)
                     }
-                    else if selectedDailyRecordSet.dailyRecordThemeName == "stoneTower_1" {
-                        StoneTower_1(
-                            dailyRecordSet: $selectedDailyRecordSet,
-                            selectedDailyRecordSetIndex: $selectedDailyRecordSetIndex,
-                            selectedRecord: $selectedRecord,
-                            popUp_startNewRecordSet: $popUp_startNewRecordSet,
-                            popUp_recordInDetail: $popUp_recordInDetail,
-//                            dailyRecordSetHiddenOrDeleted: $dailyRecordSetHiddenOrDeleted, 
-                            alert_drsHidden: $alert_drsHidden,
-                            alert_drsInTrashCan: $alert_drsInTrashCan,
-                            popUp_changeStyle: $popUp_changeStyle,
-                            isEditingTermGoals: $isEditingTermGoals,
-                            undoNewDRS: $undoNewDRS
-                        )
-                        .frame(width:geoWidth, height: geoHeight)
-                    }
+
                     
                     else {
                         
@@ -128,7 +114,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     Text("변경하는 중..")
                 }
                 
-                let noSavedDailyRecords_visible: Bool = selectedDailyRecordSet.dailyRecords?.filter({$0.visualValue1 != nil && $0.isVisible()}).count == 0
+                let noSavedDailyRecords_visible: Bool = selectedDailyRecordSet.dailyRecords?.filter({$0.hasContent}).count == 0
                 
                 if noSavedDailyRecords_visible && selectedDailyRecordSetIndex == dailyRecordSets_visible.count - 1 && !isEditingTermGoals {
                     VStack {
@@ -174,8 +160,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                         .onTapGesture {
                             popUp_changeStyle.toggle()
                         }
-                    if selectedDailyRecordSet.dailyRecordThemeName == "stoneTower_0" {
-                        StoneTower_0_popUp_ChangeStyleView(
+                    if selectedDailyRecordSet.dailyRecordThemeName == "StoneTower" {
+                        StoneTower_popUp_ChangeStyleView(
                             popUp_changeStyle:$popUp_changeStyle,
                             defaultColorIndex_tmp: $selectedDailyRecordSet.dailyRecordColorIndex
                         )
@@ -183,15 +169,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                         .background(.background)
                         .clipShape(.rect(cornerSize: CGSize(width: geoWidth*0.8*0.1, height: geoHeight*0.7*0.1)))
                     }
-                    if selectedDailyRecordSet.dailyRecordThemeName == "stoneTower_1" {
-                        StoneTower_1_popUp_ChangeStyleView(
-                            popUp_changeStyle:$popUp_changeStyle,
-                            defaultColorIndex_tmp: $selectedDailyRecordSet.dailyRecordColorIndex
-                        )
-                        .frame(width: geoWidth*0.8, height: geoHeight*0.7)
-                        .background(.background)
-                        .clipShape(.rect(cornerSize: CGSize(width: geoWidth*0.8*0.1, height: geoHeight*0.7*0.1)))
-                    }
+
                 }
                 
                 
@@ -215,7 +193,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         .onChange(of: updateSelectedDailyRecordSet) {
             if updateSelectedDailyRecordSet {
                 selectedDailyRecordSet = dailyRecordSets_visible[selectedDailyRecordSetIndex]
-                updateSelectedDailyRecordSet = false // MARK: onChange 클로저 안에서는 본인의 변화를 detect하지 않는 것 같다. 무한 루프가 생성되지 않는다. 바꿔줘도 됨.
+                updateSelectedDailyRecordSet = false // MARK: 무한 루프가 생성되지 않는다. 바꿔줘도 됨.
                 updateStartAndEnd()
                 selectedRecord = nil
             }
@@ -243,7 +221,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         .onChange(of: selectedDailyRecordSet.dailyRecordThemeName) {
             
             recalculatingVisualValues_themeChanged = true
-            recalculateVisualValues_themeChanged()
+//            recalculateVisualValues_themeChanged()
             recalculatingVisualValues_themeChanged = false
             
         }
@@ -271,16 +249,16 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         } message: {
             Text("(가장 최근의 기록의 탑은 기록이 없을 때만 삭제 가능합니다.)")
         }
-        .alert("해당 구간기록을 숨기시겠습니까?", isPresented: $alert_drsHidden) {
-            Button("숨기기") {
-                selectedDailyRecordSet.isHidden = true
-                dailyRecordSetHiddenOrDeleted.toggle()
-                alert_drsHidden.toggle()
-            }
-            Button("아니오") {
-                alert_drsHidden.toggle()
-            }
-        }
+//        .alert("해당 구간기록을 숨기시겠습니까?", isPresented: $alert_drsHidden) {
+//            Button("숨기기") {
+//                selectedDailyRecordSet.isHidden = true
+//                dailyRecordSetHiddenOrDeleted.toggle()
+//                alert_drsHidden.toggle()
+//            }
+//            Button("아니오") {
+//                alert_drsHidden.toggle()
+//            }
+//        }
         .alert("해당 구간기록을 휴지통으로 이동하시겠습니까?", isPresented: $alert_drsInTrashCan) {
             Button("휴지통으로 이동") {
                 selectedDailyRecordSet.inTrashCan = true

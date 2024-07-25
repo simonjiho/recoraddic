@@ -120,14 +120,14 @@ struct QuestInDetail: View {
                         } // 휴지통에 있을 때의 메뉴
                         else {
                             let current: Int = {
-                                if selectedQuest?.dataType == DataType.HOUR {
-                                    return DataType.cumulative_integratedValueNotation(data: (selectedQuest?.cumulative() ?? 0), dataType: selectedQuest?.dataType ?? DataType.REP)
+                                if selectedQuest?.dataType == DataType.hour.rawValue {
+                                    return DataType.cumulative_integratedValueNotation(data: (selectedQuest?.cumulative() ?? 0), dataType: dataTypeFrom(selectedQuest?.dataType ?? DataType.hour.rawValue))
                                 }
                                 else {
                                     return selectedQuest?.dailyData.count ?? 0
                                 }
                             }()
-                            let next: Int = DataType.cumulative_integratedValueNotation(data: (selectedQuest?.getNextTierCondition() ?? 0), dataType: selectedQuest?.dataType ?? DataType.REP)
+                            let next: Int = DataType.cumulative_integratedValueNotation(data: (selectedQuest?.getNextTierCondition() ?? 0), dataType: dataTypeFrom(selectedQuest?.dataType ?? DataType.hour.rawValue))
                             HStack(spacing:0.0) {
                                 Text("다음 단계")
                                     .font(.title3)
@@ -140,7 +140,7 @@ struct QuestInDetail: View {
                                     .font(.title3)
                                 
                                 
-                                if selectedQuest?.dataType == DataType.HOUR {
+                                if selectedQuest?.dataType == DataType.hour.rawValue {
                                     Text("시간")
                                 }
                                 else {
@@ -415,7 +415,7 @@ struct QuestStatistics_inTerm: View {
                         .foregroundStyle(tierColor_dark)
                         .padding(10)
                     
-                    if selectedQuest.dataType != DataType.OX {
+                    if selectedQuest.dataType != DataType.ox.rawValue {
                         
                         Chart {
                             ForEach(chartData.sorted(by: <), id:\.key) { item in
@@ -452,7 +452,7 @@ struct QuestStatistics_inTerm: View {
                                 ) {
                                     VStack {
                                         Text(rawSelectedDate)
-                                        Text("\(DataType.string_fullRepresentableNotation(data: chartData[convertToDate(from: rawSelectedDate) ?? .now] ?? 0, dataType: selectedQuest.dataType ?? 0))")
+                                        Text("\(DataType.string_fullRepresentableNotation(data: chartData[convertToDate(from: rawSelectedDate) ?? .now] ?? 0, dataType: dataTypeFrom(selectedQuest.dataType)))")
                                     }
                                     .padding(5)
                                     .foregroundStyle(tierColor_dark)
@@ -479,7 +479,7 @@ struct QuestStatistics_inTerm: View {
                                 if let valueAsInt = value.as(Int.self) {
                                     
                                     AxisValueLabel {
-                                        if selectedQuest.dataType == DataType.HOUR {
+                                        if selectedQuest.dataType == DataType.hour.rawValue {
                                             Text("\(valueAsInt/60)")
                                         }
                                         else {
@@ -538,11 +538,11 @@ struct QuestStatistics_inTerm: View {
                         
                         let cumulative_term : Int = sumIntArray(Array(chartData.values))
                         let cumulative_representation: String = {
-                            if selectedQuest.dataType == DataType.OX {
+                            if selectedQuest.dataType == DataType.ox.rawValue {
                                 return ""
                             }
                             else {
-                                return "(누적 \(DataType.string_fullRepresentableNotation(data: cumulative_term, dataType: selectedQuest.dataType, customDataTypeNotation: selectedQuest.customDataTypeNotation)))"
+                                return "(누적 \(DataType.string_fullRepresentableNotation(data: cumulative_term, dataType: dataTypeFrom(selectedQuest.dataType), customDataTypeNotation: selectedQuest.customDataTypeNotation)))"
                             }
                             
                         }()
@@ -568,17 +568,17 @@ struct QuestStatistics_inTerm: View {
                             }
                         }()
                         let average_term: String = {
-                            if chartData.count == 0 || selectedQuest.dataType == DataType.OX {
+                            if chartData.count == 0 || selectedQuest.dataType == DataType.ox.rawValue {
                                 return ""
                             }
                             
-                            else if selectedQuest.dataType == DataType.HOUR {
+                            else if selectedQuest.dataType == DataType.hour.rawValue {
                                 let average: Int = cumulative_term/term
-                                return "(\(DataType.string_fullRepresentableNotation(data: average, dataType: DataType.HOUR)))"
+                                return "(\(DataType.string_fullRepresentableNotation(data: average, dataType: DataType.hour)))"
                             }
                             else {
                                 let average: CGFloat = CGFloat(cumulative_term)/CGFloat(term)
-                                return "(\(String(format: "%.1f", average)) \(DataType.unitNotationOf(dataType: selectedQuest.dataType, customDataTypeNotation: selectedQuest.customDataTypeNotation)  ))"
+                                return "(\(String(format: "%.1f", average)) \(DataType.unitNotationOf(dataType: dataTypeFrom(selectedQuest.dataType), customDataTypeNotation: selectedQuest.customDataTypeNotation)  ))"
                             }
                             
                         }()

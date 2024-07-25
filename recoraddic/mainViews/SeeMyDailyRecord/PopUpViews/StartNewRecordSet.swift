@@ -71,7 +71,7 @@ struct StartNewRecordSet:View {
                                 ForEach(recoraddic.dailyRecordThemeNames, id:\.self) { dailyRecordThemeName in
                                     Button(action:{
                                         selectedDailyRecordThemeName = dailyRecordThemeName
-                                        if selectedDailyRecordThemeName == "stoneTower_0" {
+                                        if selectedDailyRecordThemeName == "StoneTower" {
                                             createNewDailyRecordSet_withQuestion()
                                             popUp_startNewRecordSet.toggle()
                                         }
@@ -89,55 +89,55 @@ struct StartNewRecordSet:View {
                         }
                         .frame(width:geoWidth*0.9)
                     }
-                    else if steps == 1 {
-                        
-                        VStack(spacing:questionBoxSize*0.1){
-                            Text("매일 할 질문을 설정하세요!")
-                            HStack(spacing:geoWidth*0.15) {
-                                Button(action:{numberOfQuestions -= 1}) {
-                                    Image(systemName: "minus.circle")
-                                }
-                                .disabled(numberOfQuestions == 1)
-                                Button(action:{numberOfQuestions += 1}) {
-                                    Image(systemName: "plus.circle")
-                                }
-                                .disabled(numberOfQuestions == 3)
-                            }
-                        }
-                        .frame(height: questionBoxSize)
-                        
-                        Spacer()
-                            .frame(width:geoWidth*0.9, height: questionsSize)
-                        
-                            
-                        VStack {
-                            Text("설정한 질문은 중간에 수정할 수 없으니")
-                                .font(.caption)
-                                .padding(.top, 30)
-                            
-                            Text("신중하게 설정하세요!")
-                                .font(.caption)
-                        }
-                        .frame(height: warningSize, alignment: .center)
-                        
-                        HStack(spacing:0.0) {
-                            Button("뒤로",systemImage: "chevron.left") {
-                                steps -= 1
-                            }
-                            .frame(width: geoWidth*0.45, alignment: .leading)
-
-                            Button(action:{
-                                createNewDailyRecordSet_withQuestion() // 완료 -> 새로운 dailyRecordSet 생성,
-                                popUp_startNewRecordSet.toggle()
-                            }) {
-                                Text("생성")
-                            }
-                            .frame(width: geoWidth*0.45, alignment: .trailing)
-
-                        }
-                        .frame(width:geoWidth*0.9, height:buttonsFrameSize)
-                        
-                    }
+//                    else if steps == 1 {
+//                        
+//                        VStack(spacing:questionBoxSize*0.1){
+//                            Text("매일 할 질문을 설정하세요!")
+//                            HStack(spacing:geoWidth*0.15) {
+//                                Button(action:{numberOfQuestions -= 1}) {
+//                                    Image(systemName: "minus.circle")
+//                                }
+//                                .disabled(numberOfQuestions == 1)
+//                                Button(action:{numberOfQuestions += 1}) {
+//                                    Image(systemName: "plus.circle")
+//                                }
+//                                .disabled(numberOfQuestions == 3)
+//                            }
+//                        }
+//                        .frame(height: questionBoxSize)
+//                        
+//                        Spacer()
+//                            .frame(width:geoWidth*0.9, height: questionsSize)
+//                        
+//                            
+//                        VStack {
+//                            Text("설정한 질문은 중간에 수정할 수 없으니")
+//                                .font(.caption)
+//                                .padding(.top, 30)
+//                            
+//                            Text("신중하게 설정하세요!")
+//                                .font(.caption)
+//                        }
+//                        .frame(height: warningSize, alignment: .center)
+//                        
+//                        HStack(spacing:0.0) {
+//                            Button("뒤로",systemImage: "chevron.left") {
+//                                steps -= 1
+//                            }
+//                            .frame(width: geoWidth*0.45, alignment: .leading)
+//
+//                            Button(action:{
+//                                createNewDailyRecordSet_withQuestion() // 완료 -> 새로운 dailyRecordSet 생성,
+//                                popUp_startNewRecordSet.toggle()
+//                            }) {
+//                                Text("생성")
+//                            }
+//                            .frame(width: geoWidth*0.45, alignment: .trailing)
+//
+//                        }
+//                        .frame(width:geoWidth*0.9, height:buttonsFrameSize)
+//                        
+//                    }
                     
                     
                     
@@ -151,51 +151,51 @@ struct StartNewRecordSet:View {
                 .dismissingKeyboard()
                 
                 //TODO: theme에 따라 어떤게 어떻게 변화하는지 설명
-                if steps == 1 {
-                    
-                    
-                    VStack(spacing: 10) {
-                        if numberOfQuestions >= 1 {
-                            HStack {
-                                Text("1. ")
-                                TextField("질문1", text: $question1)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    
-                            }
-                            Text("표현 방식: \(getVisualRepresentationExpression(index: 0))")
-                                .font(.caption)
-                                .opacity(0.7)
-
-                        }
-                        if numberOfQuestions >= 2 {
-                            HStack {
-                                Text("2. ")
-                                TextField("질문2", text: $question2)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                            }
-                            Text("표현 방식: \(getVisualRepresentationExpression(index: 1))")
-                                .font(.caption)
-                                .opacity(0.7)
-
-                        }
-                        if numberOfQuestions == 3 {
-                            HStack {
-                                Text("3. ")
-                                TextField("질문3", text: $question3)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                            }
-                            Text("표현 방식: \(getVisualRepresentationExpression(index: 2))")
-                                .font(.caption)
-                                .opacity(0.7)
-
-                        }
-                    }
-                    .frame(width:geoWidth*0.9, height:questionsSize, alignment: .top)
-                    .position(x:geoWidth/2, y:xButtonHeight + questionBoxSize + questionsSize/2)
-                    
-
-                    
-                }
+//                if steps == 1 {
+//                    
+//                    
+//                    VStack(spacing: 10) {
+//                        if numberOfQuestions >= 1 {
+//                            HStack {
+//                                Text("1. ")
+//                                TextField("질문1", text: $question1)
+//                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+//                                    
+//                            }
+//                            Text("표현 방식: \(getVisualRepresentationExpression(index: 0))")
+//                                .font(.caption)
+//                                .opacity(0.7)
+//
+//                        }
+//                        if numberOfQuestions >= 2 {
+//                            HStack {
+//                                Text("2. ")
+//                                TextField("질문2", text: $question2)
+//                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+//                            }
+//                            Text("표현 방식: \(getVisualRepresentationExpression(index: 1))")
+//                                .font(.caption)
+//                                .opacity(0.7)
+//
+//                        }
+//                        if numberOfQuestions == 3 {
+//                            HStack {
+//                                Text("3. ")
+//                                TextField("질문3", text: $question3)
+//                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+//                            }
+//                            Text("표현 방식: \(getVisualRepresentationExpression(index: 2))")
+//                                .font(.caption)
+//                                .opacity(0.7)
+//
+//                        }
+//                    }
+//                    .frame(width:geoWidth*0.9, height:questionsSize, alignment: .top)
+//                    .position(x:geoWidth/2, y:xButtonHeight + questionBoxSize + questionsSize/2)
+//                    
+//
+//                    
+//                }
                 
             }
             .frame(width: geoWidth,height: geoHeight)
@@ -262,19 +262,19 @@ struct StartNewRecordSet:View {
 
     }
     
-    func getVisualRepresentationExpression(index: Int) -> String {
-        if selectedDailyRecordThemeName == "stoneTower_1" {
-            switch numberOfQuestions {
-            case 1: return StoneTower_1.oneQuestion[index]
-            case 2: return StoneTower_1.twoQuestions[index]
-            case 3: return StoneTower_1.threeQuestions[index]
-            default: return "?"
-            }
-        }
-        else {
-            return "?"
-        }
-    }
+//    func getVisualRepresentationExpression(index: Int) -> String {
+//        if selectedDailyRecordThemeName == "stoneTower_1" {
+//            switch numberOfQuestions {
+//            case 1: return StoneTower_1.oneQuestion[index]
+//            case 2: return StoneTower_1.twoQuestions[index]
+//            case 3: return StoneTower_1.threeQuestions[index]
+//            default: return "?"
+//            }
+//        }
+//        else {
+//            return "?"
+//        }
+//    }
     
 }
 
@@ -291,12 +291,10 @@ struct DRSThemeThumbnailView: View {
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
             
-            if dailyRecordThemeName == "stoneTower_0" {
+            if dailyRecordThemeName == "StoneTower" {
                 VStack {
-                    StoneTower_0_stone(
-                        defaultColorIndex: 0,
-                        facialExpressionNum: 0,
-                        selected: false
+                    StoneTower_stone(
+                        shapeNum: 0, brightness: 0, defaultColorIndex: 0, facialExpressionNum: 0, selected: false
                     )
                     .frame(width:geoWidth*0.75, height: geoHeight*0.5)
                     Text("탑쌓기(질문x)")
@@ -305,23 +303,7 @@ struct DRSThemeThumbnailView: View {
                 .frame(width: geoWidth, height: geoHeight)
                 .border(getReversedColorSchemeColor(colorScheme))
             }
-            else if dailyRecordThemeName == "stoneTower_1" {
-                VStack {
-                    StoneTower_1_stone(
-                        shapeNum: 3,
-                        brightness: 0,
-                        defaultColorIndex: 0,
-                        facialExpressionNum: 0,
-                        selected: false
-                    )
-                    .frame(width:geoWidth*0.75, height: geoHeight*0.5)
-                    Text("탑쌓기(질문o)")
-                        .font(.caption)
 
-                }
-                .frame(width: geoWidth, height: geoHeight)
-                .border(getReversedColorSchemeColor(colorScheme))
-            }
       
             else {
                 Text("error")

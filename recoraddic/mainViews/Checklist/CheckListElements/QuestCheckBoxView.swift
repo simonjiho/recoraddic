@@ -56,7 +56,9 @@ func getNotificationTimeString(from date: Date?) -> String {
 
 struct QuestCheckBoxView: View {
     @Environment(\.modelContext) var modelContext
+    @Query var quests: [Quest]
     var dailyQuest: DailyQuest
+    
     
     @Binding var targetDailyQuest: DailyQuest?
     @Binding var deleteTarget: Bool
@@ -90,6 +92,8 @@ struct QuestCheckBoxView: View {
         let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= width +  0.1) ? xOffset : width, height: height), transform: nil))
         let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
         
+        let isRecent: Bool = getStartDateOfYesterday() < dailyQuest.dailyRecord!.date!
+        
         HStack(spacing:0.0) {
             
             HStack(spacing:0.0) {
@@ -102,7 +106,6 @@ struct QuestCheckBoxView: View {
                 .frame(width:width*7/8, height: height)
                 .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
                 .bold()
-                //                    .border(.red)
                 
                 NotificationButton(
                     dailyQuest: dailyQuest,
@@ -111,6 +114,8 @@ struct QuestCheckBoxView: View {
                 )
                 .frame(width: width*1/8, height: height)
                 .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
+                .disabled(!isRecent)
+                .opacity( isRecent ? 1.0 : 0.0)
             }
             .frame(width:width, height: height)
             .background(
@@ -136,7 +141,8 @@ struct QuestCheckBoxView: View {
                         a
                     }
                     .background(getTierColorOf(tier: dailyQuest.currentTier))
-                    .blur(radius: 2)
+                    .blur(radius: 1)
+                    .opacity(0.9)
                 
             )
             .disabled(offset < -menuSize*0.5)
@@ -152,7 +158,7 @@ struct QuestCheckBoxView: View {
                     .frame(width: menuSize*2, height:height)
             }
             .frame(width: menuSize*3, height:height)
-            .background(.red)
+            .background(Color.red.blur(radius: 1))
             .offset(x: offset, y:0)
             .disabled(offset > -menuSize*0.5)
             .onTapGesture {
@@ -240,11 +246,27 @@ struct QuestCheckBoxView: View {
             }
             
         }
-        .onChange(of: value) {
+        .onChange(of: value) { oldValue, newValue in
             
             xOffset = CGFloat(value).map(from:range, to: 0...width)
             dailyQuest.data = value
-            print(xOffset)
+            updateQuest(for: dailyQuest)
+            
+            if let dailyRecord = dailyQuest.dailyRecord {
+                if oldValue != 0 && newValue == 0 && !dailyRecord.hasContent {
+                    dailyRecord.dailyRecordSet?.updateDailyRecordsMomentum()
+                }
+                else if oldValue == 0 && newValue != 0 && dailyRecord.singleElm_dailyQuestOrTodo {
+    //                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    dailyRecord.dailyRecordSet?.updateDailyRecordsMomentum()
+    //                }
+                }
+            }
+            
+
+
+            
+            
         }
         .onChange(of: dailyGoal) {
             dailyQuest.dailyGoal = dailyGoal
@@ -272,6 +294,31 @@ struct QuestCheckBoxView: View {
             return newOffset
         }
     }
+    
+    func updateQuest(for dailyQuest: DailyQuest) -> Void {
+        if let date = dailyQuest.dailyRecord?.date {
+            if let targetQuest = findQuest(dailyQuest.questName) {
+                if dailyQuest.data != 0 {
+                    if targetQuest.dailyData[date] == nil {
+                        targetQuest.dailyData[date] = dailyQuest.data
+                        targetQuest.updateTier()
+                        targetQuest.updateMomentumLevel()
+                    }
+                    else {
+                        targetQuest.dailyData[date] = dailyQuest.data
+                    }
+                }
+                else {
+                    targetQuest.dailyData.removeValue(forKey: date)
+                }
+
+            }
+        }
+    }
+    
+    func findQuest(_ name: String) -> Quest? {
+        return quests.first(where: {$0.name == name})
+    }
 
 
 }
@@ -292,14 +339,14 @@ struct QuestCheckBoxContentView: View {
             let geoWidth = geometry.size.width
             let height:CGFloat = stopwatch.isRunning ? 75.0 : 60.0
 
-            if dailyQuest.dataType == DataType.OX {
+            if dailyQuest.dataType == DataType.ox.rawValue {
                 QuestCheckBoxContent_OX(
                     dailyQuest:dailyQuest,
                     value: $value
                 )
                 .frame(width: geoWidth,height: height)
 
-            } else if dailyQuest.dataType == DataType.HOUR {
+            } else if dailyQuest.dataType == DataType.hour.rawValue {
                 QuestCheckBoxContent_HOUR(
                     dailyQuest:dailyQuest,
                     value: $value,
@@ -408,6 +455,9 @@ struct QuestCheckBoxContent_HOUR:View {
             let height:CGFloat = stopwatch.isRunning ? 75.0 : 60.0
 
             HStack(spacing:0.0) {
+                
+                let isRecent: Bool = getStartDateOfYesterday() < dailyQuest.dailyRecord!.date!
+
                 if onTimer {
                     Button(action: {
                         onTimer.toggle()
@@ -436,6 +486,9 @@ struct QuestCheckBoxContent_HOUR:View {
                             
                     }
                     .frame(width: geoWidth*1/7, alignment: .center)
+                    .disabled(!isRecent)
+                    .opacity( isRecent ? 1.0 : 0.0)
+
                     
                     let HeightOnTimer:CGFloat = 75.0
                     VStack {
@@ -517,7 +570,10 @@ struct QuestCheckBoxContent_HOUR:View {
 
                     }
                     .frame(width: geoWidth*1/7, alignment: .center)
+                    .disabled(!isRecent)
+                    .opacity( isRecent ? 1.0 : 0.0)
 
+                    
                     HStack {
                         VStack {
                             Text("\(questName)")
@@ -624,6 +680,9 @@ struct QuestCheckBoxContent_HOUR:View {
                 if !isEditing_hours {
                     highlightValue = false
                 }
+            }
+            .onChange(of: value) {
+                dailyQuest.dailyRecord?.updateRecordedMinutes()
             }
 
         }
@@ -773,7 +832,7 @@ struct QuestCheckBoxContent_CUSTOM:View {
                                     .multilineTextAlignment(.center)
                                     .focused($focusedField, equals: .goal)
                             }
-                            Text(DataType.unitNotationOf(dataType: dataType, customDataTypeNotation: customDataTypeNotation))
+                            Text(DataType.unitNotationOf(dataType: dataTypeFrom(dataType), customDataTypeNotation: customDataTypeNotation))
                                 .bold(false)
 
                                 
@@ -1038,7 +1097,7 @@ struct DialForHours: View {
                             .bold()
                         Picker(selection: $value, label: Text("Second Value")) {
                             ForEach(0..<60*24) { i in
-                                Text("\(DataType.string_fullRepresentableNotation(data: i, dataType: DataType.HOUR))")
+                                Text("\(DataType.string_fullRepresentableNotation(data: i, dataType: DataType.hour))")
                                     .foregroundStyle(getDarkTierColorOf(tier: tier))
 
                             }
@@ -1062,7 +1121,7 @@ struct DialForHours: View {
                                 .bold()
                             Picker(selection: $dailyGoal_nonNil, label: Text("Second Value")) {
                                 ForEach(0..<60*24/5) { i in
-                                    Text("\(DataType.string_fullRepresentableNotation(data: (i+1)*5, dataType: DataType.HOUR))")
+                                    Text("\(DataType.string_fullRepresentableNotation(data: (i+1)*5, dataType: DataType.hour))")
                                         .tag((i+1)*5)
                                         .foregroundStyle(getDarkTierColorOf(tier: tier))
                                 }

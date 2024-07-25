@@ -11,13 +11,14 @@ import CloudKit
 import Foundation
 import os.log
 import SwiftData
+import CoreData
 //MARK: 삭제 후 재설치 -> 기존데이터 가져오기만 함 / 로그아웃 후 재로그인 -> 기존데이터 가지고 오고 반영 전에 query에서 늦게 받아들여서.. 데이터 또 쌓임
 //MARK: 처음인지는 Cloud에 저장하기
 
 // TODO: Cloud 오랫동안 끊기면 경고 주기
 // TODO: Cloud 연결 끊긴 상태 추적해서 cloud 연결 특정시간(몇분정도) 이상 끊기면 userdefaults에 cloudstatus 저장하는 변수 변경해서 view에 cloud연결 끊겼다고 알리기
 
-
+//@ModelActor
 final actor SyncManager : Sendable, ObservableObject {
     
     /// The CloudKit container to sync with.
@@ -46,30 +47,10 @@ final actor SyncManager : Sendable, ObservableObject {
         // Load the data from disk.
         // Note that this is not a very efficient way to store data, but this is a sample app.
 
-//        self.modelContext = modelContext
-        
         self.automaticallySync = automaticallySync
         
         Task {
             /// We want to initialize our sync engine lazily, but we also want to make sure it happens pretty soon after launch.
-            
-            if UserDefaults.standard.value(forKey: "stateSerialization") == nil {
-                UserDefaults.standard.setValue(nil, forKey: "stateSerialization")
-
-            }
-            if UserDefaults.standard.value(forKey: "shouldBlockTheView") == nil {
-                UserDefaults.standard.setValue(true,forKey: "shouldBlockTheView") // at initial, it starts with true
-            }
-            if UserDefaults.standard.value(forKey: "iCloudAvailable") == nil {
-                UserDefaults.standard.setValue(false,forKey: "iCloudAvailable")
-            }
-//            if UserDefaults.standard.value(forKey: "cloudAuthenticated") == nil {
-//                UserDefaults.standard.setValue(false,forKey: "cloudAuthenticated")
-//            }
-//            
-            if UserDefaults.standard.value(forKey: "fetchDone") == nil {
-                UserDefaults.standard.setValue(false,forKey: "fetchDone")
-            }
             
             await self.initializeSyncEngine()
         }
@@ -113,12 +94,9 @@ extension SyncManager : CKSyncEngineDelegate {
     
     func handleEvent(_ event: CKSyncEngine.Event, syncEngine: CKSyncEngine) async {
         
+        switch event {
 
         
-//        syncEngine.state.
-        
-        switch event {
-            
         case .stateUpdate(let event):
             do {
                 let data = try JSONEncoder().encode(event.stateSerialization)
@@ -128,24 +106,21 @@ extension SyncManager : CKSyncEngineDelegate {
             }
 //            UserDefaults.standard.setValue(event.stateSerialization, forKey: "stateSerialization")
             
-        case .accountChange(let event):
-            self.handleAccountChange(event)
+//        case .accountChange(let event):
+//            self.handleAccountChange(event)
             
-        case .willFetchChanges:
-            // The sample app doesn't track sent database changes in any meaningful way, but this might be useful depending on your data model.
-            print("willFetchChanges")
-//            UserDefaults.standard.setValue(true, forKey: "iCloudAuthenticated")
-            UserDefaults.standard.setValue(false, forKey: "fetchDone")
-
-            break
-            
+//        case .willFetchChanges:
+//            // The sample app doesn't track sent database changes in any meaningful way, but this might be useful depending on your data model.
+//            print("willFetchChanges")
+////            UserDefaults.standard.setValue(true, forKey: "iCloudAuthenticated")
+//            UserDefaults.standard.setValue(false, forKey: "fetchDone")
+//
+//            break
+//            
         case .didFetchChanges:
             print("didFetchChanges")
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                UserDefaults.standard.setValue(false, forKey: "shouldBlockTheView") // MARK: 너무 빨리 풀면 query가 적용이 안됨...swiftData와 cloudSyncEngine의 문제인가? 로그인 후 설치는 괜찮지만 설치 후 로그인은 문제가 됨.... ㅅㅂ?
-                UserDefaults.standard.setValue(true, forKey: "fetchDone")
-
-//            }
+            UserDefaults.standard.setValue(true, forKey: "fetchDone")
+            NotificationQueue.default.enqueue(Notification(name: Notification.Name(rawValue: "fetchDone")), postingStyle: .now)
 //            do {
 //                let container:CKContainer = CKContainer(identifier: "iCloud.recoraddic")
 //                let status:CKAccountStatus = try await container.accountStatus()
@@ -159,12 +134,11 @@ extension SyncManager : CKSyncEngineDelegate {
 //
 //            }
 
-            break
+//            break
         case .fetchedDatabaseChanges:
             print("fetchedDatabaseChanges")
         case .fetchedRecordZoneChanges:
             print("fetchedRecordZoneChanges")
-
         case .didFetchRecordZoneChanges:
             print("didFetchRecordZoneChanges")
             
@@ -179,6 +153,7 @@ extension SyncManager : CKSyncEngineDelegate {
     }
     
     func nextRecordZoneChangeBatch(_ context: CKSyncEngine.SendChangesContext, syncEngine: CKSyncEngine) async -> CKSyncEngine.RecordZoneChangeBatch? {
+//        NSFetchRequest.
         
 //        Logger.database.info("Returning next record change batch for context: \(context)")
         
@@ -209,18 +184,17 @@ extension SyncManager : CKSyncEngineDelegate {
         
         
         switch event.changeType {
-            
         case .signIn,.switchAccounts :
             // 화면 막고 동기화 완료 시까지 기다리게 만들기
             // 완전 처음일 때는?
             print("signIn or switchedAccount")
-            UserDefaults.standard.setValue(true, forKey: "iCloudAvailable") // MARK: 만약 처음 시작할 때 이게 안된다면...? 됨 언제든
+            UserDefaults.standard.setValue(true, forKey: "iCloudAvailable_forTheFirstTime") // MARK: 만약 처음 시작할 때 이게 안된다면...? 됨 언제든
             UserDefaults.standard.setValue(true, forKey: "shouldBlockTheView")
             break
 
             
         case .signOut:
-            UserDefaults.standard.setValue(false, forKey: "iCloudAvailable")
+            UserDefaults.standard.setValue(false, forKey: "iCloudAvailable_forTheFirstTime")
             print("signOut")
             break
             //            shouldDeleteLocalData = true
@@ -234,6 +208,7 @@ extension SyncManager : CKSyncEngineDelegate {
         }
     }
         
+    
 }
 
 

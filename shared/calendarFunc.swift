@@ -44,12 +44,12 @@ func getStartDateOfYesterday() -> Date {
     return calendar.startOfDay(for: yesterday)
 }
 
-func getYesterdayOf(_ date: Date) -> Date {
-    var calendar = Calendar.current
-    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
-    let yesterday = calendar.date(byAdding: .day, value: -1, to: date)!
-    return calendar.startOfDay(for: yesterday)
-}
+//func getYesterdayOf(_ date: Date) -> Date {
+//    var calendar = Calendar.current
+//    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
+//    let yesterday = calendar.date(byAdding: .day, value: -1, to: date)!
+//    return calendar.startOfDay(for: yesterday)
+//}
 
 func getTomorrowOf(_ date: Date) -> Date {
     var calendar = Calendar.current
@@ -199,6 +199,29 @@ func nDates(from date :Date, n:Int) -> [Date] {
 }
 
 
+func dailyStreak(from dates: [Date], targetDate: Date) -> Int {
+    // Ensure dates are sorted in ascending order
+    let sortedDates = dates.sorted()
+    
+    // Create a Calendar instance
+    let calendar = Calendar.current
+    
+    var streak = 0
+    var currentDate = calendar.date(byAdding: .day, value: -1, to: targetDate) ?? targetDate
+    
+    // Iterate backward from the target date
+    while sortedDates.contains(currentDate) {
+        streak += 1
+        if let previousDate = calendar.date(byAdding: .day, value: -1, to: currentDate) {
+            currentDate = previousDate
+        } else {
+            break
+        }
+    }
+    
+    return streak
+}
+
 func partitionByWeek(startDate: Date, endDate: Date) -> [[Date]] {
     var result:[[Date]] = [[Date]]()
     var currentWeek:[Date] = []
@@ -263,6 +286,7 @@ extension Date {
         
         return inputDate <= nowDate
     }
+    
     var hhmmTimeString: String {
         // Get the current date and time
         

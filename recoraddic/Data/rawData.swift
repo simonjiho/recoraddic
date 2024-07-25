@@ -219,6 +219,21 @@ class DailyQuest: Hashable, Equatable, Identifiable {
         }
     }
     
+//    func modifyData(_ newData: Int) -> Void {
+//        if self.data != 0 && newData == 0 {
+//            
+//        }
+//        else if self.data == 0 && newData != 0 {
+//            
+//        }
+//            
+//            
+//        self.data = newData
+//    }
+//    
+//    func modifyDailyText(_ newDailyText: String) -> Void {
+//    }
+    
 }
 
 @Model
@@ -302,7 +317,7 @@ final class DailyRecordSet: Equatable {
     
     var dailyQuestions: [String] = []
 
-    var dailyRecordThemeName: String = "stoneTower_0"
+    var dailyRecordThemeName: String = "StoneTower"
     var backgroundThemeName: String = "stoneTowerBackground_1" //MARK: backgroundSetting 하는 view에서 dailyRecordThemeName에 따라서 선택할 수 있는 backgroundThemeName 제한
     var dailyRecordColorIndex: Int = 0
     
@@ -327,20 +342,14 @@ final class DailyRecordSet: Equatable {
     
     
     func getIntegratedDailyRecordColor(colorScheme:ColorScheme) -> Color {
-        if self.dailyRecordThemeName == "stoneTower_0" {
-            return StoneTower_0.getIntegratedDailyRecordColor(
-                index: dailyRecordColorIndex,
-                colorScheme: colorScheme
-            )
-        }
-        else if self.dailyRecordThemeName == "stoneTower_1" {
-            return StoneTower_1.getIntegratedDailyRecordColor(
+        if self.dailyRecordThemeName == "StoneTower" {
+            return StoneTower.getIntegratedDailyRecordColor(
                 index: dailyRecordColorIndex,
                 colorScheme: colorScheme
             )
         }
         else {
-            return StoneTower_0.getIntegratedDailyRecordColor(
+            return StoneTower.getIntegratedDailyRecordColor(
                 index: dailyRecordColorIndex,
                 colorScheme: colorScheme
             )
@@ -363,6 +372,51 @@ final class DailyRecordSet: Equatable {
         return !isHidden && !inTrashCan
 
     }
+    
+    func updateDailyRecordsMomentum() -> Void {
+        if let dailyRecords = self.dailyRecords {
+            let dates = dailyRecords.filter({$0.hasContent}).compactMap({$0.date})
+            for dailyRecord in dailyRecords {
+                if let date = dailyRecord.date {
+                    let dates_beforeDate:[Date] = dates.filter({$0 < date})
+                    if let nearestDate:Date = dates_beforeDate.sorted().last {
+                        dailyRecord.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
+                        if dailyRecord.absence == 0 {
+                            dailyRecord.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
+                        } else {
+                            dailyRecord.streak = 0
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+//    func increaseStreak(from date:Date) {
+//        if let dailyRecords = self.dailyRecords {
+//            for dailyRecord in dailyRecords {
+//                
+//                
+//            }
+//        }
+//
+//        if let dates = dailyRecordSet.dailyRecords?.filter({$0.recordedAmount > 0}).map({ $0.date }) {
+//            if let date = self.date {
+//                let dates_beforeDate:[Date] = dates.compactMap({$0}).filter({$0 < date})
+//                if let nearestDate:Date = dates_beforeDate.sorted().last {
+//                    self.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
+//                    if self.absence == 0 {
+//                        self.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
+//                    } else {
+//                        self.streak = 0
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    func decreaseStreak(from:Date) {
+//        
+//    }
     
 }
 
@@ -393,12 +447,14 @@ final class DailyRecord: Equatable, Hashable {
     
     
     // TODO: visual value: is determined by the sequence of steppedForward in dailyRecords, and each theme of StoneTower has it's unique function to caculate them, based on the theme's concept and design. Also, when theme changes, the whole visual value will be recalculated to fit it's theme.
-    var questionValue1: Int?
-    var questionValue2: Int?
-    var questionValue3: Int?
-    var visualValue1: Int?
-    var visualValue2: Int?
-    var visualValue3: Int?
+//    var questionValue1: Int?
+//    var questionValue2: Int?
+//    var questionValue3: Int?
+    var recordedAmount: Int {(dailyQuestList?.filter({$0.data != 0}).count ?? 0) + (todoList?.filter({$0.done}).count ?? 0)} // 기록 갯수
+    var recordedMinutes: Int = 0 // 기록 시간(색)
+    var absence: Int = 0 // 기록 절단성
+    var streak: Int = 0 // 기록 연속성2
+
 
     
     var isFavorite: Bool = false
@@ -413,6 +469,11 @@ final class DailyRecord: Equatable, Hashable {
     var dailyRecordStoneAccesseryNum: Int?
     
     var dailyRecordSet: DailyRecordSet?
+    
+    var hasContent: Bool { self.recordedAmount > 0 || self.dailyText != nil}
+    var singleElm_dailyQuestOrTodo: Bool { self.dailyText == nil && self.recordedAmount == 1 }
+    var singleElm_diary: Bool { self.dailyText != nil && self.recordedAmount == 0 }
+    
     
     init() {
         
@@ -433,7 +494,7 @@ final class DailyRecord: Equatable, Hashable {
     }
     func hash(into hasher: inout Hasher) {
         hasher.combine(createdTime)
-        hasher.combine(date)
+//        hasher.combine(date)
             // Add any other properties that should be included in the hash
     }
     
@@ -442,6 +503,35 @@ final class DailyRecord: Equatable, Hashable {
         return !isHidden && !inTrashCan
 
     }
+
+    
+    
+    
+    func updateRecordedMinutes() -> Void {
+        if let dailyQuestList = self.dailyQuestList {
+            self.recordedMinutes = sumIntArray(dailyQuestList.filter({dataTypeFrom($0.dataType) == DataType.hour}).map({$0.data}))
+        }
+    }
+    
+    func updateExternalFactors() -> Void {
+        if let dailyRecordSet = self.dailyRecordSet {
+            if let dates = dailyRecordSet.dailyRecords?.filter({$0.hasContent}).map({ $0.date }) {
+                if let date = self.date {
+                    let dates_beforeDate:[Date] = dates.compactMap({$0}).filter({$0 < date})
+                    if let nearestDate:Date = dates_beforeDate.sorted().last {
+                        self.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
+                        if self.absence == 0 {
+                            self.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
+                        } else {
+                            self.streak = 0
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
     
 }
 
@@ -545,7 +635,7 @@ class Quest: Equatable, Identifiable, Hashable {
     // normal momentum: 0~10
     // special momentum: 11~31
     
-    
+     
 //    @Relationship(deleteRule:.cascade)
 //    var metaData: QuestMetaData?
     

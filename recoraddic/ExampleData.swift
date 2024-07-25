@@ -30,9 +30,9 @@ extension ContentView {
     func situation_YesterdayDataRemains() -> Void {
         print("generating example data.....")
         
-        let q1 = Quest(name: "Workout", dataType: DataType.HOUR)
-        let q2 = Quest(name: "Create apps", dataType: DataType.HOUR)
-        let q3 = Quest(name: "Drink milk", dataType: DataType.CUSTOM)
+        let q1 = Quest(name: "Workout", dataType: DataType.hour.rawValue)
+        let q2 = Quest(name: "Create apps", dataType: DataType.hour.rawValue)
+        let q3 = Quest(name: "Drink milk", dataType: DataType.hour.rawValue)
         q3.customDataTypeNotation = "ml"
         
         // need to set recent purpose, if not, will have no recentpurpose when adding quest at first, still no problem to system.
@@ -68,7 +68,7 @@ extension ContentView {
         
         
         let initialDailyRecordSet = DailyRecordSet(start:day1)
-        initialDailyRecordSet.dailyRecordThemeName = "stoneTower_0"
+        initialDailyRecordSet.dailyRecordThemeName = "StoneTower"
         initialDailyRecordSet.termGoals.append("앱 완성하기")
         initialDailyRecordSet.termGoals.append("2일이상 쉬지 않고 운동하기")
 //        initialDailyRecordSet.dailyQuestions.append(recoraddic.defaultQuestions[0])
@@ -81,15 +81,14 @@ extension ContentView {
         let dr1_qd1 = DailyQuest(
             questName: "Workout",
             data: 5,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.hlt, DefaultPurpose.atr]),
             dailyGoal: 5
         )
         dr1.mood = 21
-        dr1.questionValue1 = 3
-        dr1.visualValue1 = 3
-        dr1.visualValue2 = 0
-        dr1.visualValue3 = 0
+//        dr1.visualValue1 = 3
+//        dr1.visualValue2 = 0
+//        dr1.visualValue3 = 0
         dr1.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr1)
         dr1_qd1.dailyRecord = dr1
@@ -103,24 +102,23 @@ extension ContentView {
         let dr2_qd1 = DailyQuest(
             questName: "Create apps",
             data: 20,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.wrl, DefaultPurpose.ach, DefaultPurpose.ftr]),
             dailyGoal: 30
         )
         let dr2_qd2 = DailyQuest(
             questName: "Drink milk",
             data: 500,
-            dataType: DataType.CUSTOM,
+            dataType: DataType.custom.rawValue,
             defaultPurposes: Set([DefaultPurpose.hlt, DefaultPurpose.atr]),
             dailyGoal: 500
         )
         dr2.dailyTextType = DailyTextType.diary
         dr2.dailyText = "ㅋㅋㅋㅋㅋ 호호호호호호홐ㅋㅋㅋ 홈ㅋㅋㅎㅇㅁㅇㄴㅁㅇㄴㄹㅁㄴㅇㅎㄴ앞ㅍㅁㅎㅁㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㄹㅇㄹㅁㄴㄹㅁㄴㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹㅁㄴㅇㄹㅁㅇㄹㅁㄴㅇㄹㅁㄴㅇㄹ"
         dr2.mood = 48 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
-        dr2.questionValue1 = 2
-        dr2.visualValue1 = 3
-        dr2.visualValue2 = 0
-        dr2.visualValue3 = 0
+//        dr2.visualValue1 = 3
+//        dr2.visualValue2 = 0
+//        dr2.visualValue3 = 0
         dr2.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr2)
         dr2_qd1.dailyRecord = dr2
@@ -138,24 +136,23 @@ extension ContentView {
         let dr3_qd1 = DailyQuest(
             questName: "Create apps",
             data: 20,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.wrl, DefaultPurpose.ach, DefaultPurpose.ftr]),
             dailyGoal: 30
         )
         let dr3_qd2 = DailyQuest(
             questName: "Workout",
             data: 30,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.hlt, DefaultPurpose.atr]),
             dailyGoal: 30
         )
         dr3.dailyTextType = DailyTextType.inShort
         dr3.dailyText = "세번째 날의 일기"
         dr3.mood = 124 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
-        dr3.questionValue1 = 1
-        dr3.visualValue1 = 3
-        dr3.visualValue2 = 0
-        dr3.visualValue3 = 0
+//        dr3.visualValue1 = 3
+//        dr3.visualValue2 = 0
+//        dr3.visualValue3 = 0
         dr3.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr3)
         dr3_qd1.dailyRecord = dr3
@@ -170,24 +167,23 @@ extension ContentView {
         let dr4_qd1 = DailyQuest(
             questName: "Create apps",
             data: 24,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.wrl, DefaultPurpose.ach, DefaultPurpose.ftr]),
             dailyGoal: 18
         )
         let dr4_qd2 = DailyQuest(
             questName: "Workout",
             data: 36,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.hlt, DefaultPurpose.atr]),
             dailyGoal: 36
         )
         dr4.dailyTextType = DailyTextType.inShort
         dr4.dailyText = "네번째 날의 일기"
         dr4.mood = 14 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
-        dr4.questionValue1 = 0
-        dr4.visualValue1 = 3
-        dr4.visualValue2 = 0
-        dr4.visualValue3 = 0
+//        dr4.visualValue1 = 3
+//        dr4.visualValue2 = 0
+//        dr4.visualValue3 = 0
         dr4.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr4)
         dr4_qd1.dailyRecord = dr4
@@ -204,24 +200,23 @@ extension ContentView {
         let dr5_qd1 = DailyQuest(
             questName: "Create apps",
             data: 33,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.wrl, DefaultPurpose.ach, DefaultPurpose.ftr]),
             dailyGoal: 30
         )
         let dr5_qd2 = DailyQuest(
             questName: "Workout",
             data: 5,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.hlt, DefaultPurpose.atr]),
             dailyGoal: 5
         )
         dr5.dailyTextType = DailyTextType.inShort
         dr5.dailyText = "다섯번째 날의 일기"
         dr5.mood = 12 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
-        dr5.questionValue1 = -1
-        dr5.visualValue1 = 3
-        dr5.visualValue2 = 0
-        dr5.visualValue3 = 0
+//        dr5.visualValue1 = 3
+//        dr5.visualValue2 = 0
+//        dr5.visualValue3 = 0
         dr5.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr5)
         dr5_qd1.dailyRecord = dr5
@@ -237,24 +232,23 @@ extension ContentView {
         let dr6_qd1 = DailyQuest(
             questName: "Create apps",
             data: 24,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.wrl, DefaultPurpose.ach, DefaultPurpose.ftr]),
             dailyGoal: 18
         )
         let dr6_qd2 = DailyQuest(
             questName: "Workout",
             data: 15,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.hlt, DefaultPurpose.atr]),
             dailyGoal: 15
         )
         dr6.dailyTextType = DailyTextType.inShort
         dr6.dailyText = "여섯번째 날의 일기"
         dr6.mood = 65 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
-        dr6.questionValue1 = -2
-        dr6.visualValue1 = 3
-        dr6.visualValue2 = 0
-        dr6.visualValue3 = 0
+//        dr6.visualValue1 = 3
+//        dr6.visualValue2 = 0
+//        dr6.visualValue3 = 0
         dr6.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr6)
         dr6_qd1.dailyRecord = dr6
@@ -270,24 +264,23 @@ extension ContentView {
         let dr7_qd1 = DailyQuest(
             questName: "Create apps",
             data: 24,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.wrl, DefaultPurpose.ach, DefaultPurpose.ftr]),
             dailyGoal: 18
         )
         let dr7_qd2 = DailyQuest(
             questName: "Workout",
             data: 36,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.hlt, DefaultPurpose.atr]),
             dailyGoal: 36
         )
         dr7.dailyTextType = DailyTextType.inShort
         dr7.dailyText = "일곱번째 날의 일기"
         dr7.mood = 90 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
-        dr7.questionValue1 = -3
-        dr7.visualValue1 = 3
-        dr7.visualValue2 = 0
-        dr7.visualValue3 = 0
+//        dr7.visualValue1 = 3
+//        dr7.visualValue2 = 0
+//        dr7.visualValue3 = 0
         dr7.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr7)
         dr7_qd1.dailyRecord = dr7
@@ -305,24 +298,23 @@ extension ContentView {
         let dr8_qd1 = DailyQuest(
             questName: "Create apps",
             data: 24,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.wrl, DefaultPurpose.ach, DefaultPurpose.ftr]),
             dailyGoal: 18
         )
         let dr8_qd2 = DailyQuest(
             questName: "Workout",
             data: 36,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.hlt, DefaultPurpose.atr]),
             dailyGoal: 36
         )
         dr8.dailyTextType = DailyTextType.inShort
         dr8.dailyText = "여덟번째 날의 일기"
         dr8.mood = 98 // 이게 있으면 yesterday not remained, 없으면 yesterday remained
-        dr8.questionValue1 = -3
-        dr8.visualValue1 = 3
-        dr8.visualValue2 = 0
-        dr8.visualValue3 = 0
+//        dr8.visualValue1 = 3
+//        dr8.visualValue2 = 0
+//        dr8.visualValue3 = 0
         dr8.dailyRecordSet = initialDailyRecordSet
         modelContext.insert(dr8)
         dr8_qd1.dailyRecord = dr8
@@ -337,14 +329,14 @@ extension ContentView {
         let dr9_qd1 = DailyQuest(
             questName: "Create apps",
             data: 0,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.wrl, DefaultPurpose.ach, DefaultPurpose.ftr]),
             dailyGoal: 18
         )
         let dr9_qd2 = DailyQuest(
             questName: "Workout",
             data: 20,
-            dataType: DataType.HOUR,
+            dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.hlt, DefaultPurpose.atr]),
             dailyGoal: 36
         )
@@ -358,31 +350,7 @@ extension ContentView {
         
         
         
-        
-//        let dr10 = DailyRecord(date: day10)
-//        let dr10_qd1 = DailyQuest(
-//            questName: "Create apps",
-//            data: 0,
-//            dataType: DataType.HOUR,
-//            defaultPurposes: Set([DefaultPurpose.wrl, DefaultPurpose.ach, DefaultPurpose.ftr]),
-//            dailyGoal: 18
-//        )
-//        let dr10_qd2 = DailyQuest(
-//            questName: "Workout",
-//            data: 0,
-//            dataType: DataType.HOUR,
-//            defaultPurposes: Set([DefaultPurpose.hlt, DefaultPurpose.atr]),
-//            dailyGoal: 36
-//        )
-//        dr10.dailyTextType = DiaryTopic.inShort
-//        dr10.dailyText = "열번째 날의 일기"
-//        modelContext.insert(dr10)
-//        dr10_qd1.dailyRecord = dr10
-//        dr10_qd2.dailyRecord = dr10
-//        modelContext.insert(dr10_qd1)
-//        modelContext.insert(dr10_qd2)
-        
-        
+
         
         
         

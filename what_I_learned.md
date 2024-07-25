@@ -101,6 +101,7 @@
  - Use UIKit classes only from your app’s main thread or main dispatch queue, unless otherwise indicated in the documentation for those classes. This restriction particularly applies to classes that derive from UIResponder or that involve manipulating your app’s user interface in any way.
 
 
+# CloudSyncManager
 
 
 # MetalKit
