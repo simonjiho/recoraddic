@@ -15,8 +15,8 @@ extension ContentView {
 //    @Environment(\.modelContext) 
     
     func defaultInitialization() -> Void {
-        let firstDailyRecord = DailyRecord(date: getStartDateOfNow())
-        let firstDailyRecordSet = DailyRecordSet(start: getStartDateOfNow())
+        let firstDailyRecord = DailyRecord(date: getStandardDateOfNow())
+        let firstDailyRecordSet = DailyRecordSet(start: getStandardDateOfNow())
         modelContext.insert(firstDailyRecord)
         modelContext.insert(firstDailyRecordSet)
         
@@ -55,16 +55,16 @@ extension ContentView {
 //        let day9 = getDateOfYesterDay()
 //        let day10 = getDateOfNow()
         
-        let day1 = Calendar.current.date(byAdding: .day, value:-9, to: getStartDateOfYesterday())!
-        let day2 = Calendar.current.date(byAdding: .day, value:-8, to: getStartDateOfYesterday())!
-        let day3 = Calendar.current.date(byAdding: .day, value:-7, to: getStartDateOfYesterday())!
-        let day4 = Calendar.current.date(byAdding: .day, value:-6, to: getStartDateOfYesterday())!
-        let day5 = Calendar.current.date(byAdding: .day, value:-5, to: getStartDateOfYesterday())!
-        let day6 = Calendar.current.date(byAdding: .day, value:-4, to: getStartDateOfYesterday())!
-        let day7 = Calendar.current.date(byAdding: .day, value:-3, to: getStartDateOfYesterday())!
-        let day8 = Calendar.current.date(byAdding: .day, value:-2, to: getStartDateOfYesterday())!
-        let day9 = Calendar.current.date(byAdding: .day, value:-1, to: getStartDateOfYesterday())!
-        let day10 = getStartDateOfYesterday()
+        let day1 = Calendar.current.date(byAdding: .day, value:-9, to: getStandardDateOfYesterday())!
+        let day2 = Calendar.current.date(byAdding: .day, value:-8, to: getStandardDateOfYesterday())!
+        let day3 = Calendar.current.date(byAdding: .day, value:-7, to: getStandardDateOfYesterday())!
+        let day4 = Calendar.current.date(byAdding: .day, value:-6, to: getStandardDateOfYesterday())!
+        let day5 = Calendar.current.date(byAdding: .day, value:-5, to: getStandardDateOfYesterday())!
+        let day6 = Calendar.current.date(byAdding: .day, value:-4, to: getStandardDateOfYesterday())!
+        let day7 = Calendar.current.date(byAdding: .day, value:-3, to: getStandardDateOfYesterday())!
+        let day8 = Calendar.current.date(byAdding: .day, value:-2, to: getStandardDateOfYesterday())!
+        let day9 = Calendar.current.date(byAdding: .day, value:-1, to: getStandardDateOfYesterday())!
+        let day10 = getStandardDateOfYesterday()
         
         
         let initialDailyRecordSet = DailyRecordSet(start:day1)

@@ -367,10 +367,10 @@ struct EditCheckListView: View {
             modelContext.insert(emptyTodo)
         }
         else {
-            var lastIdx = currentDailyRecord.todoList!.map({$0.index}).sorted().first ?? 0 // if empty -> 0
+            var lastIdx = currentDailyRecord.todoList!.map({$0.idx}).sorted().first ?? 0 // if empty -> 0
             for todo in todos_tmp {
                 lastIdx += 1
-                todo.index = lastIdx
+                todo.idx = lastIdx
                 todo.dailyRecord = currentDailyRecord
                 modelContext.insert(todo)
             }

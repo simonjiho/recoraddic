@@ -242,7 +242,7 @@ final class Todo: Hashable, Identifiable, Equatable {
     var id:UUID = UUID()
     var createdTime: Date = Date()
 
-    var index: Int = 0
+    var idx: Int = 0
     var content: String = ""
     var done: Bool = false
     var purpose: Set<String> = []
@@ -251,26 +251,27 @@ final class Todo: Hashable, Identifiable, Equatable {
     
     init(dailyRecord: DailyRecord, index: Int) {
         self.dailyRecord = dailyRecord
-        self.index = index
+        self.idx = index
     }
     
     init() {
-        self.index = -1
+        self.idx = -1
     }
     
     init(content: String) {
-        self.index = -1
+        self.idx = -1
         self.content = content
     }
     
     static func == (lhs: Todo, rhs: Todo) -> Bool {
-            return lhs.createdTime == rhs.createdTime && lhs.index == rhs.index
+            return lhs.createdTime == rhs.createdTime && lhs.idx == rhs.idx && lhs.id == rhs.id
             // Add any other properties that determine equality
     }
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(createdTime)
-        hasher.combine(index)
+//        hasher.combine(idx)
+        hasher.combine(id)
             // Add any other properties that should be included in the hash
     }
     
@@ -391,6 +392,40 @@ final class DailyRecordSet: Equatable {
             }
         }
     }
+    
+    func getLocalStart() -> Date {
+        let date = self.start
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        // Extract year, month, and day components in UTC
+        let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+        // Set calendar to local time zone
+        calendar.timeZone = TimeZone.current
+        // Create a date from the components, now interpreted in the local time zone
+        return calendar.date(from: dateComponents) ?? date
+
+
+    }
+    func getLocalEnd() -> Date? {
+        if let date = self.end {
+            var calendar = Calendar.current
+            calendar.timeZone = TimeZone(identifier: "UTC")!
+            // Extract year, month, and day components in UTC
+            let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+            // Set calendar to local time zone
+            calendar.timeZone = TimeZone.current
+            // Create a date from the components, now interpreted in the local time zone
+            return calendar.date(from: dateComponents) ?? date
+        } else {
+            return nil
+        }
+
+    }
+    
+    func visibleDailyRecords() -> [DailyRecord] {
+        return self.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({$0.hasContent && ( ($0.getLocalDate() ?? getStartDateOfNow()) < .now )})
+    }
+
     
 //    func increaseStreak(from date:Date) {
 //        if let dailyRecords = self.dailyRecords {
@@ -531,6 +566,21 @@ final class DailyRecord: Equatable, Hashable {
         }
     }
     
+    func getLocalDate() -> Date? {
+        if let date = self.date {
+            var calendar = Calendar.current
+            calendar.timeZone = TimeZone(identifier: "UTC")!
+            // Extract year, month, and day components in UTC
+            let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+            // Set calendar to local time zone
+            calendar.timeZone = TimeZone.current
+            // Create a date from the components, now interpreted in the local time zone
+            return calendar.date(from: dateComponents) ?? date
+        } else {
+            return nil
+        }
+
+    }
     
     
 }

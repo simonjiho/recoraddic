@@ -37,7 +37,7 @@ struct MainView_checklist: View {
     
     @State var currentDailyRecord: DailyRecord = DailyRecord()
     
-    @State var selectedDate: Date = getStartDateOfNow()
+    @State var selectedDate: Date = getStandardDateOfNow()
     @State var popUp_addDailyQuest: Bool = false
     @State var popUp_changePurpose: Bool = false
     @State var editDiary = false
@@ -65,34 +65,7 @@ struct MainView_checklist: View {
     }
 
 
-//    init(currentRecordSet: DailyRecordSet, selectedView: Binding<MainViewName>) {
-//        self._profiles = Query()
-//        self._quests = Query()
-//        self._dailyRecords = Query(sort:\DailyRecord.date)
-//        self.currentRecordSet = currentRecordSet
-//        self._selectedView = selectedView
-//        self.currentDailyRecord = {
-//            let dailyRecords_tmp = Query(sort:\DailyRecord.date).wrappedValue
-//            if let targetDailyRecord:DailyRecord = dailyRecords_tmp.first(where: {$0.date == getStartOfDate(date: getStartDateOfNow())}) {
-//                return targetDailyRecord
-//            } else if let nilDailyRecord: DailyRecord = dailyRecords_tmp.first(where: {$0.date == nil}) {
-//                nilDailyRecord.date = getStartOfDate(date: selectedDate)
-//                nilDailyRecord.dailyRecordSet = currentRecordSet
-//                let newNilDailyRecord: DailyRecord = DailyRecord()
-//                modelContext.insert(newNilDailyRecord)
-//                return nilDailyRecord
-//            } else {
-//                let newNilDailyRecord: DailyRecord = DailyRecord()
-//                newNilDailyRecord.date = getStartOfDate(date: selectedDate)
-//                newNilDailyRecord.dailyRecordSet = currentRecordSet
-//                modelContext.insert(newNilDailyRecord)
-//                return newNilDailyRecord
-//            }
-////            dailyRecords.first(where: {$0.date == getStartDateOfNow()})
-//        }()
-//
-//    }
-    
+
     var body: some View {
 
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
@@ -355,9 +328,9 @@ struct MainView_checklist: View {
             
             .onChange(of: selectedDate) { oldValue, newValue in
                 
-                selectedDate = getStartOfDate(date: newValue) // No worry of infinite onChangeCall
+                selectedDate = getStandardDate(from: newValue) // No worry of infinite onChangeCall
                 
-                if oldValue < getStartDateOfYesterday() {
+                if oldValue < getStandardDateOfYesterday() {
                     removeEmptyDailyQuests()
                 }
                 changeDailyRecord()
@@ -382,7 +355,7 @@ struct MainView_checklist: View {
             //            print("hallo~~~")
             for dailyQuest in dailyQuests {
                 if let alermTime = dailyQuest.alermTime {
-                    if alermTime.isExpired {
+                    if alermTime.isExpired_local {
                         dailyQuest.alermTime = nil
                     }
                 }
@@ -390,19 +363,6 @@ struct MainView_checklist: View {
         }
     }
     
-//    func updateExistency() -> Void { // 오늘의 dr이 저장되어있는지, 어제의 dr이 저장되어 있는지 업데이트
-//        todayRecordExists = dailyRecords.contains(where: {$0.date == getStartDateOfNow()})
-//
-//        let currentRecordSet_isEmpty: Bool = currentRecordSet.dailyRecords!.isEmpty
-//        print("currentRecordSet_isEmpty: ", currentRecordSet_isEmpty)
-//        
-//        if todayRecordExists && currentRecordSet_isEmpty {
-//            yesterdayRecordExists = true
-//        }
-//        else {
-//            yesterdayRecordExists = dailyRecords.contains(where: {$0.date == getStartDateOfYesterday()})
-//        }
-//    }
     
     func startTimer() { // 오늘의 자정에 timer 맞추기 ( 24/07/11 12:00 -> 24/07/12 00:00 에 작동하는 타이머 설정)
         // MARK: 과연 00:00 에 작동하는가? 23:59에 작동할 가능성은?
@@ -435,11 +395,11 @@ struct MainView_checklist: View {
     
     
     func changeDailyRecord() -> Void {
-        if let targetDailyRecord:DailyRecord = dailyRecords.first(where: {$0.date == getStartOfDate(date: selectedDate)}) { // found target
+        if let targetDailyRecord:DailyRecord = dailyRecords.first(where: {$0.getLocalDate() == getStartOfDate(date: selectedDate)}) { // found target
             currentDailyRecord = targetDailyRecord
 //            currentDailyRecord.dailyRecordSet = currentRecordSet
         } else if let nilDailyRecord: DailyRecord = dailyRecords.first(where: {$0.date == nil}) { // use buffer dailyRecord
-            nilDailyRecord.date = getStartOfDate(date: selectedDate)
+            nilDailyRecord.date = getStandardDate(from: selectedDate)
             currentDailyRecord = nilDailyRecord
             currentDailyRecord.dailyRecordSet = findDailyRecordSet(selectedDate)
             let newNilDailyRecord: DailyRecord = DailyRecord()
@@ -447,7 +407,7 @@ struct MainView_checklist: View {
             print("no!!!!")
         } else { // no buffer dailyRecord
             print("no!!!!!!!")
-            let newDailyRecord: DailyRecord = DailyRecord(date: selectedDate)
+            let newDailyRecord: DailyRecord = DailyRecord(date: getStandardDate(from: selectedDate))
             currentDailyRecord = newDailyRecord
             currentDailyRecord.dailyRecordSet = findDailyRecordSet(selectedDate)
             modelContext.insert(newDailyRecord)
@@ -578,6 +538,7 @@ struct ChecklistView: View {
     @State var buffer_chosenPurposes: Set<String> = Set()
 
     @State var editingIndex: Int?
+    @State var editingTodo: Todo?
     @State var doneButtonPressed: Bool = false
     
 //    @State var todoText: [String] = []
@@ -774,7 +735,7 @@ struct ChecklistView: View {
                             }
                             
                             
-                            let todoList_sorted = currentDailyRecord.todoList!.sorted(by: {$0.index < $1.index})
+                            let todoList_sorted = currentDailyRecord.todoList!.sorted(by: {$0.idx < $1.idx})
 //                            if todoList_sorted.count != 0 {
 //                                Text("일반 퀘스트")
 //                                    .frame(width:checkListElementWidth,alignment: .leading)
@@ -838,13 +799,15 @@ struct ChecklistView: View {
 //                                        .border(.red)
 
                                         HStack(spacing:0.0) {
-                                            textFieldView(currentDailyRecord: currentDailyRecord, todo: todo, text: todo.content, idx: $editingIndex, doneButtonPressed: $doneButtonPressed)
-                                                .frame(width:editingIndex == todo.index ? todo_textWidth*0.8 : todo_textWidth)
+                                            Text("\(todo.idx)")
+                                            textFieldView(currentDailyRecord: currentDailyRecord, todo: todo, text: todo.content, editingTodo:$editingTodo, idx: $editingIndex, doneButtonPressed: $doneButtonPressed)
+//                                                .frame(width:editingIndex == todo.index ? todo_textWidth*0.8 : todo_textWidth)
+                                                .frame(width:todo_textWidth*0.8)
                                         }
                                         .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
 //                                        .border(.red)
                                         
-                                        if editingIndex == todo.index {
+                                        if editingIndex == todo.idx {
                                             Button("완료") {
                                                 doneButtonPressed.toggle()
                                             }
@@ -853,7 +816,7 @@ struct ChecklistView: View {
                                         
                                         if editingIndex == nil {
                                             Button(action:{
-                                                let targetIndex = todo.index
+                                                let targetIndex = todo.idx
                                                 
                                                 modelContext.delete(todo)
                                                 if !currentDailyRecord.hasContent {
@@ -880,8 +843,12 @@ struct ChecklistView: View {
                                     }
                                     .frame(width: checkListElementWidth, height:todo_height, alignment:.leading)
                                     
-                                    .id(todo.index)
+                                    .id(todo.idx)
                                     
+                                }
+                                .onAppear() {
+                                    print("hohoh")
+                                    print(todoList_sorted.map({$0.idx}))
                                 }
                                 
                                 if editingIndex != nil {
@@ -908,8 +875,10 @@ struct ChecklistView: View {
                         .onChange(of: editingIndex) {
 //                            print("changed!!!")
                             if editingIndex != nil {
-                                withAnimation {
-                                    scrollProxy.scrollTo(editingIndex,anchor: .center)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    withAnimation {
+                                        scrollProxy.scrollTo(editingIndex,anchor: .center)
+                                    }
                                 }
                             }
                         }
@@ -931,6 +900,7 @@ struct ChecklistView: View {
 
             } // zstack
             .frame(width:geometry.size.width, height: geometry.size.height)
+
             .onChange(of: applyDailyQuestRemoval, removeDailyQuest)
             .onChange(of: applyDailyTextRemoval, removeDailyText)
             .onChange(of: currentDailyRecord, {
@@ -1029,6 +999,7 @@ struct textFieldView: View {
     var todo: Todo
     @State var text: String
     
+    @Binding var editingTodo: Todo?
     @Binding var idx: Int?
     @Binding var doneButtonPressed: Bool
     @FocusState var isFocused: Bool
@@ -1037,7 +1008,6 @@ struct textFieldView: View {
     var body: some View {
         
         
-        let todos = currentDailyRecord.todoList!.sorted(by: {$0.index < $1.index})
         
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
@@ -1048,16 +1018,37 @@ struct textFieldView: View {
             .frame(width:geoWidth, height: geoHeight)
             .focused($isFocused)
             .onSubmit { // only when return button pressed.
+                
                 todo.content = text
-                
-                
-                for todo2 in todos {
-                    if todo2.index > todo.index {
-                        todo2.index += 1
-                    }
+
+//                let todos = currentDailyRecord.todoList!.filter({$0.idx > todo.idx}).sorted(by: {$0.idx > $1.idx})
+//                for todo2 in todos {
+//                    todo2.idx += 1
+//                }
+//                try? modelContext.save()
+
+                let a = todo.idx
+                let date = currentDailyRecord.date
+                let predicate = #Predicate<Todo> { todo2 in
+                    todo2.dailyRecord?.date == date && todo2.idx > a
+//                    todo2.idx > 0
                 }
-                modelContext.insert(Todo(dailyRecord:currentDailyRecord, index: todo.index + 1))
-                idx = todo.index + 1
+
+                var descriptor = FetchDescriptor(predicate: predicate)
+//                var todos = try! modelContext.fetch(descriptor)
+                descriptor.sortBy = [SortDescriptor(\.idx)]
+
+                try! modelContext.enumerate(
+                    descriptor,
+                    batchSize: 5000,
+                    allowEscapingMutations: false
+                ) { todo2 in
+                    todo2.idx += 1
+                }
+                
+                
+                modelContext.insert(Todo(dailyRecord:currentDailyRecord, index: todo.idx + 1))
+                idx = todo.idx + 1
                 //                }
                 //                else {
                 //                    doneButtonPressed = false
@@ -1072,7 +1063,7 @@ struct textFieldView: View {
                 
             })
             .onChange(of: idx) {
-                if idx == todo.index {
+                if idx == todo.idx {
                     isFocused = true
                 }
                 else {
@@ -1085,12 +1076,12 @@ struct textFieldView: View {
                 //                    idx = todo.index
                 //                }
                 if isFocused {
-                    idx = todo.index
+                    idx = todo.idx
                 }
                 
             })
             .onAppear() {
-                if idx == todo.index {
+                if idx == todo.idx {
                     isFocused = true
                 }
             }

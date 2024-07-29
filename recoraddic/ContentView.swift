@@ -60,6 +60,7 @@ struct ContentView: View {
     @AppStorage("iCloudAvailable_forTheFirstTime") var iCloudAvailable: Bool = false
     @AppStorage("initialization") var initialization: Bool = true
     @AppStorage("fetchDone") var fetchDone: Bool = false
+    @AppStorage("standardDateAdjusted") var standardDateAdjusted: Bool = false
 
 
     @StateObject var netWorkMonitor: NetworkMonitor = NetworkMonitor()
@@ -112,7 +113,7 @@ struct ContentView: View {
          }
          else {
              
-             // MARK: 나중에
+             // MARK: 이 조건문이 필요한가?
              if profiles.count == 0 || dailyRecords.count == 0 || defaultPurposeDatas.count == 0 || dailyRecordSets.count == 0 {
                  // MARK: 설치 후 로그인하면 fetch 완료 후에도 local에 제대로 저장이 되지 않는 경우가 존재
                  VStack {
@@ -122,7 +123,7 @@ struct ContentView: View {
              }
              else {
                  
-                 let currentDailyRecordSet: DailyRecordSet = dailyRecordSets.filter({$0.start < .now}).last ?? DailyRecordSet(start: Calendar.current.date(byAdding: .day, value: 1000, to: .now)!) // MARK: signOutErrorPrevention
+
 
                      
                  TabView(selection: $selectedView){
@@ -144,8 +145,8 @@ struct ContentView: View {
                      .ignoresSafeArea(.keyboard)
                      .tag(mainViews[1])
 
-                     
-                     let index = dailyRecordSets.filter({$0.start < .now}).count > 0 ? dailyRecordSets.filter({$0.start < .now}).count-1 : 0
+                     let currentDailyRecordSet: DailyRecordSet = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).last ?? DailyRecordSet(start: getStandardDate(from: Date().addingDays(1000))) // MARK: signOutErrorPrevention
+                     let index = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).count > 0 ? dailyRecordSets.filter({$0.start < .now}).count-1 : 0
                      MainView_SeeMyDailyRecord(
                         selectedDailyRecordSetIndex: index,
                         selectedDailyRecordSet: currentDailyRecordSet,
@@ -177,6 +178,13 @@ struct ContentView: View {
                              mergeDuplicatedDR()
                              try? modelContext.save()
                          }
+                     }
+                     if UserDefaults.standard.value(forKey: "standardDateAdjusted") == nil {
+                         UserDefaults.standard.setValue(false, forKey: "standardDateAdjusted")
+                     }
+                     if !standardDateAdjusted {
+                         adjustStandardDate()
+                         UserDefaults.standard.setValue(true, forKey: "standardDateAdjusted")
                      }
                  }
                  .onChange(of: selectedView) { oldValue, newValue in //여기에 다양한 것 넣어주기
@@ -234,9 +242,6 @@ struct ContentView: View {
                     initializeDatas()
                     UserDefaults.standard.setValue(false,forKey: "initialization")
                 }
-
-//            case .couldNotDetermine, .restricted, .noAccount, .temporarilyUnavailable:
-//                print("Unknown iCloud status")
 
 
             default:
@@ -313,90 +318,19 @@ struct ContentView: View {
     
     func reorganizeDailyRecord() -> Void {
         print("reorganizingDailyRecord")
-//        var dr_noTargetDRS: [DailyRecord] = []
         for dailyRecord in dailyRecords {
             if let date = dailyRecord.date {
                 if let nearestDRS:DailyRecordSet = dailyRecordSets.filter({$0.start <= date}).last {
                     if nearestDRS.start != dailyRecord.dailyRecordSet?.start {
                         dailyRecord.dailyRecordSet = nearestDRS
                     }
-                } 
-//                else {
-//                    if let firstDRS = dailyRecordSets.first {
-//                        if calculateDaysBetweenTwoDates(from:date, to: firstDRS.start) < 10 {
-//                        
-//                        }
-//                    }
-//                    dr_noTargetDRS.append(dailyRecord)
-//                }
-
+                }
+                
+                
             }
         }
-//        if let startDate = dr_noTargetDRS.compactMap({$0.date}).sorted().first {
-//            let newDailyRecordSet:DailyRecordSet = DailyRecordSet(start: startDate)
-//            modelContext.insert(newDailyRecordSet)
-//            for dr in dr_noTargetDRS {
-//                dr.dailyRecordSet = newDailyRecordSet
-//            }
-//        }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-//    private func checkForChanges(after delay: TimeInterval) async {
-//        // Wait for the specified delay
-//        try? await Task.sleep(nanoseconds: UInt64(delay * Double(NSEC_PER_SEC)))
-//        
-//        // Check if there are changes and wait until there are no changes
-//        await waitForNoChanges()
-//        
-//
-//
-//    }
-//    
-//    private func waitForNoChanges() async {
-//        // Assuming you have a model container instance
-////        
-//        while !modelContext.insertedModelsArray.isEmpty {
-//            // Wait for a short interval before checking again
-//            try? await Task.sleep(nanoseconds: UInt64(0.5 * Double(NSEC_PER_SEC)))
-//        }
-//        
-//        
-//        UserDefaults.standard.setValue(false, forKey: "shouldBlockTheView") // MARK: 너무 빨리 풀면 query가 적용이 안됨...swiftData와 cloudSyncEngine의 문제인가? 로그인 후 설치는 괜찮지만 설치 후 로그인은 문제가 됨.... ㅅㅂ?
-//        try! modelContext.save() //MARK: 강제 저장을 통해 해결(그러나 modelContext.hasChanges = false로 나타남, swiftData또는 CKSyncEngine 자체의 문제인 것으로 추정(24.03.02))
-//        
-//        
-//        
-//        
-//        if profiles.count == 0 {
-//            modelContext.insert(Profile())
-//        }
-//        if dailyRecords.count == 0 || dailyRecordSets.count == 0 {
-//            // put functions that you wanna set as default data for debug
-//            if sampleData {
-//                situation_YesterdayDataRemains()
-//            }
-//            else {
-//                defaultInitialization()
-//            }
-//        }
-//        if defaultPurposeDatas.count == 0 {
-//            for defaultPurpose in recoraddic.defaultPurposes {
-//                modelContext.insert(DefaultPurposeData(name: defaultPurpose))
-//            }
-//        }
-//        // Perform any actions you need to take once there are no pending changes
-//        print("No pending changes in the model container.")
-//    }
 
-    
-    
         
     func initializeDatas() -> Void {
         if profiles.count == 0 {
@@ -418,6 +352,31 @@ struct ContentView: View {
         }
     }
 
+    func adjustStandardDate() -> Void {
+        
+        // dr date, drs start&end, quest.dailyData date
+        for dr in dailyRecords {
+            if let date = dr.date {
+                dr.date = getStandardDate(from:date)
+            }
+        }
+        for drs in dailyRecordSets {
+            drs.start = getStandardDate(from:drs.start)
+            if let end = drs.end {
+                drs.end = getStandardDate(from:end)
+            }
+        }
+        for quest in quests {
+            for date in quest.dailyData.keys {
+                let value = quest.dailyData[date] ?? 0
+                quest.dailyData.removeValue(forKey: date)
+                quest.dailyData[getStandardDate(from: date)] = value
+            }
+        }
+        
+        print("adjusted!")
+    
+    }
     
 }
 
@@ -430,5 +389,7 @@ func checkiCloudAccountStatus(completion: @escaping (CKAccountStatus, Error?) ->
         }
     }
 }
+
+
 
 

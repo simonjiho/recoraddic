@@ -41,7 +41,7 @@ func getDayOption(at date: Date) -> DayOption {
 func getNotificationTimeString(from date: Date?) -> String {
     if let date_nonNil = date {
         let dayOption: DayOption = getDayOption(at: date_nonNil)
-        return (DayOption.dayOption_kor[dayOption] ?? "unexpectedValue") + " " + date_nonNil.hhmmTimeString
+        return (DayOption.dayOption_kor[dayOption] ?? "unexpectedValue") + " " + date_nonNil.hhmmTimeString_local
     } else {
         return "no alermTime"
     }
@@ -92,7 +92,7 @@ struct QuestCheckBoxView: View {
         let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= width +  0.1) ? xOffset : width, height: height), transform: nil))
         let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
         
-        let isRecent: Bool = getStartDateOfYesterday() < dailyQuest.dailyRecord!.date!
+        let isRecent: Bool = getStartDateOfYesterday() <= dailyQuest.dailyRecord!.date!
         
         HStack(spacing:0.0) {
             
@@ -456,7 +456,7 @@ struct QuestCheckBoxContent_HOUR:View {
 
             HStack(spacing:0.0) {
                 
-                let isRecent: Bool = getStartDateOfYesterday() < dailyQuest.dailyRecord!.date!
+                let isRecent: Bool = getStandardDateOfYesterday() <= dailyQuest.dailyRecord!.date!
 
                 if onTimer {
                     Button(action: {
@@ -999,6 +999,7 @@ class Stopwatch: ObservableObject {
             self.totalSec = Int(Date().timeIntervalSince(startTime))
             self.updateTime()
         }
+        RunLoop.current.add(timer!, forMode: .common)
     }
 
     func stop() {

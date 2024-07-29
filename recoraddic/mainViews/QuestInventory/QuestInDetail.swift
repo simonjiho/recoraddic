@@ -397,7 +397,7 @@ struct QuestStatistics_inTerm: View {
             
             
 //            let chartData:[Date:Int] = selectedQuest.dailyData.filter({$0.key >= start && $0.key <= end})
-            let chartData:[Date:Int] = selectedQuest.dailyData.filter({selectedOption == -1 ? true : calculateDaysBetweenTwoDates(from: $0.key, to: getStartDateOfNow())  < selectedOption })
+            let chartData:[Date:Int] = selectedQuest.dailyData.filter({selectedOption == -1 ? true : calculateDaysBetweenTwoDates(from: $0.key, to: getStandardDateOfNow())  < selectedOption })
             let maxValue:Int = selectedQuest.dailyData.values.max() ?? 0
             
             
@@ -422,14 +422,14 @@ struct QuestStatistics_inTerm: View {
                                 
                                 if chartData.count < 10 {
                                     PointMark(
-                                        x: .value("Date", yymmddFormatOf(item.key)),
+                                        x: .value("Date", yymmddFormatOf(standardDateToLocalStartOfDay(std: item.key))),
                                         y: .value("Profit A",  item.value)
                                     )
                                     .foregroundStyle(tierColor_dark)
                                 }
                                 
                                 LineMark(
-                                    x: .value("Date", yymmddFormatOf(item.key)),
+                                    x: .value("Date", yymmddFormatOf(standardDateToLocalStartOfDay(std: item.key))),
                                     //                        x: .value("Date", item.key),
                                     y: .value("Profit A",  item.value),
                                     series: .value("Company", "A")
@@ -719,7 +719,7 @@ struct RowContent: View {
     var body: some View {
         let elementCnt: Int = dates.count
         
-        let startOfMonthIndex: Int? = dates.firstIndex(where: {$0.isStartOfMonth})
+        let startOfMonthIndex: Int? = dates.firstIndex(where: {$0.isStartOfMonth_local})
         let isMonthChangingRow: Bool = containsFirstDateOfMonth(dates: dates)
         
         let startOfMonthIndexIsNonzero: Bool = {
@@ -754,7 +754,7 @@ struct RowContent: View {
                     ForEach(0..<elementCnt, id:\.self) { index in
                         let date = dates[index]
                         let isDone = doneList[index]
-                        let monthRepresentaion: Bool = date.isStartOfMonth || (isFirst&&index==0)
+                        let monthRepresentaion: Bool = date.isStartOfMonth_local || (isFirst&&index==0)
                         ZStack {
                             Spacer()
                                 .background(isDone ? gradiant_done: gradiant_notDone)

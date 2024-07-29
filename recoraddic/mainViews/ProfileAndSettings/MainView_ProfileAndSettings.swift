@@ -48,14 +48,14 @@ struct MainView_ProfileAndSettings: View {
                                 filteredOption: "isHidden"
 //                                selectedData: "dailyRecord"
                             )
-                            .navigationTitle("숨김")
+                            .navigationTitle("숨긴 퀘스트")
                             .navigationBarTitleDisplayMode(.inline)
 
 //                            .frame(width:geometry.size.width, height: geoHeight) //MARK: potential problem caused by the frame size.
                             // MARK: frame을 지정한 이유 -> destination의 기본 frame의 height 값이 좀 작음. 그래서 크게 만들었다.
                             // 크기 지정하니까 작동 안하네?! ㅅㅂ
                     ) {
-                        Text("숨김")
+                        Text("숨긴 퀘스트")
                     }
                     NavigationLink(
                         destination:
@@ -63,13 +63,13 @@ struct MainView_ProfileAndSettings: View {
                                 filteredOption: "inTrashCan"
 //                                selectedData: "dailyRecord"
                             )
-                            .navigationTitle("휴지통")
+                            .navigationTitle("삭제한 퀘스트")
                             .navigationBarTitleDisplayMode(.inline)
 //                            .frame(width:geometry.size.width, height: geoHeight) //MARK: potential problem caused by the frame size.
                             // MARK: frame을 지정한 이유 -> destination의 기본 frame의 height 값이 좀 작음. 그래서 크게 만들었다.
                             // 크기 지정하니까 작동 안하네?! ㅅㅂ
                     ) {
-                        Text("휴지통")
+                        Text("삭제한 퀘스트")
                     }
                     
                 }
@@ -107,7 +107,6 @@ struct FilteredDatas: View {
     
     
     @State var selectedQuestName: String = ""
-    @State var selectedData: String = "quest"
 
     
 
@@ -134,51 +133,14 @@ struct FilteredDatas: View {
             
             
             ZStack {
-                VStack {
-//                    Text("숨겨진 \()")
-
-                    if filteredOption != "isArchived" {
-                        
-                        Picker("wow", selection: $selectedData) {
-                            Text("퀘스트").tag("quest")
-                            Text("일일기록").tag("dailyRecord")
-                            Text("구간기록").tag("dailyRecordSet")
-                            
-                        }
-                        .foregroundStyle(.foreground)
-                        .pickerStyle(.menu)
-                        .padding(.horizontal,10)
-                        .frame(width: geoWidth, alignment: .trailing)
-                    }
-//                    .border(.red)
-                    switch selectedData {
-                    case "quest":
-                        HiddenQuests(
-                            filteredOption: filteredOption,
-                            selectedQuest: $selectedQuest,
-                            selectedQuestName: $selectedQuestName,
-                            popUp_quest: $popUp_quest,
-                            popUp_deleteQuest: $popUp_deleteQuest
-                        )
-                            .frame(width: geoWidth)
-                    case "dailyRecord":
-                        HiddenDailyRecords(
-                            filteredOption: filteredOption,
-                            selectedDailyRecord: $selectedDailyRecord,
-                            popUp_dailyRecord: $popUp_dailyRecord
-                        )
-                        .frame(width: geoWidth)
-
-
-                    case "dailyRecordSet":
-                        HiddenDailyRecordSets(filteredOption: filteredOption)
-                            .frame(width: geoWidth)
-
-                        
-                    default:
-                        Text("undefined")
-                    }
-                }
+                
+                FilteredQuests(
+                    filteredOption: filteredOption,
+                    selectedQuest: $selectedQuest,
+                    selectedQuestName: $selectedQuestName,
+                    popUp_quest: $popUp_quest,
+                    popUp_deleteQuest: $popUp_deleteQuest
+                )
                 .frame(width: geoWidth, height: geoHeight, alignment: .top)
                 
                 if popUp_deleteQuest {
@@ -238,7 +200,7 @@ struct FilteredDatas: View {
 }
             
 
-struct HiddenQuests: View {
+struct FilteredQuests: View {
     @Environment(\.modelContext) var modelContext
     @Query(sort:\Quest.createdTime) var quests:[Quest]
     
@@ -331,157 +293,6 @@ struct HiddenQuests: View {
     }
 }
 
-
-struct HiddenDailyRecords: View {
-    @Environment(\.modelContext) var modelContext
-    @Query(sort:\DailyRecord.date) var dailyRecords:[DailyRecord]
-
-    let filteredOption: String
-
-    
-    @Binding var selectedDailyRecord: DailyRecord?
-    @Binding var popUp_dailyRecord: Bool
-    
-    var body: some View {
-        
-        let dailyRecords_filtered: [DailyRecord] = {
-            if filteredOption == "isHidden" {
-                return dailyRecords.filter({$0.isHidden})
-            }
-            else if filteredOption == "inTrashCan" {
-                return dailyRecords.filter({$0.inTrashCan})
-
-            }
-            else {
-                return []
-            }
-            
-        }()
-        GeometryReader { geometry in
-            let geoWidth: CGFloat = geometry.size.width
-            let geoHeight: CGFloat = geometry.size.height
-            
-            if dailyRecords_filtered.count == 0 {
-                Text("일일기록 없음")
-                    .frame(width:geoWidth, height: geoHeight)
-
-            }
-            else {
-                List {
-                    ForEach(dailyRecords_filtered, id: \.createdTime) { dr in
-                        //            GeometryReader { geometry in
-                        Button(action:{
-                            selectedDailyRecord = dr
-                            popUp_dailyRecord.toggle()
-                        })
-                        {
-                            Text("\(yyyymmddFormatOf(dr.date!))")
-                            
-                        }
-                        
-                    }
-                }
-                .frame(width:geoWidth, height: geoHeight)
-                .sheet(
-                    isPresented: $popUp_dailyRecord,
-                    content: {
-                        
-                        RecordInDetailView_optional(
-                            popUp_recordInDetail: $popUp_dailyRecord,
-                            record: $selectedDailyRecord
-                        )
-                        
-                    }
-                )
-
-
-            }
-            
-        }
-        
-        
-
-    }
-}
-
-struct HiddenDailyRecordSets: View {
-    @Environment(\.modelContext) var modelContext
-    @Query(sort:\DailyRecordSet.createdTime) var dailyRecordSets:[DailyRecordSet]
-    
-    @State var showingAlert: Bool = false
-    @State var selectedDrs: DailyRecordSet? = nil
-
-    let filteredOption: String
-
-    var body: some View {
-        
-        let dailyRecordSets_filtered: [DailyRecordSet] = {
-            if filteredOption == "isHidden" {
-                return dailyRecordSets.filter({$0.isHidden})
-            }
-            else if filteredOption == "inTrashCan" {
-                return dailyRecordSets.filter({$0.inTrashCan})
-            }
-            else {
-                return []
-            }
-            
-        }()
-        
-        GeometryReader { geometry in
-            let geoWidth: CGFloat = geometry.size.width
-            let geoHeight: CGFloat = geometry.size.height
-            if dailyRecordSets_filtered.count == 0 {
-                Text("구간기록 없음")
-                    .frame(width:geoWidth, height: geoHeight)
-            }
-            else {
-                List {
-                    ForEach(dailyRecordSets_filtered, id: \.createdTime) { dailyRecordSet in
-                        //            GeometryReader { geometry in
-                        Menu {
-                            Button("되돌리기") {
-                                dailyRecordSet.isHidden = false
-                                dailyRecordSet.inTrashCan = false
-                            }
-                            
-                            if filteredOption == "isHidden" {
-                                Button("휴지통으로 이동") {
-                                    dailyRecordSet.isHidden = false
-                                    dailyRecordSet.inTrashCan = true
-                                }
-                            }
-                            if filteredOption == "inTrashCan" {
-                                Button("영구 삭제") {
-//
-                                    selectedDrs = dailyRecordSet
-                                    showingAlert.toggle()
-                                }
-                            }
-                            
-                        } label: {
-                            
-                            Text("\(yyyymmddFormatOf(dailyRecordSet.start)) ~ \(yyyymmddFormatOf(dailyRecordSet.end!)) ")
-                            
-                        }
-
-                    }
-                }
-                .alert("해당 구간기록을 영구적으로 삭제하시겠습니까?", isPresented: $showingAlert) {
-                    Button("Ok") {
-                        let targetDrs: DailyRecordSet = selectedDrs!
-                        modelContext.delete(targetDrs)
-                        selectedDrs = nil
-                        showingAlert.toggle()}
-                    Button("no..") {showingAlert.toggle()}
-                } message: {
-                    Text("(당일, 전날의 일일기록을 제외하고는 퀘스트의 기록에 영향을 끼치지 않습니다.)")
-                }
-            }
-        }
-    }
-    
-}
 
 
 

@@ -114,7 +114,7 @@ extension Quest {
     func representingDataToString() -> String {
         let calendar = Calendar.current
         
-        let currentDate = (dailyData.isEmpty || dailyData.keys.contains(getStartDateOfNow())) ? getStartDateOfNow() : calendar.date(byAdding: .day, value: -1, to: getStartDateOfNow())!
+//        let currentDate = (dailyData.isEmpty || dailyData.keys.contains(getStandardDateOfNow())) ? getStartDateOfNow() : calendar.date(byAdding: .day, value: -1, to: getStartDateOfNow())!
         // 오늘기록완료시(get d -> 마지막기록날짜 / 기록완료 안했을 시: 전날
         
         if representingData == QuestRepresentingData.cumulativeData {
@@ -169,7 +169,7 @@ extension Quest {
         // 1. special
 
         
-        let today: Date = getStartDateOfNow()
+        let today: Date = getStandardDateOfNow()
         
         if self.dailyData.count == 0 {
             return 0

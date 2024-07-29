@@ -26,10 +26,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     @Environment(\.colorScheme) private var colorScheme
     
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
+    @Query var dailyRecords: [DailyRecord]
     
-    var dailyRecordSets_visible: [DailyRecordSet] {
-        dailyRecordSets.filter({$0.isVisible()})
-    }
     
     @State var selectedDailyRecordSetIndex: Int // it does not automatically changes selectedDailyRecordSet. you need to toggle updateSelectedDailyRecordSet to update selectedDailyRecordSet
     @State var selectedDailyRecordSet: DailyRecordSet
@@ -61,16 +59,55 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     @State var newDailyRecordSetAdded: Bool = false
     @State var undoNewDRS: Bool = false
     
+    @State var startDate: Date = Date()
+    @State var endDate: Date = Date()
     
     var body: some View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
-        
-        let statusBarHeight:CGFloat = getStatusBarHeight()
-        
         let backGroundColor:Color = getColorSchemeColor(colorScheme)
+        let statusBarHeight:CGFloat = getStatusBarHeight()
+
+        let dailyRecordSetEmpty: Bool = selectedDailyRecordSet.dailyRecords!.filter({$0.hasContent}).count == 0
+//        let lastDailyRecord: Bo
         
-        let dailyRecordSetEmpty: Bool = selectedDailyRecordSet.dailyRecords!.filter({$0.isVisible()}).count == 0
+        let nextDRS: DailyRecordSet? = selectedDailyRecordSetIndex < dailyRecordSets.count - 1  ? dailyRecordSets[selectedDailyRecordSetIndex+1] : nil
+        
+        let prevDRS_start: Date? = standardDateToLocalStartOfDay(std:dailyRecordSets.map({$0.start}).filter({$0 < selectedDailyRecordSet.start}).sorted().last)
+        let nextDRS_start: Date? = standardDateToLocalStartOfDay(std:dailyRecordSets.map({$0.start}).filter({$0 > selectedDailyRecordSet.start}).sorted().first)
+        let nextDRS_end: Date? = {if let end = nextDRS?.end {return end} else {return nil}}()
+        
+        let startRange: ClosedRange<Date> = {
+            if let min = prevDRS_start?.addingDays(-1) {
+                if let max = standardDateToLocalStartOfDay(std: selectedDailyRecordSet.end)  {
+                    return min...max
+                }
+                else {
+                    return min...Calendar.current.date(byAdding: .year, value: 50, to: min)!
+                }
+            }
+            else {
+                if let max = standardDateToLocalStartOfDay(std: selectedDailyRecordSet.end) {
+                    return Calendar.current.date(byAdding: .year, value: -50, to: max)!...max
+                }
+                else {
+                    return Calendar.current.date(byAdding: .year, value: -50, to: standardDateToLocalStartOfDay(std: selectedDailyRecordSet.start))!...Calendar.current.date(byAdding: .year, value: 50, to: standardDateToLocalStartOfDay(std: selectedDailyRecordSet.start))!
+                }
+            }
+        }()
+        let endRange: ClosedRange<Date> = {
+            let min = standardDateToLocalStartOfDay(std: selectedDailyRecordSet.start)
+            if let max = standardDateToLocalStartOfDay(std: nextDRS_end)?.addingDays(-1) {
+//                print(min)
+//                print(max)
+//                if selectedDailyRecordSetIndex <
+                return min...max
+            }
+            else {
+                return min...Calendar.current.date(byAdding: .year, value: 50, to: min)!
+            }
+        }()
+
         
         GeometryReader { geometry in
             
@@ -92,12 +129,18 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                             selectedRecord: $selectedRecord,
                             popUp_startNewRecordSet: $popUp_startNewRecordSet,
                             popUp_recordInDetail: $popUp_recordInDetail,
-                            alert_drsHidden: $alert_drsHidden,
-                            alert_drsInTrashCan: $alert_drsInTrashCan,
+//                            alert_drsHidden: $alert_drsHidden,
+//                            alert_drsInTrashCan: $alert_drsInTrashCan,
 //                            dailyRecordSetHiddenOrDeleted: $dailyRecordSetHiddenOrDeleted,
                             popUp_changeStyle: $popUp_changeStyle,
                             isEditingTermGoals: $isEditingTermGoals,
-                            undoNewDRS: $undoNewDRS
+                            undoNewDRS: $undoNewDRS,
+                            startDate: $startDate,
+                            endDate: $endDate,
+                            prevDRS_start: prevDRS_start,
+                            nextDRS_start: nextDRS_start,
+                            startRange: startRange,
+                            endRange: endRange
                         )
 //                        Text("")
                         .frame(width:geoWidth, height: geoHeight)
@@ -116,40 +159,19 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 
                 let noSavedDailyRecords_visible: Bool = selectedDailyRecordSet.dailyRecords?.filter({$0.hasContent}).count == 0
                 
-                if noSavedDailyRecords_visible && selectedDailyRecordSetIndex == dailyRecordSets_visible.count - 1 && !isEditingTermGoals {
-                    VStack {
-                        HStack {
-                            Text("매일매일의 기록을 저장하세요!")
-                        }
-                        .foregroundStyle(.opacity(0.5))
-
-                        Button(action:{
-                            selectedView = .checkList
-                        }) {
-                            Text("저장하러 가기")
-                                .font(.caption)
-                        }
-                    }
-                    
-                    
+                if noSavedDailyRecords_visible && selectedDailyRecordSetIndex == dailyRecordSets.count - 1 && !isEditingTermGoals {
+                    Text("매일매일의 기록을 저장하세요!")
+                        .opacity(0.5)
                 }
-                
-//                Text("기록의 탑")
-//                    .frame(height: geoHeight*0.07)
-//                    .position(CGPoint(x:geoWidth/2,y:geoHeight*0.035))
-//                    .opacity(0.7)
-                
-//                if !isEditingTermGoals && selectedDailyRecordSet.termGoals.isEmpty {
-//                    Text("나만의 목표를 설정하세요!")
-//                        .opacity(0.5)
-//                }
+
                 
                 
                 if popUp_startNewRecordSet {
                     Color.gray.opacity(0.5)
                     StartNewRecordSet(
                         popUp_startNewRecordSet: $popUp_startNewRecordSet,
-                        newDailyRecordSetAdded: $newDailyRecordSetAdded
+                        newDailyRecordSetAdded: $newDailyRecordSetAdded,
+                        minDate: selectedDailyRecordSet.start.addingDays(1)
                     )
                         .popUpViewLayout(width: geoWidth*0.9, height: (geoHeight-statusBarHeight)*0.9, color: backGroundColor)
                         .position(x:geoWidth/2,y: statusBarHeight + (geoHeight-statusBarHeight)/2 )
@@ -192,98 +214,171 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         }
         .onChange(of: updateSelectedDailyRecordSet) {
             if updateSelectedDailyRecordSet {
-                selectedDailyRecordSet = dailyRecordSets_visible[selectedDailyRecordSetIndex]
-                updateSelectedDailyRecordSet = false // MARK: 무한 루프가 생성되지 않는다. 바꿔줘도 됨.
-                updateStartAndEnd()
-                selectedRecord = nil
-            }
-            
-        }
-        .onChange(of: dailyRecordSetHiddenOrDeleted) {
-            
-            if selectedDailyRecordSetIndex > dailyRecordSets_visible.count - 1 {
-                selectedDailyRecordSetIndex -= 1
-            }
-            updateSelectedDailyRecordSet = true
-        }
+                
 
-        .onChange(of: isNewDailyRecordAdded) { //
-            selectedDailyRecordSetIndex = dailyRecordSets_visible.count - 1
+
+                
+                selectedDailyRecordSet = dailyRecordSets[selectedDailyRecordSetIndex]
+                
+                // tmp code
+                if selectedDailyRecordSetIndex == dailyRecordSets.count - 1 {
+                    selectedDailyRecordSet.end = nil
+                }
+                updateSelectedDailyRecordSet = false // MARK: 무한 루프가 생성되지 않는다. 바꿔줘도 됨.
+//                updateStartAndEnd()
+                selectedRecord = nil
+                startDate = standardDateToLocalStartOfDay(std:selectedDailyRecordSet.start)
+                endDate = standardDateToLocalStartOfDay(std:selectedDailyRecordSet.end ?? Date())
+            }
+            
+        }
+        .onAppear() {
+            startDate = standardDateToLocalStartOfDay(std: selectedDailyRecordSet.start)
+            endDate = standardDateToLocalStartOfDay(std:selectedDailyRecordSet.end ?? Date())
         }
         .onChange(of: selectedView) {
-            selectedDailyRecordSetIndex = dailyRecordSets_visible.count - 1
+            selectedDailyRecordSetIndex = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).count > 0 ? dailyRecordSets.filter({$0.start < .now}).count-1 : 0
         }
         .onChange(of: newDailyRecordSetAdded) {
-            selectedDailyRecordSetIndex = dailyRecordSets_visible.count - 1
+            selectedDailyRecordSetIndex = dailyRecordSets.count - 1
         }
         
         
         .onChange(of: selectedDailyRecordSet.dailyRecordThemeName) {
             
             recalculatingVisualValues_themeChanged = true
-//            recalculateVisualValues_themeChanged()
             recalculatingVisualValues_themeChanged = false
             
         }
-
-        // index가 바뀌지 않아도 selectedDailyRecordSet가 바뀌는 경우(ex: 아무것도 안 쌓은 채로 다시 새로 dailyRecordSet 생성)
-        // 그런 경우에도 selectedDailyRecordSet를 바꿔주기 위해서 이렇게 단계를 두개로 나눔.
-
-    
+        .onChange(of: startDate) { oldValue, newValue in
+            
+            if newValue != selectedDailyRecordSet.start {
                 
-
-        .alert("비어있는 기록의 탑을 생성 취소하고, 기존의 기록의 탑에 계속 기록하시겠습니까?",isPresented: $undoNewDRS) {
-            Button("생성 취소") {
-                let targetDRS: DailyRecordSet = selectedDailyRecordSet
-                selectedDailyRecordSetIndex -= 1
+                let stdStartDate = getStandardDate(from: newValue)
+                // 1.change selectedDRS.start
+                selectedDailyRecordSet.start = stdStartDate
+                let prevDrsExists = selectedDailyRecordSetIndex > 0
                 
-                DispatchQueue.main.asyncAfter(deadline: .now()+0.3) {
-                    modelContext.delete(targetDRS)
+                // 2.change prevDRS.end if exists
+                if prevDrsExists {dailyRecordSets[selectedDailyRecordSetIndex-1].end = stdStartDate.addingDays(-1)}
+                
+                // 3.move dailyRecords between prevDRS and
+                if oldValue < newValue && prevDrsExists {
+                    let prevDRS = dailyRecordSets[selectedDailyRecordSetIndex-1]
+                    for dailyRecord in selectedDailyRecordSet.dailyRecords! {
+                        if let date = dailyRecord.date {
+                            if date < stdStartDate {
+                                dailyRecord.dailyRecordSet = prevDRS
+                            }
+                        }
+                    }
                 }
+                else if oldValue < newValue && !prevDrsExists {
+                    for dailyRecord in selectedDailyRecordSet.dailyRecords! {
+                        if let date = dailyRecord.date {
+                            if date < stdStartDate {
+                                dailyRecord.dailyRecordSet = nil
+                            }
+                        }
+                    }
+                }
+                else if oldValue > newValue && prevDrsExists {
+                    let prevDRS = dailyRecordSets[selectedDailyRecordSetIndex-1]
+                    for dailyRecord in prevDRS.dailyRecords! {
+                        if let date = dailyRecord.date {
+                            if date >= stdStartDate {
+                                dailyRecord.dailyRecordSet = selectedDailyRecordSet
+                            }
+                        }
+                    }
+                }
+                else if oldValue > newValue && !prevDrsExists {
+                    for dailyRecord in dailyRecords.filter({$0.dailyRecordSet == nil}) {
+                        if let date = dailyRecord.date {
+                            if date >= stdStartDate {
+                                dailyRecord.dailyRecordSet = selectedDailyRecordSet
+                            }
+                        }
+                    }
+                    
+                    
+                }
+            }
+        }
 
-                undoNewDRS.toggle()
+        .onChange(of: endDate) { oldValue, newValue in
+        
+            if newValue != selectedDailyRecordSet.end {
+                
+                let stdEndDate = getStandardDate(from: newValue)
+
+                let nextDrsExists = selectedDailyRecordSetIndex < dailyRecordSets.count - 1
+                // 1.change nextDRS.start if exists
+                if nextDrsExists {dailyRecordSets[selectedDailyRecordSetIndex+1].start = stdEndDate.addingDays(1)}
+                
+                // 2.change selectedDRS.end
+                if nextDrsExists {selectedDailyRecordSet.end = stdEndDate }
+                else { selectedDailyRecordSet.end = nil }
+                
+                // 3.move dailyRecords between nextDRS and selectedDRS
+                if oldValue > newValue && nextDrsExists  {
+                    let nextDRS = dailyRecordSets[selectedDailyRecordSetIndex+1]
+                    for dailyRecord in selectedDailyRecordSet.dailyRecords! {
+                        if let date = dailyRecord.date {
+                            if date > stdEndDate {
+                                dailyRecord.dailyRecordSet = nil
+                            }
+                        }
+                    }
+                }
+                else if oldValue > newValue && !nextDrsExists {
+                    for dailyRecord in selectedDailyRecordSet.dailyRecords! {
+                        if let date = dailyRecord.date {
+                            if date > stdEndDate {
+                                dailyRecord.dailyRecordSet = nil
+                            }
+                        }
+                    }
+                }
+                else if oldValue < newValue && nextDrsExists  {
+                    let nextDRS = dailyRecordSets[selectedDailyRecordSetIndex+1]
+                    for dailyRecord in nextDRS.dailyRecords! {
+                        if let date = dailyRecord.date {
+                            if date <= stdEndDate {
+                                dailyRecord.dailyRecordSet = selectedDailyRecordSet
+                            }
+                        }
+                    }
+                }
+                else if oldValue < newValue && !nextDrsExists {
+                    for dailyRecord in dailyRecords.filter({$0.dailyRecordSet == nil}) {
+                        if let date = dailyRecord.date {
+                            if date <= stdEndDate {
+                                dailyRecord.dailyRecordSet = selectedDailyRecordSet
+                            }
+                        }
+                    }
+                    
+                    
+                }
             }
-            Button("아니오") {
-                undoNewDRS.toggle()
-            }
-        } message: {
-            Text("(가장 최근의 기록의 탑은 기록이 없을 때만 삭제 가능합니다.)")
+
         }
-//        .alert("해당 구간기록을 숨기시겠습니까?", isPresented: $alert_drsHidden) {
-//            Button("숨기기") {
-//                selectedDailyRecordSet.isHidden = true
-//                dailyRecordSetHiddenOrDeleted.toggle()
-//                alert_drsHidden.toggle()
-//            }
-//            Button("아니오") {
-//                alert_drsHidden.toggle()
-//            }
+        
+        
+    }
+    
+    
+//    func updateStartAndEnd() -> Void {
+//        let dates: [Date] = selectedDailyRecordSet.dailyRecords!.compactMap{$0.date}.sorted()
+//        if let start: Date = dates.first {
+//            selectedDailyRecordSet.start = start
 //        }
-        .alert("해당 구간기록을 휴지통으로 이동하시겠습니까?", isPresented: $alert_drsInTrashCan) {
-            Button("휴지통으로 이동") {
-                selectedDailyRecordSet.inTrashCan = true
-                dailyRecordSetHiddenOrDeleted.toggle()
-                alert_drsInTrashCan.toggle()
-            }
-            Button("아니오") {
-                alert_drsInTrashCan.toggle()
-            }
-        }
-        
-        
-    }
-    
-    
-    func updateStartAndEnd() -> Void {
-        let dates: [Date] = selectedDailyRecordSet.dailyRecords!.compactMap{$0.date}.sorted()
-        if let start: Date = dates.first {
-            selectedDailyRecordSet.start = start
-        }
-        if let last: Date = dates.last {
-            selectedDailyRecordSet.end = last
-        }
-    }
-    
+//        if let end: Date = dates.last {
+//            selectedDailyRecordSet.end = end
+//        }
+//    }
+//    
 
     
     

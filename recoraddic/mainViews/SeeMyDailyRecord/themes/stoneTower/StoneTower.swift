@@ -23,28 +23,28 @@ struct StoneTower: View {
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
     
     @Binding var dailyRecordSet:DailyRecordSet
-    
     @Binding var selectedDailyRecordSetIndex: Int
     @Binding var selectedRecord: DailyRecord?
     @Binding var popUp_startNewRecordSet: Bool
     @Binding var popUp_recordInDetail: Bool
-    @Binding var alert_drsHidden: Bool
-    @Binding var alert_drsInTrashCan: Bool
-
     @Binding var popUp_changeStyle: Bool
     @Binding var isEditingTermGoals: Bool
-//    @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
     @Binding var undoNewDRS: Bool
+    @Binding var startDate: Date
+    @Binding var endDate: Date
+    
+    
+    let prevDRS_start: Date?
+    let nextDRS_start: Date?
+    let startRange: ClosedRange<Date>
+    let endRange: ClosedRange<Date>
+    
+    
     
     @State var scrollViewCenterY: CGFloat = 0
-    
-    
     @State var editText:[String] = []
-
     @State private var keyboardHeight: CGFloat = 0
-    
     @State var keyboardAppeared: Bool = false
-    
     private var keyboardHeightPublisher: AnyPublisher<CGFloat, Never> {
         Publishers.Merge(
             NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
@@ -54,22 +54,16 @@ struct StoneTower: View {
         )
         .eraseToAnyPublisher()
     }
-    
     @State var presentQuestions: Bool = false
-    
     @State var showDailyQuestionStatistics: Bool = false
     @FocusState var editTermGoals: Int?
     
     
     var body: some View {
+
+        let dailyRecords_visible: [DailyRecord] = dailyRecordSet.visibleDailyRecords()
         
-        let dailyRecordSet_isVisible_count: Int = dailyRecordSets.filter({$0.isVisible()}).count
-        
-        let dailyRecords_savedAndVisible: [DailyRecord] = dailyRecordSet.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({$0.hasContent})
-        
-        let dailyRecords_savedAndNotHidden_withVisualValues: [DailyRecord] = dailyRecords_savedAndVisible.filter({($0.date ?? getStartDateOfNow()) < .now})
-        
-        let numberOfStones: Int  = dailyRecords_savedAndNotHidden_withVisualValues.count
+        let numberOfStones: Int  = dailyRecords_visible.count
         
 
 
@@ -92,7 +86,7 @@ struct StoneTower: View {
                     return false
                 }
                 else {
-                    return dailyRecords_savedAndNotHidden_withVisualValues.contains(selectedRecord!)
+                    return dailyRecords_visible.contains(selectedRecord!)
                 }
             }() //MARK: 다른기기에서 selectedRecord에 할당된 데이터를 지워 cloud상에서 삭제되었음에도, view의 selectedRecord에 할당되어 있을 때
             
@@ -104,7 +98,7 @@ struct StoneTower: View {
             let selectedStoneHeight:CGFloat = stoneHeight*1.4
             let selectedStoneWidth:CGFloat = stoneWidth*1.4
             let heightGap:CGFloat = haveSelectedRecord ? (selectedStoneHeight - stoneHeight) : 0.0
-            let horizontalUnitWidth:CGFloat = stoneWidth*0.115 // 최대 *9번 갈 수 있음( calculateVisualValue3() 에서)
+            let horizontalUnitWidth:CGFloat = stoneWidth*0.07 // 최대 *9번 갈 수 있음( calculateVisualValue3() 에서)
             let questionMarkSize: CGFloat = geoWidth*0.05
             
             let groundHeight:CGFloat = geoHeight/2 - stoneHeight/2
@@ -115,6 +109,8 @@ struct StoneTower: View {
 
             let buttonWidth:CGFloat = geoWidth*0.25
             let buttonWidth2:CGFloat = geoWidth*0.1
+            
+            let detailTextBoxSize: CGFloat = geoWidth*0.25
             
             let scrollViewCenter_bottom:CGFloat = scrollViewCenterY + stoneHeight
             let scrollViewCenter_above:CGFloat = scrollViewCenterY - stoneHeight
@@ -152,8 +148,7 @@ struct StoneTower: View {
                                     ForEach((0...lastIndexOfRecordStone).reversed(), id:\.self) { index in
                                         
                                         
-                                        let record:DailyRecord = dailyRecords_savedAndNotHidden_withVisualValues[index]
-                                        
+                                        let record:DailyRecord = dailyRecords_visible[index]
                                         
                                         let isSelectedRecord:Bool = {
                                             if selectedRecord == nil { return false }
@@ -180,7 +175,9 @@ struct StoneTower: View {
                                             
                                             let shapeNum:Int = shapeNum(record.recordedMinutes)
                                             let brightness:Int = brightness(record.recordedAmount)
-                                            let misalignment:Int = misalignment(record.absence)
+                                            
+
+                                            let misalignment:Int = misalignment(record.absence, index)
                                             let heat:Int = heatNum(record.streak)
                                             
                                             ZStack {
@@ -195,33 +192,48 @@ struct StoneTower: View {
                                                 .padding(.leading, geoWidth/2 - width/2 + CGFloat(misalignment)*horizontalUnitWidth)
                                                 .padding(.trailing, geoWidth/2 - width/2 - CGFloat(misalignment)*horizontalUnitWidth)
                                                 .padding(.vertical, 0)
-//                                                .opacity(0.8)
                                                 .onTapGesture {
                                                     if isSelectedRecord {
                                                         popUp_recordInDetail.toggle()
                                                     }
                                                     else {
-                                                        selectedRecord = dailyRecords_savedAndNotHidden_withVisualValues[index]
+                                                        selectedRecord = dailyRecords_visible[index]
                                                         withAnimation {
-                                                            scrollProxy.scrollTo(record.date, anchor:.center)
+                                                            scrollProxy.scrollTo(record.getLocalDate(), anchor:.center)
                                                         }
                                                     }
                                                 }
                                                 
-                                                
-                                                Text(yyyymmddFormatOf(record.date!))
+                                                Text(yyyymmddFormatOf(record.getLocalDate()!))
                                                     .bold(isSelectedRecord)
                                                     .font(.caption)
-                                                //                                                    .font(isOnCenter ? .footnote : .subheadline)
                                                     .opacity(isOnCenter ? 1.0 : (isNearCenter ? 0.3 : 0.0))
                                                     .position(x: misalignment <= 0 ? geoWidth*0.77 : geoWidth*0.23, y: height/2)
+                                                
+                                                VStack {
+                                                    if record.dailyText != nil {
+                                                        Image(systemName: "book.closed.fill")
+                                                    }
+                                                    Text_hours(value: record.recordedMinutes)
+                                                    Text("\(record.recordedAmount) 개의 기록")
+                                                }
+                                                .frame(width:detailTextBoxSize, alignment: misalignment <= 0 ? .trailing : .leading)
+//                                                .border(.red)
+                                                .bold(isSelectedRecord)
+                                                .font(.caption)
+                                                .opacity(isSelectedRecord ? 1.0 : 0.0)
+//                                                .opacity(isOnCenter ? (isSelectedRecord ? 1.0 : 0.5) : 0.0)
+                                                .position(x: geoWidth*0.5 + (misalignment <= 0 ? -1.0 : 1.0) * (selectedStoneWidth*0.5 + geoWidth*0.00 + detailTextBoxSize*0.5) + CGFloat(misalignment)*horizontalUnitWidth, y: height/2)
+//                                                .position(x: misalignment <= 0 ? geoWidth*0.23 : geoWidth*0.77, y: height/2)
+
+                                                
                                                 
                                             }
                                             .frame(height:height)
                                             
                                         }
                                         .frame(height:height)
-                                        .id(record.date)
+                                        .id(record.getLocalDate())
                                         
                                         
                                         
@@ -242,44 +254,43 @@ struct StoneTower: View {
                                                 .aspectRatio(contentMode: .fit)
                                                 .frame(width:geoWidth*0.12,height: groundHeight*0.1)
                                         }
-                                        .disabled(selectedDailyRecordSetIndex == 0)
+                                        .disabled(selectedDailyRecordSetIndex == 0 || isEditingTermGoals)
                                         
-                                        ZStack {
-                                            HStack(spacing:0.0) {
-                                                Text(isEditingTermGoals ? "목표" : "\(dailyRecordSet.getTerm_string())")
-                                                    .padding(.trailing,5)
-                                                    .minimumScaleFactor(0.7)
-                                                    .lineLimit(1)
-                                                    .bold()
-                                                    .opacity(0.8)
-//                                                    .border(.red)
 
-                                                if isEditingTermGoals {
-                                                    Button (action:{
-                                                        dailyRecordSet.termGoals = []
-                                                        for text in editText {
-                                                            if text != "" {
-                                                                dailyRecordSet.termGoals.append(text)
-                                                            }
-                                                        }
-                                                        isEditingTermGoals.toggle()
-                                                    }) {
-                                                        Text("저장")
-//                                                                .frame(width:goalEditButtonSize*0.8, height: goalEditButtonSize*0.8)
-                                                            .minimumScaleFactor(0.7)
-                                                    }
-                                                    .buttonStyle(MainButtonStyle2(colorScheme: _colorScheme, width: goalEditButtonSize, height: goalEditButtonSize))
-                                                    
-
-
-                                                }
-
+                                        HStack {
+                                            if dailyRecordSet.end != nil {
+                                                DatePicker(
+                                                    "",
+                                                    selection: $startDate,
+                                                    in: startRange,
+                                                    displayedComponents: [.date]
+                                                )
+                                                .labelsHidden()
+                                                .frame(width:geoWidth*0.25)
+                                                
+                                                Text("~")
+                                                DatePicker(
+                                                    "",
+                                                    selection: $endDate,
+                                                    in: endRange,
+                                                    displayedComponents: [.date]
+                                                )
+                                                .labelsHidden()
+                                                .frame(width:geoWidth*0.25)
                                             }
-                                            .frame(width:geoWidth/2,height: groundHeight*0.15)
-                                            .offset(x:isEditingTermGoals ? goalEditButtonSize/2 : 0.0)
-//                                            .frame(alignment:.center)
-//                                            .border(.black)
-                                            
+                                            else {
+                                                DatePicker(
+                                                    "",
+                                                    selection: $startDate,
+                                                    in: startRange,
+                                                    displayedComponents: [.date]
+                                                )
+                                                .labelsHidden()
+                                                .frame(width:geoWidth*0.25)
+                                                
+                                                Text("~")
+                                            }
+
                                         }
                                         .frame(width:geoWidth*0.7, height:groundHeight*0.15, alignment: .center)
                                         Button(action:{
@@ -290,7 +301,7 @@ struct StoneTower: View {
                                                 .aspectRatio(contentMode: .fit)
                                                 .frame(width:geoWidth*0.12, height: groundHeight*0.1)
                                         }
-                                        .disabled(isLatestDailyRecordSet)
+                                        .disabled(isLatestDailyRecordSet || isEditingTermGoals)
 
                                     }
                                     .frame(width:geoWidth, height:groundHeight*0.23)
@@ -307,6 +318,11 @@ struct StoneTower: View {
                                                             .textFieldStyle(RoundedBorderTextFieldStyle())
                                                             .frame(width:geoWidth*0.7, alignment:.leading)
                                                             .focused($editTermGoals, equals:index)
+                                                            .onSubmit {
+                                                                dailyRecordSet.termGoals = editText.filter({$0 != ""})
+                                                                editTermGoals = nil
+                                                                isEditingTermGoals.toggle()
+                                                            }
                                                         
                                                         if index != 0 {
                                                             Button(action: {
@@ -336,22 +352,39 @@ struct StoneTower: View {
                                         }
 
                                         else {
-                                            if dailyRecordSet.termGoals.count != 0 {
-                                                ForEach(0...dailyRecordSet.termGoals.count-1, id:\.self) { index in
-                                                    HStack {
-                                                        Text("\(index+1). ")
-                                                        Text(dailyRecordSet.termGoals[index])
-                                                            .frame(width:geoWidth*0.7, alignment:.leading)
+                                            Group {
+                                                if dailyRecordSet.termGoals.count != 0 {
+                                                    ForEach(0...dailyRecordSet.termGoals.count-1, id:\.self) { index in
+                                                        HStack {
+                                                            Text("\(index+1). ")
+                                                            Text(dailyRecordSet.termGoals[index])
+                                                                .frame(width:geoWidth*0.7, alignment:.leading)
                                                             
+                                                        }
+                                                        .opacity(0.8)
+                                                        .padding(.vertical,3)
+                                                        
+                                                        
                                                     }
-                                                    .opacity(0.8)
-                                                    .padding(.vertical,3)
-                                                    
                                                     
                                                 }
-                                                
+                                                else {
+                                                    Text("목표를 적어보세요")
+                                                        .opacity(0.3)
+                                                }
                                             }
+                                            .onTapGesture {
+                                                editText = dailyRecordSet.termGoals
+                                                if dailyRecordSet.termGoals.count == 0 {
+                                                    editText.append("")
+                                                }
+                                                editTermGoals = editText.count - 1
+                                                isEditingTermGoals.toggle()
+                                            }
+                                        
                                         }
+                                        
+                                        
                                         if isEditingTermGoals && editText.count <= 2 {
                                             Button(action:{
                                                 editText.append("")
@@ -368,67 +401,48 @@ struct StoneTower: View {
                                     // 나중에 얘 ZStack으로 옮겨서 SeeMyRecord로 옮기고, viewModifier로 넣기?
                                 
 //                                        HStack(spacing:0.0) {
-                                        Menu {
-//                                            Text("통계")
-//                                            Text("스타일 변경") // DRtheme, background, DRColor변경
-                                            Button("스타일 변경") { // 나중에 theme, theme별 선택 가능 요소(색,배경 등등들 다 바꿀 수 있게 하기
-                                                popUp_changeStyle.toggle()
-                                            }
-                                            
-//                                            if dailyRecordSet_isVisible_count > 1 && !isLatestDailyRecordSet {
-//                                                Button("숨기기") {
-////                                                    dailyRecordSet.isHidden = true
-//                                                    alert_drsHidden.toggle()
-//                                                }
-//                                                Button("휴지통으로 이동", systemImage:"trash" ) {
-////                                                    dailyRecordSet.inTrashCan = true
-//                                                    alert_drsInTrashCan.toggle()
-//                                                    
-//                                                }
-//                                                .foregroundStyle(.red)
+                                    Menu {
+                                        Button("스타일 변경") { // 나중에 theme, theme별 선택 가능 요소(색,배경 등등들 다 바꿀 수 있게 하기
+                                            popUp_changeStyle.toggle()
+                                        }
+                                        
+//                                        Button (action:{
+//                                            editText = dailyRecordSet.termGoals
+//                                            if editText.isEmpty {
+//                                                editText.append("")
 //                                            }
-                                            
-                                            if dailyRecordSet_isVisible_count > 1 && isLatestDailyRecordSet && dailyRecords_savedAndVisible.count == 0 {
-                                                Button("생성 취소") {
-                                                    undoNewDRS.toggle()
-                                                }
-                                            }
-                                            
+//                                            isEditingTermGoals.toggle()
+//                                            editTermGoals = editText.count - 1
+//                                            
+//                                        }) {
+//                                            let noTermGoals = dailyRecordSet.termGoals.count == 0
+//                                            Text("목표 \(noTermGoals ? "설정" : "편집")")
+//                                        }
+//                                        .disabled(isEditingTermGoals)
+                                        
 
-                                            if isLatestDailyRecordSet {
-                                                Button(action: {
-                                                    popUp_startNewRecordSet.toggle()
-                                                }) {
-                                                    Text("새로운 기록의 탑 생성")
+                                        if isLatestDailyRecordSet {
+                                            Button(action: {
+                                                popUp_startNewRecordSet.toggle()
+                                            }) {
+                                                Text("새로운 기록의 탑 생성")
 //                                                            .minimumScaleFactor(0.5)
-                                                }
-                                                Button (action:{
-                                                    editText = dailyRecordSet.termGoals
-                                                    if editText.isEmpty {
-                                                        editText.append("")
-                                                    }
-                                                    isEditingTermGoals.toggle()
-                                                    editTermGoals = editText.count - 1
-                                                    
-                                                }) {
-                                                    let noTermGoals = dailyRecordSet.termGoals.count == 0
-                                                    Text("목표 \(noTermGoals ? "설정" : "편집")")
-                                                }
-                                                .disabled(isEditingTermGoals)
-
                                             }
-                                            
-                                        } label: {
-                                            Button(action:{}) {
-                                                Image(systemName:"line.3.horizontal")
 
-                                            }
-                                            .buttonStyle(MainButtonStyle2(width: buttonWidth2, height: buttonWidth2))
-                                            .shadow(color:shadowColor ,radius: 1.0)
-                                    }
-                                        .padding(.bottom,10)
-                                        .padding(.trailing,10)
-                                        .frame(width: geoWidth, height:groundHeight*0.15, alignment:.bottomTrailing)
+
+                                        }
+                                        
+                                    } label: {
+                                        Button(action:{}) {
+                                            Image(systemName:"line.3.horizontal")
+
+                                        }
+                                        .buttonStyle(MainButtonStyle2(width: buttonWidth2, height: buttonWidth2))
+                                        .shadow(color:shadowColor ,radius: 1.0)
+                                }
+                                    .padding(.bottom,10)
+                                    .padding(.trailing,10)
+                                    .frame(width: geoWidth, height:groundHeight*0.15, alignment:.bottomTrailing)
 
 //                                        .frame(width: geoWidth, height:groundHeight*0.15, alignment:.leading)
 
@@ -475,16 +489,16 @@ struct StoneTower: View {
 
                             
 
-                            let dailyQuestionStatisticsButtonPosition: CGPoint = CGPoint(x:questionMarkSize/2+geoWidth*0.05,y:totalSkyHeight-questionMarkSize/2-10)
-                            Button(action:{
-                                showDailyQuestionStatistics.toggle()
-                            }) {
-                                Image(systemName: "questionmark")
-                                    .resizable()
-                                    .frame(width:questionMarkSize, height:questionMarkSize)
-                            }
-                            .buttonStyle(.plain)
-                            .position(x:questionMarkSize/2+geoWidth*0.05,y:totalSkyHeight-questionMarkSize/2-10)
+//                            let dailyQuestionStatisticsButtonPosition: CGPoint = CGPoint(x:questionMarkSize/2+geoWidth*0.05,y:totalSkyHeight-questionMarkSize/2-10)
+//                            Button(action:{
+//                                showDailyQuestionStatistics.toggle()
+//                            }) {
+//                                Image(systemName: "questionmark")
+//                                    .resizable()
+//                                    .frame(width:questionMarkSize, height:questionMarkSize)
+//                            }
+//                            .buttonStyle(.plain)
+//                            .position(x:questionMarkSize/2+geoWidth*0.05,y:totalSkyHeight-questionMarkSize/2-10)
 
                             
 
@@ -569,6 +583,10 @@ struct StoneTower: View {
 //                print(dr.visualValue3!)
 //            }
         }
+        .onChange(of: selectedDailyRecordSetIndex) { oldValue, newValue in
+//            isEditingTermGoals = false
+        }
+
         
 
 
@@ -600,10 +618,10 @@ struct StoneTower: View {
         
     }
     
-    func misalignment(_ input: Int) -> Int { // 기록 연속성(오랜만에 쌓을 수록 비뚤어짐) 0일 -> 0 / -1~-3일 -> +-1~3
+    func misalignment(_ input: Int, _ idx: Int) -> Int { // 기록 연속성(오랜만에 쌓을 수록 비뚤어짐) 0일 -> 0 / -1~-3일 -> +-1~3
 
 //        let plusOrMinus:Int = Int.random(in: 0...1) == 1 ? 1 : -1
-        let plusOrMinus:Int = 1
+        let plusOrMinus:Int = idx % 2 * 2 - 1
 
         switch input {
         case ...1: return 0

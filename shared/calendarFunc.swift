@@ -44,6 +44,68 @@ func getStartDateOfYesterday() -> Date {
     return calendar.startOfDay(for: yesterday)
 }
 
+func getStandardDate(from date: Date) -> Date {
+    let dateComponents =  Calendar.current.dateComponents([.year, .month,.day], from: date)
+    
+    var calendar = Calendar.current
+    calendar.timeZone = TimeZone(identifier: "UTC")!
+    
+    return calendar.date(from: dateComponents) ?? date
+}
+
+func getStandardDateOfYesterday() -> Date {
+    let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+
+    let dateComponents =  Calendar.current.dateComponents([.year, .month,.day], from: yesterday)
+
+    
+    var calendar = Calendar.current
+    calendar.timeZone = TimeZone(identifier: "UTC")!
+    
+    return calendar.date(from: dateComponents) ?? yesterday
+}
+
+func getStandardDateOfNow() -> Date {
+    let dateComponents =  Calendar.current.dateComponents([.year, .month,.day], from: Date())
+    
+    var calendar = Calendar.current
+    calendar.timeZone = TimeZone(identifier: "UTC")!
+    
+    return calendar.date(from: dateComponents) ?? Date()
+}
+
+func standardDateToLocalStartOfDay(std date: Date) -> Date {
+    var calendar = Calendar.current
+    calendar.timeZone = TimeZone(identifier: "UTC")!
+    
+    // Extract year, month, and day components in UTC
+    let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+    
+    // Set calendar to local time zone
+    calendar.timeZone = TimeZone.current
+    
+    // Create a date from the components, now interpreted in the local time zone
+    return calendar.date(from: dateComponents) ?? date
+}
+
+func standardDateToLocalStartOfDay(std date: Date?) -> Date? {
+    if date == nil {return nil}
+    else {
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        
+        // Extract year, month, and day components in UTC
+        let dateComponents = calendar.dateComponents([.year, .month, .day], from: date!)
+        
+        // Set calendar to local time zone
+        calendar.timeZone = TimeZone.current
+        
+        // Create a date from the components, now interpreted in the local time zone
+        return calendar.date(from: dateComponents)
+    }
+}
+
+
 //func getYesterdayOf(_ date: Date) -> Date {
 //    var calendar = Calendar.current
 //    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
@@ -64,9 +126,11 @@ func convertToDate(from dateString: String) -> Date? {
     formatter.dateFormat = "yy/MM/dd"
 //    formatter.locale = Locale(identifier: "en_US_POSIX") // Ensures consistent parsing
     formatter.locale = Locale(identifier: "ko_KR") // Ensures consistent parsing
-    return getStartOfDate(date:formatter.date(from: dateString) ?? .now)
+    return getStandardDate(from: formatter.date(from: dateString) ?? .now)
+//    return getStartOfDate(date:formatter.date(from: dateString) ?? .now)
     
 }
+
 
 //func getDateOfYesterDay() -> Date {
 //    let now = Date()
@@ -252,24 +316,24 @@ func partitionByWeek(startDate: Date, endDate: Date) -> [[Date]] {
 
 
 func containsFirstDateOfMonth(dates:[Date]) -> Bool {
-    let startOfMonthIndex: Int? = dates.firstIndex(where: {$0.isStartOfMonth})
+    let startOfMonthIndex: Int? = dates.firstIndex(where: {$0.isStartOfMonth_local})
     if startOfMonthIndex != nil { return true }
     else { return false}
 }
 
 extension Date {
-    var isStartOfMonth: Bool {
+    var isStartOfMonth_local: Bool {
         let components = Calendar.current.dateComponents([.year, .month, .day], from: self)
         return components.day == 1
     }
     
-    var isEndOfMonth: Bool {
+    var isEndOfMonth_local: Bool {
         let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: self)!
         return !Calendar.current.isDate(nextDay, equalTo: self, toGranularity: .month)
     }
     
     
-    var isExpired: Bool {
+    var isExpired_local: Bool {
         let calendar = Calendar.current
         let now = Date()
         
@@ -287,7 +351,7 @@ extension Date {
         return inputDate <= nowDate
     }
     
-    var hhmmTimeString: String {
+    var hhmmTimeString_local: String {
         // Get the current date and time
         
         // Create a DateFormatter
@@ -303,6 +367,62 @@ extension Date {
         let timeString = formatter.string(from: self)
         
         return timeString
+    }
+    
+    var isStartOfMonth_std: Bool {
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        let components = calendar.dateComponents([.year, .month, .day], from: self)
+        return components.day == 1
+    }
+    
+    var isEndOfMonth_std: Bool {
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        let nextDay = calendar.date(byAdding: .day, value: 1, to: self)!
+        return !Calendar.current.isDate(nextDay, equalTo: self, toGranularity: .month)
+    }
+    
+    
+    var isExpired_std: Bool {
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        
+        // Compare the components of the date up to the minute
+        let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
+        let inputDateComponents = calendar.dateComponents(components, from: self)
+        let nowDateComponents = Calendar.current.dateComponents(components, from: Date())
+        
+        // Create dates truncated to the minute
+        guard let inputDate = Calendar.current.date(from: inputDateComponents),
+              let nowDate = Calendar.current.date(from: nowDateComponents) else {
+            return false
+        }
+        
+        return inputDate <= nowDate
+    }
+    
+    
+    
+//    var hhmmTimeString_std: String {
+//        // Get the current date and time
+//        
+//        // Create a DateFormatter
+//        let formatter = DateFormatter()
+//        
+//        // Set the locale to the current locale of the device
+//        formatter.locale = Locale(identifier: <#T##String#>)
+//        
+//        // Set the time style to short (00:00)
+//        formatter.timeStyle = .short
+//        
+//        // Format the current date to a string
+//        let timeString = formatter.string(from: self)
+//        
+//        return timeString
+//    }
+    func addingDays(_ value: Int) -> Date {
+        return Calendar.current.date(byAdding: .day, value: value, to: self) ?? self
     }
     
 }
