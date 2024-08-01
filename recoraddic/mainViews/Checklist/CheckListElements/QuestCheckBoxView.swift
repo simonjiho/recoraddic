@@ -1540,6 +1540,74 @@ struct EditNotificationTimeView: View {
 }
 
 
+struct ClockView: View {
+    var hour: Int
+    var minute: Int
+    
+    var body: some View {
+        GeometryReader { geometry in
+            let width = geometry.size.width
+            let height = geometry.size.height
+            let clockSize = min(width, height)
+            let mainLineWidth = clockSize / 10
+            let subLineWidth = mainLineWidth * 0.67
+            
+            ZStack {
+                // Draw the clock face
+                Circle()
+                    .stroke(lineWidth: mainLineWidth)
+                    .frame(width: clockSize, height: clockSize)
+                
+                // Draw the hour ticks
+                ForEach(0..<12) { tick in
+                    Rectangle()
+                        .fill(Color.primary)
+                        .frame(width: 1, height: clockSize / 20)
+                        .offset(y: -clockSize / 2 + clockSize / 40)
+                        .rotationEffect(Angle(degrees: Double(tick) * 30))
+                }
+                
+                Circle()
+                    .fill(Color.primary)
+                    .frame(width: subLineWidth, height: subLineWidth)
+                
+                // Draw the hour hand
+                Path { path in
+                    path.move(to: CGPoint(x: clockSize / 2, y: clockSize / 2))
+                    path.addLine(to: CGPoint(x: clockSize / 2, y: clockSize / 4))
+                }
+                .stroke(Color.primary, style: StrokeStyle(lineWidth: mainLineWidth, lineCap: .round))
+                
+//                .offset(x: -clockSize / 2, y: -clockSize / 2)
+                .rotationEffect(hourAngle(hour: hour, minute: minute), anchor: .center)
+                .offset(x:sin(hourAngle(hour: hour, minute: minute).radians)*(mainLineWidth-subLineWidth), y:-cos(hourAngle(hour: hour, minute: minute).radians)*(mainLineWidth-subLineWidth))
+                
+                // Draw the minute hand
+                Path { path in
+                    path.move(to: CGPoint(x: clockSize / 2, y: clockSize / 2))
+                    path.addLine(to: CGPoint(x: clockSize / 2, y: clockSize / 10))
+                }
+                .stroke(Color.primary, style: StrokeStyle(lineWidth: subLineWidth, lineCap: .round))
+//                .offset(x: -clockSize / 2, y: -clockSize / 2)
+                .rotationEffect(minuteAngle(minute: minute), anchor: .center)
+            }
+            .frame(width: clockSize, height: clockSize)
+        }
+    }
+    
+    private func hourAngle(hour: Int, minute: Int) -> Angle {
+        let hourIn12 = hour % 12
+        let hourAngle = (Double(hourIn12) + Double(minute) / 60.0) * 30.0
+        return Angle(degrees: hourAngle)
+    }
+    
+    private func minuteAngle(minute: Int) -> Angle {
+        let minuteAngle = Double(minute) * 6.0
+        return Angle(degrees: minuteAngle)
+    }
+}
+
+
 #Preview(body: {
     VStack {
         QuestCheckBoxColorPreview(tier: 0)
@@ -1564,4 +1632,6 @@ struct EditNotificationTimeView: View {
     }
 
 })
+
+
 

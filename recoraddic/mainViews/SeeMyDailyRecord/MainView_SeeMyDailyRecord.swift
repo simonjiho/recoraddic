@@ -101,7 +101,11 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
 //                print(min)
 //                print(max)
 //                if selectedDailyRecordSetIndex <
-                return min...max
+                if max >= min {
+                    return min...max
+                } else {
+                    return min...min
+                }
             }
             else {
                 return min...Calendar.current.date(byAdding: .year, value: 50, to: min)!
@@ -157,13 +161,6 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     Text("변경하는 중..")
                 }
                 
-                let noSavedDailyRecords_visible: Bool = selectedDailyRecordSet.dailyRecords?.filter({$0.hasContent}).count == 0
-                
-                if noSavedDailyRecords_visible && selectedDailyRecordSetIndex == dailyRecordSets.count - 1 && !isEditingTermGoals {
-                    Text("매일매일의 기록을 저장하세요!")
-                        .opacity(0.5)
-                }
-
                 
                 
                 if popUp_startNewRecordSet {

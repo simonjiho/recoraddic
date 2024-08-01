@@ -72,9 +72,7 @@ struct ContentView: View {
     @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord] // currentDailyRecord -> date = nil -> thus it places on first on sorted array
     @Query var dailyQuests: [DailyQuest]
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
-    var dailyRecordSets_visible: [DailyRecordSet] {
-        dailyRecordSets.filter({$0.isVisible()})
-    }
+
     
     
     @Query var defaultPurposeDatas: [DefaultPurposeData]
@@ -179,13 +177,15 @@ struct ContentView: View {
                              try? modelContext.save()
                          }
                      }
-                     if UserDefaults.standard.value(forKey: "standardDateAdjusted") == nil {
-                         UserDefaults.standard.setValue(false, forKey: "standardDateAdjusted")
-                     }
-                     if !standardDateAdjusted {
-                         adjustStandardDate()
-                         UserDefaults.standard.setValue(true, forKey: "standardDateAdjusted")
-                     }
+                     
+                     // 24.08.01 below code is used for users that stored dat before standardization of dates. No need to use it afterwards.
+//                     if UserDefaults.standard.value(forKey: "standardDateAdjusted") == nil {
+//                         UserDefaults.standard.setValue(false, forKey: "standardDateAdjusted")
+//                     }
+//                     if !standardDateAdjusted {
+//                         adjustStandardDate()
+//                         UserDefaults.standard.setValue(true, forKey: "standardDateAdjusted")
+//                     }
                  }
                  .onChange(of: selectedView) { oldValue, newValue in //여기에 다양한 것 넣어주기
                      

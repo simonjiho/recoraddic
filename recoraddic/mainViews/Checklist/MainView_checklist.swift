@@ -101,6 +101,8 @@ struct MainView_checklist: View {
 
             let facialExpressionSize = geoWidth*0.085
             
+//            let isNotToday: Bool = getStartOfDate(date: selectedDate) != getStartDateOfNow()
+            
             ZStack {
 
                 VStack(spacing:0.0) {
@@ -115,18 +117,49 @@ struct MainView_checklist: View {
 
                             }
                             .padding(.leading)
-                            .frame(width:geoWidth*0.2, alignment: .leading)
+                            .frame(width:geoWidth*0.15, alignment: .leading)
                             .buttonStyle(.plain)
 //                            .border(.red)
                         } else {
                             Spacer()
-                                .frame(width:geoWidth*0.2)
+                                .frame(width:geoWidth*0.15)
                         }
                         
+                        HStack {
+                            HStack(spacing:10.0) {
+                                if getStartOfDate(date: selectedDate) > getStartDateOfNow() {
+                                    Button(action: {selectedDate = getStartDateOfNow()}) {
+                                        Image(systemName: "arrow.uturn.left")
+                                    }
+            //                        .frame(height: geoHeight*0.05)
+                                }
+                                Button(action:{selectedDate = selectedDate.addingDays(-1)}) {
+                                    Image(systemName: "chevron.left")
+                                }
+
+                            }
+                            .padding(.trailing,7)
+                            .frame(width: geoWidth*0.15, alignment: .trailing)
+                            DatePicker(selection: $selectedDate,displayedComponents: [.date]) {}
+                                .labelsHidden()
+//                                .frame(width: geoWidth*0.5)
+                            HStack(spacing:10.0) {
+                                Button(action:{selectedDate = selectedDate.addingDays(1)}) {
+                                    Image(systemName: "chevron.right")
+                                }
+                                if getStartOfDate(date: selectedDate) < getStartDateOfNow() {
+                                    Button(action: {selectedDate = getStartDateOfNow()}) {
+                                        Image(systemName: "arrow.uturn.right")
+                                    }
+            //                        .frame(height: geoHeight*0.05)
+                                }
+                            }
+                            .padding(.leading,7)
+                            .frame(width: geoWidth*0.15, alignment: .leading)
+                        }
+                        .frame(width: geoWidth*0.7)
                         
-                        DatePicker(selection: $selectedDate,displayedComponents: [.date]) {}
-                        .labelsHidden()
-                        .frame(width: geoWidth*0.6)
+                            
                         
                         Group {
                             if currentDailyRecord.mood == 0 {
@@ -151,7 +184,7 @@ struct MainView_checklist: View {
                             }
                         }
                         .padding(.trailing)
-                        .frame(width:geoWidth*0.2,alignment: .trailing)
+                        .frame(width:geoWidth*0.15,alignment: .trailing)
                         .onTapGesture {
                             changeMood.toggle()
                         }
@@ -226,11 +259,14 @@ struct MainView_checklist: View {
                         // use "in:" to add date range
                     }
                     .padding(.top,geoHeight*0.035)
-                    .padding(.bottom, geoHeight*0.02)
+                    .padding(.bottom, geoHeight*0.005)
+                    
 
                     Color.gray
                         .opacity(0.4)
                         .frame(width: checkListElementWidth, height: 1)
+                        .padding(.top, geoHeight*0.015)
+
                     ChecklistView(
                         currentDailyRecord: currentDailyRecord,
                         editDiary: $editDiary,
@@ -241,8 +277,11 @@ struct MainView_checklist: View {
                         changeMood: $changeMood,
                         forceToChooseMood: $forceToChooseMood
                     )
-                    .frame(height: geoHeight*0.93)
+//                    .frame(height: isToday ? geoHeight*0.93 : geoHeight*0.88)
+//                    .border(.red)
                 }
+                .frame(width:geometry.size.width, height: geometry.size.height, alignment: .top)
+//                .border(.blue)
 
 
                 Button(action:{
@@ -256,6 +295,10 @@ struct MainView_checklist: View {
                 .buttonStyle(CheckListButtonStyle2())
                 .frame(width:buttonSize, height:buttonSize)
                 .position(x:geoWidth/2, y:geoHeight*0.95 - 10)
+                
+
+
+                
             
                 
                 let nothingToSave: Bool = currentDailyRecord.dailyText == nil && currentDailyRecord.dailyQuestList!.count == 0 && currentDailyRecord.todoList!.count == 0
@@ -593,7 +636,7 @@ struct ChecklistView: View {
             let purposeTagsHeight = geometry.size.height*0.04
             
 //            let diaryHeight = diaryViewWiden ? geometry.size.height * (editDiary ? 0.6 : 0.9) : 60
-            let diaryHeight = (currentDailyRecord.dailyTextType == DailyTextType.diary && editDiary) ? (geometry.size.height - keyboardHeight)*0.88 : questCheckBoxHeight
+            let diaryHeight = (currentDailyRecord.dailyTextType == DailyTextType.diary && editDiary) ? (geometry.size.height - keyboardHeight)*0.9 : questCheckBoxHeight
 
             
             let diaryExists: Bool = currentDailyRecord.dailyTextType != nil
@@ -679,7 +722,8 @@ struct ChecklistView: View {
                             }
                             
 
-                            if diaryExists && (dailyQuestExists || todoExists) {
+//                            if diaryExists && (dailyQuestExists || todoExists) {
+                            if diaryExists {
                                 Color.gray
                                     .opacity(0.4)
                                     .frame(width: checkListElementWidth, height: 1)
@@ -759,10 +803,25 @@ struct ChecklistView: View {
                                         }
                                         .frame(width: questCheckBoxWidth*0.1, alignment: .center)
 
-                                        HStack(spacing:0.0) {
-                                            Text("클릭하여 당장 생각나는 할 일 적기")
+//                                        HStack(spacing:0.0) {
+                                        if let date = currentDailyRecord.getLocalDate() {
+                                            if date < getStartDateOfNow() {
+                                                Text("클릭하여 달성한 일 적기")
+                                                    .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
+                                            }
+                                            else if date == getStartDateOfNow() {
+                                                Text("클릭하여 당장 생각나는 할 일 적기")
+                                                    .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
+                                            }
+                                            else {
+                                                Text("클릭하여 나중에 할 일 적기")
+                                                    .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
+                                            }
                                         }
-                                        .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
+
+//                                            }
+//                                        }
+//                                        .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
                                         
                                         Spacer()
                                             .frame(width:questCheckBoxWidth*0.1)
@@ -798,11 +857,12 @@ struct ChecklistView: View {
                                         .buttonStyle(.plain)
 //                                        .border(.red)
 
-                                        HStack(spacing:0.0) {
-                                            Text("\(todo.idx)")
+//                                        HStack(spacing:0.0) {
+//                                            Text("\(todo.idx)")
+                                        Group {
                                             textFieldView(currentDailyRecord: currentDailyRecord, todo: todo, text: todo.content, editingTodo:$editingTodo, idx: $editingIndex, doneButtonPressed: $doneButtonPressed)
-//                                                .frame(width:editingIndex == todo.index ? todo_textWidth*0.8 : todo_textWidth)
-                                                .frame(width:todo_textWidth*0.8)
+                                                .frame(width:editingIndex == todo.idx ? todo_textWidth*0.8 : todo_textWidth)
+//                                                .frame(width:todo_textWidth*0.8)
                                         }
                                         .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
 //                                        .border(.red)
@@ -865,7 +925,8 @@ struct ChecklistView: View {
                             
                             
                             Spacer()
-                                .frame(width: geometry.size.width, height: keyboardAppeared ? keyboardHeight*1.1 : geometry.size.height*0.2)
+//                                .frame(width: geometry.size.width, height: keyboardAppeared ? keyboardHeight*1.1 : geometry.size.height*0.2) // ~24.08.02
+                                .frame(width: geometry.size.width, height: keyboardAppeared ? ( editDiary ? keyboardHeight*1.1 : keyboardHeight + geoHeight * 0.3): geometry.size.height*0.4)
                             
 //                            TestNotificationView()
                             

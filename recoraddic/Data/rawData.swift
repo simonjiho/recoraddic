@@ -323,10 +323,7 @@ final class DailyRecordSet: Equatable {
     var dailyRecordColorIndex: Int = 0
     
     var termGoals: [String] = []
-    
-//    var isArchived: Bool = false
-    var isHidden: Bool = false
-    var inTrashCan: Bool = false
+
     
     @Relationship(deleteRule:.cascade, inverse: \DailyRecord.dailyRecordSet)
     var dailyRecords:[DailyRecord]? = []
@@ -368,11 +365,7 @@ final class DailyRecordSet: Equatable {
         }
     }
     
-    func isVisible() -> Bool {
-//        return !isArchived && !isHidden && !inTrashCan
-        return !isHidden && !inTrashCan
 
-    }
     
     func updateDailyRecordsMomentum() -> Void {
         if let dailyRecords = self.dailyRecords {
@@ -458,9 +451,9 @@ final class DailyRecordSet: Equatable {
 
 
 @Model
-final class DailyRecord: Equatable, Hashable {
+final class DailyRecord: Equatable, Identifiable, Hashable {
 //final class DailyRecord: Equatable {
-
+    var id: UUID = UUID()
     
     var createdTime: Date = Date()
 
@@ -494,9 +487,7 @@ final class DailyRecord: Equatable, Hashable {
     
     var isFavorite: Bool = false
     
-//    var isArchived: Bool = false
-    var isHidden: Bool = false
-    var inTrashCan: Bool = false
+
 
     
     var dailyRecordThemeNum: Int? // stone + background
@@ -524,21 +515,16 @@ final class DailyRecord: Equatable, Hashable {
     
     
     static func == (lhs: DailyRecord, rhs: DailyRecord) -> Bool {
-            return lhs.createdTime == rhs.createdTime
+        return lhs.createdTime == rhs.createdTime && lhs.id == rhs.id
             // Add any other properties that determine equality
     }
     func hash(into hasher: inout Hasher) {
         hasher.combine(createdTime)
+        hasher.combine(id)
 //        hasher.combine(date)
             // Add any other properties that should be included in the hash
     }
     
-    func isVisible() -> Bool {
-//        return !isArchived && !isHidden && !inTrashCan
-        return !isHidden && !inTrashCan
-
-    }
-
     
     
     

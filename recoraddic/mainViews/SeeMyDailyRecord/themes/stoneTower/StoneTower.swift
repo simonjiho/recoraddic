@@ -485,6 +485,13 @@ struct StoneTower: View {
                                     .opacity(0.4)
                                 }
                                 .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
+                                let noSavedDailyRecords_visible: Bool = dailyRecordSet.dailyRecords?.filter({$0.hasContent}).count == 0
+                                
+                                if noSavedDailyRecords_visible && selectedDailyRecordSetIndex == dailyRecordSets.count - 1 && !isEditingTermGoals {
+                                    Text("매일매일의 기록을 저장하세요!")
+                                        .opacity(0.5)
+                                        .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
+                                }
                             }
 
                             
