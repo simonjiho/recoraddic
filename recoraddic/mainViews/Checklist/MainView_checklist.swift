@@ -373,6 +373,8 @@ struct MainView_checklist: View {
                 
                 selectedDate = getStandardDate(from: newValue) // No worry of infinite onChangeCall
                 
+                
+                
                 if oldValue < getStandardDateOfYesterday() {
                     removeEmptyDailyQuests()
                 }
@@ -785,55 +787,6 @@ struct ChecklistView: View {
 //                                    .frame(width:checkListElementWidth,alignment: .leading)
 //                            }
                             VStack (spacing:todo_height*0.2) {
-                                if todoList_sorted.isEmpty {
-                                    HStack(spacing:0.0) {
-                                        let tagSize = min(todo_purposeTagsWidth*0.8,todo_height*0.3)
-                                        HStack {
-                                            Image(systemName:"questionmark.square")
-                                                .resizable()
-                                                .frame(width:tagSize, height:tagSize)
-                                                .foregroundStyle(reversedColorSchemeColor)
-                                        }
-                                        .frame(width: todo_purposeTagsWidth)
-
-                                        HStack {
-                                            Image(systemName: "checkmark.circle")
-                                                .resizable()
-                                                .frame(width: questCheckBoxWidth*0.1*0.65, height: questCheckBoxWidth*0.1*0.65)
-                                        }
-                                        .frame(width: questCheckBoxWidth*0.1, alignment: .center)
-
-//                                        HStack(spacing:0.0) {
-                                        if let date = currentDailyRecord.getLocalDate() {
-                                            if date < getStartDateOfNow() {
-                                                Text("클릭하여 달성한 일 적기")
-                                                    .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
-                                            }
-                                            else if date == getStartDateOfNow() {
-                                                Text("클릭하여 당장 생각나는 할 일 적기")
-                                                    .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
-                                            }
-                                            else {
-                                                Text("클릭하여 나중에 할 일 적기")
-                                                    .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
-                                            }
-                                        }
-
-//                                            }
-//                                        }
-//                                        .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
-                                        
-                                        Spacer()
-                                            .frame(width:questCheckBoxWidth*0.1)
-                                    }
-                                    .frame(width: checkListElementWidth, height:todo_height, alignment:.leading)
-                                    .opacity(0.5)
-                                    .onTapGesture {
-                                        let firstTodo = Todo(dailyRecord: currentDailyRecord, index: 0)
-                                        modelContext.insert(firstTodo)
-                                    }
-                                    
-                                }
                                 ForEach(todoList_sorted, id:\.self) { todo in
                                     
                                     // view에 반영하는 내용은 stateVariable로 전부 대체 -> 처음 불러올 때 적용, 그리고 tapgesture on checkbox, submission(추가), 완료, x(삭제) 때만 modelContext의 데이터 변경해주기
@@ -920,6 +873,61 @@ struct ChecklistView: View {
                                     }
                                     .frame(width:checkListElementWidth)
                                     .opacity(0.5)
+                                } else {
+                                    HStack(spacing:0.0) {
+                                        let tagSize = min(todo_purposeTagsWidth*0.8,todo_height*0.3)
+                                        HStack {
+                                            Image(systemName:"questionmark.square")
+                                                .resizable()
+                                                .frame(width:tagSize, height:tagSize)
+                                                .foregroundStyle(reversedColorSchemeColor)
+                                        }
+                                        .frame(width: todo_purposeTagsWidth)
+
+                                        HStack {
+                                            Image(systemName: "checkmark.circle")
+                                                .resizable()
+                                                .frame(width: questCheckBoxWidth*0.1*0.65, height: questCheckBoxWidth*0.1*0.65)
+                                        }
+                                        .frame(width: questCheckBoxWidth*0.1, alignment: .center)
+
+//                                        HStack(spacing:0.0) {
+                                        if let date = currentDailyRecord.getLocalDate() {
+                                            if date < getStartDateOfNow() {
+                                                Text("클릭하여 달성한 일 적기")
+                                                    .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
+                                            }
+                                            else if date == getStartDateOfNow() {
+                                                Text("클릭하여 당장 생각나는 할 일 적기")
+                                                    .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
+                                            }
+                                            else {
+                                                Text("클릭하여 나중에 할 일 적기")
+                                                    .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
+                                            }
+                                        }
+
+//                                            }
+//                                        }
+//                                        .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
+                                        
+                                        Spacer()
+                                            .frame(width:questCheckBoxWidth*0.1)
+                                    }
+                                    .frame(width: checkListElementWidth, height:todo_height, alignment:.leading)
+                                    .opacity(0.5)
+                                    .onTapGesture {
+//                                        let firstTodo = Todo(dailyRecord: currentDailyRecord, index: 0)
+//                                        modelContext.insert(firstTodo)
+//                                        let newIdx:Int = (todoList_sorted.map({$0.idx}).sorted(by:{$0 < $1}).last + 1) ?? 0
+                                        let newIdx:Int = todoList_sorted.map({$0.idx + 1}).sorted(by:{$0 < $1}).last ?? 0
+                                        let newTodo = Todo(dailyRecord: currentDailyRecord, index: newIdx)
+                                        modelContext.insert(newTodo)
+//                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            editingIndex = newIdx
+//                                        }
+                                    }
+                                    
                                 }
                             }
                             
@@ -966,6 +974,7 @@ struct ChecklistView: View {
             .onChange(of: applyDailyTextRemoval, removeDailyText)
             .onChange(of: currentDailyRecord, {
                 editDiary = false
+                editingIndex = nil
                 diaryViewWiden = false
                 
             })

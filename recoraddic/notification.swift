@@ -12,7 +12,7 @@ import UserNotifications
 func scheduleNotification(at date: Date, for questName: String, goal: Int?, dataType: Int, customDataTypeNotation: String?) {
     let content = UNMutableNotificationContent()
     content.title = questName
-    content.subtitle = String(describing: date)
+//    content.subtitle = String(describing: date)
     if let goal_nonNil = goal {
         content.body = "목표: \(DataType.string_fullRepresentableNotation(data: goal_nonNil, dataType: dataTypeFrom(dataType), customDataTypeNotation: customDataTypeNotation))"
     }

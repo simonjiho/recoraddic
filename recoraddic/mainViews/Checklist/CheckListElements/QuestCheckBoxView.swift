@@ -116,6 +116,7 @@ struct QuestCheckBoxView: View {
                 .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
                 .disabled(!isRecent)
                 .opacity( isRecent ? 1.0 : 0.0)
+//                .border(.red)
             }
             .frame(width:width, height: height)
             .background(
@@ -1302,7 +1303,7 @@ struct NotificationButton: View {
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
-            
+            let size = min(geoWidth, geoHeight)
 //            Button("",systemImage: setAlready ? "bell" : "bell.slash") {
 //                if setAlready {
 //                    showNotficationTime.toggle()
@@ -1318,9 +1319,16 @@ struct NotificationButton: View {
                 }
 
             }) {
-                Image(systemName: setAlready ? "bell" : "bell.slash")
+                if let alermTime = dailyQuest.alermTime {
+                    ClockView(hour: Calendar.current.component(.hour, from: alermTime), minute: Calendar.current.component(.minute, from: alermTime))
+                        .frame(width:25, height: 25)
+                } else {
+                    Image(systemName: setAlready ? "bell" : "bell.slash")
+                        .opacity(0.7)
+                }
+                
             }
-            .bold(setAlready)
+//            .bold(setAlready)
 //            .border(.yellow)
             .frame(width: geoWidth, height: geoHeight)
 //            .border(.red)
