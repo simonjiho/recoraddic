@@ -59,10 +59,12 @@ struct MainView_QuestInventory: View {
             let gridHorizontalPadding = geoWidth*0.02
             let gridInnerPadding = geoWidth * 0.02
             let gridViewFrameWidth = geoWidth - gridHorizontalPadding*2 - gridInnerPadding*2
-            let gridSize = (gridViewFrameWidth) / 3 * 0.955
-            let gridItemSize = gridSize * 0.85
-            let gridItemSpacing = gridItemSize*0.3
-            let gridVerticalSpacing = gridSize*0.08
+            let gridWidth = (gridViewFrameWidth) / 2 * 0.97
+            let gridHeight = gridWidth / 1.618
+            let gridItemWidth = gridWidth * 0.85
+            let gridItemHeight = gridHeight * 0.85
+            let gridItemSpacing = gridItemWidth*0.3
+            let gridVerticalSpacing = gridWidth*0.08
         
             
             let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
@@ -110,7 +112,7 @@ struct MainView_QuestInventory: View {
                             ScrollView {
                                 
                                     
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum: gridSize, maximum: gridSize))], spacing: gridVerticalSpacing) {
+                                LazyVGrid(columns: [GridItem(.adaptive(minimum: gridWidth, maximum: gridWidth))], spacing: gridVerticalSpacing) {
                                     ForEach(quest_sorted,id:\.createdTime) { quest in
                                         
                                         
@@ -132,7 +134,7 @@ struct MainView_QuestInventory: View {
                                             ZStack {
                                                 ZStack {
                                                     QuestThumbnailView(quest: quest)
-                                                        .frame(width: gridItemSize, height: gridItemSize)
+                                                        .frame(width: gridItemWidth, height: gridItemHeight)
                                                     if isEdit {
                                                         Button(action:{
                                                             if selectedQuestNames.contains(quest.name) {
@@ -143,25 +145,25 @@ struct MainView_QuestInventory: View {
                                                             }
                                                         }) {
                                                             ZStack {
-                                                                let path: Path = Path(roundedRect: CGRect(x: 0, y: 0, width: gridItemSize, height: gridItemSize), cornerSize: CGSize(width: gridItemSize/20, height: gridItemSize/20))
+                                                                let path: Path = Path(roundedRect: CGRect(x: 0, y: 0, width: gridItemWidth, height: gridItemHeight), cornerSize: CGSize(width: gridItemWidth/20, height: gridItemWidth/20))
                                                                 path
-                                                                    .stroke(lineWidth: gridItemSize/15)
+                                                                    .stroke(lineWidth: gridItemWidth/15)
                                                                 if selectedQuestNames.contains(quest.name) {
                                                                     Image(systemName:"checkmark")
                                                                         .resizable()
-                                                                        .frame(width:gridItemSize*0.6, height: gridItemSize*0.6)
+                                                                        .frame(width:gridItemWidth*0.6, height: gridItemHeight*0.6)
                                                                 }
                                                                 
                                                             }
-                                                            .frame(width:gridItemSize, height: gridItemSize)
+                                                            .frame(width:gridItemWidth, height: gridItemHeight)
                                                             .foregroundStyle(.blue)
                                                             
                                                         }
                                                     }
                                                 }
-                                                .frame(width: gridItemSize, height: gridItemSize)
+                                                .frame(width: gridItemWidth, height: gridItemHeight)
                                             }
-                                            .frame(width:gridSize, height: gridSize)
+                                            .frame(width:gridWidth, height: gridHeight)
                                             
                                         }
                                         .contextMenu(ContextMenu(menuItems: {
@@ -172,7 +174,7 @@ struct MainView_QuestInventory: View {
                                         .onAppear() {
                                             quest.updateMomentumLevel()
                                         }
-                                        .frame(width:gridSize, height: gridSize)
+                                        .frame(width:gridWidth, height: gridHeight)
                                         //                                        .border(.yellow)
                                         
                                         
@@ -190,7 +192,7 @@ struct MainView_QuestInventory: View {
 ) {
                                                 Image(systemName: "plus.square")
                                                     .resizable()
-                                                    .frame(width: gridItemSize*0.4, height: gridItemSize*0.4)
+                                                    .frame(width: gridItemWidth*0.3, height: gridItemWidth*0.3)
                                                 
                                             }
                                             .buttonStyle(.plain)
@@ -202,11 +204,11 @@ struct MainView_QuestInventory: View {
                                             //                                            }) {
                                             //                                                Image(systemName: "plus.square")
                                             //                                                    .resizable()
-                                            //                                                    .frame(width: gridItemSize*0.4, height: gridItemSize*0.4)
+                                            //                                                    .frame(width: gridItemWidth*0.4, height: gridItemWidth*0.4)
                                             //                                            }
                                             //                                            .buttonStyle(.plain)
                                         }
-                                        .frame(width: gridItemSize, height: gridItemSize)
+                                        .frame(width: gridItemWidth, height: gridItemHeight)
                                     }
                                     
                                     
@@ -215,7 +217,7 @@ struct MainView_QuestInventory: View {
                                 .frame(width:gridViewFrameWidth)
                                 .padding(gridInnerPadding)
                                 .background(.quaternary)
-                                .clipShape(.rect(cornerRadius: gridItemSize/20))
+                                .clipShape(.rect(cornerRadius: gridItemWidth/20))
 //                                .padding(.top, gridItemSpacing)
                                 .padding(.horizontal, gridHorizontalPadding)
                                     
@@ -590,13 +592,13 @@ struct QuestTierView: View {
                 case 0:
                     return 0.0
                 case 1:
-                    return geoWidth*0.04
+                    return geoHeight*0.04
                 case 2:
-                    return geoWidth*0.06
+                    return geoHeight*0.06
                 case 3:
-                    return geoWidth*0.09
+                    return geoHeight*0.09
                 case 4:
-                    return geoWidth*0.09
+                    return geoHeight*0.09
                 default:
                     return 0.0
                 }
@@ -611,12 +613,12 @@ struct QuestTierView: View {
                     .fill(LinearGradient(colors: getGradientColorsOf(tier: tier, type:1), startPoint: .topLeading, endPoint: .bottomTrailing))
                 
                 RotatingGradient(level: tier%5, colors: rotationGradientColors)
-                    .frame(width:(geoWidth+strokeWidth*2)*1.5, height: (geoHeight+strokeWidth*2)*1.5)
+                    .frame(width:(geoWidth+strokeWidth*2)*1.5, height: (geoWidth+strokeWidth*2)*1.5)
                     .position(x:geoWidth/2, y:geoHeight/2)
                     .mask {
                         RoundedRectangle(cornerSize: CGSize(width: geoWidth/20, height: geoHeight/20))
                             .stroke(lineWidth: strokeWidth)
-                            .frame(width:geoHeight+strokeWidth/2, height: geoHeight+strokeWidth/2)
+                            .frame(width:geoWidth+strokeWidth/2, height: geoHeight+strokeWidth/2)
                     }
 
                 
@@ -647,7 +649,7 @@ struct QuestThumbnailView: View {
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
-//            let gridItemSize = geoWidth
+//            let gridItemWidth = geoWidth
             
             ZStack {
                 QuestTierView(tier: quest.tier)
@@ -658,11 +660,11 @@ struct QuestThumbnailView: View {
                     .position(x:geoWidth/2,y:geoHeight/2)
                     .opacity(0.7)
                 VStack {
-                    Text("\(quest.subName != nil  ? quest.subName! : quest.name)")
+                    Text("\(quest.getName())")
                         .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
                         .bold()
-                        .minimumScaleFactor(0.3)
-                        .lineLimit(2)
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
                         .padding(.bottom, geoHeight/10)
                     
                     //                                        Text(QuestRepresentingData.titleOf(representingData: quest.representingData))
@@ -1144,7 +1146,7 @@ struct QuestThumbnailView_forPreview: View {
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
-//            let gridItemSize = geoWidth
+//            let gridItemWidth = geoWidth
             
             ZStack {
                 QuestTierView(tier: tier)
@@ -1267,17 +1269,30 @@ struct RotatingGradient: View {
     var body: some View {
         // 10 7 5 3.5 1
 //        let duration: CGFloat = 5/(CGFloat(level)+4.0) * 3.0
+//        let duration: CGFloat = {
+//            switch level {
+//            case 1:
+//                return 8
+//            case 2:
+//                return 4
+//            case 3:
+//                return 2.5
+//            case 4:
+//                return 1.5
+//            default: return 1.0
+//            }
+//        }()
         let duration: CGFloat = {
             switch level {
             case 1:
-                return 8
+                return 12
             case 2:
-                return 4
+                return 9
             case 3:
-                return 2.5
+                return 6
             case 4:
-                return 1.5
-            default: return 1.0
+                return 4
+            default: return 4.0
             }
         }()
 

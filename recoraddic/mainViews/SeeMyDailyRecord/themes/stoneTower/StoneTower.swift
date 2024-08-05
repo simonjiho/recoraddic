@@ -254,6 +254,7 @@ struct StoneTower: View {
                                                 .aspectRatio(contentMode: .fit)
                                                 .frame(width:geoWidth*0.12,height: groundHeight*0.1)
                                         }
+                                        .buttonStyle(.plain)
                                         .disabled(selectedDailyRecordSetIndex == 0 || isEditingTermGoals)
                                         
 
@@ -269,6 +270,7 @@ struct StoneTower: View {
                                                 .frame(width:geoWidth*0.25)
                                                 
                                                 Text("~")
+                                                    .padding(.horizontal,5)
                                                 DatePicker(
                                                     "",
                                                     selection: $endDate,
@@ -289,6 +291,8 @@ struct StoneTower: View {
                                                 .frame(width:geoWidth*0.25)
                                                 
                                                 Text("~")
+                                                    .padding(.horizontal,5)
+
                                             }
 
                                         }
@@ -301,6 +305,7 @@ struct StoneTower: View {
                                                 .aspectRatio(contentMode: .fit)
                                                 .frame(width:geoWidth*0.12, height: groundHeight*0.1)
                                         }
+                                        .buttonStyle(.plain)
                                         .disabled(isLatestDailyRecordSet || isEditingTermGoals)
 
                                     }

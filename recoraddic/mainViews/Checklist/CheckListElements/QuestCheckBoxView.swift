@@ -5,6 +5,7 @@
 //  Created by 김지호 on 12/19/23.
 // TODO: 공통 요소들 extract해서 이용하기
 
+
 import Foundation
 import SwiftUI
 import SwiftData
@@ -76,6 +77,7 @@ struct QuestCheckBoxView: View {
     @State var showMenu: Bool = false
 //    @State var isDragging: Bool = false
     @State var isAnimating: Bool = false
+    
 
     
 //    let menuSize:CGFloat = UIScreen.main.bounds.width * 0.2
@@ -84,7 +86,7 @@ struct QuestCheckBoxView: View {
     
     var body: some View {
         
-        let height:CGFloat = stopwatch.isRunning ? 75.0 : 60.0
+        let height:CGFloat = stopwatch.isRunning ? 75.0 : (dailyQuest.dataType != DataType.ox.rawValue ? 60.0 : 50.0)
         let sheetHeight:CGFloat = UIScreen.main.bounds.height * 0.4
         //            let geoHeight = geometry.size.height
         let menuSize:CGFloat = width * 0.2
@@ -101,7 +103,8 @@ struct QuestCheckBoxView: View {
                     dailyQuest: dailyQuest,
                     value: $value,
                     dailyGoal: $dailyGoal,
-                    stopwatch: stopwatch
+                    stopwatch: stopwatch,
+                    isAnimating: $isAnimating
                 )
                 .frame(width:width*7/8, height: height)
                 .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
@@ -126,16 +129,16 @@ struct QuestCheckBoxView: View {
                             LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
                         )
                         .frame(width:width, height:height)
-                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * width)
-                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * width, y:0)
+//                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
                     
                     Rectangle()
                         .fill(
                             LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
                         )
                         .frame(width:width, height:height)
-                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * width)
-                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * width, y:0)
+//                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
                 }
                     .frame(width:width, height:height)
                     .mask {
@@ -148,9 +151,10 @@ struct QuestCheckBoxView: View {
             )
             .disabled(offset < -menuSize*0.5)
             .offset(x: offset, y:0)
-            .onAppear() {
-                isAnimating = true
-            }
+//            .onAppear() {
+//                isAnimating = true
+//            }
+
             
             HStack(spacing:0.0) {
                 Image(systemName: "xmark")
@@ -249,7 +253,12 @@ struct QuestCheckBoxView: View {
         }
         .onChange(of: value) { oldValue, newValue in
             
-            xOffset = CGFloat(value).map(from:range, to: 0...width)
+            if value == 0  {
+                xOffset = 0.01
+            } else {
+                xOffset = CGFloat(value).map(from:range, to: 0...width)
+            }
+            
             dailyQuest.data = value
             updateQuest(for: dailyQuest)
             
@@ -274,7 +283,11 @@ struct QuestCheckBoxView: View {
             xOffset = CGFloat(value).map(from:range, to: 0...width)
         }
         .onChange(of: range) {
-            xOffset = CGFloat(value).map(from:range, to: 0...width)
+            if value == 0 {
+                xOffset = 0.01
+            } else {
+                xOffset = CGFloat(value).map(from:range, to: 0...width)
+            }
         }
         //        }
     }
@@ -331,6 +344,8 @@ struct QuestCheckBoxContentView: View {
     @Binding var value: Int
     @Binding var dailyGoal: Int?
     @ObservedObject var stopwatch: Stopwatch
+    @Binding var isAnimating: Bool
+
 
 
     var body: some View {
@@ -338,7 +353,7 @@ struct QuestCheckBoxContentView: View {
         GeometryReader { geometry in
             
             let geoWidth = geometry.size.width
-            let height:CGFloat = stopwatch.isRunning ? 75.0 : 60.0
+            let height:CGFloat = stopwatch.isRunning ? 75.0 : (dailyQuest.dataType != DataType.ox.rawValue ? 60.0 : 50.0)
 
             if dailyQuest.dataType == DataType.ox.rawValue {
                 QuestCheckBoxContent_OX(
@@ -354,7 +369,9 @@ struct QuestCheckBoxContentView: View {
                     dailyGoal: $dailyGoal,
                     hasGoal: dailyQuest.dailyGoal != nil,
                     hasGoal_toggle: dailyQuest.dailyGoal != nil,
-                    stopwatch: stopwatch
+                    stopwatch: stopwatch,
+                    isAnimating: $isAnimating
+//                    onTimer: dailyQuest.timerStart != nil
                 )
                 .frame(width: geoWidth,height: height)
 
@@ -388,8 +405,8 @@ struct QuestCheckBoxContent_OX:View {
             let geoHeight = geometry.size.height
             
             HStack(spacing:0.0) {
-                Button(action:{dailyQuest.data = dailyQuest.data == 1 ? 0 : 1}) {
-                    Image(systemName: dailyQuest.data == 1 ? "checkmark.square" : "square")
+                Group {
+                    Image(systemName: (value == 1) ? "checkmark.square" : "square")
                         .resizable()
                         .frame(width: geoWidth*1/7*0.67, height: geoWidth*1/7*0.67)
                 }
@@ -401,8 +418,13 @@ struct QuestCheckBoxContent_OX:View {
                 Text(dailyQuest.getName())
                     .frame(width: geoWidth*6/7, height: geoHeight)
                     .bold()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
             .frame(width: geoWidth,height: geoHeight)
+            .onTapGesture {
+                value = ( value == 1 ) ? 0 : 1
+            }
         }
     }
 }
@@ -423,13 +445,11 @@ struct QuestCheckBoxContent_HOUR:View {
     @State var hasGoal: Bool
     @State var hasGoal_toggle: Bool // onChangeOf(hasGoal) 과 toggle버튼에 의해서만 변경해야 함
     @ObservedObject var stopwatch: Stopwatch
-
+    @Binding var isAnimating: Bool
+//    @State var onTimer: Bool
     
 //    @ObservedObject var activityManager: ActivityManager
-    @State var onTimer: Bool = false
     @State var isEditing_hours: Bool = false
-    @State var showQuestName: Bool = false
-    @State var showValue: Bool = false
     @State private var activity: Activity<RecoraddicWidgetAttributes>? = nil
 
     @State var highlightValue: Bool = false
@@ -459,27 +479,8 @@ struct QuestCheckBoxContent_HOUR:View {
                 
                 let isRecent: Bool = getStandardDateOfYesterday() <= dailyQuest.dailyRecord!.date!
 
-                if onTimer {
-                    Button(action: {
-                        onTimer.toggle()
-                        guard let activity_activated = activity else {
-                            return
-                        }
-                        let dismissalPolicy: ActivityUIDismissalPolicy = .immediate
-                        Task {
-                            await activity_activated.end(ActivityContent(state: activity_activated.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
-
-                        }
-                        activity = nil
-
-                        DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
-                            withAnimation(.easeInOut(duration:0.2)) {
-                                stopwatch.stop()
-                            }
-                            value = stopwatch.getTotalSec()/60
-                            stopwatch.setTotalSec(value*60)
-                        }
-                    }) {
+                if stopwatch.isRunning {
+                    Button(action:stopStopWatch) {
                         Image(systemName: "pause")
 //                            .resizable()
 //                            .scaledToFit()
@@ -522,47 +523,13 @@ struct QuestCheckBoxContent_HOUR:View {
                                 }
                             }
                         }
-                        .popover(isPresented: $showQuestName) {
-                            Text("\(questName)")
-                                .padding()
-                                .frame(width:geoWidth*8/7)
-                                .foregroundStyle(getBrightTierColorOf(tier: tier))
-                                .background(getDarkTierColorOf(tier: dailyQuest.currentTier)) // 크기 유지를 위해(없으면 자동 조정됨)
-                                .presentationCompactAdaptation(.popover)
-                                .presentationBackground(getDarkTierColorOf(tier: dailyQuest.currentTier))
-                        }
+
 
 
                 }
                 else {
                     let height:CGFloat = 60.0
-                    Button(action: {
-                        
-                        stopwatch.setTotalSec(value*60)
-                        let calendar = Calendar.current
-                        let startTime: Date = calendar.date(byAdding: .minute, value: -(value), to: .now)!
-                        
-                        withAnimation(.easeInOut(duration:0.2)) {
-                            stopwatch.start(startTime:startTime)
-                        }
-                        let attributes = RecoraddicWidgetAttributes(questName: questName, startTime:startTime, tier: tier)
-                        let initialContentState = RecoraddicWidgetAttributes.ContentState(goal: dailyGoal)
-                        do {
-                            let activity = try Activity<RecoraddicWidgetAttributes>.request(
-                                attributes: attributes,
-                                content: ActivityContent(state: initialContentState, staleDate: nil),
-                                pushType: nil
-                            )
-                            self.activity = activity
-                        } catch {
-                            print("Failed to start activity: \(error.localizedDescription)")
-                        }
-
-                        DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
-                            onTimer.toggle()
-                        }
-                        
-                    }) {
+                    Button(action:startStopWatch) {
                         Image(systemName: "play")
 //                            .resizable()
 //                            .scaledToFit()
@@ -581,15 +548,7 @@ struct QuestCheckBoxContent_HOUR:View {
                                 .lineLimit(1)
                                 .font(.system(size: highlightValue ? height*0.25 : height*0.4))
                                 .minimumScaleFactor(0.85)
-                                .popover(isPresented: $showQuestName) {
-                                    Text("\(questName)")
-                                        .padding()
-                                        .frame(width:geoWidth*8/7)
-                                        .foregroundStyle(getBrightTierColorOf(tier: tier))
-                                        .background(getDarkTierColorOf(tier: dailyQuest.currentTier)) // 크기 유지를 위해(없으면 자동 조정됨)
-                                        .presentationCompactAdaptation(.popover)
-                                        .presentationBackground(getDarkTierColorOf(tier: dailyQuest.currentTier))
-                                }
+
 //                            Text("\(stopwatch.timeString)")
                             HStack {
                                 Text_hours(value: value)
@@ -636,12 +595,7 @@ struct QuestCheckBoxContent_HOUR:View {
                             }
                         }
                     }
-//                    Text("\(questName)")
-//                        .frame(width: geoWidth*6/7, height: geoHeight)
-//                        .lineLimit(1)
-//                        .onTapGesture {
-//                            showValue.toggle()
-//                        }
+
                 }
             }
 
@@ -685,6 +639,14 @@ struct QuestCheckBoxContent_HOUR:View {
             .onChange(of: value) {
                 dailyQuest.dailyRecord?.updateRecordedMinutes()
             }
+            .onAppear() {
+                if let _ = dailyQuest.timerStart {
+                    autoCheckActivityAndAdjustToStopWatch()
+                }
+            }
+            .onDisappear() {
+                stopwatch.stop()
+            }
 
         }
     }
@@ -701,6 +663,94 @@ struct QuestCheckBoxContent_HOUR:View {
     }
     
 
+    func startStopWatch() -> Void {
+        
+        let calendar = Calendar.current
+        let startTime = calendar.date(byAdding: .minute, value: -(value), to: .now)!
+        dailyQuest.timerStart = startTime
+        stopwatch.setTotalSec(value*60)
+
+//        isAnimating = false
+        withAnimation(.easeInOut(duration:0.2)) {
+            stopwatch.start(startTime:startTime)
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.21) {
+            withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
+                isAnimating = true
+            }
+        }
+        
+        if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
+            self.activity = targetActivity
+        } else {
+            let attributes = RecoraddicWidgetAttributes(questName: dailyQuest.getName(), startTime:startTime, tier: dailyQuest.currentTier)
+            let initialContentState = RecoraddicWidgetAttributes.ContentState(goal: dailyGoal)
+            do {
+                let activity = try Activity<RecoraddicWidgetAttributes>.request(
+                    attributes: attributes,
+                    content: ActivityContent(state: initialContentState, staleDate: nil),
+                    pushType: nil
+                )
+                self.activity = activity
+            } catch {
+                print("Failed to start activity: \(error.localizedDescription)")
+            }
+        }
+
+    }
+    
+    func autoCheckActivityAndAdjustToStopWatch() -> Void {
+        
+        let startTime: Date = dailyQuest.timerStart!
+        
+        if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
+            stopwatch.setTotalSec(Int(Date().timeIntervalSince(startTime)))
+            isAnimating = false
+            stopwatch.start(startTime:startTime)
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.05) {
+                withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
+                    isAnimating = true
+                }
+            }
+            self.activity = targetActivity
+//            DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
+//                onTimer = true
+//            }
+        } else {
+//            onTimer = false
+            value = Int(Date().timeIntervalSince(startTime)) / 60
+        }
+
+
+
+        
+    }
+    
+    func stopStopWatch() -> Void {
+//        onTimer = false
+        guard let activity_activated = activity else {
+            return
+        }
+        let dismissalPolicy: ActivityUIDismissalPolicy = .immediate
+        Task {
+            await activity_activated.end(ActivityContent(state: activity_activated.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
+        }
+        activity = nil
+        dailyQuest.timerStart = nil
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
+
+            withAnimation(.easeInOut(duration:0.2)) {
+                stopwatch.stop()
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.21) {
+                withAnimation(.spring(duration: 0.1)) {
+                    isAnimating = false
+                }
+            }
+            value = stopwatch.getTotalSec()/60
+            stopwatch.setTotalSec(value*60)
+        }
+    }
 }
 
 
@@ -766,7 +816,6 @@ struct QuestCheckBoxContent_CUSTOM:View {
         case goal
     }
     
-    @State var showValue: Bool = false
     @State var highlightValue: Bool = false
     @State var onToggleModification: Bool = false
     @State var lastTapTime: Date = Date()
@@ -996,6 +1045,7 @@ class Stopwatch: ObservableObject {
 
     func start(startTime: Date) {
         self.startTime = startTime
+        self.updateTime()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             self.totalSec = Int(Date().timeIntervalSince(startTime))
             self.updateTime()
@@ -1247,7 +1297,7 @@ struct QuestCheckBoxColorPreview: View {
                             LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)
                         )
                         .frame(width:geoWidth, height:geoHeight)
-                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth, y:0)
                         .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
                     
                     Rectangle()
@@ -1255,7 +1305,7 @@ struct QuestCheckBoxColorPreview: View {
                             LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)
                         )
                         .frame(width:geoWidth, height:geoHeight)
-                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth)
+                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth, y:0)
                         .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
                 }
                 .frame(width:geoWidth, height:geoHeight)

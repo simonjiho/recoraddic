@@ -136,6 +136,7 @@ struct MainView_checklist: View {
                                 Button(action:{selectedDate = selectedDate.addingDays(-1)}) {
                                     Image(systemName: "chevron.left")
                                 }
+                                .buttonStyle(.plain)
 
                             }
                             .padding(.trailing,7)
@@ -147,10 +148,12 @@ struct MainView_checklist: View {
                                 Button(action:{selectedDate = selectedDate.addingDays(1)}) {
                                     Image(systemName: "chevron.right")
                                 }
+                                .buttonStyle(.plain)
                                 if getStartOfDate(date: selectedDate) < getStartDateOfNow() {
                                     Button(action: {selectedDate = getStartDateOfNow()}) {
                                         Image(systemName: "arrow.uturn.right")
                                     }
+                                    .buttonStyle(.plain)
             //                        .frame(height: geoHeight*0.05)
                                 }
                             }
