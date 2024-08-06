@@ -13,7 +13,7 @@ import SwiftUI
 import SwiftData
 import UIKit // not available on macOS
 import Combine
-
+import ActivityKit
 
 
 
@@ -24,7 +24,7 @@ struct MainView_checklist: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
-
+    @Environment(\.scenePhase) var scenePhase
     
     @Query var profiles: [Profile]
     @Query var quests: [Quest]
@@ -70,6 +70,24 @@ struct MainView_checklist: View {
 
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+        
+        let topForegroundColor: Color = {
+            if getStartOfDate(date: selectedDate) == getStartDateOfNow() {
+                return reversedColorSchemeColor
+            } else if getStartOfDate(date: selectedDate) > getStartDateOfNow() {
+                if colorScheme == .light {
+                    return Color.blue.adjust(saturation:-0.5, brightness: -0.4)
+                } else {
+                    return Color.blue.adjust(saturation:-0.35, brightness: 0.7)
+                }
+            } else {
+                if colorScheme == .light {
+                    return Color.green.adjust(saturation:-0.3, brightness: -0.4)
+                } else {
+                    return Color.green.adjust(saturation:-0.2, brightness: 0.7)
+                }
+            }
+        }()
         
         let shadowColor:Color = getShadowColor(colorScheme)
 
@@ -176,7 +194,7 @@ struct MainView_checklist: View {
                                     Circle()
                                         .stroke(lineWidth: geoWidth*0.002)
                                         .frame(width:facialExpressionSize, height: facialExpressionSize)
-                                    reversedColorSchemeColor
+                                    topForegroundColor
                                         .frame(width:facialExpressionSize, height: facialExpressionSize)
                                         .mask(
                                             Image("facialExpression_\(currentDailyRecord.mood)")
@@ -263,6 +281,8 @@ struct MainView_checklist: View {
                     }
                     .padding(.top,geoHeight*0.035)
                     .padding(.bottom, geoHeight*0.005)
+                    .foregroundStyle(topForegroundColor) // 너무 튀는 것 같기도 하고..
+//                    .foregroundStyle(reversedColorSchemeColor.opacity(getStartOfDate(date: selectedDate) == getStartDateOfNow() ? 1.0 : 0.6))
                     
 
                     Color.gray
@@ -383,7 +403,23 @@ struct MainView_checklist: View {
                 }
                 changeDailyRecord()
             }
+            .onChange(of: scenePhase) { oldValue, newValue in
+                if scenePhase == .active {
+                    if let newDate = Activity<RecoraddicWidgetAttributes>.activities.map({$0.attributes.containedDate}).sorted().first {
+                        selectedDate = getStartOfDate(date: newDate)
+                    }
+                }
+            }
             
+//            .onReceive(NotificationCenter.default.publisher(for: .specificNotification)) { notification in
+//                if let userInfo = notification.userInfo {
+//                    
+//                    if let date = userInfo["date"] as? Int {
+//                        print("Received extraInfo: \(extraInfo)")
+//                    }
+//                }
+//            }
+
  
 
         }
@@ -559,7 +595,7 @@ struct ChecklistView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
 
-    @Query var profiles: [Profile]
+    @Query(sort:\Profile.createdTime) var profiles: [Profile]
     @Query(sort:\DailyQuest.createdTime) var dailyQuests: [DailyQuest]
     @Query var quests: [Quest]
 
@@ -612,8 +648,36 @@ struct ChecklistView: View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
 
-//        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
 
+        let showHiddenQuests = profile.showHiddenQuests
+        let hiddenQuestNames: [String] = showHiddenQuests ? [] : quests.filter({$0.isHidden}).map({$0.getName()}) 
+        
+        let dailyQuests_notHidden_sorted = currentDailyRecord.dailyQuestList!.filter({!hiddenQuestNames.contains($0.getName())}).sorted(by:{
+            
+            if $0.dataType != $1.dataType {
+                return $0.dataType < $1.dataType  // Sort by Age in ascending order
+            }
+            else if $0.alermTime != nil && $1.alermTime != nil {
+                return $0.alermTime! <= $1.alermTime!
+            }
+            else if $0.alermTime != nil && $1.alermTime == nil {
+                return true
+            }
+            else if $0.alermTime == nil && $1.alermTime != nil {
+                return false
+            }
+            else {
+                return $0.createdTime < $1.createdTime  // Sort by Name in ascending order
+            }
+            
+
+        })
+        
+        let diaryExists: Bool = currentDailyRecord.dailyTextType != nil
+        let dailyQuestExists: Bool = dailyQuests_notHidden_sorted.count !=  0
+        let todoExists: Bool = currentDailyRecord.todoList!.count != 0
+        
+        
         GeometryReader { geometry in
 
 
@@ -643,10 +707,6 @@ struct ChecklistView: View {
 //            let diaryHeight = diaryViewWiden ? geometry.size.height * (editDiary ? 0.6 : 0.9) : 60
             let diaryHeight = (currentDailyRecord.dailyTextType == DailyTextType.diary && editDiary) ? (geometry.size.height - keyboardHeight)*0.9 : questCheckBoxHeight
 
-            
-            let diaryExists: Bool = currentDailyRecord.dailyTextType != nil
-            let dailyQuestExists: Bool = currentDailyRecord.dailyQuestList!.count !=  0
-            let todoExists: Bool = currentDailyRecord.todoList!.count != 0
 
             ZStack {
                 ScrollViewReader { scrollProxy in
@@ -739,13 +799,17 @@ struct ChecklistView: View {
 //                                Text("누적 퀘스트")
 //                                    .frame(width:checkListElementWidth,alignment: .leading)
 //                            }
-                            VStack(spacing:questCheckBoxHeight*0.2) {
-                                ForEach(currentDailyRecord.dailyQuestList!.sorted(by: {$0.createdTime < $1.createdTime}), id: \.self) { dailyQuest in
+
+                            VStack(spacing:5.0) {
+                                ForEach(dailyQuests_notHidden_sorted, id: \.self) { dailyQuest in
                                     
                                     HStack(spacing: 0) {
                                         
+                                        let height:CGFloat = dailyQuest.dataType != DataType.ox.rawValue ? 60.0 : 50.0
+
+                                        
                                         PurposeOfDailyQuestView(dailyQuest: dailyQuest, parentWidth: geoWidth, parentHeight: geoHeight)
-                                            .frame(width:questCheckBox_purposeTagsWidth, height: questCheckBoxHeight, alignment: .leading)
+                                            .frame(width:questCheckBox_purposeTagsWidth, height: height, alignment: .leading)
                                             .opacity(0.9)
                                             .zIndex(3)
 
@@ -755,7 +819,7 @@ struct ChecklistView: View {
 
                                         QuestCheckBoxView(
                                             dailyQuest: dailyQuest,
-                                            targetDailyQuest: $dailyQuestToDelete, 
+                                            targetDailyQuest: $dailyQuestToDelete,
                                             deleteTarget: $applyDailyQuestRemoval,
                                             value: data,
                                             dailyGoal: dailyQuest.dailyGoal,
@@ -768,6 +832,8 @@ struct ChecklistView: View {
                                         
                                     }
                                     .frame(width: checkListElementWidth, alignment:.leading)
+                                    
+
                                 }
                             }
                             
@@ -962,11 +1028,11 @@ struct ChecklistView: View {
                     
                 }
 //                }
-                if currentDailyRecord.dailyQuestList!.isEmpty && currentDailyRecord.dailyTextType == nil && currentDailyRecord.todoList?.count == 0 && !selectDiaryOption {
-                    Text("체크리스트에 내용을 추가하세요!")
-                        .opacity(0.5)
-                    
-                }
+//                if currentDailyRecord.dailyQuestList!.isEmpty && currentDailyRecord.dailyTextType == nil && currentDailyRecord.todoList?.count == 0 && !selectDiaryOption {
+//                    Text("체크리스트에 내용을 추가하세요!")
+//                        .opacity(0.5)
+//                    
+//                }
 
 
 
@@ -1089,6 +1155,8 @@ struct textFieldView: View {
             TextField("할 일을 입력하세요",text: $text, axis:.horizontal)
             .padding(.leading, 5)
             .frame(width:geoWidth, height: geoHeight)
+//            .lineLimit(2) // does not work
+            .minimumScaleFactor(0.7)
             .focused($isFocused)
             .onSubmit { // only when return button pressed.
                 

@@ -60,14 +60,14 @@ struct ContentView: View {
     @AppStorage("iCloudAvailable_forTheFirstTime") var iCloudAvailable: Bool = false
     @AppStorage("initialization") var initialization: Bool = true
     @AppStorage("fetchDone") var fetchDone: Bool = false
-    @AppStorage("standardDateAdjusted") var standardDateAdjusted: Bool = false
+    @AppStorage("update_240807") var update_240807: Bool = false
 
 
     @StateObject var netWorkMonitor: NetworkMonitor = NetworkMonitor()
 //    @StateObject private var notificationManager = NotificationManager()
 
     
-    @Query var profiles: [Profile]
+    @Query(sort:\Profile.createdTime) var profiles: [Profile]
     @Query(sort:\Quest.name) var quests: [Quest]
     @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord] // currentDailyRecord -> date = nil -> thus it places on first on sorted array
     @Query var dailyQuests: [DailyQuest]
@@ -121,13 +121,14 @@ struct ContentView: View {
              }
              else {
                  
-
-
+                 let profile = profiles.first ?? Profile()
+//                 let showHiddenQuests: Bool = profiles.first?.showHiddenQuests ?? false
                      
                  TabView(selection: $selectedView){
                      MainView_checklist(
 //                        currentRecordSet: currentDailyRecordSet,
                         selectedView: $selectedView
+                        
                      )
                      .background(.quaternary)
                      .tabItem {
@@ -160,7 +161,7 @@ struct ContentView: View {
 
 
                      .tag(mainViews[2])
-                     MainView_ProfileAndSettings()
+                     MainView_ProfileAndSettings(profile: profile)
                      .tabItem {
                          Image(systemName: images[mainViews[3]]!)
                      }
@@ -179,13 +180,19 @@ struct ContentView: View {
                      }
                      
                      // 24.08.01 below code is used for users that stored dat before standardization of dates. No need to use it afterwards.
-//                     if UserDefaults.standard.value(forKey: "standardDateAdjusted") == nil {
-//                         UserDefaults.standard.setValue(false, forKey: "standardDateAdjusted")
-//                     }
-//                     if !standardDateAdjusted {
-//                         adjustStandardDate()
-//                         UserDefaults.standard.setValue(true, forKey: "standardDateAdjusted")
-//                     }
+                     if UserDefaults.standard.value(forKey: "update_240807") == nil {
+                         UserDefaults.standard.setValue(false, forKey: "update_240807")
+                     }
+                     if !update_240807 {
+                         for quest in quests {
+                             if quest.dataType == DataType.custom.rawValue {
+                                 quest.dataType = DataType.ox.rawValue
+                             }
+                             else if quest.dataType == DataType.ox.rawValue {
+                                 quest.dataType = DataType.custom.rawValue
+                             }                         }
+                         UserDefaults.standard.setValue(true, forKey: "update_240807")
+                     }
                  }
                  .onChange(of: selectedView) { oldValue, newValue in //여기에 다양한 것 넣어주기
                      
@@ -352,31 +359,6 @@ struct ContentView: View {
         }
     }
 
-    func adjustStandardDate() -> Void {
-        
-        // dr date, drs start&end, quest.dailyData date
-        for dr in dailyRecords {
-            if let date = dr.date {
-                dr.date = getStandardDate(from:date)
-            }
-        }
-        for drs in dailyRecordSets {
-            drs.start = getStandardDate(from:drs.start)
-            if let end = drs.end {
-                drs.end = getStandardDate(from:end)
-            }
-        }
-        for quest in quests {
-            for date in quest.dailyData.keys {
-                let value = quest.dailyData[date] ?? 0
-                quest.dailyData.removeValue(forKey: date)
-                quest.dailyData[getStandardDate(from: date)] = value
-            }
-        }
-        
-        print("adjusted!")
-    
-    }
     
 }
 

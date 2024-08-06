@@ -14,16 +14,22 @@ import SwiftData
 
 struct MainView_ProfileAndSettings: View {
     @Environment(\.modelContext) var modelContext
-
-
-
+    
+    @Query(sort:\Profile.createdTime) var profiles: [Profile]
+    
+    @State var profile: Profile
+//    @State var showHiddenQuests: Bool
     
     var body: some View {
+        
+//        let profile = profiles.first ?? Profile()
+        
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
             
             let backButtonHeight = geoHeight*0.1
+            
             
             NavigationView {
                 List {
@@ -70,6 +76,11 @@ struct MainView_ProfileAndSettings: View {
                             // 크기 지정하니까 작동 안하네?! ㅅㅂ
                     ) {
                         Text("삭제한 퀘스트")
+                    }
+                    
+                    
+                    Toggle(isOn: $profile.showHiddenQuests) {
+                        Text("숨긴 퀘스트 보기")
                     }
                     
                 }

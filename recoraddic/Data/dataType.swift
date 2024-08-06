@@ -9,8 +9,8 @@ import Foundation
 
 func dataTypeFrom(_ input: Int) -> DataType {
     if input == 0 { return DataType.hour}
-    else if input == 1 { return DataType.ox}
-    else if input == 2 { return DataType.custom}
+    else if input == 1 { return DataType.custom}
+    else if input == 2 { return DataType.ox}
     else { return DataType.hour}
 }
 
@@ -20,8 +20,8 @@ enum DataType:Int, CaseIterable, Identifiable {
 //    static let NO = -1 // ~~하지 않기 -> 이후 출시
 //    static let NONE = 0
     case hour = 0
-    case ox = 1
-    case custom = 2
+    case custom = 1
+    case ox = 2
 
     var id: Int { self.rawValue }
     

@@ -32,7 +32,7 @@ extension ContentView {
         
         let q1 = Quest(name: "Workout", dataType: DataType.hour.rawValue)
         let q2 = Quest(name: "Create apps", dataType: DataType.hour.rawValue)
-        let q3 = Quest(name: "Drink milk", dataType: DataType.hour.rawValue)
+        let q3 = Quest(name: "Drink milk", dataType: DataType.custom.rawValue)
         q3.customDataTypeNotation = "ml"
         
         // need to set recent purpose, if not, will have no recentpurpose when adding quest at first, still no problem to system.

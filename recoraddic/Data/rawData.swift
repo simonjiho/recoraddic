@@ -564,6 +564,7 @@ final class DailyRecord: Equatable, Identifiable, Hashable {
             // Create a date from the components, now interpreted in the local time zone
             return calendar.date(from: dateComponents) ?? date
         } else {
+
             return nil
         }
 
@@ -732,6 +733,8 @@ class Quest: Equatable, Identifiable, Hashable {
 @Model
 class Profile {
     
+    var createdTime: Date = Date()
+    
     var name: String = ""
     var birthDay: Date = Date.now
     var email: String = ""
@@ -742,6 +745,8 @@ class Profile {
     //    var cumulativeRecord
     // unit of sleepingTime: 1 -> 5min, 12 -> 1hour
     var sleepingTime: Int = 0 // deprecated...
+    
+    var showHiddenQuests: Bool = false
     
     var adjustedThemeSetName: String = "default1" // deprecated....
     

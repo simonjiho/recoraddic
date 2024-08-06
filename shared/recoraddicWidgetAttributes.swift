@@ -14,6 +14,7 @@ struct RecoraddicWidgetAttributes: ActivityAttributes {
     }
     var questName: String
     var startTime: Date
+    var containedDate: Date
     var tier: Int
 
 }

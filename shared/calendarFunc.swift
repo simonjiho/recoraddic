@@ -425,6 +425,10 @@ extension Date {
         return Calendar.current.date(byAdding: .day, value: value, to: self) ?? self
     }
     
+    func addingHours(_ value: Int) -> Date {
+        return Calendar.current.date(byAdding: .hour, value: value, to: self) ?? self
+    }
+    
 }
 
 

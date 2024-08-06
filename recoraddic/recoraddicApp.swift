@@ -75,6 +75,10 @@ struct recoraddicApp: App {
     }
 }
 
+//extension Notification.Name {
+//    static let specificNotification = Notification.Name("specificNotification")
+//}
+
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
@@ -90,6 +94,33 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
         return true
     }
+    
+
+//    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+//        if url.scheme == "stopWatch" && url.host == "recoraddic" {
+//            url.description
+//            // Handle the tap on the Live Activity
+//            NotificationCenter.default.post(name: .specificNotification, object: nil, userInfo: <#T##[AnyHashable : Any]?#>)
+//            return true
+//        }
+//        return false
+//    }
+//    
+////     This method is called when the app is opened from a notification
+//    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+//        handleNotification(userInfo)
+//        completionHandler(.newData)
+//    }
+//    
+//    
+//    // This method is called when the app is opened from a notification while being in the background
+//    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
+//        handleNotification(userInfo)
+//    }
+//
+//    func handleNotification(_ userInfo: [AnyHashable : Any]) {
+//        NotificationCenter.default.post(name: Notification.Name(""), object: nil, userInfo: userInfo)
+//    }
 
     private func setupNotificationCategories() {
         let customCategory = UNNotificationCategory(

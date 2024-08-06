@@ -13,36 +13,36 @@ import ActivityKit
 
 enum DayOption: String, CaseIterable, Identifiable {
     
+    case yesterday
     case today
     case tomorrow
-    case dayAfterTomorrow
     
     var id: String { self.rawValue }
     
     
-    static let dayOption_kor:[DayOption:String] = [.today:"오늘",.tomorrow:"내일",.dayAfterTomorrow:"모레"]
+    static let dayOption_kor:[DayOption:String] = [.yesterday:"전날", .today:"당일",.tomorrow:"다음날"]
 
 }
-func getDayOption(at date: Date) -> DayOption {
-    let today = Date()
-    let tomorrow = getTomorrowOf(today)
-    let dayAfterTomorrow = getTomorrowOf(getTomorrowOf(today))
-    if date < tomorrow {
-        return .today
+func getDayOption(at alermTime: Date, from date: Date) -> DayOption {
+    let today = getStartOfDate(date: date)
+    let yesterday = today.addingDays(-1)
+    let tomorrow = today.addingDays(1)
+    if alermTime < today {
+        return .yesterday
     }
-    else if date < dayAfterTomorrow {
+    else if alermTime >= tomorrow {
         return .tomorrow
     }
     else {
-        return .dayAfterTomorrow
+        return .today
     }
 
 }
 
-func getNotificationTimeString(from date: Date?) -> String {
-    if let date_nonNil = date {
-        let dayOption: DayOption = getDayOption(at: date_nonNil)
-        return (DayOption.dayOption_kor[dayOption] ?? "unexpectedValue") + " " + date_nonNil.hhmmTimeString_local
+func getNotificationTimeString(at alermTime: Date?, from date: Date) -> String {
+    if let alermTime_nonNil = alermTime {
+        let dayOption: DayOption = getDayOption(at: alermTime_nonNil, from: date)
+        return (DayOption.dayOption_kor[dayOption] ?? "unexpectedValue") + " " + alermTime_nonNil.hhmmTimeString_local
     } else {
         return "no alermTime"
     }
@@ -87,14 +87,13 @@ struct QuestCheckBoxView: View {
     var body: some View {
         
         let height:CGFloat = stopwatch.isRunning ? 75.0 : (dailyQuest.dataType != DataType.ox.rawValue ? 60.0 : 50.0)
-        let sheetHeight:CGFloat = UIScreen.main.bounds.height * 0.4
         //            let geoHeight = geometry.size.height
         let menuSize:CGFloat = width * 0.2
         
         let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= width +  0.1) ? xOffset : width, height: height), transform: nil))
         let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
         
-        let isRecent: Bool = getStartDateOfYesterday() <= dailyQuest.dailyRecord!.date!
+        let isRecent: Bool = getStartDateOfYesterday() <= dailyQuest.dailyRecord!.getLocalDate()!
         
         HStack(spacing:0.0) {
             
@@ -289,6 +288,7 @@ struct QuestCheckBoxView: View {
                 xOffset = CGFloat(value).map(from:range, to: 0...width)
             }
         }
+
         //        }
     }
     func calculateOffset(dragAmount: CGFloat, lastOffset: CGFloat, boundary: CGFloat) -> CGFloat {
@@ -461,6 +461,8 @@ struct QuestCheckBoxContent_HOUR:View {
 
     
     var body: some View {
+        let isRecent: Bool = getStartDateOfYesterday() <= dailyQuest.dailyRecord!.getLocalDate()!
+
         
         let questName = dailyQuest.getName()
 
@@ -514,7 +516,11 @@ struct QuestCheckBoxContent_HOUR:View {
                     .frame(width:geoWidth*6/7)
                         .onTapGesture {
                             lastTapTime = Date()
-                            highlightValue2 = (highlightValue2 + 1) % 3
+                            if dailyQuest.dailyGoal == nil {
+                                highlightValue2 = (highlightValue2 + 1) % 2
+                            } else {
+                                highlightValue2 = (highlightValue2 + 1) % 3
+                            }
                             if highlightValue2 != 1 {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
                                     if Date().timeIntervalSince(lastTapTime) > 4.0 {
@@ -640,8 +646,13 @@ struct QuestCheckBoxContent_HOUR:View {
                 dailyQuest.dailyRecord?.updateRecordedMinutes()
             }
             .onAppear() {
-                if let _ = dailyQuest.timerStart {
-                    autoCheckActivityAndAdjustToStopWatch()
+                if dailyQuest.timerStart != nil {
+                    if isRecent {
+                        autoCheckActivityAndAdjustToStopWatch()
+                    }
+                    else {
+                        dailyQuest.timerStart = nil
+                    }
                 }
             }
             .onDisappear() {
@@ -683,7 +694,7 @@ struct QuestCheckBoxContent_HOUR:View {
         if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
             self.activity = targetActivity
         } else {
-            let attributes = RecoraddicWidgetAttributes(questName: dailyQuest.getName(), startTime:startTime, tier: dailyQuest.currentTier)
+            let attributes = RecoraddicWidgetAttributes(questName: dailyQuest.getName(), startTime:startTime, containedDate:dailyQuest.dailyRecord?.date ?? Date(), tier: dailyQuest.currentTier)
             let initialContentState = RecoraddicWidgetAttributes.ContentState(goal: dailyGoal)
             do {
                 let activity = try Activity<RecoraddicWidgetAttributes>.request(
@@ -692,6 +703,8 @@ struct QuestCheckBoxContent_HOUR:View {
                     pushType: nil
                 )
                 self.activity = activity
+                
+                
             } catch {
                 print("Failed to start activity: \(error.localizedDescription)")
             }
@@ -1080,6 +1093,7 @@ class Stopwatch: ObservableObject {
 
 
 
+let dialMinutes:[Int] = Array(0...120) + stride(from: 125, through: 1440, by: 5)
 
 
 
@@ -1148,7 +1162,8 @@ struct DialForHours: View {
                         Text("달성")
                             .bold()
                         Picker(selection: $value, label: Text("Second Value")) {
-                            ForEach(0..<60*24) { i in
+//                            ForEach(0..<60*24) { i in
+                            ForEach(dialMinutes, id:\.self) { i in
                                 Text("\(DataType.string_fullRepresentableNotation(data: i, dataType: DataType.hour))")
                                     .foregroundStyle(getDarkTierColorOf(tier: tier))
 
@@ -1348,6 +1363,7 @@ struct NotificationButton: View {
     var body: some View {
 
         let questName = dailyQuest.getName()
+        let date = dailyQuest.dailyRecord?.getLocalDate() ?? Date()
 
         let setAlready:Bool = dailyQuest.alermTime != nil
         GeometryReader { geometry in
@@ -1370,8 +1386,12 @@ struct NotificationButton: View {
 
             }) {
                 if let alermTime = dailyQuest.alermTime {
-                    ClockView(hour: Calendar.current.component(.hour, from: alermTime), minute: Calendar.current.component(.minute, from: alermTime))
-                        .frame(width:25, height: 25)
+                    VStack(spacing:3.0) {
+                        ClockView(hour: Calendar.current.component(.hour, from: alermTime), minute: Calendar.current.component(.minute, from: alermTime))
+                            .frame(width:25, height: 25)
+                        Text(Calendar.current.component(.hour, from: alermTime) < 12 ? "am" : "pm")
+                            .font(.system(size: 12.0))
+                    }
                 } else {
                     Image(systemName: setAlready ? "bell" : "bell.slash")
                         .opacity(0.7)
@@ -1384,7 +1404,7 @@ struct NotificationButton: View {
 //            .border(.red)
             .popover(isPresented: $showNotficationTime, attachmentAnchor: .point(.topLeading)) {
                 HStack {
-                    Text(getNotificationTimeString(from: dailyQuest.alermTime))
+                    Text(getNotificationTimeString(at:dailyQuest.alermTime, from: date))
                         .padding(.horizontal)
                     Button("수정") {
                         showNotficationTime.toggle()
@@ -1416,10 +1436,12 @@ struct NotificationButton: View {
 
             }
             .sheet(isPresented: $editNotificationTime) {
+                let alermTime = (dailyQuest.alermTime ?? (dailyQuest.dailyRecord?.getLocalDate()?.addingHours(9) ?? getStartDateOfNow()))
+
                 EditNotificationTimeView(
                     dailyQuest: dailyQuest,
-                    selectedTime: dailyQuest.alermTime ?? Date(),
-                    selectedDay: getDayOption(at: dailyQuest.alermTime ?? Date()),
+                    selectedTime: alermTime,
+                    selectedDay: getDayOption(at: alermTime, from: date),
                     editNotificationTime: $editNotificationTime
                 )
                 .presentationDetents([.height(sheetHeight)])
@@ -1427,6 +1449,7 @@ struct NotificationButton: View {
                 .foregroundStyle(getBrightTierColorOf(tier: dailyQuest.currentTier))
                 .background(getDarkTierColorOf(tier: dailyQuest.currentTier))
                 .presentationDragIndicator(.visible)
+
 //                .preferredColorScheme(.dark)
 
                 
@@ -1577,18 +1600,19 @@ struct EditNotificationTimeView: View {
             .padding()
             .frame(width:geoWidth, height: geoHeight)
             .onAppear() {
-                if selectedDay == .today && getStartOfDate(date:selectedTime) != getStartDateOfNow() {
-                    selectedTime = Date()
+                // MARK: 쓸 일 없을 것 같은데
+                if selectedDay == .today && getStartOfDate(date:selectedTime) != getStartOfDate(date: dailyQuest.dailyRecord?.getLocalDate() ?? Date()) {
+                    selectedTime = dailyQuest.dailyRecord?.getLocalDate() ?? Date()
                 }
             }
             .onChange(of: selectedDay) { oldValue, newValue in
                 let calendar = Calendar.current
                 switch (oldValue, newValue) {
                     //                case ("today":"today"),("tomorrow":"tomorrow"), ("dayAftertomorrow":"dayAftertomorrow"): break
-                case (.tomorrow,.today),(.dayAfterTomorrow,.tomorrow): selectedTime = calendar.date(byAdding: .day, value: -1, to: selectedTime) ?? Date()
-                case (.today,.tomorrow),(.tomorrow,.dayAfterTomorrow): selectedTime = calendar.date(byAdding: .day, value: 1, to: selectedTime) ?? Date()
-                case (.dayAfterTomorrow,.today): selectedTime = calendar.date(byAdding: .day, value: -2, to: selectedTime) ?? Date()
-                case (.today,.dayAfterTomorrow): selectedTime = calendar.date(byAdding: .day, value: 2, to: selectedTime) ?? Date()
+                case (.tomorrow,.today),(.today,.yesterday): selectedTime = selectedTime.addingDays(-1)
+                case (.today,.tomorrow),(.yesterday,.today): selectedTime = selectedTime.addingDays(1)
+                case (.tomorrow,.yesterday): selectedTime = selectedTime.addingDays(-2)
+                case (.yesterday,.tomorrow): selectedTime = selectedTime.addingDays(2)
                     
                 default: break
                 }
