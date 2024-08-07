@@ -60,7 +60,7 @@ struct ContentView: View {
     @AppStorage("iCloudAvailable_forTheFirstTime") var iCloudAvailable: Bool = false
     @AppStorage("initialization") var initialization: Bool = true
     @AppStorage("fetchDone") var fetchDone: Bool = false
-    @AppStorage("update_240807") var update_240807: Bool = false
+    @AppStorage("update_240808") var update_240808: Bool = false
 
 
     @StateObject var netWorkMonitor: NetworkMonitor = NetworkMonitor()
@@ -178,20 +178,24 @@ struct ContentView: View {
                              try? modelContext.save()
                          }
                      }
-                     
-                     // 24.08.01 below code is used for users that stored dat before standardization of dates. No need to use it afterwards.
-                     if UserDefaults.standard.value(forKey: "update_240807") == nil {
-                         UserDefaults.standard.setValue(false, forKey: "update_240807")
+
+//                      codes used for data transition
+                     if UserDefaults.standard.value(forKey: "update_240808") == nil {
+                         UserDefaults.standard.setValue(false, forKey: "update_240808")
                      }
-                     if !update_240807 {
-                         for quest in quests {
-                             if quest.dataType == DataType.custom.rawValue {
-                                 quest.dataType = DataType.ox.rawValue
+                     if !update_240808 {
+                         for dailyQuest in dailyQuests {
+                             let dateComponents = DateComponents(calendar: Calendar.current, year:2024, month: 8, day: 7, hour:10, minute: 15)
+                             if dailyQuest.createdTime < Calendar.current.date(from: dateComponents)! {
+                                 if dailyQuest.dataType == DataType.custom.rawValue {
+                                     dailyQuest.dataType = DataType.ox.rawValue
+                                 }
+                                 else if dailyQuest.dataType == DataType.ox.rawValue {
+                                     dailyQuest.dataType = DataType.custom.rawValue
+                                 }
                              }
-                             else if quest.dataType == DataType.ox.rawValue {
-                                 quest.dataType = DataType.custom.rawValue
-                             }                         }
-                         UserDefaults.standard.setValue(true, forKey: "update_240807")
+                         }
+                         UserDefaults.standard.setValue(true, forKey: "update_240808")
                      }
                  }
                  .onChange(of: selectedView) { oldValue, newValue in //여기에 다양한 것 넣어주기
