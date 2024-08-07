@@ -180,12 +180,12 @@ struct ContentView: View {
                      }
 
 //                      codes used for data transition
-                     if UserDefaults.standard.value(forKey: "update_240808") == nil {
-                         UserDefaults.standard.setValue(false, forKey: "update_240808")
+                     if UserDefaults.standard.value(forKey: "update_240809") == nil {
+                         UserDefaults.standard.setValue(false, forKey: "update_240809")
                      }
                      if !update_240808 {
+                         let dateComponents = DateComponents(calendar: Calendar.current, year:2024, month: 8, day: 7, hour:10, minute: 15)
                          for dailyQuest in dailyQuests {
-                             let dateComponents = DateComponents(calendar: Calendar.current, year:2024, month: 8, day: 7, hour:10, minute: 15)
                              if dailyQuest.createdTime < Calendar.current.date(from: dateComponents)! {
                                  if dailyQuest.dataType == DataType.custom.rawValue {
                                      dailyQuest.dataType = DataType.ox.rawValue
@@ -195,7 +195,18 @@ struct ContentView: View {
                                  }
                              }
                          }
-                         UserDefaults.standard.setValue(true, forKey: "update_240808")
+                         
+                         for quest in quests {
+                             if quest.createdTime < Calendar.current.date(from: dateComponents)! {
+                                 if quest.dataType == DataType.custom.rawValue {
+                                     quest.dataType = DataType.ox.rawValue
+                                 }
+                                 else if quest.dataType == DataType.ox.rawValue {
+                                     quest.dataType = DataType.custom.rawValue
+                                 }
+                             }
+                         }
+                         UserDefaults.standard.setValue(true, forKey: "update_240809")
                      }
                  }
                  .onChange(of: selectedView) { oldValue, newValue in //여기에 다양한 것 넣어주기
