@@ -90,6 +90,8 @@
 - computed properties are really heavy. Don't use it if necessary
 - 같은 뷰 안에 Animation 트리거를 여러 뷰가 공유하면 하나밖에 적용 안됨...? (시뮬레이터 기준)
 - canvas는 simulator에서 rendering을 이상하게 한다.
+- swiftUI 에 \.scenePhase를 enviroment variable로 추가하면 에러메시지 없이 app crash 일어날 때가 있다.
+- swift 5.9 기준: Image는 다른 view와 다르게 ZStack에서 onTapGesture, Button으로 사용 시 비작동 할 때가 있다. -> 해결 방법: 아주 옅은 color에 .overlay(Image())
 
 
 

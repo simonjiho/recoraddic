@@ -65,6 +65,7 @@ struct recoraddicApp: App {
 //                        UserDefaults.standard.setValue(false, forKey: "shouldBlockTheView") // MARK: 너무 빨리 풀면 query가 적용이 안됨...swiftData와 cloudSyncEngine의 문제인가? 로그인 후 설치는 괜찮지만 설치 후 로그인은 문제가 됨.... ㅅㅂ?
 //                    }
                 }
+//                .onChange(of: <#T##V#>, <#T##(V, V) -> Void#>)
         }
 
         .modelContainer(Self.container)
@@ -76,7 +77,7 @@ struct recoraddicApp: App {
 }
 
 //extension Notification.Name {
-//    static let specificNotification = Notification.Name("specificNotification")
+//    static let scenePhaseChanged = Notification.Name("scenePhaseChanged")
 //}
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {

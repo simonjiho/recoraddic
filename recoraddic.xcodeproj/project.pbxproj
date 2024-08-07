@@ -51,6 +51,7 @@
 		B2ADCD012C4FC46900D9DE99 /* QuestCheckBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2ADCD002C4FC46900D9DE99 /* QuestCheckBoxView.swift */; };
 		B2AECB872B4EDA4F0020A937 /* ExampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AECB862B4EDA4F0020A937 /* ExampleData.swift */; };
 		B2AECB892B5139F90020A937 /* DismissingKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AECB882B5139F90020A937 /* DismissingKeyboard.swift */; };
+		B2AFEE5F2C64B5FC003A5129 /* DiaryView_tmp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AFEE5E2C64B5FC003A5129 /* DiaryView_tmp.swift */; };
 		B2B28DBD2AC5D69D0071531B /* MainView_ProfileAndSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B28DB22AC5D69D0071531B /* MainView_ProfileAndSettings.swift */; };
 		B2B64EDE2C6247BC00929804 /* MainView_QuestInventory_tmp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B64EDD2C6247BC00929804 /* MainView_QuestInventory_tmp.swift */; };
 		B2B6B1922B47F8F3006DDCBE /* defaultImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2B6B1912B47F8F3006DDCBE /* defaultImages.xcassets */; };
@@ -173,6 +174,7 @@
 		B2ADCD002C4FC46900D9DE99 /* QuestCheckBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestCheckBoxView.swift; sourceTree = "<group>"; };
 		B2AECB862B4EDA4F0020A937 /* ExampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleData.swift; sourceTree = "<group>"; };
 		B2AECB882B5139F90020A937 /* DismissingKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DismissingKeyboard.swift; sourceTree = "<group>"; };
+		B2AFEE5E2C64B5FC003A5129 /* DiaryView_tmp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryView_tmp.swift; sourceTree = "<group>"; };
 		B2B28DB22AC5D69D0071531B /* MainView_ProfileAndSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainView_ProfileAndSettings.swift; sourceTree = "<group>"; };
 		B2B64EDD2C6247BC00929804 /* MainView_QuestInventory_tmp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_QuestInventory_tmp.swift; sourceTree = "<group>"; };
 		B2B6B1912B47F8F3006DDCBE /* defaultImages.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = defaultImages.xcassets; sourceTree = "<group>"; };
@@ -449,6 +451,7 @@
 			children = (
 				B2ADCD002C4FC46900D9DE99 /* QuestCheckBoxView.swift */,
 				B2BA89092B32E0EB00A3D50E /* DiaryView.swift */,
+				B2AFEE5E2C64B5FC003A5129 /* DiaryView_tmp.swift */,
 			);
 			path = CheckListElements;
 			sourceTree = "<group>";
@@ -669,6 +672,7 @@
 				B2E1AB712B24D6E300EBF359 /* TextFieldForHour.swift in Sources */,
 				B283397D2AFB97E9009AEB2A /* calendarFunc.swift in Sources */,
 				B2ADCD012C4FC46900D9DE99 /* QuestCheckBoxView.swift in Sources */,
+				B2AFEE5F2C64B5FC003A5129 /* DiaryView_tmp.swift in Sources */,
 				B2D7AD082B9451920045C9EA /* StartNewRecordSet.swift in Sources */,
 				B27A5CEE2B14764A0042ADF6 /* dataType.swift in Sources */,
 				B2AECB892B5139F90020A937 /* DismissingKeyboard.swift in Sources */,

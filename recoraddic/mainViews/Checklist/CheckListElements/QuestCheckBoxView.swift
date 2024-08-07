@@ -173,8 +173,6 @@ struct QuestCheckBoxView: View {
         }
         .frame(width:width, height: height, alignment: .leading)
         .clipShape(.buttonBorder)
-        .clipped()
-        
         .gesture(
             DragGesture()
                 .onChanged { value in
@@ -718,7 +716,7 @@ struct QuestCheckBoxContent_HOUR:View {
         
         if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
             stopwatch.setTotalSec(Int(Date().timeIntervalSince(startTime)))
-            isAnimating = false
+//            isAnimating = false
             stopwatch.start(startTime:startTime)
             DispatchQueue.main.asyncAfter(deadline: .now()+0.05) {
                 withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
@@ -1265,81 +1263,81 @@ struct DialForHours: View {
 }
 
 
-struct QuestCheckBoxColorPreview: View {
-
-    @State var isAnimating: Bool = false
-    var tier: Int
-    
-    var body: some View {
-        
-
-        
-        GeometryReader { geometry in
-            
-            let geoWidth = geometry.size.width
-            let geoHeight = geometry.size.height
-            
-            
-            let a: Path = Path(CGPath(roundedRect: CGRect(x: 0, y: 0, width: geoWidth, height: geoHeight), cornerWidth: geoWidth/20, cornerHeight: geoHeight/20, transform: nil))
-
-            
-            let percentage:CGFloat = 1.0
-            let brightness:CGFloat = percentage * 0.0
-            
-            
-            let gradientColors = getGradientColorsOf(tier: tier, type:0)
-            let _: [Color] = {
-                var newGradient: [Color] = []
-                for idx in 0...(gradientColors.count - 1) {
-                    if idx % 2 == 0 {
-                        newGradient.append(gradientColors[idx].adjust(brightness: brightness))
-                    }
-                    else {
-                        newGradient.append(gradientColors[idx].adjust(brightness: brightness*0.5))
-                    }
-                }
-                return newGradient
-            }()
-            
-
-
-                
-            ZStack {
-                
-                ZStack {
-                    Rectangle()
-                        .fill(
-                            LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)
-                        )
-                        .frame(width:geoWidth, height:geoHeight)
-                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth, y:0)
-                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
-                    
-                    Rectangle()
-                        .fill(
-                            LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)
-                        )
-                        .frame(width:geoWidth, height:geoHeight)
-                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth, y:0)
-                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
-                }
-                .frame(width:geoWidth, height:geoHeight)
-                .mask{a}
-                .onAppear() {
-                    isAnimating = true
-                }
-                
-                
-                
-            }
-                    
-
-
-
-
-        }
-    }
-}
+//struct QuestCheckBoxColorPreview: View {
+//
+//    @State var isAnimating: Bool = false
+//    var tier: Int
+//    
+//    var body: some View {
+//        
+//
+//        
+//        GeometryReader { geometry in
+//            
+//            let geoWidth = geometry.size.width
+//            let geoHeight = geometry.size.height
+//            
+//            
+//            let a: Path = Path(CGPath(roundedRect: CGRect(x: 0, y: 0, width: geoWidth, height: geoHeight), cornerWidth: geoWidth/20, cornerHeight: geoHeight/20, transform: nil))
+//
+//            
+//            let percentage:CGFloat = 1.0
+//            let brightness:CGFloat = percentage * 0.0
+//            
+//            
+//            let gradientColors = getGradientColorsOf(tier: tier, type:0)
+//            let _: [Color] = {
+//                var newGradient: [Color] = []
+//                for idx in 0...(gradientColors.count - 1) {
+//                    if idx % 2 == 0 {
+//                        newGradient.append(gradientColors[idx].adjust(brightness: brightness))
+//                    }
+//                    else {
+//                        newGradient.append(gradientColors[idx].adjust(brightness: brightness*0.5))
+//                    }
+//                }
+//                return newGradient
+//            }()
+//            
+//
+//
+//                
+//            ZStack {
+//                
+//                ZStack {
+//                    Rectangle()
+//                        .fill(
+//                            LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)
+//                        )
+//                        .frame(width:geoWidth, height:geoHeight)
+//                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth, y:0)
+//                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+//                    
+//                    Rectangle()
+//                        .fill(
+//                            LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)
+//                        )
+//                        .frame(width:geoWidth, height:geoHeight)
+//                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth, y:0)
+//                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
+//                }
+//                .frame(width:geoWidth, height:geoHeight)
+//                .mask{a}
+//                .onAppear() {
+//                    isAnimating = true
+//                }
+//                
+//                
+//                
+//            }
+//                    
+//
+//
+//
+//
+//        }
+//    }
+//}
 
 
 
@@ -1690,30 +1688,30 @@ struct ClockView: View {
 }
 
 
-#Preview(body: {
-    VStack {
-        QuestCheckBoxColorPreview(tier: 0)
-            .frame(width:300, height: 45)
-        QuestCheckBoxColorPreview(tier: 5)
-            .frame(width:300, height: 45)
-        QuestCheckBoxColorPreview(tier: 10)
-            .frame(width:300, height: 45)
-        QuestCheckBoxColorPreview(tier: 15)
-            .frame(width:300, height: 45)
-        QuestCheckBoxColorPreview(tier: 20)
-            .frame(width:300, height: 45)
-        QuestCheckBoxColorPreview(tier: 25)
-            .frame(width:300, height: 45)
-        QuestCheckBoxColorPreview(tier: 30)
-            .frame(width:300, height: 45)
-        QuestCheckBoxColorPreview(tier: 35)
-            .frame(width:300, height: 45)
-        QuestCheckBoxColorPreview(tier: 40)
-            .frame(width:300, height: 45)
-
-    }
-
-})
+//#Preview(body: {
+//    VStack {
+//        QuestCheckBoxColorPreview(tier: 0)
+//            .frame(width:300, height: 45)
+//        QuestCheckBoxColorPreview(tier: 5)
+//            .frame(width:300, height: 45)
+//        QuestCheckBoxColorPreview(tier: 10)
+//            .frame(width:300, height: 45)
+//        QuestCheckBoxColorPreview(tier: 15)
+//            .frame(width:300, height: 45)
+//        QuestCheckBoxColorPreview(tier: 20)
+//            .frame(width:300, height: 45)
+//        QuestCheckBoxColorPreview(tier: 25)
+//            .frame(width:300, height: 45)
+//        QuestCheckBoxColorPreview(tier: 30)
+//            .frame(width:300, height: 45)
+//        QuestCheckBoxColorPreview(tier: 35)
+//            .frame(width:300, height: 45)
+//        QuestCheckBoxColorPreview(tier: 40)
+//            .frame(width:300, height: 45)
+//
+//    }
+//
+//})
 
 
 

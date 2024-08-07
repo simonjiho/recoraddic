@@ -24,7 +24,6 @@ struct MainView_checklist: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.scenePhase) var scenePhase
     
     @Query var profiles: [Profile]
     @Query var quests: [Quest]
@@ -324,7 +323,7 @@ struct MainView_checklist: View {
                 
             
                 
-                let nothingToSave: Bool = currentDailyRecord.dailyText == nil && currentDailyRecord.dailyQuestList!.count == 0 && currentDailyRecord.todoList!.count == 0
+//                let nothingToSave: Bool = currentDailyRecord.dailyText == nil && currentDailyRecord.dailyQuestList!.count == 0 && currentDailyRecord.todoList!.count == 0
                 
 
 
@@ -339,6 +338,8 @@ struct MainView_checklist: View {
                 updateDailyQuestAlerm()
                 startTimer()
                 setKeyboardAppearanceStateValue()
+                
+//                NotificationCenter.default.addObserver(forName: ., object: <#T##Any?#>, queue: <#T##OperationQueue?#>, using: <#T##(Notification) -> Void#>)
                 
             }
             .onDisappear {
@@ -403,13 +404,13 @@ struct MainView_checklist: View {
                 }
                 changeDailyRecord()
             }
-            .onChange(of: scenePhase) { oldValue, newValue in
-                if scenePhase == .active {
-                    if let newDate = Activity<RecoraddicWidgetAttributes>.activities.map({$0.attributes.containedDate}).sorted().first {
-                        selectedDate = getStartOfDate(date: newDate)
-                    }
-                }
-            }
+//            .onChange(of: scenePhase) { oldValue, newValue in
+//                if scenePhase == .active {
+//                    if let newDate = Activity<RecoraddicWidgetAttributes>.activities.map({$0.attributes.containedDate}).sorted().first {
+//                        selectedDate = getStartOfDate(date: newDate)
+//                    }
+//                }
+//            }
             
 //            .onReceive(NotificationCenter.default.publisher(for: .specificNotification)) { notification in
 //                if let userInfo = notification.userInfo {
@@ -769,6 +770,8 @@ struct ChecklistView: View {
                                     isEdit: $editDiary
                                 )
                                 .frame(width:checkListElementWidth, height: diaryHeight)
+//                                .frame(width:checkListElementWidth)
+//                                .zIndex(3)
 
                                 
                                 
@@ -777,8 +780,8 @@ struct ChecklistView: View {
                                 InShortView(
                                     currentDailyRecord: currentDailyRecord,
                                     inShortText: currentDailyRecord.dailyText!,
-                                    applyDailyTextRemoval: $applyDailyTextRemoval,
-                                    isEdit: $editDiary
+                                    applyDailyTextRemoval: $applyDailyTextRemoval
+//                                    isEdit: $editDiary
                                 )
                                 .frame(width:checkListElementWidth, height: diaryHeight)
                                 //                            .background(.gray.adjust(brightness: 0.4).opacity(0.7))

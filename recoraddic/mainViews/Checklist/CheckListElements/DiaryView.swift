@@ -37,10 +37,13 @@ struct InShortView: View {
 //    @Binding var diaryEllipsisTapped: Bool
     
     
-    @Binding var isEdit: Bool
+//    @Binding var isEdit: Bool
     
     @FocusState var keyBoard: Bool
     
+    
+    @State private var offset: CGFloat = 0
+    @State var showMenu: Bool = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -55,86 +58,189 @@ struct InShortView: View {
             let iconHeight: CGFloat = 20
             
 
-            
-            ZStack {
-                Color.gray.opacity(0.15)
-                    .frame(width: isEdit ? geoWidth : geoWidth*0.9, height: geoHeight)
-                    .position(CGPoint(x: isEdit ? geoWidth/2 : geoWidth*0.55, y: geoHeight/2))
-                if !isEdit {
-                    HStack {
-                        Image(systemName: "book.closed.fill")
-//                            .resizable()
-//                            .frame(width:iconWidth, height: iconHeight)
-                            .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-                        Text(inShortText)
-                            .frame(width:geoWidth*0.85, height: geoHeight*0.9)
-                            .minimumScaleFactor(0.8)
-                            .lineLimit(2)
-                    }
-
-                }
-                else {
-                    HStack {
-
-                
-                        VStack(alignment: .trailing) {
-                            TextField("하루를 요약해보세요",text:$inShortText)
-                                .frame(width:geoWidth*0.8, alignment: .trailing)
-                                .lineLimit(3)
-                                .focused($keyBoard)
-                                .maxLength(50, text: $inShortText)
-                            Text("\(inShortText.count)/50")
-                                .font(.footnote)
-                            
-                        }
-                        .frame(width:geoWidth*0.8, height: geoHeight*0.8)
-                        .onAppear() {
-                            keyBoard = true
-                        }
-                        .onChange(of:keyBoard) {
-                            if !keyBoard {
-                                isEdit = false
-                            }
-                        }
-
-                        Button("완료", action:{
-                            isEdit = false
-                            keyBoard = false
-                            currentDailyRecord.dailyText = inShortText
-                        })
+            HStack {
+//                ZStack {
+//                    Color.gray.opacity(0.15)
+//                        .frame(width: isEdit ? geoWidth : geoWidth*0.9, height: geoHeight)
+//                        .position(CGPoint(x: isEdit ? geoWidth/2 : geoWidth*0.55, y: geoHeight/2))
+                HStack(spacing:0.0) {
+                    Image(systemName: "book.closed.fill")
+                        .frame(width:geoWidth*0.1)
                         
-                    }
-                }
-
-                
-                
-                Menu {
+                            //                            .resizable()
+                            //                            .frame(width:iconWidth, height: iconHeight)
+                                .foregroundStyle(getReversedColorSchemeColor(colorScheme))
+                            
+                            VStack(alignment: .trailing) {
+                                TextField("하루를 요약해보세요",text:$inShortText)
+                                    .frame(width:geoWidth*(keyBoard ? 0.77 : 0.9), alignment: .trailing)
+                                    .lineLimit(3)
+                                    .minimumScaleFactor(0.7)
+                                    .focused($keyBoard)
+                                    .maxLength(50, text: $inShortText)
+                                
+                                if keyBoard {
+                                    Text("\(inShortText.count)/50")
+                                        .font(.footnote)
+                                }
+                                
+                            }
+                            .frame(width: geoWidth*(keyBoard ? 0.8 : 0.9), height: geoHeight*0.95, alignment: keyBoard ? .bottom : .center)
+                            if keyBoard {
+                                Button("완료", action:{
+                                    //                                isEdit = false
+                                    keyBoard = false
+                                    currentDailyRecord.dailyText = inShortText
+                                })
+                                .frame(width:geoWidth*0.1)
+                            }
+//                            Text(inShortText)
+//                                .frame(width:geoWidth*0.85, height: geoHeight*0.9)
+//                                .minimumScaleFactor(0.8)
+//                                .lineLimit(2)
+                        }
+                        
+//                        .onTapGesture {
+//
+//                            isEdit = true
+//                            keyBoard = true
+//                        }
+                        
+//                    }
+//                        HStack {
+//                            
+//                            VStack(alignment: .trailing) {
+//                                TextField("하루를 요약해보세요",text:$inShortText)
+//                                    .frame(width:geoWidth*0.8, alignment: .trailing)
+//                                    .lineLimit(3)
+//                                    .minimumScaleFactor(0.7)
+//                                    .focused($keyBoard)
+//                                    .maxLength(50, text: $inShortText)
+//                                Text("\(inShortText.count)/50")
+//                                    .font(.footnote)
+//                                
+//                            }
+//                            .frame(width:geoWidth*0.8, height: geoHeight*0.8)
+//                            .onAppear() {
+//                                keyBoard = true
+//                            }
+//                            .onChange(of:keyBoard) {
+//                                if !keyBoard {
+//                                    isEdit = false
+//                                }
+//                            }
+//                            
+//                            Button("완료", action:{
+//                                isEdit = false
+//                                keyBoard = false
+//                                currentDailyRecord.dailyText = inShortText
+//                            })
+//                            
+//                        }
+//                    }
                     
-                    Button("수정",action: {
-                        isEdit = true
-                        keyBoard = true
-                    })
-                    Button("삭제",action: {
-                        applyDailyTextRemoval.toggle()
-                    })
-                    //
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.title3)
-                        .frame(height: geoHeight*0.75, alignment:.top)
-
-
-                }
-                .padding(.top,3)
-                .buttonStyle(.plain)
-                .frame(width:geoWidth*0.975, height: geoHeight, alignment: .topTrailing)
-                .disabled(isEdit)
-
-            
+                    
+                    
+//                    Menu {
+//                        
+//                        Button("수정",action: {
+//                            isEdit = true
+//                            keyBoard = true
+//                        })
+//                        Button("삭제",action: {
+//                            applyDailyTextRemoval.toggle()
+//                        })
+//                        //
+//                    } label: {
+//                        Image(systemName: "ellipsis")
+//                            .font(.title3)
+//                            .frame(height: geoHeight*0.75, alignment:.top)
+//                        
+//                        
+//                    }
+//                    .padding(.top,3)
+//                    .buttonStyle(.plain)
+//                    .frame(width:geoWidth*0.975, height: geoHeight, alignment: .topTrailing)
+//                    .disabled(isEdit)
+//                    
+                    
+                    
+                    
+//                }
+                        .frame(width: geoWidth, height: geoHeight, alignment: .leading)
+                .disabled(offset < -geoHeight*0.5)
+                .offset(x: offset, y:0)
                 
+                HStack(spacing:0.0) {
+                    Image(systemName: "xmark")
+                        .frame(width: geoHeight, height:geoHeight)
+                    Spacer()
+                        .frame(width: geoHeight*2, height:geoHeight)
+                }
+                .frame(width: geoHeight*3, height:geoHeight)
+                .background(Color.red.blur(radius: 1))
+                .offset(x: offset, y:0)
+                .disabled(offset > -geoHeight*0.5)
+                .onTapGesture {
+                    applyDailyTextRemoval.toggle()
+                }
                 
             }
-            .frame(width: geometry.size.width, height: geometry.size.height)
+            .frame(width:geoWidth, height: geoHeight, alignment: .leading)
+            .clipped()
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        if keyBoard { return }
+                        
+                        if showMenu {
+                            if value.translation.width < 0 {
+                                let delta = log10(10 - value.translation.width*0.1)
+                                offset = (-geoHeight) * (delta)
+                            }
+                            else if value.translation.width > geoHeight {
+                                let delta = log10(1 + (value.translation.width - geoHeight)*0.01)
+                                offset = (geoHeight) * (delta)
+                            }
+                            else {
+                                offset = -geoHeight + value.translation.width
+                                
+                            }
+                        } else {
+                            if value.translation.width < -geoHeight {
+                                let delta = log10(10 - (value.translation.width + geoHeight)*0.1)
+                                offset = (-geoHeight) * (delta)
+                            }
+                            else if value.translation.width > 0 {
+                            }
+                            else {
+                                offset = value.translation.width
+                            }
+                            
+                        }
+                        
+                        
+                    }
+                    .onEnded { value in
+                        if keyBoard { return }
+                        
+                        if !(value.translation.width > 0 && !showMenu) {
+                            if value.translation.width < -geoWidth*0.05 {
+                                withAnimation {
+                                    offset = -geoHeight
+                                }
+                                showMenu = true
+                                
+                            } else {
+                                showMenu = false
+                                withAnimation {
+                                    offset = 0
+                                }
+                            }
+                        }
+                        
+                    }
+            )
             .onChange(of: currentDailyRecord) {
                 inShortText = currentDailyRecord.dailyText!
             }
@@ -142,6 +248,7 @@ struct InShortView: View {
 
 
 
+            
 
         }
     }
@@ -170,16 +277,22 @@ struct DiaryView: View {
     @Binding var isEdit: Bool
     @FocusState var keyBoard: Bool
     
-    @State var showWholeContent:Bool = false
+    
+    @State private var offset: CGFloat = 0
+    @State var showMenu: Bool = false
+
+
     
     var body: some View {
         GeometryReader { geometry in
+            
+            let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+            let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
             
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
             
             
-
             let iconWidth: CGFloat = isEdit ? 40 : 20
             let textBoxWidth: CGFloat = isEdit ? geometry.size.width*0.9 : (geometry.size.width-iconWidth)*0.8
 
@@ -199,41 +312,27 @@ struct DiaryView: View {
             let imagePosition: CGPoint = isEdit ? CGPoint(x: axisWiden, y: 10 + iconHeight + 10 ): CGPoint(x: 10 + iconWidth + 5 , y: axisNotWiden)
             let textBoxPosition: CGPoint = isEdit ? CGPoint(x: axisWiden, y: 10 + iconHeight + 10 + 10 + textBoxHeight/2): CGPoint(x: 10 + iconWidth + 5 + 10 + textBoxWidth/2 , y: axisNotWiden)
 
-            ZStack(alignment:isEdit ? .top : .leading) {
-                
-                
-                Color.gray.opacity(0.15)
-                    .frame(width: isEdit ? geoWidth : geoWidth*0.9, height: geoHeight)
-                    .position(CGPoint(x: isEdit ? geoWidth/2 : geoWidth*0.55, y: geoHeight/2))
-                    .onTapGesture {
-                        if !isEdit {
-                            showWholeContent.toggle()
-                        }
-                    }
-
-                Group {
+            HStack(spacing:0.0) {
+                ZStack(alignment:isEdit ? .top : .leading) {
                     
-
-                    HStack {
-                        Image(systemName: "book.closed.fill")
-//                            .resizable()
-//                            .frame(width:iconWidth, height: iconHeight)
-                            .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-                        if isEdit {
-                            Button("완료") {
+                    
+                    Color.gray.opacity(0.15)
+                        .frame(width: isEdit ? geoWidth : geoWidth*0.9, height: geoHeight)
+                        .position(CGPoint(x: isEdit ? geoWidth/2 : geoWidth*0.55, y: geoHeight/2))
+                        .onTapGesture {
+                            if !isEdit {
                                 withAnimation {
-                                    isEdit = false
+                                    isEdit = true
                                 }
-                                keyBoard = false
-                                currentDailyRecord.dailyText = diaryText
                             }
-                            .buttonStyle(.borderedProminent)
                         }
-                    }
-                    .position(iconPosition)
+//                        .border(.blue)
+//                        .zIndex(1)
+                    
+                        
 
                     
-                    
+    
                     
                     if isEdit {
                         TextEditor(text: $diaryText)
@@ -241,90 +340,141 @@ struct DiaryView: View {
                             .frame(width:textBoxWidth, height: textBoxHeight, alignment: .top)
                             .scrollContentBackground(.hidden)
                             .position(textBoxPosition)
-//                            .border(.gray)
+//                            .border(.red)
+                        //                            .border(.gray)
                             .focused($keyBoard)
                             .onAppear() {
-                                keyBoard = true
+                                if diaryText == "" {
+                                    keyBoard = true
+                                }
                             }
-
+//                            .zIndex(2)
+                        
                     }
                     else {
-   
-                            Text("\(text)\(diaryText.count > text.count ? "..." : "")")
-                                .lineLimit(1)
-                                .position(textBoxPosition)
-//                                .border(.gray)
+                        
+                        Text("\(text)\(diaryText.count > text.count ? "..." : "")")
+                            .lineLimit(1)
+                            .position(textBoxPosition)
+                        //                                .border(.gray)
                     }
-                }
-                .onTapGesture {
-                    if !isEdit {
-                        showWholeContent.toggle()
-                    }
-                }
-//                .onChange(of: keyBoard) {
-//                    if isEdit != keyBoard {
-//                        withAnimation {
-//                            isEdit = keyBoard
-//                        }
-//                    }
-//                }
-//                .onChange(of: isEdit) {
-//                    if isEdit != keyBoard {
-//                        keyBoard = isEdit
-//                    }
-//                }
-
-                
-                if !isEdit {
                     
-                    Menu {
-                        
-                        Button("수정",action: {
-                            
-                            withAnimation {
-                                isEdit = true
+                    
+                    HStack {
+                        Image(systemName: "book.closed.fill")
+                            .foregroundStyle(getReversedColorSchemeColor(colorScheme))
+                        if isEdit {
+                            if keyBoard {
+                                Button("완료") {
+                                    withAnimation {
+                                        isEdit = false
+                                    }
+                                    keyBoard = false
+                                    currentDailyRecord.dailyText = diaryText
+                                }
+//                                .zIndex(11)
+                                .buttonStyle(.borderedProminent)
                             }
-                            keyBoard = true
+                            else {
+                                Button(action: {
+                                    withAnimation {
+                                        isEdit = false
+                                    }
+                                }) {
+                                    Color.white.opacity(0.01)
+                                        .overlay(
+                                            Image(systemName: "chevron.up")
+                                    )
+                                        .frame(width:iconWidth, height: iconHeight)
+                                        .foregroundStyle(reversedColorSchemeColor)
+                                }
+
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                    .position(iconPosition)
+                    
+
+                }
+                .frame(width: geoWidth, height: geoHeight)
+                .disabled(offset < -geoHeight*0.5)
+//                .disabled(showMenu)
+                .offset(x: offset, y:0)
+
+                
+                HStack(spacing:0.0) {
+                    Image(systemName: "xmark")
+                        .frame(width: geoHeight, height:geoHeight)
+                    Spacer()
+                        .frame(width: geoHeight*2, height:geoHeight)
+                }
+                .frame(width: geoHeight*3, height:geoHeight)
+                .background(Color.red.blur(radius: 1))
+                .offset(x: offset, y:0)
+                .disabled(offset > -geoHeight*0.5)
+                .onTapGesture {
+                    applyDiaryRemoval.toggle()
+                }
+            }
+            .frame(width:geoWidth, height: geoHeight, alignment: .leading)
+            .clipped()
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        if isEdit { return }
+                        
+                        if showMenu {
+                            if value.translation.width < 0 {
+                                let delta = log10(10 - value.translation.width*0.1)
+                                offset = (-geoHeight) * (delta)
+                            }
+                            else if value.translation.width > geoHeight {
+                                let delta = log10(1 + (value.translation.width - geoHeight)*0.01)
+                                offset = (geoHeight) * (delta)
+                            }
+                            else {
+                                offset = -geoHeight + value.translation.width
+                                
+                            }
+                        } else {
+                            if value.translation.width < -geoHeight {
+                                let delta = log10(10 - (value.translation.width + geoHeight)*0.1)
+                                offset = (-geoHeight) * (delta)
+                            }
+                            else if value.translation.width > 0 {
+                            }
+                            else {
+                                offset = value.translation.width
+                            }
                             
-                        })
-                        Button("삭제",action: {
-                            applyDiaryRemoval.toggle()
-                        })
-                        //
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .font(.title3)
-                            .frame(height: geoHeight*0.75, alignment:.top)
+                        }
+                        
                         
                     }
-                    .padding(.top,3)
-                    .buttonStyle(.plain)
-                    .frame(width:geoWidth*0.975, height: geoHeight, alignment: .topTrailing)
-                }
-                
-
-
-            
-                
-                
-            }
-            .frame(width: geometry.size.width, height: geoHeight)
-
+                    .onEnded { value in
+                        if isEdit { return }
+                        
+                        if !(value.translation.width > 0 && !showMenu) {
+                            if value.translation.width < -geoWidth*0.05 {
+                                withAnimation {
+                                    offset = -geoHeight
+                                }
+                                showMenu = true
+                                
+                            } else {
+                                showMenu = false
+                                withAnimation {
+                                    offset = 0
+                                }
+                            }
+                        }
+                        
+                    }
+            )
             .onChange(of: currentDailyRecord) {
                 diaryText = currentDailyRecord.dailyText!
             }
-            .sheet(isPresented: $showWholeContent, content: {
-                GeometryReader { geometry2 in
-                    VStack {
-                        DiaryView_WholeContent(diaryText: diaryText, showWholeContent: $showWholeContent)
-                            .frame(width:geometry2.size.width*0.95, height: geometry2.size.height*0.85)
-                    }
-                    .frame(width:geometry2.size.width, height: geometry2.size.height, alignment: .center)
-                }
-//                    .presentationCompactAdaptation(.none)
-
-            })
-
 
 
 
@@ -335,77 +485,3 @@ struct DiaryView: View {
 
 
 
-struct DiaryView_WholeContent: View {
-    
-    @Environment(\.colorScheme) var colorScheme
-
-    var diaryText: String
-
-    @Binding var showWholeContent: Bool
-    
-
-    
-    var body: some View {
-        
-        let shadowColor = getShadowColor(colorScheme)
-        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
-        
-        GeometryReader { geometry in
-            
-            let geoWidth = geometry.size.width
-            let geoHeight = geometry.size.height
-            let contentWidth = geoWidth*0.95
-            let contentHeight = geoHeight*0.9
-            
-
-            let iconWidth: CGFloat = 40
-//            let imageWidth: CGFloat = image == nil ? 0.0 : geometry.size.width*0.8
-            let textBoxWidth: CGFloat = geometry.size.width*0.9
-            
-            let iconHeight: CGFloat = 35
-//            let imageHeight: CGFloat = image == nil ? 0.0 : geometry.size.height*0.2
-            let textBoxHeight: CGFloat = geometry.size.height  - iconHeight - 30
-//            let textBoxHeight: CGFloat = diaryViewWiden ? (geometry.size.height - imageHeight)*(isEdit ? 0.7 : 1.0) : geometry.size.height*0.8
-            
-//            let iconAndDoneButtonHStackWidth:  CGFloat = iconWidth*2
-            
-            
-            
-            
-                
-                VStack(spacing:0.0) {
-                    
-                    Image(systemName: "book.closed.fill")
-                        .resizable()
-                        .frame(width:iconWidth, height: iconHeight)
-                        .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-                        .padding(.vertical, 10)
-                    
-                    
-                    ScrollView {
-                        Text("\(diaryText)")
-                            .frame(width: contentWidth*0.95)
-                    }
-                    .frame(width: geoWidth ,height: max(geoHeight-20-iconHeight-10, 0.0))
-                    .padding(.bottom, 10)
-
-                }
-                .frame(width: geoWidth, height: geoHeight, alignment: .center)
-                .background(.gray.opacity(0.15))
-//                .clipShape(.containerRelative)
-//                .shadow(color:shadowColor.opacity(0.6), radius: 2)
-//                .border(.gray)
-            
-
-
-
-
-
-
-
-
-
-        }
-    }
-}

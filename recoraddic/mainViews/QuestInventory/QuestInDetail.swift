@@ -479,12 +479,12 @@ struct QuestStatistics_inTerm: View {
                                 if let valueAsInt = value.as(Int.self) {
                                     
                                     AxisValueLabel {
-                                        if selectedQuest.dataType == DataType.hour.rawValue {
-                                            Text("\(valueAsInt/60)")
-                                        }
-                                        else {
+//                                        if selectedQuest.dataType == DataType.hour.rawValue {
+//                                            Text("\(DataType.string_fullRepresentableNotation(data: valueAsInt, dataType: DataType.hour) )")
+//                                        }
+//                                        else {
                                             Text("\(valueAsInt)")
-                                        }
+//                                        }
                                         
                                     }
                                     .foregroundStyle(tierColor_bright)
