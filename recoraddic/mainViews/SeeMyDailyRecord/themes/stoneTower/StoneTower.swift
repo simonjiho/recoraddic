@@ -22,7 +22,7 @@ struct StoneTower: View {
     
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
     
-    let dailyRecordSet:DailyRecordSet
+    @Binding var dailyRecordSet:DailyRecordSet
 //    @Binding var dailyRecordSet:DailyRecordSet
     @Binding var selectedDailyRecordSetIndex: Int
     @Binding var selectedRecord: DailyRecord?
