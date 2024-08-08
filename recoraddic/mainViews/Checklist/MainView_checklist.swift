@@ -133,8 +133,8 @@ struct MainView_checklist: View {
                                     .frame(width: facialExpressionSize*0.7, height: facialExpressionSize*0.7)
 
                             }
-                            .padding(.leading)
-                            .frame(width:geoWidth*0.15, alignment: .leading)
+                            .padding(.trailing)
+                            .frame(width:geoWidth*0.15, alignment: .trailing)
                             .buttonStyle(.plain)
 //                            .border(.red)
                         } else {
@@ -142,40 +142,70 @@ struct MainView_checklist: View {
                                 .frame(width:geoWidth*0.15)
                         }
                         
-                        HStack {
-                            HStack(spacing:10.0) {
-                                if getStartOfDate(date: selectedDate) > getStartDateOfNow() {
-                                    Button(action: {selectedDate = getStartDateOfNow()}) {
-                                        Image(systemName: "arrow.uturn.left")
-                                    }
-            //                        .frame(height: geoHeight*0.05)
-                                }
-                                Button(action:{selectedDate = selectedDate.addingDays(-1)}) {
-                                    Image(systemName: "chevron.left")
+                        HStack(spacing: 0.0) {
+//                            HStack(spacing:10.0) {
+//                                if getStartOfDate(date: selectedDate) > getStartDateOfNow() {
+//                                    Button(action: {selectedDate = getStartDateOfNow()}) {
+//                                        Image(systemName: "arrow.uturn.left")
+//                                    }
+//            //                        .frame(height: geoHeight*0.05)
+//                                }
+//                                Button(action:{selectedDate = selectedDate.addingDays(-1)}) {
+//                                    Image(systemName: "chevron.left")
+//                                }
+//                                .buttonStyle(.plain)
+//
+//                            }
+//                            .padding(.trailing,7)
+//                            .frame(width: geoWidth*0.15, alignment: .trailing)
+
+                            if getStartOfDate(date: selectedDate) > getStartDateOfNow() {
+                                Button(action: {selectedDate = getStartDateOfNow()}) {
+                                    Image(systemName: "arrow.uturn.left")
                                 }
                                 .buttonStyle(.plain)
+                                .padding(.trailing,7)
+                                .frame(width: geoWidth*0.15, alignment: .trailing)
+//                                .border(.red)
+                            }
+                            else {
+                                Spacer()
+                                    .frame(width: geoWidth*0.15)
 
                             }
-                            .padding(.trailing,7)
-                            .frame(width: geoWidth*0.15, alignment: .trailing)
                             DatePicker(selection: $selectedDate,displayedComponents: [.date]) {}
                                 .labelsHidden()
+                                .foregroundStyle(topForegroundColor)
 //                                .frame(width: geoWidth*0.5)
-                            HStack(spacing:10.0) {
-                                Button(action:{selectedDate = selectedDate.addingDays(1)}) {
-                                    Image(systemName: "chevron.right")
+//                            HStack(spacing:10.0) {
+//                                Button(action:{selectedDate = selectedDate.addingDays(1)}) {
+//                                    Image(systemName: "chevron.right")
+//                                }
+//                                .buttonStyle(.plain)
+//                                if getStartOfDate(date: selectedDate) < getStartDateOfNow() {
+//                                    Button(action: {selectedDate = getStartDateOfNow()}) {
+//                                        Image(systemName: "arrow.uturn.right")
+//                                    }
+//                                    .buttonStyle(.plain)
+//            //                        .frame(height: geoHeight*0.05)
+//                                }
+//                            }
+//                            .padding(.leading,7)
+//                            .frame(width: geoWidth*0.15, alignment: .leading)
+                            if getStartOfDate(date: selectedDate) < getStartDateOfNow() {
+                                Button(action: {selectedDate = getStartDateOfNow()}) {
+                                    Image(systemName: "arrow.uturn.right")
                                 }
+                                .padding(.leading,7)
+                                .frame(width: geoWidth*0.15, alignment: .leading)
                                 .buttonStyle(.plain)
-                                if getStartOfDate(date: selectedDate) < getStartDateOfNow() {
-                                    Button(action: {selectedDate = getStartDateOfNow()}) {
-                                        Image(systemName: "arrow.uturn.right")
-                                    }
-                                    .buttonStyle(.plain)
-            //                        .frame(height: geoHeight*0.05)
-                                }
                             }
-                            .padding(.leading,7)
-                            .frame(width: geoWidth*0.15, alignment: .leading)
+                            else {
+                                Spacer()
+                                    .frame(width: geoWidth*0.15)
+                                
+                            }
+                            
                         }
                         .frame(width: geoWidth*0.7)
                         
@@ -278,11 +308,13 @@ struct MainView_checklist: View {
                         
                         // use "in:" to add date range
                     }
+//                    .frame(width: geoWidth, height: 100)
                     .padding(.top,geoHeight*0.035)
                     .padding(.bottom, geoHeight*0.005)
                     .foregroundStyle(topForegroundColor) // 너무 튀는 것 같기도 하고..
 //                    .foregroundStyle(reversedColorSchemeColor.opacity(getStartOfDate(date: selectedDate) == getStartDateOfNow() ? 1.0 : 0.6))
                     
+
 
                     Color.gray
                         .opacity(0.4)
@@ -300,24 +332,48 @@ struct MainView_checklist: View {
                         forceToChooseMood: $forceToChooseMood
                     )
 //                    .frame(height: isToday ? geoHeight*0.93 : geoHeight*0.88)
+//                    .frame(height:geoHeight*0.93)
 //                    .border(.red)
                 }
                 .frame(width:geometry.size.width, height: geometry.size.height, alignment: .top)
 //                .border(.blue)
 
+                HStack(spacing:0.0) {
+                    
+                    Button(action:{selectedDate = selectedDate.addingDays(-1)}) {
+                        Image(systemName: "chevron.left")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width:buttonSize, height:buttonSize)
+                    }
+                    .padding(.leading, 20)
+                    .frame(width:geoWidth*0.35, alignment: .leading)
+                    .buttonStyle(CheckListButtonStyle3(color: topForegroundColor))
 
-                Button(action:{
-                    popUp_addDailyQuest.toggle()
-                    selectDiaryOption = false // ??
-                }) {
-                    Image(systemName: "plus")
-                        .resizable()
-                        .frame(width:buttonSize, height:buttonSize)
+                    Button(action:{
+                        popUp_addDailyQuest.toggle()
+                        selectDiaryOption = false // ??
+                    }) {
+                        Image(systemName: "plus")
+                            .resizable()
+                            .frame(width:buttonSize, height:buttonSize)
+                    }
+                    .buttonStyle(CheckListButtonStyle3(color: topForegroundColor))
+//                    .frame(width:buttonSize, height:buttonSize)
+                    .frame(width:geoWidth*0.3)
+                    
+                    Button(action:{selectedDate = selectedDate.addingDays(1)}) {
+                        Image(systemName: "chevron.right")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width:buttonSize, height:buttonSize)
+                    }
+                    .padding(.trailing, 20)
+                    .frame(width:geoWidth*0.35, alignment: .trailing)
+                    .buttonStyle(CheckListButtonStyle3(color: topForegroundColor))
+
                 }
-                .buttonStyle(CheckListButtonStyle2())
-                .frame(width:buttonSize, height:buttonSize)
                 .position(x:geoWidth/2, y:geoHeight*0.95 - 10)
-                
 
 
                 
@@ -395,7 +451,7 @@ struct MainView_checklist: View {
             
             .onChange(of: selectedDate) { oldValue, newValue in
                 
-                selectedDate = getStandardDate(from: newValue) // No worry of infinite onChangeCall
+//                selectedDate = getStandardDate(from: newValue) // No worry of infinite onChangeCall
                 
                 
                 
@@ -578,12 +634,32 @@ struct CheckListButtonStyle2: ButtonStyle {
             .padding(.horizontal, 7)
             .foregroundStyle(getReversedColorSchemeColor(colorScheme))
 //            .background(getColorSchemeColor(colorScheme))
-            .background(.thinMaterial)
+            .background(.ultraThinMaterial)
             .clipShape(.buttonBorder)
 
     }
 }
 
+
+struct CheckListButtonStyle3: ButtonStyle {
+    
+    let color: Color
+
+    init(color:Color) {
+        self.color = color
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 7)
+            .padding(.horizontal, 7)
+            .foregroundStyle(color)
+//            .background(getColorSchemeColor(colorScheme))
+            .background(.ultraThinMaterial)
+            .clipShape(.buttonBorder)
+
+    }
+}
 
 
 
@@ -713,8 +789,8 @@ struct ChecklistView: View {
                 ScrollViewReader { scrollProxy in
                     ScrollView {
                         
-                        VStack(alignment: .center) {
-                            
+//                        VStack {
+//
                             Spacer()
                                 .frame(height: geoHeight*0.02)
                             
@@ -805,6 +881,7 @@ struct ChecklistView: View {
 
                             VStack(spacing:5.0) {
                                 ForEach(dailyQuests_notHidden_sorted, id: \.self) { dailyQuest in
+//                                ForEach(currentDailyRecord.dailyQuestList!, id: \.self) { dailyQuest in
                                     
                                     HStack(spacing: 0) {
                                         
@@ -1012,23 +1089,24 @@ struct ChecklistView: View {
                             
                             
                             
-                        } // VStack
-                        .onChange(of: editingIndex) {
-//                            print("changed!!!")
-                            if editingIndex != nil {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    withAnimation {
-                                        scrollProxy.scrollTo(editingIndex,anchor: .center)
-                                    }
-                                }
-                            }
-                        }
+//                        } // VStack
+
 
                     } // scroll view
                     .frame(width:geometry.size.width, height: geometry.size.height)
+                    .onChange(of: editingIndex) {
+//                            print("changed!!!")
+                        if editingIndex != nil {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                withAnimation {
+                                    scrollProxy.scrollTo(editingIndex,anchor: .center)
+                                }
+                            }
+                        }
+                    }
                     .position(x:geometry.size.width/2, y:geometry.size.height/2)
                     .scrollDisabled(editDiary)
-                    .defaultScrollAnchor(.bottom)
+//                    .defaultScrollAnchor(.bottom)
                     
                 }
 //                }

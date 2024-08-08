@@ -32,6 +32,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     @State var selectedDailyRecordSetIndex: Int // it does not automatically changes selectedDailyRecordSet. you need to toggle updateSelectedDailyRecordSet to update selectedDailyRecordSet
     @State var selectedDailyRecordSet: DailyRecordSet
     
+    
 //    var navigationBarHeight: CGFloat
     
     @Binding var isNewDailyRecordAdded: Bool
@@ -61,6 +62,9 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     
     @State var startDate: Date = Date()
     @State var endDate: Date = Date()
+    
+    @State var lastTapTime: Date = Date()
+    @State var lastEditedTime: Date = Date()
     
     var body: some View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
@@ -200,7 +204,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             .sheet(isPresented: $popUp_recordInDetail) {
                 RecordInDetailView_optional(
                     popUp_recordInDetail: $popUp_recordInDetail,
-                    record: $selectedRecord
+                record: $selectedRecord
                 )
                 .background(colorSchemeColor)
                 
@@ -237,9 +241,32 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         }
         .onChange(of: selectedView) {
             selectedDailyRecordSetIndex = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).count > 0 ? dailyRecordSets.filter({$0.start < .now}).count-1 : 0
+            selectedRecord = nil
+            
+            // 후보 코드: 오랫동안 seeMyRecord를 안들어가면 currentDailyRecord로 돌아감과 동시에 맨 위로 스크롤 돌아감.
+//            if selectedView != .seeMyRecord {
+//                lastEditedTime = Date()
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 20.0) {
+//                    if Date().timeIntervalSince(lastEditedTime) > 19.0 && selectedView != .seeMyRecord { // additional condition: if current DailyRecordSet
+//                        // code that scrolls to the top of the View
+//                    }
+//                }
+//            }
+            
         }
         .onChange(of: newDailyRecordSetAdded) {
             selectedDailyRecordSetIndex = dailyRecordSets.count - 1
+        }
+        .onChange(of: selectedRecord) { oldValue, newValue in
+            if selectedRecord != nil {
+                lastTapTime = Date()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+                    if Date().timeIntervalSince(lastTapTime) > 9.0 {
+                        selectedRecord = nil
+                    }
+                }
+            }
+
         }
         
         

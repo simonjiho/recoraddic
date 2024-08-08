@@ -460,46 +460,46 @@ struct StoneTower: View {
                                 
                                 
                             
-                            if numberOfStones == 0 {
-                                VStack(spacing:0) {
-
-                                    StoneTower_stone(
-                                        shapeNum: 3,
-                                        brightness: 0,
-                                        defaultColorIndex: defaultColorIndex,
-                                        facialExpressionNum: 3,
-                                        selected: false
-                                    )
-                                    .frame(width: stoneWidth, height: stoneHeight)
-                                    .opacity(0.2)
-                                    StoneTower_stone(
-                                        shapeNum: 1,
-                                        brightness: 2,
-                                        defaultColorIndex: defaultColorIndex,
-                                        facialExpressionNum: 2,
-                                        selected: false
-                                    )
-                                    .frame(width: stoneWidth, height: stoneHeight)
-                                    .opacity(0.3)
-                                    StoneTower_stone(
-                                        shapeNum: 2,
-                                        brightness: 1,
-                                        defaultColorIndex: defaultColorIndex,
-                                        facialExpressionNum: 1,
-                                        selected: false
-                                    )
-                                    .frame(width: stoneWidth, height: stoneHeight)
-                                    .opacity(0.4)
-                                }
-                                .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
-                                let noSavedDailyRecords_visible: Bool = dailyRecordSet.dailyRecords?.filter({$0.hasContent}).count == 0
-                                
-                                if noSavedDailyRecords_visible && selectedDailyRecordSetIndex == dailyRecordSets.count - 1 && !isEditingTermGoals {
-                                    Text("매일매일의 기록을 저장하세요!")
-                                        .opacity(0.5)
-                                        .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
-                                }
-                            }
+//                            if numberOfStones == 0 {
+//                                VStack(spacing:0) {
+//
+//                                    StoneTower_stone(
+//                                        shapeNum: 3,
+//                                        brightness: 0,
+//                                        defaultColorIndex: defaultColorIndex,
+//                                        facialExpressionNum: 3,
+//                                        selected: false
+//                                    )
+//                                    .frame(width: stoneWidth, height: stoneHeight)
+//                                    .opacity(0.2)
+//                                    StoneTower_stone(
+//                                        shapeNum: 1,
+//                                        brightness: 2,
+//                                        defaultColorIndex: defaultColorIndex,
+//                                        facialExpressionNum: 2,
+//                                        selected: false
+//                                    )
+//                                    .frame(width: stoneWidth, height: stoneHeight)
+//                                    .opacity(0.3)
+//                                    StoneTower_stone(
+//                                        shapeNum: 2,
+//                                        brightness: 1,
+//                                        defaultColorIndex: defaultColorIndex,
+//                                        facialExpressionNum: 1,
+//                                        selected: false
+//                                    )
+//                                    .frame(width: stoneWidth, height: stoneHeight)
+//                                    .opacity(0.4)
+//                                }
+//                                .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
+//                                let noSavedDailyRecords_visible: Bool = dailyRecordSet.dailyRecords?.filter({$0.hasContent}).count == 0
+//                                
+//                                if noSavedDailyRecords_visible && selectedDailyRecordSetIndex == dailyRecordSets.count - 1 && !isEditingTermGoals {
+//                                    Text("매일매일의 기록을 저장하세요!")
+//                                        .opacity(0.5)
+//                                        .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
+//                                }
+//                            }
 
                             
 
@@ -637,7 +637,9 @@ struct StoneTower: View {
 
 //        let plusOrMinus:Int = Int.random(in: 0...1) == 1 ? 1 : -1
         let plusOrMinus:Int = idx % 2 * 2 - 1
-
+        
+        if idx  == 0 { return 0 }
+        
         switch input {
         case ...1: return 0
         case 2...4: return (input-1) * plusOrMinus

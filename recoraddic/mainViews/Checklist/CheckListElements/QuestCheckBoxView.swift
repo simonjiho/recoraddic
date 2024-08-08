@@ -116,8 +116,8 @@ struct QuestCheckBoxView: View {
                 )
                 .frame(width: width*1/8, height: height)
                 .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
-                .disabled(!isRecent)
-                .opacity( isRecent ? 1.0 : 0.0)
+//                .disabled(!isRecent)
+//                .opacity( isRecent ? 1.0 : 0.0)
 //                .border(.red)
             }
             .frame(width:width, height: height)
@@ -512,21 +512,21 @@ struct QuestCheckBoxContent_HOUR:View {
                     }
                     .padding(.horizontal,10)
                     .frame(width:geoWidth*6/7)
-                        .onTapGesture {
-                            lastTapTime = Date()
-                            if dailyQuest.dailyGoal == nil {
-                                highlightValue2 = (highlightValue2 + 1) % 2
-                            } else {
-                                highlightValue2 = (highlightValue2 + 1) % 3
-                            }
-                            if highlightValue2 != 1 {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-                                    if Date().timeIntervalSince(lastTapTime) > 4.0 {
-                                        highlightValue2 = 1
-                                    }
+                    .onTapGesture {
+                        lastTapTime = Date()
+                        if dailyQuest.dailyGoal == nil {
+                            highlightValue2 = (highlightValue2 + 1) % 2
+                        } else {
+                            highlightValue2 = (highlightValue2 + 1) % 3
+                        }
+                        if highlightValue2 != 1 {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                                if Date().timeIntervalSince(lastTapTime) > 4.0 {
+                                    highlightValue2 = 1
                                 }
                             }
                         }
+                    }
 
 
 
