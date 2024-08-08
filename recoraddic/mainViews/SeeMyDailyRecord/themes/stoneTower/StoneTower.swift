@@ -22,7 +22,8 @@ struct StoneTower: View {
     
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
     
-    @Binding var dailyRecordSet:DailyRecordSet
+    let dailyRecordSet:DailyRecordSet
+//    @Binding var dailyRecordSet:DailyRecordSet
     @Binding var selectedDailyRecordSetIndex: Int
     @Binding var selectedRecord: DailyRecord?
     @Binding var popUp_startNewRecordSet: Bool
@@ -39,6 +40,7 @@ struct StoneTower: View {
     let startRange: ClosedRange<Date>
     let endRange: ClosedRange<Date>
     
+//    let selectedDailyRecordSetIndex: Int
     
     
     @State var scrollViewCenterY: CGFloat = 0
@@ -567,6 +569,7 @@ struct StoneTower: View {
 
                 }
                 .scrollDisabled(keyboardAppeared)
+                
 
 
             }

@@ -654,11 +654,7 @@ struct ChecklistView: View {
         let hiddenQuestNames: [String] = showHiddenQuests ? [] : quests.filter({$0.isHidden}).map({$0.getName()}) 
         
         let dailyQuests_notHidden_sorted = currentDailyRecord.dailyQuestList!.filter({!hiddenQuestNames.contains($0.getName())}).sorted(by:{
-            
-            if $0.dataType != $1.dataType {
-                return $0.dataType < $1.dataType  // Sort by Age in ascending order
-            }
-            else if $0.alermTime != nil && $1.alermTime != nil {
+            if $0.alermTime != nil && $1.alermTime != nil {
                 return $0.alermTime! <= $1.alermTime!
             }
             else if $0.alermTime != nil && $1.alermTime == nil {
@@ -667,6 +663,10 @@ struct ChecklistView: View {
             else if $0.alermTime == nil && $1.alermTime != nil {
                 return false
             }
+            else if $0.dataType != $1.dataType {
+                return $0.dataType < $1.dataType  // Sort by Age in ascending order
+            }
+
             else {
                 return $0.createdTime < $1.createdTime  // Sort by Name in ascending order
             }
@@ -1028,6 +1028,7 @@ struct ChecklistView: View {
                     .frame(width:geometry.size.width, height: geometry.size.height)
                     .position(x:geometry.size.width/2, y:geometry.size.height/2)
                     .scrollDisabled(editDiary)
+                    .defaultScrollAnchor(.bottom)
                     
                 }
 //                }
@@ -1041,7 +1042,9 @@ struct ChecklistView: View {
 
             } // zstack
             .frame(width:geometry.size.width, height: geometry.size.height)
-
+            .onAppear() {
+                
+            }
             .onChange(of: applyDailyQuestRemoval, removeDailyQuest)
             .onChange(of: applyDailyTextRemoval, removeDailyText)
             .onChange(of: currentDailyRecord, {

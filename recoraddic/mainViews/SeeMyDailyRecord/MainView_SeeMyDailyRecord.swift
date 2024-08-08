@@ -144,7 +144,9 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                             prevDRS_start: prevDRS_start,
                             nextDRS_start: nextDRS_start,
                             startRange: startRange,
-                            endRange: endRange
+                            endRange: endRange,
+//                            selectedDailyRecordSetIndex: $selectedDailyRecordSetIndex
+                            
                         )
 //                        Text("")
                         .frame(width:geoWidth, height: geoHeight)
