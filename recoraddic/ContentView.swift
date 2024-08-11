@@ -60,7 +60,7 @@ struct ContentView: View {
     @AppStorage("iCloudAvailable_forTheFirstTime") var iCloudAvailable: Bool = false
     @AppStorage("initialization") var initialization: Bool = true
     @AppStorage("fetchDone") var fetchDone: Bool = false
-    @AppStorage("update_240808") var update_240808: Bool = false
+    @AppStorage("update_240809") var update_240809: Bool = false
 
 
     @StateObject var netWorkMonitor: NetworkMonitor = NetworkMonitor()
@@ -183,7 +183,7 @@ struct ContentView: View {
                      if UserDefaults.standard.value(forKey: "update_240809") == nil {
                          UserDefaults.standard.setValue(false, forKey: "update_240809")
                      }
-                     if !update_240808 {
+                     if !update_240809 {
                          let dateComponents = DateComponents(calendar: Calendar.current, year:2024, month: 8, day: 7, hour:10, minute: 15)
                          for dailyQuest in dailyQuests {
                              if dailyQuest.createdTime < Calendar.current.date(from: dateComponents)! {

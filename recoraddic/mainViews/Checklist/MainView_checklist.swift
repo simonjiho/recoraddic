@@ -391,7 +391,7 @@ struct MainView_checklist: View {
                 
 //                updateExistency()
                 changeDailyRecord()
-                updateDailyQuestAlerm()
+//                updateDailyQuestAlerm()
                 startTimer()
                 setKeyboardAppearanceStateValue()
                 
@@ -421,7 +421,7 @@ struct MainView_checklist: View {
             .onChange(of: selectedView) { oldValue, newValue in
 //                currentDailyRecord = dailyRecords.first ?? DailyRecord()
 //                updateExistency()
-                updateDailyQuestAlerm()
+//                updateDailyQuestAlerm()
                 
                 for dailyQuest in currentDailyRecord.dailyQuestList! {
                     dailyQuest.currentTier = quests.first(where: {$0.name == dailyQuest.questName})?.tier ?? 0
@@ -435,7 +435,7 @@ struct MainView_checklist: View {
             }
             .onReceive(notificationManager.$notificationData) { userInfo in
                 
-                updateDailyQuestAlerm()
+//                updateDailyQuestAlerm()
             }
             .popover(isPresented: $popUp_addDailyQuest) {
                 EditCheckListView(
@@ -489,20 +489,20 @@ struct MainView_checklist: View {
 
 
     
-    private func updateDailyQuestAlerm() {
-        // MARK: 앱을 끈 상태에서 들어가면 잘 nil처리 됨, 킨 상태이면 안됨
-        // Your function to be executed when the app is opened via notification
-        if let dailyQuests = currentDailyRecord.dailyQuestList {
-            //            print("hallo~~~")
-            for dailyQuest in dailyQuests {
-                if let alermTime = dailyQuest.alermTime {
-                    if alermTime.isExpired_local {
-                        dailyQuest.alermTime = nil
-                    }
-                }
-            }
-        }
-    }
+//    private func updateDailyQuestAlerm() {
+//        // MARK: 앱을 끈 상태에서 들어가면 잘 nil처리 됨, 킨 상태이면 안됨
+//        // Your function to be executed when the app is opened via notification
+//        if let dailyQuests = currentDailyRecord.dailyQuestList {
+//            //            print("hallo~~~")
+//            for dailyQuest in dailyQuests {
+//                if let alermTime = dailyQuest.alermTime {
+//                    if alermTime.isExpired_local {
+//                        dailyQuest.alermTime = nil
+//                    }
+//                }
+//            }
+//        }
+//    }
     
     
     func startTimer() { // 오늘의 자정에 timer 맞추기 ( 24/07/11 12:00 -> 24/07/12 00:00 에 작동하는 타이머 설정)
@@ -861,7 +861,7 @@ struct ChecklistView: View {
                                 )
                                 .frame(width:checkListElementWidth, height: diaryHeight)
                                 //                            .background(.gray.adjust(brightness: 0.4).opacity(0.7))
-                                .clipShape(.buttonBorder)
+//                                .clipShape(.buttonBorder)
                                 
                             }
                             
@@ -895,8 +895,10 @@ struct ChecklistView: View {
 
 
                                         let data = dailyQuest.data
-                                        let xOffset = CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal ?? dailyQuest.data), to: 0...questCheckBoxWidth)
-
+                                        
+                                        let xOffset:CGFloat = data == 0 ? 0.1 : CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal ?? dailyQuest.data), to: 0...questCheckBoxWidth)
+                                        
+                                        
                                         QuestCheckBoxView(
                                             dailyQuest: dailyQuest,
                                             targetDailyQuest: $dailyQuestToDelete,
@@ -1163,8 +1165,12 @@ struct ChecklistView: View {
 
     func removeDailyQuest() -> Void {
         
+        
         if let dailyQuest = dailyQuestToDelete {
             updateQuest_onDelete(for: dailyQuest)
+            if let alermTime = dailyQuest.alermTime {
+                removeNotification(at: alermTime, for: dailyQuest.getName()) // MARK: questName 변경 시 지울 수 없음
+            }
             modelContext.delete(dailyQuest)
         }
         dailyQuestToDelete = nil

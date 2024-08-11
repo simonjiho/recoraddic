@@ -74,6 +74,7 @@
 		B2E6C6392C47A8C20082B000 /* SolarCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E6C6382C47A8C20082B000 /* SolarCalculator.swift */; };
 		B2E6C63B2C47AA1B0082B000 /* SunriseSunsetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E6C63A2C47AA1B0082B000 /* SunriseSunsetViewModel.swift */; };
 		B2E6C6472C4A80C90082B000 /* fire_background.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2E6C6462C4A80C90082B000 /* fire_background.xcassets */; };
+		B2EC07CC2C69F0D200BD6AC5 /* RecordInDetailView_tmp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EC07CB2C69F0D200BD6AC5 /* RecordInDetailView_tmp.swift */; };
 		B2F0171D2C3D155400765EF6 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2F0171C2C3D155400765EF6 /* WidgetKit.framework */; };
 		B2F0171F2C3D155400765EF6 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2F0171E2C3D155400765EF6 /* SwiftUI.framework */; };
 		B2F017222C3D155400765EF6 /* recoraddicWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F017212C3D155400765EF6 /* recoraddicWidgetBundle.swift */; };
@@ -197,6 +198,7 @@
 		B2E6C6382C47A8C20082B000 /* SolarCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolarCalculator.swift; sourceTree = "<group>"; };
 		B2E6C63A2C47AA1B0082B000 /* SunriseSunsetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunriseSunsetViewModel.swift; sourceTree = "<group>"; };
 		B2E6C6462C4A80C90082B000 /* fire_background.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = fire_background.xcassets; sourceTree = "<group>"; };
+		B2EC07CB2C69F0D200BD6AC5 /* RecordInDetailView_tmp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordInDetailView_tmp.swift; sourceTree = "<group>"; };
 		B2F0171A2C3D155400765EF6 /* recoraddicWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = recoraddicWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2F0171C2C3D155400765EF6 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		B2F0171E2C3D155400765EF6 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -460,6 +462,7 @@
 			isa = PBXGroup;
 			children = (
 				B220DA3B2B6268260039160C /* RecordInDetailView.swift */,
+				B2EC07CB2C69F0D200BD6AC5 /* RecordInDetailView_tmp.swift */,
 				B2D7AD072B9451920045C9EA /* StartNewRecordSet.swift */,
 				B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */,
 			);
@@ -664,6 +667,7 @@
 			files = (
 				B2BA89072B32CA5600A3D50E /* textFieldMaxLength.swift in Sources */,
 				B260A39A2A9C759B00D73208 /* MainView_SeeMyDailyRecord.swift in Sources */,
+				B2EC07CC2C69F0D200BD6AC5 /* RecordInDetailView_tmp.swift in Sources */,
 				B2AECB872B4EDA4F0020A937 /* ExampleData.swift in Sources */,
 				B265D2852B049FBA002E51A8 /* theme.swift in Sources */,
 				B220DA2E2B612EB60039160C /* colorFunc.swift in Sources */,

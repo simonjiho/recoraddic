@@ -497,7 +497,7 @@ final class DailyRecord: Equatable, Identifiable, Hashable {
     
     var dailyRecordSet: DailyRecordSet?
     
-    var hasContent: Bool { self.recordedAmount > 0 || self.dailyText != nil}
+    var hasContent: Bool { self.recordedAmount > 0 || (self.dailyText != nil && self.dailyText != "")}
     var singleElm_dailyQuestOrTodo: Bool { self.dailyText == nil && self.recordedAmount == 1 }
     var singleElm_diary: Bool { self.dailyText != nil && self.recordedAmount == 0 }
     

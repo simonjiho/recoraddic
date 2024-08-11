@@ -131,7 +131,7 @@ enum DataType:Int, CaseIterable, Identifiable {
     
     static func string_fullRepresentableNotation(data: Int, dataType: DataType, customDataTypeNotation: String? = nil) -> String {
         if dataType == .ox {
-            return "\(data)"
+            return "\(data)회 기록"
         }
         if dataType == .hour {
             let (hours,minutes) = string_unitDataToRepresentableData_hours(data: data)

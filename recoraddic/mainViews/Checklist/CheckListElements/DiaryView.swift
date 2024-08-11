@@ -59,115 +59,37 @@ struct InShortView: View {
             
 
             HStack {
-//                ZStack {
-//                    Color.gray.opacity(0.15)
-//                        .frame(width: isEdit ? geoWidth : geoWidth*0.9, height: geoHeight)
-//                        .position(CGPoint(x: isEdit ? geoWidth/2 : geoWidth*0.55, y: geoHeight/2))
+
                 HStack(spacing:0.0) {
                     Image(systemName: "book.closed.fill")
                         .frame(width:geoWidth*0.1)
-                        
-                            //                            .resizable()
-                            //                            .frame(width:iconWidth, height: iconHeight)
                                 .foregroundStyle(getReversedColorSchemeColor(colorScheme))
                             
-                            VStack(alignment: .trailing) {
-                                TextField("하루를 요약해보세요",text:$inShortText)
-                                    .frame(width:geoWidth*(keyBoard ? 0.77 : 0.9), alignment: .trailing)
-                                    .lineLimit(3)
-                                    .minimumScaleFactor(0.7)
-                                    .focused($keyBoard)
-                                    .maxLength(50, text: $inShortText)
-                                
-                                if keyBoard {
-                                    Text("\(inShortText.count)/50")
-                                        .font(.footnote)
-                                }
-                                
-                            }
-                            .frame(width: geoWidth*(keyBoard ? 0.8 : 0.9), height: geoHeight*0.95, alignment: keyBoard ? .bottom : .center)
-                            if keyBoard {
-                                Button("완료", action:{
-                                    //                                isEdit = false
-                                    keyBoard = false
-                                    currentDailyRecord.dailyText = inShortText
-                                })
-                                .frame(width:geoWidth*0.1)
-                            }
-//                            Text(inShortText)
-//                                .frame(width:geoWidth*0.85, height: geoHeight*0.9)
-//                                .minimumScaleFactor(0.8)
-//                                .lineLimit(2)
+                    VStack(alignment: .trailing) {
+                        TextField("하루를 요약해보세요",text:$inShortText)
+                            .frame(width:geoWidth*(keyBoard ? 0.77 : 0.9), alignment: .trailing)
+                            .lineLimit(3)
+                            .minimumScaleFactor(0.7)
+                            .focused($keyBoard)
+                            .maxLength(50, text: $inShortText)
+                        
+                        if keyBoard {
+                            Text("\(inShortText.count)/50")
+                                .font(.footnote)
                         }
                         
-//                        .onTapGesture {
-//
-//                            isEdit = true
-//                            keyBoard = true
-//                        }
-                        
-//                    }
-//                        HStack {
-//                            
-//                            VStack(alignment: .trailing) {
-//                                TextField("하루를 요약해보세요",text:$inShortText)
-//                                    .frame(width:geoWidth*0.8, alignment: .trailing)
-//                                    .lineLimit(3)
-//                                    .minimumScaleFactor(0.7)
-//                                    .focused($keyBoard)
-//                                    .maxLength(50, text: $inShortText)
-//                                Text("\(inShortText.count)/50")
-//                                    .font(.footnote)
-//                                
-//                            }
-//                            .frame(width:geoWidth*0.8, height: geoHeight*0.8)
-//                            .onAppear() {
-//                                keyBoard = true
-//                            }
-//                            .onChange(of:keyBoard) {
-//                                if !keyBoard {
-//                                    isEdit = false
-//                                }
-//                            }
-//                            
-//                            Button("완료", action:{
-//                                isEdit = false
-//                                keyBoard = false
-//                                currentDailyRecord.dailyText = inShortText
-//                            })
-//                            
-//                        }
-//                    }
-                    
-                    
-                    
-//                    Menu {
-//                        
-//                        Button("수정",action: {
-//                            isEdit = true
-//                            keyBoard = true
-//                        })
-//                        Button("삭제",action: {
-//                            applyDailyTextRemoval.toggle()
-//                        })
-//                        //
-//                    } label: {
-//                        Image(systemName: "ellipsis")
-//                            .font(.title3)
-//                            .frame(height: geoHeight*0.75, alignment:.top)
-//                        
-//                        
-//                    }
-//                    .padding(.top,3)
-//                    .buttonStyle(.plain)
-//                    .frame(width:geoWidth*0.975, height: geoHeight, alignment: .topTrailing)
-//                    .disabled(isEdit)
-//                    
-                    
-                    
-                    
-//                }
-                        .frame(width: geoWidth, height: geoHeight, alignment: .leading)
+                    }
+                    .frame(width: geoWidth*(keyBoard ? 0.8 : 0.9), height: geoHeight*0.95, alignment: keyBoard ? .bottom : .center)
+                    if keyBoard {
+                        Button("완료", action:{
+                            keyBoard = false
+                            currentDailyRecord.dailyText = inShortText
+                        })
+                        .frame(width:geoWidth*0.1)
+                    }
+
+                        }
+                .frame(width: geoWidth, height: geoHeight, alignment: .leading)
                 .disabled(offset < -geoHeight*0.5)
                 .offset(x: offset, y:0)
                 
@@ -187,6 +109,7 @@ struct InShortView: View {
                 
             }
             .frame(width:geoWidth, height: geoHeight, alignment: .leading)
+            .background(.gray.opacity(0.2))
             .clipped()
             .gesture(
                 DragGesture()
@@ -222,7 +145,7 @@ struct InShortView: View {
                         
                     }
                     .onEnded { value in
-                        if keyBoard { return }
+//                        if keyBoard { return }
                         
                         if !(value.translation.width > 0 && !showMenu) {
                             if value.translation.width < -geoWidth*0.05 {
@@ -316,7 +239,7 @@ struct DiaryView: View {
                 ZStack(alignment:isEdit ? .top : .leading) {
                     
                     
-                    Color.gray.opacity(0.15)
+                    Color.gray.opacity(0.2)
                         .frame(width: isEdit ? geoWidth : geoWidth*0.9, height: geoHeight)
                         .position(CGPoint(x: isEdit ? geoWidth/2 : geoWidth*0.55, y: geoHeight/2))
                         .onTapGesture {
@@ -354,6 +277,7 @@ struct DiaryView: View {
                     else {
                         
                         Text("\(text)\(diaryText.count > text.count ? "..." : "")")
+                            .frame(width:textBoxWidth)
                             .lineLimit(1)
                             .position(textBoxPosition)
                         //                                .border(.gray)
@@ -399,7 +323,6 @@ struct DiaryView: View {
                 }
                 .frame(width: geoWidth, height: geoHeight)
                 .disabled(offset < -geoHeight*0.5)
-//                .disabled(showMenu)
                 .offset(x: offset, y:0)
 
                 

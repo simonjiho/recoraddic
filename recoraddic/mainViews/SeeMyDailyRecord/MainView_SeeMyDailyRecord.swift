@@ -202,10 +202,11 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 
             }
             .sheet(isPresented: $popUp_recordInDetail) {
-                RecordInDetailView_optional(
-                    popUp_recordInDetail: $popUp_recordInDetail,
-                record: $selectedRecord
-                )
+                RecordInDetailView_new(selectedDailyRecord:$selectedRecord)
+//                RecordInDetailView_optional(
+//                    popUp_recordInDetail: $popUp_recordInDetail,
+//                record: $selectedRecord
+//                )
                 .background(colorSchemeColor)
                 
                 //TODO: light모드일 때,  Col

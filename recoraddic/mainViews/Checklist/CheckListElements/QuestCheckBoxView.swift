@@ -143,7 +143,8 @@ struct QuestCheckBoxView: View {
                     .mask {
                         a
                     }
-                    .background(getTierColorOf(tier: dailyQuest.currentTier))
+//                    .background(getTierColorOf(tier: dailyQuest.currentTier))
+                    .background(getBrightTierColorOf3(tier: dailyQuest.currentTier))
                     .blur(radius: 1)
                     .opacity(0.9)
                 
@@ -420,6 +421,7 @@ struct QuestCheckBoxContent_OX:View {
                     .minimumScaleFactor(0.5)
             }
             .frame(width: geoWidth,height: geoHeight)
+            .background(.gray.opacity(0.01))
             .onTapGesture {
                 value = ( value == 1 ) ? 0 : 1
             }
@@ -1434,8 +1436,18 @@ struct NotificationButton: View {
 
             }
             .sheet(isPresented: $editNotificationTime) {
-                let alermTime = (dailyQuest.alermTime ?? (dailyQuest.dailyRecord?.getLocalDate()?.addingHours(9) ?? getStartDateOfNow()))
-
+                let alermTime = {
+                    if let alermTime = dailyQuest.alermTime { return alermTime}
+                    else if let date = dailyQuest.dailyRecord?.getLocalDate() {
+                        if date == getStartDateOfNow() {
+                            return Date()
+                        }
+                        else { return date.addingHours(9)}
+                    }
+                    else {
+                        return getStartDateOfNow()
+                    }
+                }()
                 EditNotificationTimeView(
                     dailyQuest: dailyQuest,
                     selectedTime: alermTime,
@@ -1577,13 +1589,16 @@ struct EditNotificationTimeView: View {
                     
                     
                     //                    Button((dailyQuest.alermTime ?? selectedTime) == selectedTime ? "취소" : (dailyQuest.alermTime == nil ? "알림 설정" : "알림 수정") ) {
-                    Button(dailyQuest.alermTime == nil ? "알림 설정" : "알림 수정") {
+                    
+                    Button(selectedTime <= Date() ? "달성 설정" :(dailyQuest.alermTime == nil ? "알림 설정" : "알림 수정")) {
                         if let previousAlermTime = dailyQuest.alermTime {
                             removeNotification(at: previousAlermTime, for: questName) // MARK: questName 변경 시 지울 수 없음
                         }
                         dailyQuest.alermTime = selectedTime
-                        scheduleNotification(at: selectedTime, for: questName, goal: dailyQuest.dailyGoal, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation
-                        )
+                        if selectedTime > Date() {
+                            scheduleNotification(at: selectedTime, for: questName, goal: dailyQuest.dailyGoal, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation
+                            )
+                        }
                         editNotificationTime.toggle()
                     }
                     .frame(width: geoWidth/2)
