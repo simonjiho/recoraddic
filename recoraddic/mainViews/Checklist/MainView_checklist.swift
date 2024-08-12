@@ -424,7 +424,7 @@ struct MainView_checklist: View {
 //                updateDailyQuestAlerm()
                 
                 for dailyQuest in currentDailyRecord.dailyQuestList! {
-                    dailyQuest.currentTier = quests.first(where: {$0.name == dailyQuest.questName})?.tier ?? 0
+                    dailyQuest.currentTier = quests.first(where: {$0.name == dailyQuest.questName && !$0.inTrashCan})?.tier ?? 0
                 }
                 
             }
@@ -1211,7 +1211,11 @@ struct ChecklistView: View {
         
     
     func findQuest(_ name: String) -> Quest? {
-        return quests.first(where: {$0.name == name})
+        if let quest_notDeleted = quests.first(where: {$0.name == name && !$0.inTrashCan}) {
+            return quest_notDeleted
+        } else {
+            return quests.first(where: {$0.name == name})
+        }
     }
     
 

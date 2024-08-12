@@ -19,7 +19,7 @@ struct EditCheckListView: View {
 
     
     @Query var quests: [Quest]
-    var quests_notHidden: [Quest] {
+    var quests_visible: [Quest] {
         quests.filter({$0.isVisible()})
     }
     @Query(sort:\Todo_preset.createdTime) var todos_preset: [Todo_preset]
@@ -87,7 +87,7 @@ struct EditCheckListView: View {
                     
                     ScrollView {
                         if appendOption == .quest {
-                            if quests_notHidden.isEmpty {
+                            if quests_visible.isEmpty {
                                 Button(action:{
                                     popUp_self.toggle()
                                     selectedView = .gritBoardAndStatistics}){
@@ -100,7 +100,7 @@ struct EditCheckListView: View {
                             }
                             else {
                                 let dailyQuestsNowAndWill: [DailyQuest] = currentDailyRecord.dailyQuestList! + dailyQuests_tmp
-                                let quests_notAdded: [Quest] = quests_notHidden.filter({quest in !(dailyQuestsNowAndWill.map({dailyQuest in dailyQuest.questName}).contains(quest.name)) })
+                                let quests_notAdded: [Quest] = quests_visible.filter({quest in !(dailyQuestsNowAndWill.map({dailyQuest in dailyQuest.questName}).contains(quest.name)) })
 //                                ForEach(quests_notHidden) { quest in
                                 ForEach(quests_notAdded) { quest in
                                     Button(action:{

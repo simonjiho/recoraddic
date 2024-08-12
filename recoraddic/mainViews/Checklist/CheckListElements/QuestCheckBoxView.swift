@@ -287,6 +287,16 @@ struct QuestCheckBoxView: View {
                 xOffset = CGFloat(value).map(from:range, to: 0...width)
             }
         }
+        .onChange(of: showMenu) {
+            if !showMenu && stopwatch.isRunning {
+                isAnimating = false
+                DispatchQueue.main.asyncAfter(deadline: .now()+0.2){
+                    withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
+                        isAnimating = true
+                    }
+                }
+            }
+        }
 
         //        }
     }
@@ -330,7 +340,7 @@ struct QuestCheckBoxView: View {
     }
     
     func findQuest(_ name: String) -> Quest? {
-        return quests.first(where: {$0.name == name})
+        return quests.first(where: {$0.name == name && !$0.inTrashCan})
     }
 
 
@@ -645,12 +655,14 @@ struct QuestCheckBoxContent_HOUR:View {
             .onChange(of: value) {
                 dailyQuest.dailyRecord?.updateRecordedMinutes()
             }
+        
             .onAppear() {
                 if dailyQuest.timerStart != nil {
                     if isRecent {
                         autoCheckActivityAndAdjustToStopWatch()
                     }
                     else {
+                        deleteOutdatedActivity()
                         dailyQuest.timerStart = nil
                     }
                 }
@@ -712,6 +724,25 @@ struct QuestCheckBoxContent_HOUR:View {
 
     }
     
+    func deleteOutdatedActivity() -> Void {
+        let startTime: Date = dailyQuest.timerStart!
+        
+        if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
+            let dismissalPolicy: ActivityUIDismissalPolicy = .immediate
+            Task {
+                await targetActivity.end(ActivityContent(state: targetActivity.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
+            }
+
+        } else {
+//            onTimer = false
+            if Int(Date().timeIntervalSince(startTime)) > 60*60*24 {
+                value = 60*24
+            } else {
+                value = Int(Date().timeIntervalSince(startTime)) / 60
+            }
+        }
+    }
+    
     func autoCheckActivityAndAdjustToStopWatch() -> Void {
         
         let startTime: Date = dailyQuest.timerStart!
@@ -730,8 +761,12 @@ struct QuestCheckBoxContent_HOUR:View {
 //                onTimer = true
 //            }
         } else {
-//            onTimer = false
-            value = Int(Date().timeIntervalSince(startTime)) / 60
+            //            onTimer = false
+            if Int(Date().timeIntervalSince(startTime)) > 60*60*24 {
+                value = 60*24
+            } else {
+                value = Int(Date().timeIntervalSince(startTime)) / 60
+            }
         }
 
 

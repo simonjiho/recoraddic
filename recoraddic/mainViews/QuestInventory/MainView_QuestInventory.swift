@@ -147,10 +147,11 @@ struct MainView_QuestInventory: View {
                                                             ZStack {
                                                                 let path: Path = Path(roundedRect: CGRect(x: 0, y: 0, width: gridItemWidth, height: gridItemHeight), cornerSize: CGSize(width: gridItemWidth/20, height: gridItemWidth/20))
                                                                 path
-                                                                    .stroke(lineWidth: gridItemWidth/15)
+                                                                    .stroke(lineWidth: gridItemHeight/15)
                                                                 if selectedQuestNames.contains(quest.name) {
                                                                     Image(systemName:"checkmark")
                                                                         .resizable()
+                                                                        .scaledToFit()
                                                                         .frame(width:gridItemWidth*0.6, height: gridItemHeight*0.6)
                                                                 }
                                                                 
@@ -331,21 +332,21 @@ struct MainView_QuestInventory: View {
                 if newValue == true {
                     if editOption == .archive {
                         for selectedQuestName in selectedQuestNames {
-                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName}).first {
+                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName && !$0.isArchived}).first {
                                 targetQuest.isArchived = true
                             }
                         }
                     }
                     else if editOption == .hide {
                         for selectedQuestName in selectedQuestNames {
-                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName}).first {
+                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName && !$0.isHidden}).first {
                                 targetQuest.isHidden = true
                             }
                         }
                     }
                     else if editOption == .delete {
                         for selectedQuestName in selectedQuestNames {
-                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName}).first {
+                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName && !$0.inTrashCan}).first {
                                 targetQuest.inTrashCan = true
                             }
                         }
@@ -716,6 +717,9 @@ struct CreateNewQuest: View {
     @FocusState var focusedTextField: Int?
     
     var body: some View {
+        
+        let questNames = quests.filter({!$0.inTrashCan}).map { $0.name }
+        
         GeometryReader { geometry in
             
             let geoWidth = geometry.size.width
@@ -762,7 +766,7 @@ struct CreateNewQuest: View {
                             .font(.caption)
                             
                         }
-                    else if quests.contains(where: {quest in quest.name == questNameToAppend}) {
+                    else if questNames.contains(questNameToAppend) {
                         Text("퀘스트 이름이 이미 존재합니다.")
                             .frame(width: geometry.size.width, height: 20)
                             .foregroundStyle(.red)
@@ -951,7 +955,7 @@ struct CreateNewQuest: View {
                     .padding(.top,10)
                     .disabled(
                         (
-                            quests.contains(where: {quest in quest.name == questNameToAppend}) || (questDataTypeToAppend == .custom && (customDataTypeNotation == "" || customDataTypeNotation == nil)) ||
+                            questNames.contains(questNameToAppend) || (questDataTypeToAppend == .custom && (customDataTypeNotation == "" || customDataTypeNotation == nil)) ||
                             questNameToAppend == "")
                         
                     )

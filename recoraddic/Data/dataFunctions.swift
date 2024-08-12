@@ -14,7 +14,7 @@ extension Quest {
     
     func updateTier() -> Void {
         
-        if self.tier == 40 { return }
+//        if self.tier == 40 { return }
         
         if dataType == DataType.hour.rawValue {
             var cumulative = cumulative()

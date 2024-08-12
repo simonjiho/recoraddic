@@ -642,7 +642,7 @@ class Quest: Equatable, Identifiable, Hashable {
 //    @Attribute(.unique)
     var name: String = ""
     var subName: String? //MARK: 아직 사용하지는 않지만, 일단 만들어둠. 쓸까 말까..
-    var dataType: Int = 1
+    var dataType: Int = 0
     var pastCumulatve: Int = 0
     var dailyData: [Date:Int] = [:]
     
