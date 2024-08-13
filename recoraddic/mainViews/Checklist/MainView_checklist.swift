@@ -110,8 +110,11 @@ struct MainView_checklist: View {
             
             let buttonSize = geoWidth/13
             
-            let popUp_addQuest_height = geometry.size.height*(keyboardAppeared ? 0.6 : 0.8)
-            let popUp_addQuest_yPos = keyboardAppeared ? 35 + popUp_addQuest_height/2 : geometry.size.height/2
+//            let popUp_addQuest_height = geometry.size.height*(keyboardAppeared ? 0.6 : 0.8)
+//            let popUp_addQuest_yPos = keyboardAppeared ? 35 + popUp_addQuest_height/2 : geometry.size.height/2
+            
+//            let popOver_changeMood_width = geoWidth*0.6
+//            let popOver_changeMood_height = geoHeight*0.6
             
             let popUp_changeMood_width = geoWidth * 0.7
             let popUp_changeMood_height = geoHeight * 0.7
@@ -241,7 +244,7 @@ struct MainView_checklist: View {
                         .popover(isPresented: $changeMood) {
                             VStack {
                                 Picker("분류", selection: $selectedClassification) {
-                                    ForEach(["긍정적","부정적","중립적"],id:\.self) {
+                                    ForEach(["전체", "😆","😀","😐","😟","😩","?"],id:\.self) {
                                         Text($0)
                                     }
                                 }
@@ -249,13 +252,16 @@ struct MainView_checklist: View {
                                 //                            .frame(height:geoHeight*0.06)
                                 ScrollView {
                                     let numList:[Int] = {
+                                        
                                         if selectedClassification == "전체" {return Array(1...125)}
-                                        else if selectedClassification == "긍정적" {return recoraddic.facialExpression_Good}
-                                        else if selectedClassification == "부정적" {return recoraddic.facialExpression_Bad}
-                                        else if selectedClassification == "중립적" {return recoraddic.facialExpression_Middle}
+                                        else if selectedClassification == "😆" {return recoraddic.facialExpression_Good2}
+                                        else if selectedClassification == "😀" {return recoraddic.facialExpression_Good1}
+                                        else if selectedClassification == "😟" {return recoraddic.facialExpression_Bad1}
+                                        else if selectedClassification == "😩" {return recoraddic.facialExpression_Bad2}
+                                        else if selectedClassification == "😐" {return recoraddic.facialExpression_Middle}
                                         else { return [1]}
                                     }()
-                                    let VGridSize = popUp_changeMood_width * 0.3
+                                    let VGridSize = popUp_changeMood_width * 0.2
                                     
                                     if forceToChooseMood {
                                         Text("하루를 표현할 표정을 선택하세요!")
@@ -297,10 +303,11 @@ struct MainView_checklist: View {
                                         
                                     } // LazyVGrid
                                 } // ScrollView
-                                .frame(width: popUp_changeMood_width, height: popUp_addQuest_height*0.9)
+                                .frame(width: popUp_changeMood_width*0.95, height: popUp_changeMood_height*0.9)
                             }
-                            .padding(.vertical,popUp_addQuest_height*0.02)
-                            .frame(width: popUp_changeMood_width, height: popUp_addQuest_height, alignment: .top)
+                            .padding(.horizontal,popUp_changeMood_width*0.02)
+                            .padding(.vertical,popUp_changeMood_height*0.02)
+                            .frame(width: popUp_changeMood_width, height: popUp_changeMood_height, alignment: .top)
                             .presentationCompactAdaptation(.popover)
                             
                             
@@ -1380,7 +1387,9 @@ struct PurposeOfDailyQuestView: View {
                         .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
                         .presentationCompactAdaptation(.popover)
                         .onDisappear() {
-                            if let quest = quests.first(where:{$0.name == dailyQuest.questName}) {
+                            if let quest = quests.first(where:{$0.name == dailyQuest.questName && !$0.inTrashCan}) {
+                                quest.recentPurpose = dailyQuest.defaultPurposes
+                            } else if let quest = quests.first(where:{$0.name == dailyQuest.questName}){
                                 quest.recentPurpose = dailyQuest.defaultPurposes
                             }
                         }

@@ -312,6 +312,8 @@ final class Todo_preset: Hashable, Identifiable, Equatable {
 @Model
 final class DailyRecordSet: Equatable {
     
+    var id: UUID = UUID()
+    
     var createdTime: Date = Date()
     
     var start:Date = Date()
@@ -634,6 +636,8 @@ final class DailyRecord: Equatable, Identifiable, Hashable {
 
 // 커스텀 기능들 제공 (ex: 매일/며칠/특정일(캘린더 통해 선택) 마다 몇 시간/분/회/OX/money)
 // 설정 주기보다 더 자주 한 날은 더 큰 버닝 게이지 제공
+
+
 @Model
 class Quest: Equatable, Identifiable, Hashable {
     
@@ -694,7 +698,7 @@ class Quest: Equatable, Identifiable, Hashable {
     }
     
     static func == (lhs: Quest, rhs: Quest) -> Bool {
-            return lhs.createdTime == rhs.createdTime
+            return lhs.createdTime == rhs.createdTime && lhs.name == rhs.name && lhs.dailyData == rhs.dailyData
             // Add any other properties that determine equality
     }
     

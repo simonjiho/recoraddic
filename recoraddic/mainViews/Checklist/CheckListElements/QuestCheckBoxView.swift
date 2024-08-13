@@ -620,6 +620,14 @@ struct QuestCheckBoxContent_HOUR:View {
             .sheet(isPresented: $isEditing_hours) {
                 // code for on dismiss
             } content: {
+                let dialMinutes:[Int] = {
+                    if value < 120 || value%5 == 0{
+                        return Array(0...120) + stride(from: 125, through: 1440, by: 5)
+                    } else {
+                        var arr = Array(0...120) + stride(from: 125, through: 1440, by: 5) + [value]
+                        return arr.sorted()
+                    }
+                }()
                 DialForHours(
                     questName:questName,
                     dailyGoal: $dailyGoal,
@@ -627,6 +635,7 @@ struct QuestCheckBoxContent_HOUR:View {
                     isEditing: $isEditing_hours,
                     hasGoal_toggle: $hasGoal_toggle,
                     tier: tier,
+                    dialMinutes: dialMinutes,
                     dailyGoal_nonNil: dailyGoal ?? value
                 )
                 .presentationDetents([.height(sheetHeight)])
@@ -1128,7 +1137,7 @@ class Stopwatch: ObservableObject {
 
 
 
-let dialMinutes:[Int] = Array(0...120) + stride(from: 125, through: 1440, by: 5)
+//let dialMinutes:[Int] = Array(0...120) + stride(from: 125, through: 1440, by: 5)
 
 
 
@@ -1143,6 +1152,7 @@ struct DialForHours: View {
     @Binding var isEditing: Bool
     @Binding var hasGoal_toggle: Bool
     var tier: Int
+    let dialMinutes:[Int]
 
     
 //    @State var hour = 0

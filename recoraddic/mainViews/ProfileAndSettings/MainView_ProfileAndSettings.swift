@@ -33,51 +33,52 @@ struct MainView_ProfileAndSettings: View {
             
             NavigationView {
                 List {
-                    NavigationLink(
-                        destination:
-                            FilteredDatas(
-                                filteredOption: "isArchived"
-//                                selectedData: "quest"
-                            )
-                            .navigationTitle("보관한 퀘스트")
-                            .navigationBarTitleDisplayMode(.inline)
-
-//                            .frame(width:geometry.size.width, height: geoHeight) //MARK: potential problem caused by the frame size.
+                    Section {
+                        NavigationLink(
+                            destination:
+                                FilteredDatas(
+                                    filteredOption: "isArchived"
+                                    //                                selectedData: "quest"
+                                )
+                                .navigationTitle("보관한 퀘스트")
+                                .navigationBarTitleDisplayMode(.inline)
+                            
+                            //                            .frame(width:geometry.size.width, height: geoHeight) //MARK: potential problem caused by the frame size.
                             // MARK: frame을 지정한 이유 -> destination의 기본 frame의 height 값이 좀 작음. 그래서 크게 만들었다.
                             // 크기 지정하니까 작동 안하네?! ㅅㅂ
-                    ) {
-                        Text("보관한 퀘스트")
-                    }
-                    NavigationLink(
-                        destination:
-                            FilteredDatas(
-                                filteredOption: "isHidden"
-//                                selectedData: "dailyRecord"
-                            )
-                            .navigationTitle("숨긴 퀘스트")
-                            .navigationBarTitleDisplayMode(.inline)
-
-//                            .frame(width:geometry.size.width, height: geoHeight) //MARK: potential problem caused by the frame size.
+                        ) {
+                            Text("보관한 퀘스트")
+                        }
+                        NavigationLink(
+                            destination:
+                                FilteredDatas(
+                                    filteredOption: "isHidden"
+                                    //                                selectedData: "dailyRecord"
+                                )
+                                .navigationTitle("숨긴 퀘스트")
+                                .navigationBarTitleDisplayMode(.inline)
+                            
+                            //                            .frame(width:geometry.size.width, height: geoHeight) //MARK: potential problem caused by the frame size.
                             // MARK: frame을 지정한 이유 -> destination의 기본 frame의 height 값이 좀 작음. 그래서 크게 만들었다.
                             // 크기 지정하니까 작동 안하네?! ㅅㅂ
-                    ) {
-                        Text("숨긴 퀘스트")
-                    }
-                    NavigationLink(
-                        destination:
-                            FilteredDatas(
-                                filteredOption: "inTrashCan"
-//                                selectedData: "dailyRecord"
-                            )
-                            .navigationTitle("삭제한 퀘스트")
-                            .navigationBarTitleDisplayMode(.inline)
-//                            .frame(width:geometry.size.width, height: geoHeight) //MARK: potential problem caused by the frame size.
+                        ) {
+                            Text("숨긴 퀘스트")
+                        }
+                        NavigationLink(
+                            destination:
+                                FilteredDatas(
+                                    filteredOption: "inTrashCan"
+                                    //                                selectedData: "dailyRecord"
+                                )
+                                .navigationTitle("삭제한 퀘스트")
+                                .navigationBarTitleDisplayMode(.inline)
+                            //                            .frame(width:geometry.size.width, height: geoHeight) //MARK: potential problem caused by the frame size.
                             // MARK: frame을 지정한 이유 -> destination의 기본 frame의 height 값이 좀 작음. 그래서 크게 만들었다.
                             // 크기 지정하니까 작동 안하네?! ㅅㅂ
-                    ) {
-                        Text("삭제한 퀘스트")
+                        ) {
+                            Text("삭제한 퀘스트")
+                        }
                     }
-                    
                     
                     Toggle(isOn: $profile.showHiddenQuests) {
                         Text("숨긴 퀘스트 보기")
@@ -143,64 +144,16 @@ struct FilteredDatas: View {
             let reversedcolorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
             
             
-            ZStack {
                 
-                FilteredQuests(
-                    filteredOption: filteredOption,
-                    selectedQuest: $selectedQuest,
-                    selectedQuestName: $selectedQuestName,
-                    popUp_quest: $popUp_quest,
-                    popUp_deleteQuest: $popUp_deleteQuest
-                )
-                .frame(width: geoWidth, height: geoHeight, alignment: .top)
-                
-                if popUp_deleteQuest {
-                    Color.gray
-                        .opacity(0.1)
-                        .onTapGesture {
-                            popUp_deleteQuest.toggle()
-                        }
-                    VStack(spacing:0.0) {
-                        
-                        
-                        Text("퀘스트 \"\(selectedQuestName)\"를")
-                            .minimumScaleFactor(0.3)
-                            .lineLimit(1)
-                            .padding(.bottom, confirmationPopUp_height*0.1)
-                        Text("정말로 삭제하시겠습니까?")
-                            .minimumScaleFactor(0.3)
-                            .lineLimit(1)
-                            .padding(.bottom, confirmationPopUp_height*0.2)
-                            
+            FilteredQuests(
+                filteredOption: filteredOption,
+                selectedQuest: $selectedQuest,
+                selectedQuestName: $selectedQuestName,
+                popUp_quest: $popUp_quest,
+                alert_delete: $popUp_deleteQuest
+            )
+            .frame(width: geoWidth, height: geoHeight, alignment: .top)
 
-                        
-                        HStack {
-                            Button("예") {
-                                modelContext.delete(selectedQuest!)
-                                selectedQuest = nil
-                                selectedQuestName = ""
-                                popUp_deleteQuest.toggle()
-                            }
-                            .frame(width: confirmationPopUp_width*0.5)
-                            Button("아니오") {
-                                selectedQuest = nil
-                                selectedQuestName = ""
-                                popUp_deleteQuest.toggle()
-                            }
-                            .frame(width: confirmationPopUp_width*0.5)
-                        }
-                
-
-                    }
-                        .frame(width: confirmationPopUp_width, height: confirmationPopUp_width*0.65)
-                        .background(.background)
-                        .clipShape(.rect(cornerSize: CGSize(width: confirmationPopUp_width*0.1, height: confirmationPopUp_width*0.65*0.1)))
-                        .shadow(color:reversedcolorSchemeColor,radius: 5)
-                }
-                
-                
-            }
-            .frame(width: geoWidth, height: geoHeight)
 //            .border(.gray)
 //            .background(.red)
 
@@ -220,7 +173,7 @@ struct FilteredQuests: View {
     @Binding var selectedQuest: Quest?
     @Binding var selectedQuestName: String
     @Binding var popUp_quest: Bool
-    @Binding var popUp_deleteQuest: Bool
+    @Binding var alert_delete: Bool
     
     var body: some View {
         
@@ -268,15 +221,44 @@ struct FilteredQuests: View {
                             }
                             .contextMenu(ContextMenu(menuItems: {
                                 Button("되돌리기") {
+                                    quest.isArchived = false
                                     quest.isHidden = false
+                                    quest.inTrashCan = false
                                 }
-                                
-                                Button("삭제") {
-                                    selectedQuest = quest
-                                    selectedQuestName = selectedQuest!.name
-                                    popUp_deleteQuest.toggle()
-                                    
+                                if filteredOption != "isArchived" {
+                                    Button("보관") {
+                                        quest.isArchived = true
+                                        quest.isHidden = false
+                                        quest.inTrashCan = false
+                                    }
                                 }
+                                if filteredOption != "isHidden" {
+                                    Button("숨기기") {
+                                        quest.isArchived = false
+                                        quest.isHidden = true
+                                        quest.inTrashCan = false
+                                    }
+                                }
+                                if filteredOption != "inTrashCan" {
+                                    Button("휴지통으로 이동") {
+                                        quest.isArchived = false
+                                        quest.isHidden = false
+                                        quest.inTrashCan = true
+                                    }
+                                }
+                                if filteredOption == "inTrashCan" {
+                                    Button("영구적으로 삭제") {
+                                        selectedQuest = quest
+                                        selectedQuestName = selectedQuest!.name
+                                        alert_delete.toggle()
+                                    }
+                                }
+//                                Button("삭제") {
+//                                    selectedQuest = quest
+//                                    selectedQuestName = selectedQuest!.name
+//                                    popUp_deleteQuest.toggle()
+//                                    
+//                                }
                             }))
                             .sheet(
                                 isPresented: $popUp_quest,
@@ -296,6 +278,21 @@ struct FilteredQuests: View {
                     
                 }
                 .frame(width:geoWidth, height: geoHeight)
+                .alert("퀘스트 '\(selectedQuest?.name ?? "")' 를 영구적으로 삭제하시겠습니까?", isPresented: $alert_delete) {
+                    Button("영구적으로 삭제") {
+                        
+                        let targetQuest: Quest = selectedQuest ?? Quest(name: "tmp", dataType: 0)
+                        selectedQuest = nil
+                        
+                        alert_delete.toggle()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                            modelContext.delete(targetQuest)
+                        }
+                    }
+                    Button("취소") {
+                        alert_delete.toggle()
+                    }
+                }
 
             }
             

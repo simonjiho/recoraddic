@@ -20,7 +20,7 @@ struct MainView_QuestInventory: View {
     
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
-    @Query(sort:\Quest.momentumLevel) var quests:[Quest]
+    @Query var quests:[Quest]
     
 
     
@@ -32,6 +32,7 @@ struct MainView_QuestInventory: View {
     } // add customPurpose later
     
     @State var selectedQuest: Quest?
+    @State var selectedQuest2: Quest = Quest(name: "", dataType: 0)
     @State var popUp_questStatisticsInDetail: Bool = false
     
     @State var popUp_addNewQuest: Bool = false
@@ -43,13 +44,23 @@ struct MainView_QuestInventory: View {
     
     @State var editOption: QuestEditOption?
     
+    @State var editQuestInfo: Bool = false
+    
     // @State enum -> 보관 / 숨기기 / 휴지통 하시겠습니까? -> enum에 따른 함수 구분해서 바꿔주기
     
     var body: some View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
         
-        let quest_sorted = quests.filter({$0.isVisible()})
+        let quest_sorted_visible = quests.filter({$0.isVisible()}).sorted(by: {
+            if $0.momentumLevel != $1.momentumLevel {
+                return $0.momentumLevel > $1.momentumLevel
+            } else if $0.tier != $1.tier {
+                return $0.tier > $1.tier
+            } else {
+                return $0.createdTime > $0.createdTime
+            }
+        })
         
         GeometryReader { geometry in
             
@@ -113,7 +124,7 @@ struct MainView_QuestInventory: View {
                                 
                                     
                                 LazyVGrid(columns: [GridItem(.adaptive(minimum: gridWidth, maximum: gridWidth))], spacing: gridVerticalSpacing) {
-                                    ForEach(quest_sorted,id:\.createdTime) { quest in
+                                    ForEach(quest_sorted_visible,id:\.createdTime) { quest in
                                         
                                         
                                         Button(action:{
@@ -168,9 +179,23 @@ struct MainView_QuestInventory: View {
                                             
                                         }
                                         .contextMenu(ContextMenu(menuItems: {
+                                            
+                                            Button("정보 수정") {
+                                                selectedQuest = quest
+                                                editQuestInfo.toggle()
+//                                                toggleEditQuestInfo()
+                                            }
+                                            Button("보관") {
+                                                quest.isArchived = true
+                                            }
                                             Button("숨기기") {
                                                 quest.isHidden = true
                                             }
+
+                                            Button("휴지통으로 이동", systemImage:"trash") {
+                                                quest.inTrashCan = true
+                                            }
+                                            .foregroundStyle(.red)
                                         }))
                                         .onAppear() {
                                             quest.updateMomentumLevel()
@@ -260,6 +285,7 @@ struct MainView_QuestInventory: View {
                             selectedQuest: $selectedQuest,
                             popUp_questStatisticsInDetail: $popUp_questStatisticsInDetail
                         )
+                        .ignoresSafeArea(.keyboard)
                     }
                 }
 
@@ -274,6 +300,13 @@ struct MainView_QuestInventory: View {
                         .shadow(color:shadowColor, radius: 3.0)
                 }
 
+            }
+            
+            .fullScreenCover(isPresented: $editQuestInfo, onDismiss: {selectedQuest=nil}) {
+                EditQuest2(
+                    popUp_editQuest: $editQuestInfo,
+                    selectedQuest: $selectedQuest
+                )
             }
             
             .sheet(isPresented: $isEdit) {
@@ -374,6 +407,16 @@ struct MainView_QuestInventory: View {
         editOption = nil
         editConfirmed = false
     }
+    
+//    func toggleEditQuestInfo() -> Void {
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+//            if selectedQuest != nil {
+//                editQuestInfo = true
+//            } else {
+//                toggleEditQuestInfo()
+//            }
+//        }
+//    }
     
 }
 
@@ -1325,3 +1368,38 @@ struct RotatingGradient: View {
 }
 
 
+
+struct EditQuest2: View {
+    
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.colorScheme) var colorScheme
+    
+    @Query var quests: [Quest]
+        
+    @Binding var popUp_editQuest: Bool
+    @Binding var selectedQuest: Quest?
+
+    
+    var body: some View {
+        if let quest = selectedQuest {
+            EditQuest(
+                popUp_editQuest: $popUp_editQuest,
+                quest: quest,
+                questName: quest.name,
+                questDataType: DataType(rawValue: quest.dataType) ?? .hour ,
+                customDataTypeNotation:quest.customDataTypeNotation,
+                customDataTypeNotation_textField: quest.customDataTypeNotation ?? "",
+                addSubName: quest.subName != nil,
+                questSubname: quest.subName ?? "",
+                addPastCumulative: quest.pastCumulatve != 0,
+                pastCumulative: quest.pastCumulatve/60,
+                pastCumulative_str: String(quest.pastCumulatve/60)
+            )
+        } else {
+            Spacer()
+        }
+    }
+    
+    
+    
+}

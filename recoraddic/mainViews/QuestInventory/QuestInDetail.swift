@@ -20,6 +20,8 @@ struct QuestInDetail: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
     
+    @Query var quests: [Quest]
+    
     @Binding var selectedQuest: Quest? // MARK: 이렇게 하지 않으면 화면이 잘 업데이트 되지 않았었음.
     
     @Binding var popUp_questStatisticsInDetail: Bool
@@ -27,6 +29,7 @@ struct QuestInDetail: View {
     @State var alert_inTrashCan: Bool = false
     @State var alert_restore: Bool = false
     @State var alert_delete: Bool = false
+    @State var alert_sameName: Bool = false
     
     @State var currentPage = 0
 
@@ -34,6 +37,7 @@ struct QuestInDetail: View {
     
     var body: some View {
         
+        let questNames = quests.filter({!$0.inTrashCan}).map { $0.name }
         
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let contentColor: Color = colorScheme == .light ? colorSchemeColor.adjust(brightness: -0.05) : colorSchemeColor
@@ -71,7 +75,7 @@ struct QuestInDetail: View {
                                     .frame(width: geoWidth)
                                     .font(.title)
                                     .padding(.top, geoHeight*0.02)
-                                if let startDate: Date  = selectedQuest!.dailyData.keys.sorted().first {
+                                if let startDate: Date  = selectedQuest?.dailyData.keys.sorted().first {
                                     Text("시작일: \(yyyymmddFormatOf(startDate))")
                                 }
                                 
@@ -87,14 +91,26 @@ struct QuestInDetail: View {
                                     }
                                     .alert("퀘스트 '\(selectedQuest?.name ?? "")' 를 복구하시겠습니까?", isPresented: $alert_restore) {
                                         Button("복구") {
-                                            selectedQuest?.inTrashCan = false
-                                            popUp_questStatisticsInDetail.toggle()
+                                            if questNames.contains(selectedQuest?.name ?? "") {
+                                                alert_sameName.toggle()
+                                            } else {
+                                                selectedQuest?.inTrashCan = false
+                                                popUp_questStatisticsInDetail.toggle()
+                                            }
                                             alert_restore.toggle()
                                         }
                                         Button("취소") {
                                             alert_restore.toggle()
                                         }
                                     }
+                                    .alert("같은 이름의 퀘스트가 존재합니다.",isPresented: $alert_sameName) {
+                                        Button("확인") {
+                                            alert_sameName.toggle()
+                                        }
+                                    }
+                                    
+                                    
+                                    
                                     Button("영구적으로 삭제") {
                                         alert_delete.toggle()
                                     }
@@ -115,6 +131,7 @@ struct QuestInDetail: View {
                                             alert_delete.toggle()
                                         }
                                     }
+
                                     
                                 }
                                 .padding(.bottom,geoHeight*0.01)

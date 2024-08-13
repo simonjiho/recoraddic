@@ -60,40 +60,52 @@ struct StartNewRecordSet:View {
                 Button(action:{popUp_startNewRecordSet.toggle()}) {
                     Image(systemName: "xmark")
                 }
+//                .padding(10)
                 .frame(width: geoWidth*0.95, height: xButtonHeight, alignment: .trailing)
                     
                 HStack {
-                    DatePicker("시작일",selection: $selectedDate, in: minDate...minDate.addingDays(500), displayedComponents: [.date])
-                        .zIndex(3)
-                    Spacer()
+                    Text("시작일:")
+                    DatePicker("",selection: $selectedDate, in: minDate...minDate.addingDays(500), displayedComponents: [.date])
+                        .labelsHidden()
                 }
+                .frame(width: geoWidth*0.9, alignment: .leading)
+                .padding(.bottom)
+//                .padding(5)
+//                .border(.gray)
+//                .padding()
                 
-                Text("기록의 탑 선택")
-                    .frame(height: questionBoxSize)
                 
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: gridSize))]) {
-                        ForEach(recoraddic.dailyRecordThemeNames, id:\.self) { dailyRecordThemeName in
-                            Button(action:{
-                                selectedDailyRecordThemeName = dailyRecordThemeName
-                                if selectedDailyRecordThemeName == "StoneTower" {
-                                    createNewDailyRecordSet()
-                                    popUp_startNewRecordSet.toggle()
+                VStack {
+                    Text("스타일 선택")
+                    ScrollView {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: gridSize))]) {
+                            ForEach(recoraddic.dailyRecordThemeNames, id:\.self) { dailyRecordThemeName in
+                                Button(action:{
+                                    selectedDailyRecordThemeName = dailyRecordThemeName
+                                }) {
+                                    DRSThemeThumbnailView(dailyRecordThemeName: dailyRecordThemeName)
+                                        .frame(width:gridSize, height: gridSize)
+                                        .border(.gray.opacity(selectedDailyRecordThemeName == dailyRecordThemeName ? 1.0 : 0.0),width:3.0)
                                 }
-                                else {
-                                    
-                                    steps += 1
-                                }
-                            }) {
-                                DRSThemeThumbnailView(dailyRecordThemeName: dailyRecordThemeName)
-                                    .frame(width:gridSize, height: gridSize)
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
                         }
                     }
+                    .frame(width:geoWidth*0.8)
                 }
-                .frame(width:geoWidth*0.8)
+                .frame(width:geoWidth*0.9)
+                .padding(.vertical)
+                .border(.gray)
 
+                Button("생성") {
+                    if selectedDailyRecordThemeName == "StoneTower" {
+                        createNewDailyRecordSet()
+                        popUp_startNewRecordSet.toggle()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(selectedDailyRecordThemeName == nil)
+                .padding()
                 
                 
             }
@@ -139,16 +151,22 @@ struct DRSThemeThumbnailView: View {
             let geoHeight = geometry.size.height
             
             if dailyRecordThemeName == "StoneTower" {
-                VStack {
+                VStack(spacing:0.0) {
                     StoneTower_stone(
                         shapeNum: 3, brightness: 3, defaultColorIndex: 0, facialExpressionNum: 0, selected: false
                     )
                     .frame(width:geoWidth*0.75, height: geoHeight*0.5)
                     Text("기본")
                         .font(.caption)
+                        .frame(height: geoHeight*0.25, alignment: .bottom)
+//                        .padding(.top,10)
                 }
+                .padding(.vertical,geoHeight*0.15)
                 .frame(width: geoWidth, height: geoHeight)
-                .border(getReversedColorSchemeColor(colorScheme))
+                .background(.gray.opacity(0.3))
+//                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+//                .border(getReversedColorSchemeColor(colorScheme))
+                
             }
 
       

@@ -43,6 +43,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     @State var popUp_changeStyle = false
     
     @State var selectedRecord: DailyRecord? = nil
+    @State var selectedDrDate: Date? = nil
     
     @State var updateSelectedDailyRecordSet: Bool = false
     
@@ -176,7 +177,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                         newDailyRecordSetAdded: $newDailyRecordSetAdded,
                         minDate: selectedDailyRecordSet.start.addingDays(1)
                     )
-                        .popUpViewLayout(width: geoWidth*0.9, height: (geoHeight-statusBarHeight)*0.9, color: backGroundColor)
+                        .popUpViewLayout(width: geoWidth*0.9, height: (geoHeight-statusBarHeight)*0.6, color: backGroundColor)
                         .position(x:geoWidth/2,y: statusBarHeight + (geoHeight-statusBarHeight)/2 )
                 }
                 
@@ -196,21 +197,40 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     }
 
                 }
+                if popUp_recordInDetail {
+                    Color.gray.opacity(0.5)
+                        .onTapGesture {
+                            popUp_recordInDetail.toggle()
+                        }
+                    RecordInDetailView_new(
+                        selectedDailyRecord:$selectedRecord,
+                        popUp_recordInDetail: $popUp_recordInDetail
+//                        selectedDrDate:$selectedDrDate
+//                        selectedDrDate: selectedRecord?.date ?? nil
+                    )
+                    .frame(width: geoWidth*0.95, height: geoHeight*0.7)
+                    .background(.background)
+                    .clipShape(.rect(cornerSize: CGSize(width: geoWidth*0.95*0.1, height: geoHeight*0.7*0.1)))
+                }
+                
                 
                 
                 
                 
             }
-            .sheet(isPresented: $popUp_recordInDetail) {
-                RecordInDetailView_new(selectedDailyRecord:$selectedRecord)
-//                RecordInDetailView_optional(
-//                    popUp_recordInDetail: $popUp_recordInDetail,
-//                record: $selectedRecord
+//            .sheet(isPresented: $popUp_recordInDetail) {
+//                RecordInDetailView_new(
+//                    selectedDailyRecord:$selectedRecord,
+//                    selectedDrDate: selectedRecord?.date ?? nil
 //                )
-                .background(colorSchemeColor)
-                
-                //TODO: light모드일 때,  Col
-            }
+////                RecordInDetailView_optional(
+////                    popUp_recordInDetail: $popUp_recordInDetail,
+////                record: $selectedRecord
+////                )
+//                .background(colorSchemeColor)
+//                
+//                //TODO: light모드일 때,  Col
+//            }
             .scrollDisabled(dailyRecordSetEmpty)
         }
         .onChange(of: selectedDailyRecordSetIndex) {
@@ -259,6 +279,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             selectedDailyRecordSetIndex = dailyRecordSets.count - 1
         }
         .onChange(of: selectedRecord) { oldValue, newValue in
+            selectedDrDate = selectedRecord?.date
             if selectedRecord != nil {
                 lastTapTime = Date()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {

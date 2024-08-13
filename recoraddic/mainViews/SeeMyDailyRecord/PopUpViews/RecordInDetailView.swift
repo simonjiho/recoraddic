@@ -19,42 +19,61 @@ struct RecordInDetailView_new: View {
     
     
     @Binding var selectedDailyRecord: DailyRecord?
-    @State var selectedDrDate: Date?
-    
+    @Binding var popUp_recordInDetail: Bool
+//    @Binding var selectedDrDate: Date?
+    @State var selectedDrIdx: Int?
     
     var body: some View {
         
         let dailyRecords_withContent = dailyRecords.filter({$0.hasContent})
         
-            
-            ScrollView(.horizontal) {
-                LazyHStack(spacing:0.0) {
-                    ForEach(dailyRecords_withContent, id:\.self) { dr in
-                        VStack {
-                            if let date = dr.date {
-                                DailyRecordInShort(dailyRecord: dr)
-                            } else {
-                                Text("nil dailyRecord")
+        Group {
+            if selectedDrIdx == nil {
+                Spacer()
+            } else {
+                VStack {
+                    ScrollView(.horizontal) {
+                        LazyHStack(spacing:0.0) {
+                            //                HStack(spacing:0.0) {
+                            //                    ForEach(dailyRecords_withContent, id:\.self) { dr in
+                            ForEach(dailyRecords_withContent.indices, id:\.self) { idx in
+                                VStack {
+                                    //                            if let date = dr.date {
+                                    DailyRecordInShort(dailyRecord: dailyRecords_withContent[idx])
+                                    //                            } else {
+                                    //                            Text("nil dailyRecord")
+                                    //                            }
+                                }
+                                .containerRelativeFrame([.horizontal, .vertical])
+                                .id(idx)
                             }
                         }
-                        .containerRelativeFrame([.horizontal, .vertical])
-                        .id(dr.date)
+                        .scrollTargetLayout()
+                        
+                        
                     }
-                }
-                .scrollTargetLayout()
-
-                
-            }
-            .scrollTargetBehavior(.paging)
-            .scrollPosition(id: $selectedDrDate)
-            .scrollIndicators(.never)
-            .onAppear() {
-                
-                DispatchQueue.main.async {
-                    selectedDrDate = selectedDailyRecord?.date ?? nil
-
+                    .scrollPosition(id: $selectedDrIdx)
+                    //            .scrollPosition(id: $selectedDrDate)
+                    .scrollTargetBehavior(.paging)
+                    .scrollIndicators(.never)
+                    Button(action:{popUp_recordInDetail.toggle()}) {
+                        Image(systemName: "xmark")
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.vertical,10)
                 }
             }
+        }
+        .onAppear() {
+//                print(selectedDrDate)
+            DispatchQueue.main.async {
+                selectedDrIdx = dailyRecords_withContent.firstIndex(of: selectedDailyRecord!) ?? 0
+//                    selectedDrDate = selectedDailyRecord?.date ?? nil
+            }
+        }
+            
+
+
         
 
     }
@@ -108,29 +127,54 @@ struct DailyRecordInShort: View {
 //            let iconHeight: CGFloat = 35
             
             VStack {
-                
-                HStack(spacing:geoWidth*0.05) {
-                    if dailyRecord.mood != 0 {
-                        ZStack {
-                            Circle()
-                                .stroke(lineWidth: geoWidth*0.002)
-                                .frame(width:facialExpressionSize, height: facialExpressionSize)
-                            reversedcolorSchemeColor
-                                .frame(width:facialExpressionSize, height: facialExpressionSize)
-                                .mask(
-                                    Image("facialExpression_\(dailyRecord.mood)")
-                                        .resizable()
-                                        .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
-                                )
-                        }
-                        .frame(width:facialExpressionSize, height: facialExpressionSize)
+                if dailyRecord.mood != 0 {
+                    ZStack {
+                        Circle()
+                            .stroke(lineWidth: geoWidth*0.002)
+                            .frame(width:facialExpressionSize, height: facialExpressionSize)
+                        reversedcolorSchemeColor
+                            .frame(width:facialExpressionSize, height: facialExpressionSize)
+                            .mask(
+                                Image("facialExpression_\(dailyRecord.mood)")
+                                    .resizable()
+                                    .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
+                            )
                     }
+                    //                .frame(width:geoWidth*0.2, height: facialExpressionSize,alignment: .trailing)
+                    .frame(width:facialExpressionSize, height: facialExpressionSize)
+//                    .opacity(dailyRecord.mood == 0 ? 0.0 : 1.0)
+                    
+                } else {
+                    Image(systemName: "questionmark.circle")
+                        .resizable()
+                        .frame(width:facialExpressionSize, height: facialExpressionSize)
+                }
+//                HStack(spacing:0.0) {
+//                    ZStack {
+//                        Circle()
+//                            .stroke(lineWidth: geoWidth*0.002)
+//                            .frame(width:facialExpressionSize, height: facialExpressionSize)
+//                        reversedcolorSchemeColor
+//                            .frame(width:facialExpressionSize, height: facialExpressionSize)
+//                            .mask(
+//                                Image("facialExpression_\(dailyRecord.mood)")
+//                                    .resizable()
+//                                    .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
+//                            )
+//                    }
+//                    .frame(width:geoWidth*0.2, height: facialExpressionSize,alignment: .trailing)
+////                    .frame(width:facialExpressionSize, height: facialExpressionSize)
+//                    .opacity(dailyRecord.mood == 0 ? 0.0 : 1.0)
                     Text(kor_yyyymmddFormatOf(dailyRecord.date ?? Date()))
                     //                        .frame(width: geoWidth)
                         .font(.title3)
                         .bold()
-                }
-                .padding(.top,30)
+//                        .frame(width: geoWidth*0.6)
+//                    Spacer()
+//                        .frame(width:geoWidth*0.2, height: facialExpressionSize)
+//                    
+//                }
+//                .padding(.top,30)
                 
                 
                 ScrollView {
@@ -158,7 +202,7 @@ struct DailyRecordInShort: View {
                                 .padding(elementWidth*0.03)
                                 .frame(width:elementWidth)
                                 .background(.gray.opacity(0.1))
-                                .padding(.bottom,geoHeight*0.05)
+//                                .padding(.bottom,geoHeight*0.05)
                         }
 
 
@@ -229,6 +273,7 @@ struct DailyRecordInShort: View {
                 }//ScrollView
                 .frame(width: geometry.size.width, height: geometry.size.height*0.8)
             } // VStack
+            .padding(.vertical,15)
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
 
                 
