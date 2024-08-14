@@ -1288,8 +1288,8 @@ struct EditQuest: View {
         
         
         
-        if quest.name != "" { quest.name = newName }
-        if addSubName && questSubname != "" { quest.subName = newSubName }
+        quest.name = newName
+        if addSubName { quest.subName = newSubName }
         else { quest.subName = nil }
         if questDataType == .custom { quest.customDataTypeNotation = customDataTypeNotation }
         if addPastCumulative {

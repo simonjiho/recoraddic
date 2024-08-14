@@ -48,7 +48,7 @@ struct MainView_checklist: View {
     @State var keyboardHeight: CGFloat = 0
     @State var changeMood: Bool = false
     @State var forceToChooseMood: Bool = false
-    @State var selectedClassification: String = "긍정적"
+    @State var selectedClassification: String = "전체"
     
     @StateObject private var notificationManager = NotificationManager()
 
@@ -88,13 +88,13 @@ struct MainView_checklist: View {
             }
         }()
         
-        let shadowColor:Color = getShadowColor(colorScheme)
+//        let shadowColor:Color = getShadowColor(colorScheme)
 
         let middleColor:Color = colorScheme == .light ? Color.black.adjust(brightness: 0.2) : Color.white
-        let linearGradient1: LinearGradient =
-        LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .leading, endPoint: .trailing)
-        let linearGradient2: LinearGradient =
-        LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .topLeading, endPoint: .bottomTrailing)
+//        let linearGradient1: LinearGradient =
+//        LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .leading, endPoint: .trailing)
+//        let linearGradient2: LinearGradient =
+//        LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .topLeading, endPoint: .bottomTrailing)
         
         let bgColor: Color = currentDailyRecord.dailyRecordSet?.getIntegratedDailyRecordColor(colorScheme: colorScheme) ?? Color.gray
         
@@ -108,7 +108,8 @@ struct MainView_checklist: View {
             
             let checkListElementWidth: CGFloat = geoWidth * 0.95
             
-            let buttonSize = geoWidth/13
+            let buttonSize = geoWidth*0.06
+//            let buttonSize = geoWidth/13 // ~24.08.17
             
 //            let popUp_addQuest_height = geometry.size.height*(keyboardAppeared ? 0.6 : 0.8)
 //            let popUp_addQuest_yPos = keyboardAppeared ? 35 + popUp_addQuest_height/2 : geometry.size.height/2
@@ -120,7 +121,7 @@ struct MainView_checklist: View {
             let popUp_changeMood_height = geoHeight * 0.7
 
             let facialExpressionSize = geoWidth*0.085
-            
+//            facialExpressionSize*0.7
 //            let isNotToday: Bool = getStartOfDate(date: selectedDate) != getStartDateOfNow()
             
             ZStack {
@@ -244,7 +245,7 @@ struct MainView_checklist: View {
                         .popover(isPresented: $changeMood) {
                             VStack {
                                 Picker("분류", selection: $selectedClassification) {
-                                    ForEach(["전체", "😆","😀","😐","😟","😩","?"],id:\.self) {
+                                    ForEach(["전체", "😆","😀","😐","😟","😩"],id:\.self) {
                                         Text($0)
                                     }
                                 }
@@ -270,6 +271,24 @@ struct MainView_checklist: View {
                                     }
                                     
                                     LazyVGrid(columns: [GridItem(.adaptive(minimum: VGridSize))]) {
+                                        Color.black.opacity(0.6)
+                                            .mask {
+                                                Image(systemName: "questionmark")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .blur(radius: 0.2)
+                                                    .frame(width:VGridSize*0.7, height: VGridSize*0.7)
+                                            }
+                                            .frame(width:VGridSize, height: VGridSize)
+                                            .background(bgColor.opacity(0.3))
+                                            .onTapGesture {
+                                                
+                                                currentDailyRecord.mood = numList[Int.random(in: 0...numList.count-1)]
+                                                changeMood.toggle()
+
+                                                
+                                            } // onTapGesture
+                                        
                                         
                                         ForEach(numList, id: \.self) { index in
                                             Color.black.opacity(0.6)
@@ -734,9 +753,9 @@ struct ChecklistView: View {
 
 
         let showHiddenQuests = profile.showHiddenQuests
-        let hiddenQuestNames: [String] = showHiddenQuests ? [] : quests.filter({$0.isHidden}).map({$0.getName()}) 
+        let hiddenQuestNames: [String] = showHiddenQuests ? [] : quests.filter({$0.isHidden}).map({$0.name})
         
-        let dailyQuests_notHidden_sorted = currentDailyRecord.dailyQuestList!.filter({!hiddenQuestNames.contains($0.getName())}).sorted(by:{
+        let dailyQuests_notHidden_sorted = currentDailyRecord.dailyQuestList!.filter({!hiddenQuestNames.contains($0.questName)}).sorted(by:{
             if $0.alermTime != nil && $1.alermTime != nil {
                 return $0.alermTime! <= $1.alermTime!
             }

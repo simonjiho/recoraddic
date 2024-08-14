@@ -39,6 +39,7 @@
 		B27A5CEE2B14764A0042ADF6 /* dataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27A5CED2B14764A0042ADF6 /* dataType.swift */; };
 		B27A5CF12B15C9D50042ADF6 /* questBar.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B27A5CF02B15C9D50042ADF6 /* questBar.xcassets */; };
 		B27CBB592BA41E6C00CD6CD3 /* recalculateVisualValues_dr.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27CBB582BA41E6C00CD6CD3 /* recalculateVisualValues_dr.swift */; };
+		B282D1222C70826E008F6F7A /* MainView_Memo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B282D1212C70826E008F6F7A /* MainView_Memo.swift */; };
 		B283397D2AFB97E9009AEB2A /* calendarFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B283397C2AFB97E9009AEB2A /* calendarFunc.swift */; };
 		B29C702E2A35C5E30046873E /* recoraddicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29C702D2A35C5E30046873E /* recoraddicApp.swift */; };
 		B29C70302A35C5E30046873E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29C702F2A35C5E30046873E /* ContentView.swift */; };
@@ -160,6 +161,7 @@
 		B27A5CED2B14764A0042ADF6 /* dataType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dataType.swift; sourceTree = "<group>"; };
 		B27A5CF02B15C9D50042ADF6 /* questBar.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = questBar.xcassets; sourceTree = "<group>"; };
 		B27CBB582BA41E6C00CD6CD3 /* recalculateVisualValues_dr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recalculateVisualValues_dr.swift; sourceTree = "<group>"; };
+		B282D1212C70826E008F6F7A /* MainView_Memo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_Memo.swift; sourceTree = "<group>"; };
 		B283397C2AFB97E9009AEB2A /* calendarFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = calendarFunc.swift; sourceTree = "<group>"; };
 		B29C702A2A35C5E30046873E /* recoraddic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = recoraddic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B29C702D2A35C5E30046873E /* recoraddicApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recoraddicApp.swift; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 				B260A38F2A9B870100D73208 /* Checklist */,
 				B260A3982A9C758E00D73208 /* SeeMyDailyRecord */,
 				B2B28DB12AC5D69D0071531B /* ProfileAndSettings */,
+				B282D1212C70826E008F6F7A /* MainView_Memo.swift */,
 			);
 			path = mainViews;
 			sourceTree = "<group>";
@@ -703,6 +706,7 @@
 				B2E6C63B2C47AA1B0082B000 /* SunriseSunsetViewModel.swift in Sources */,
 				B2FB22002B1367DC00AB17FA /* buttonsView.swift in Sources */,
 				B220DA442B6519C20039160C /* stoneTower_backgroundThemes.swift in Sources */,
+				B282D1222C70826E008F6F7A /* MainView_Memo.swift in Sources */,
 				B2E6C6372C4674220082B000 /* EditCheckListView.swift in Sources */,
 				B265D27B2B04976E002E51A8 /* themeData.swift in Sources */,
 				B2F017352C3D157600765EF6 /* recoraddicWidgetAttributes.swift in Sources */,

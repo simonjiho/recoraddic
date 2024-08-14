@@ -22,10 +22,11 @@ struct StoneTower: View {
     
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
     
-    @Binding var dailyRecordSet:DailyRecordSet
-//    @Binding var dailyRecordSet:DailyRecordSet
-    @Binding var selectedDailyRecordSetIndex: Int
-    @Binding var selectedRecord: DailyRecord?
+    @Binding var selectedDailyRecordSet:DailyRecordSet
+    @Binding var selectedDrsIdx: Int
+    @Binding var selectedDailyRecord: DailyRecord?
+    @Binding var selectedDrIdx: Int?
+    var dailyRecords_withContent:[DailyRecord]
     @Binding var popUp_startNewRecordSet: Bool
     @Binding var popUp_recordInDetail: Bool
     @Binding var popUp_changeStyle: Bool
@@ -40,7 +41,7 @@ struct StoneTower: View {
     let startRange: ClosedRange<Date>
     let endRange: ClosedRange<Date>
     
-//    let selectedDailyRecordSetIndex: Int
+//    let selectedDrsIdx: Int
     
     
     @State var scrollViewCenterY: CGFloat = 0
@@ -63,15 +64,13 @@ struct StoneTower: View {
     
     var body: some View {
 
-        let dailyRecords_visible: [DailyRecord] = dailyRecordSet.visibleDailyRecords()
+//        let dailyRecords_visible: [DailyRecord] = dailyRecordSet.visibleDailyRecords()
         
-        let numberOfStones: Int  = dailyRecords_visible.count
+        let numberOfStones: Int  = dailyRecords_withContent.count
         
 
-
-
         
-        let defaultColorIndex:Int = dailyRecordSet.dailyRecordColorIndex
+        let defaultColorIndex:Int = selectedDailyRecordSet.dailyRecordColorIndex
 
 
 
@@ -84,11 +83,11 @@ struct StoneTower: View {
         GeometryReader { geometry in
             
             let haveSelectedRecord: Bool = {
-                if selectedRecord == nil {
+                if selectedDailyRecord == nil {
                     return false
                 }
                 else {
-                    return dailyRecords_visible.contains(selectedRecord!)
+                    return dailyRecords_withContent.contains(selectedDailyRecord!)
                 }
             }() //MARK: 다른기기에서 selectedRecord에 할당된 데이터를 지워 cloud상에서 삭제되었음에도, view의 selectedRecord에 할당되어 있을 때
             
@@ -117,7 +116,7 @@ struct StoneTower: View {
             let scrollViewCenter_bottom:CGFloat = scrollViewCenterY + stoneHeight
             let scrollViewCenter_above:CGFloat = scrollViewCenterY - stoneHeight
             
-            let isLatestDailyRecordSet: Bool = dailyRecordSet == dailyRecordSets.last
+            let isLatestDailyRecordSet: Bool = selectedDailyRecordSet == dailyRecordSets.last
             
             let goalEditButtonSize:CGFloat = groundHeight/10
             let plusMinusButtonSize:CGFloat = groundHeight/12
@@ -130,14 +129,14 @@ struct StoneTower: View {
                     GeometryReader { geometry2 in // for preferenceKey
                         ZStack {
                             StoneTowerBackground(
-                                backgroundThemeName: dailyRecordSet.backgroundThemeName,
+                                backgroundThemeName: selectedDailyRecordSet.backgroundThemeName,
                                 totalSkyHeight: totalSkyHeight,
                                 groundHeight: groundHeight + keyboardHeight,
                                 displayHeight: geoHeight
                             )
                             .frame(height: totalSkyHeight + groundHeight + keyboardHeight)
                             .onTapGesture {
-                                selectedRecord = nil
+                                selectedDailyRecord = nil
                             }
 
                                 
@@ -150,12 +149,12 @@ struct StoneTower: View {
                                     ForEach((0...lastIndexOfRecordStone).reversed(), id:\.self) { index in
                                         
                                         
-                                        let record:DailyRecord = dailyRecords_visible[index]
+                                        let record:DailyRecord = dailyRecords_withContent[index]
                                         
                                         let isSelectedRecord:Bool = {
-                                            if selectedRecord == nil { return false }
+                                            if selectedDailyRecord == nil { return false }
                                             else {
-                                                if selectedRecord == record { return true }
+                                                if selectedDailyRecord == record { return true }
                                                 else { return false}
                                             }
                                         }()
@@ -196,10 +195,11 @@ struct StoneTower: View {
                                                 .padding(.vertical, 0)
                                                 .onTapGesture {
                                                     if isSelectedRecord {
+                                                        selectedDrIdx = index
                                                         popUp_recordInDetail.toggle()
                                                     }
                                                     else {
-                                                        selectedRecord = dailyRecords_visible[index]
+                                                        selectedDailyRecord = dailyRecords_withContent[index]
                                                         withAnimation {
                                                             scrollProxy.scrollTo(record.getLocalDate(), anchor:.center)
                                                         }
@@ -248,7 +248,7 @@ struct StoneTower: View {
                                     HStack {
                                         Button(action:{
                                             
-                                            selectedDailyRecordSetIndex -= 1
+                                            selectedDrsIdx -= 1
                                             isEditingTermGoals = false
                                         }) {
                                             Image(systemName: "chevron.left")
@@ -257,11 +257,11 @@ struct StoneTower: View {
                                                 .frame(width:geoWidth*0.12,height: groundHeight*0.1)
                                         }
                                         .buttonStyle(.plain)
-                                        .disabled(selectedDailyRecordSetIndex == 0 || isEditingTermGoals)
+                                        .disabled(selectedDrsIdx == 0 || isEditingTermGoals)
                                         
 
                                         HStack {
-                                            if dailyRecordSet.end != nil {
+                                            if selectedDailyRecordSet.end != nil {
                                                 DatePicker(
                                                     "",
                                                     selection: $startDate,
@@ -300,7 +300,7 @@ struct StoneTower: View {
                                         }
                                         .frame(width:geoWidth*0.7, height:groundHeight*0.15, alignment: .center)
                                         Button(action:{
-                                            selectedDailyRecordSetIndex += 1
+                                            selectedDrsIdx += 1
                                         }) {
                                             Image(systemName: "chevron.right")
                                                 .resizable()
@@ -326,7 +326,7 @@ struct StoneTower: View {
                                                             .frame(width:geoWidth*0.7, alignment:.leading)
                                                             .focused($editTermGoals, equals:index)
                                                             .onSubmit {
-                                                                dailyRecordSet.termGoals = editText.filter({$0 != ""})
+                                                                selectedDailyRecordSet.termGoals = editText.filter({$0 != ""})
                                                                 editTermGoals = nil
                                                                 isEditingTermGoals.toggle()
                                                             }
@@ -360,11 +360,11 @@ struct StoneTower: View {
 
                                         else {
                                             Group {
-                                                if dailyRecordSet.termGoals.count != 0 {
-                                                    ForEach(0...dailyRecordSet.termGoals.count-1, id:\.self) { index in
+                                                if selectedDailyRecordSet.termGoals.count != 0 {
+                                                    ForEach(0...selectedDailyRecordSet.termGoals.count-1, id:\.self) { index in
                                                         HStack {
                                                             Text("\(index+1). ")
-                                                            Text(dailyRecordSet.termGoals[index])
+                                                            Text(selectedDailyRecordSet.termGoals[index])
                                                                 .frame(width:geoWidth*0.7, alignment:.leading)
                                                             
                                                         }
@@ -381,8 +381,8 @@ struct StoneTower: View {
                                                 }
                                             }
                                             .onTapGesture {
-                                                editText = dailyRecordSet.termGoals
-                                                if dailyRecordSet.termGoals.count == 0 {
+                                                editText = selectedDailyRecordSet.termGoals
+                                                if selectedDailyRecordSet.termGoals.count == 0 {
                                                     editText.append("")
                                                 }
                                                 editTermGoals = editText.count - 1
@@ -494,7 +494,7 @@ struct StoneTower: View {
 //                                .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
 //                                let noSavedDailyRecords_visible: Bool = dailyRecordSet.dailyRecords?.filter({$0.hasContent}).count == 0
 //                                
-//                                if noSavedDailyRecords_visible && selectedDailyRecordSetIndex == dailyRecordSets.count - 1 && !isEditingTermGoals {
+//                                if noSavedDailyRecords_visible && selectedDrsIdx == dailyRecordSets.count - 1 && !isEditingTermGoals {
 //                                    Text("매일매일의 기록을 저장하세요!")
 //                                        .opacity(0.5)
 //                                        .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
@@ -598,7 +598,7 @@ struct StoneTower: View {
 //                print(dr.visualValue3!)
 //            }
         }
-        .onChange(of: selectedDailyRecordSetIndex) { oldValue, newValue in
+        .onChange(of: selectedDrsIdx) { oldValue, newValue in
 //            isEditingTermGoals = false
         }
 

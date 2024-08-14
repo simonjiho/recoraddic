@@ -20,16 +20,20 @@ import SwiftData
 // TODO: 계산 중에는 selectedDR, selectedDRS 의 변경 막기
 
 // TODO: 공통 부분 다 여기로 불러오기, 미리 설정해야 그래픽 크기는 staticfunc로 만들어서 여기서 설정해서 넣어주기
-struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selectedDailyRecordSetIndex로 컨트롤한다. selectedDailyRecordSet은 직접 건드리지 않는다.
+struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selectedDrsIdx로 컨트롤한다. selectedDailyRecordSet은 직접 건드리지 않는다.
     
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) private var colorScheme
     
+    
+    @Query(sort:\Profile.createdTime) var profiles: [Profile]
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
-    @Query var dailyRecords: [DailyRecord]
+    @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
+    @Query var quests: [Quest]
+
     
     
-    @State var selectedDailyRecordSetIndex: Int // it does not automatically changes selectedDailyRecordSet. you need to toggle updateSelectedDailyRecordSet to update selectedDailyRecordSet
+    @State var selectedDrsIdx: Int // it does not automatically changes selectedDailyRecordSet. you need to toggle updateSelectedDailyRecordSet to update selectedDailyRecordSet
     @State var selectedDailyRecordSet: DailyRecordSet
     
     
@@ -67,7 +71,23 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     @State var lastTapTime: Date = Date()
     @State var lastEditedTime: Date = Date()
     
+    @State var selectedDrIdx:Int? = nil
+
+    
     var body: some View {
+        
+        let showHiddenQuests = profiles.first?.showHiddenQuests ?? false
+        let hiddenQuestNames: Set<String> = showHiddenQuests ? [] : Set(quests.filter({$0.isHidden}).map({$0.name}))
+
+        let dailyRecords_withContent:[DailyRecord] = {
+            if showHiddenQuests {
+                return selectedDailyRecordSet.dailyRecords!.filter({$0.hasContent}).sorted(by: {$0.date! < $1.date!})
+            } else {
+//                print(hiddenQuestNames)
+                return selectedDailyRecordSet.dailyRecords!.filter({$0.hasContent && !Set($0.dailyQuestList!.map{$0.questName}).subtracting(hiddenQuestNames).isEmpty}).sorted(by: {$0.date! < $1.date!})
+            }
+        }()
+        
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
         let backGroundColor:Color = getColorSchemeColor(colorScheme)
@@ -76,7 +96,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         let dailyRecordSetEmpty: Bool = selectedDailyRecordSet.dailyRecords!.filter({$0.hasContent}).count == 0
 //        let lastDailyRecord: Bo
         
-        let nextDRS: DailyRecordSet? = selectedDailyRecordSetIndex < dailyRecordSets.count - 1  ? dailyRecordSets[selectedDailyRecordSetIndex+1] : nil
+        let nextDRS: DailyRecordSet? = selectedDrsIdx < dailyRecordSets.count - 1  ? dailyRecordSets[selectedDrsIdx+1] : nil
         
         let prevDRS_start: Date? = standardDateToLocalStartOfDay(std:dailyRecordSets.map({$0.start}).filter({$0 < selectedDailyRecordSet.start}).sorted().last)
         let nextDRS_start: Date? = standardDateToLocalStartOfDay(std:dailyRecordSets.map({$0.start}).filter({$0 > selectedDailyRecordSet.start}).sorted().first)
@@ -105,7 +125,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             if let max = standardDateToLocalStartOfDay(std: nextDRS_end)?.addingDays(-1) {
 //                print(min)
 //                print(max)
-//                if selectedDailyRecordSetIndex <
+//                if selectedDrsIdx <
                 if max >= min {
                     return min...max
                 } else {
@@ -116,6 +136,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 return min...Calendar.current.date(byAdding: .year, value: 50, to: min)!
             }
         }()
+
+        
 
         
         GeometryReader { geometry in
@@ -133,9 +155,11 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     }
                     else if selectedDailyRecordSet.dailyRecordThemeName == "StoneTower" {
                         StoneTower(
-                            dailyRecordSet: $selectedDailyRecordSet,
-                            selectedDailyRecordSetIndex: $selectedDailyRecordSetIndex,
-                            selectedRecord: $selectedRecord,
+                            selectedDailyRecordSet: $selectedDailyRecordSet,
+                            selectedDrsIdx: $selectedDrsIdx,
+                            selectedDailyRecord: $selectedRecord,
+                            selectedDrIdx: $selectedDrIdx,
+                            dailyRecords_withContent: dailyRecords_withContent,
                             popUp_startNewRecordSet: $popUp_startNewRecordSet,
                             popUp_recordInDetail: $popUp_recordInDetail,
 //                            alert_drsHidden: $alert_drsHidden,
@@ -150,7 +174,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                             nextDRS_start: nextDRS_start,
                             startRange: startRange,
                             endRange: endRange
-//                            selectedDailyRecordSetIndex: $selectedDailyRecordSetIndex
+//                            selectedDrsIdx: $selectedDrsIdx
                             
                         )
 //                        Text("")
@@ -197,14 +221,18 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     }
 
                 }
-                if popUp_recordInDetail {
+//                if popUp_recordInDetail {
+                if selectedDrIdx != nil && popUp_recordInDetail {
                     Color.gray.opacity(0.5)
                         .onTapGesture {
                             popUp_recordInDetail.toggle()
                         }
                     RecordInDetailView_new(
-                        selectedDailyRecord:$selectedRecord,
-                        popUp_recordInDetail: $popUp_recordInDetail
+                        dailyRecords_withContent: dailyRecords_withContent,
+                        showHiddenQuests:showHiddenQuests,
+//                        selectedDailyRecord:$selectedRecord,
+                        popUp_recordInDetail: $popUp_recordInDetail,
+                        selectedDrIdx: $selectedDrIdx
 //                        selectedDrDate:$selectedDrDate
 //                        selectedDrDate: selectedRecord?.date ?? nil
                     )
@@ -218,22 +246,9 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 
                 
             }
-//            .sheet(isPresented: $popUp_recordInDetail) {
-//                RecordInDetailView_new(
-//                    selectedDailyRecord:$selectedRecord,
-//                    selectedDrDate: selectedRecord?.date ?? nil
-//                )
-////                RecordInDetailView_optional(
-////                    popUp_recordInDetail: $popUp_recordInDetail,
-////                record: $selectedRecord
-////                )
-//                .background(colorSchemeColor)
-//                
-//                //TODO: light모드일 때,  Col
-//            }
             .scrollDisabled(dailyRecordSetEmpty)
         }
-        .onChange(of: selectedDailyRecordSetIndex) {
+        .onChange(of: selectedDrsIdx) {
             updateSelectedDailyRecordSet = true
         }
         .onChange(of: updateSelectedDailyRecordSet) {
@@ -242,10 +257,10 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
 
 
                 // MARK: 오류!
-                selectedDailyRecordSet = dailyRecordSets[selectedDailyRecordSetIndex]
+                selectedDailyRecordSet = dailyRecordSets[selectedDrsIdx]
                 
                 // tmp code
-                if selectedDailyRecordSetIndex == dailyRecordSets.count - 1 {
+                if selectedDrsIdx == dailyRecordSets.count - 1 {
                     selectedDailyRecordSet.end = nil
                 }
                 updateSelectedDailyRecordSet = false // MARK: 무한 루프가 생성되지 않는다. 바꿔줘도 됨.
@@ -261,8 +276,13 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             endDate = standardDateToLocalStartOfDay(std:selectedDailyRecordSet.end ?? Date())
         }
         .onChange(of: selectedView) {
-            selectedDailyRecordSetIndex = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).count > 0 ? dailyRecordSets.filter({$0.start < .now}).count-1 : 0
+            selectedDrsIdx = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).count > 0 ? dailyRecordSets.filter({$0.start < .now}).count-1 : 0
+            popUp_changeStyle = false
+            popUp_startNewRecordSet = false
+            popUp_recordInDetail = false
+            selectedDrIdx = nil
             selectedRecord = nil
+            
             
             // 후보 코드: 오랫동안 seeMyRecord를 안들어가면 currentDailyRecord로 돌아감과 동시에 맨 위로 스크롤 돌아감.
 //            if selectedView != .seeMyRecord {
@@ -276,7 +296,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             
         }
         .onChange(of: newDailyRecordSetAdded) {
-            selectedDailyRecordSetIndex = dailyRecordSets.count - 1
+            selectedDrsIdx = dailyRecordSets.count - 1
         }
         .onChange(of: selectedRecord) { oldValue, newValue in
             selectedDrDate = selectedRecord?.date
@@ -305,14 +325,14 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 let stdStartDate = getStandardDate(from: newValue)
                 // 1.change selectedDRS.start
                 selectedDailyRecordSet.start = stdStartDate
-                let prevDrsExists = selectedDailyRecordSetIndex > 0
+                let prevDrsExists = selectedDrsIdx > 0
                 
                 // 2.change prevDRS.end if exists
-                if prevDrsExists {dailyRecordSets[selectedDailyRecordSetIndex-1].end = stdStartDate.addingDays(-1)}
+                if prevDrsExists {dailyRecordSets[selectedDrsIdx-1].end = stdStartDate.addingDays(-1)}
                 
                 // 3.move dailyRecords between prevDRS and
                 if oldValue < newValue && prevDrsExists {
-                    let prevDRS = dailyRecordSets[selectedDailyRecordSetIndex-1]
+                    let prevDRS = dailyRecordSets[selectedDrsIdx-1]
                     for dailyRecord in selectedDailyRecordSet.dailyRecords! {
                         if let date = dailyRecord.date {
                             if date < stdStartDate {
@@ -331,7 +351,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     }
                 }
                 else if oldValue > newValue && prevDrsExists {
-                    let prevDRS = dailyRecordSets[selectedDailyRecordSetIndex-1]
+                    let prevDRS = dailyRecordSets[selectedDrsIdx-1]
                     for dailyRecord in prevDRS.dailyRecords! {
                         if let date = dailyRecord.date {
                             if date >= stdStartDate {
@@ -360,9 +380,9 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 
                 let stdEndDate = getStandardDate(from: newValue)
 
-                let nextDrsExists = selectedDailyRecordSetIndex < dailyRecordSets.count - 1
+                let nextDrsExists = selectedDrsIdx < dailyRecordSets.count - 1
                 // 1.change nextDRS.start if exists
-                if nextDrsExists {dailyRecordSets[selectedDailyRecordSetIndex+1].start = stdEndDate.addingDays(1)}
+                if nextDrsExists {dailyRecordSets[selectedDrsIdx+1].start = stdEndDate.addingDays(1)}
                 
                 // 2.change selectedDRS.end
                 if nextDrsExists {selectedDailyRecordSet.end = stdEndDate }
@@ -370,7 +390,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 
                 // 3.move dailyRecords between nextDRS and selectedDRS
                 if oldValue > newValue && nextDrsExists  {
-                    let nextDRS = dailyRecordSets[selectedDailyRecordSetIndex+1]
+                    let nextDRS = dailyRecordSets[selectedDrsIdx+1]
                     for dailyRecord in selectedDailyRecordSet.dailyRecords! {
                         if let date = dailyRecord.date {
                             if date > stdEndDate {
@@ -389,7 +409,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     }
                 }
                 else if oldValue < newValue && nextDrsExists  {
-                    let nextDRS = dailyRecordSets[selectedDailyRecordSetIndex+1]
+                    let nextDRS = dailyRecordSets[selectedDrsIdx+1]
                     for dailyRecord in nextDRS.dailyRecords! {
                         if let date = dailyRecord.date {
                             if date <= stdEndDate {
@@ -412,10 +432,21 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             }
 
         }
+//        .onChange(of: popUp_recordInDetail) {
+////            if popUp_recordInDetail && selectedDrIdx == nil && selectedRecord != nil {
+//            if popUp_recordInDetail {
+//                DispatchQueue.main.async {
+//                    selectedDrIdx = dailyRecords_withContent.firstIndex(of: selectedRecord!) ?? 0
+//                    print(selectedDrIdx)
+//                }
+//            }
+//        }
         
         
     }
+        
     
+
     
 //    func updateStartAndEnd() -> Void {
 //        let dates: [Date] = selectedDailyRecordSet.dailyRecords!.compactMap{$0.date}.sorted()

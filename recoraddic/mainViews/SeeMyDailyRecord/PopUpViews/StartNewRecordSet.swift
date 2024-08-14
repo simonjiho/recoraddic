@@ -27,8 +27,8 @@ struct StartNewRecordSet:View {
     @State var dailyRecordSetThemeContainsDailyQuestions: Bool = false
     
     @State var numberOfQuestions: Int = 1
-    @State var question1: String = recoraddic.defaultQuestions[0]
-    @State var question2: String = recoraddic.defaultQuestions[1]
+//    @State var question1: String = recoraddic.defaultQuestions[0]
+//    @State var question2: String = recoraddic.defaultQuestions[1]
     @State var question3: String = ""
 
     

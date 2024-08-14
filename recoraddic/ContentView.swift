@@ -26,6 +26,7 @@ enum MainViewName {
     case gritBoardAndStatistics
     case seeMyRecord
     case profileAndSettings
+    case memo
     
 }
 
@@ -78,7 +79,7 @@ struct ContentView: View {
     @Query var defaultPurposeDatas: [DefaultPurposeData]
 
     // 여기서 순서 지정
-    let mainViews: [MainViewName] = [.checkList, .gritBoardAndStatistics, .seeMyRecord, .profileAndSettings]
+    let mainViews: [MainViewName] = [.checkList, .gritBoardAndStatistics, .seeMyRecord, .memo, .profileAndSettings]
     @State var selectedView: MainViewName = .checkList //HomeView
     
     @State var isNewDailyRecordAdded: Bool = false
@@ -93,8 +94,8 @@ struct ContentView: View {
         .checkList : "checklist.checked",
         .gritBoardAndStatistics: "flame",
         .seeMyRecord: "map",
-        .profileAndSettings: "person.crop.circle"
-        
+        .profileAndSettings: "person.crop.circle",
+        .memo: "note.text"
     ] // (view name) : (ImageName)
 
 
@@ -141,13 +142,14 @@ struct ContentView: View {
                      .tabItem {
                          Image(systemName: images[mainViews[1]]!)
                      }
+                     .background(.quaternary)
                      .ignoresSafeArea(.keyboard)
                      .tag(mainViews[1])
 
                      let currentDailyRecordSet: DailyRecordSet = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).last ?? DailyRecordSet(start: getStandardDate(from: Date().addingDays(1000))) // MARK: signOutErrorPrevention
                      let index = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).count > 0 ? dailyRecordSets.filter({$0.start < .now}).count-1 : 0
                      MainView_SeeMyDailyRecord(
-                        selectedDailyRecordSetIndex: index,
+                        selectedDrsIdx: index,
                         selectedDailyRecordSet: currentDailyRecordSet,
                         isNewDailyRecordAdded: $isNewDailyRecordAdded,
                         selectedView: $selectedView
@@ -161,12 +163,22 @@ struct ContentView: View {
 
 
                      .tag(mainViews[2])
+                     
+                     MainView_Memo(profile:profile)
+                         .tabItem {
+                             Image(systemName: images[mainViews[3]]!)
+                         }
+                         .background(.quaternary)
+                         .ignoresSafeArea(.keyboard)
+                         .tag(mainViews[3])
+                     
                      MainView_ProfileAndSettings(profile: profile)
                      .tabItem {
-                         Image(systemName: images[mainViews[3]]!)
+                         Image(systemName: images[mainViews[4]]!)
                      }
+                     .background(.quaternary)
                      .ignoresSafeArea(.keyboard)
-                     .tag(mainViews[3])
+                     .tag(mainViews[4])
                  }
                  .onAppear() {
                      NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "fetchDone"), object: nil, queue: .main) { _ in

@@ -11,21 +11,47 @@ import SwiftData
 
 
 
-struct RecordInDetailView_new: View {
-    @Environment(\.modelContext) var modelContext
+struct RecordInDetailView_new: View { // 해당 view의 심각한 문제점: initialization의 연산이 오래걸리면 scrollPosition으로 옮기는 것이 실패할 확률이 높아짐
+    // 해결방법: dailyRecords_withContent를 state로 따로 관리하고, init() function으로 직접 관리?
+    
     @Environment(\.colorScheme) private var colorScheme
     @Query(sort:\DailyRecord.date) var dailyRecords: [DailyRecord]
-    @Query var quests: [Quest]
+//    @Query(sort:\Profile.createdTime) var profiles: [Profile]
+//    @Query var quests: [Quest]
     
     
-    @Binding var selectedDailyRecord: DailyRecord?
+    var dailyRecords_withContent: [DailyRecord]
+    var showHiddenQuests: Bool
+//    var hiddenQuestNames: [String]
+//    @Binding var selectedDailyRecord: DailyRecord?
     @Binding var popUp_recordInDetail: Bool
 //    @Binding var selectedDrDate: Date?
-    @State var selectedDrIdx: Int?
+    @Binding var selectedDrIdx: Int?
+    
+
+
+    
+    
+//    init(selectedDailyRecord: DailyRecord? = nil, popUp_recordInDetail: Bool, selectedDrIdx: Int? = nil) {
+//        self.selectedDailyRecord = selectedDailyRecord
+//        self.popUp_recordInDetail = popUp_recordInDetail
+//        self.dailyRecords_withContent =
+////        self.selectedDrIdx = dailyRecords_withContent.firstIndex(of: selectedDailyRecord?) ?? 0
+//    }
     
     var body: some View {
         
-        let dailyRecords_withContent = dailyRecords.filter({$0.hasContent})
+        
+//        let showHiddenQuests = profiles.first?.showHiddenQuests ?? false
+//        let hiddenQuestNames: Set<String> = showHiddenQuests ? [] : Set(quests.filter({$0.isHidden}).map({$0.name}))
+//        let dailyRecords_withContent = {
+//            if showHiddenQuests {
+//                return dailyRecords.filter({$0.hasContent})
+//            } else {
+//                print(hiddenQuestNames)
+//                return dailyRecords.filter({$0.hasContent && !Set($0.dailyQuestList!.map{$0.questName}).subtracting(hiddenQuestNames).isEmpty})
+//            }
+//        }()
         
         Group {
             if selectedDrIdx == nil {
@@ -37,13 +63,18 @@ struct RecordInDetailView_new: View {
                             //                HStack(spacing:0.0) {
                             //                    ForEach(dailyRecords_withContent, id:\.self) { dr in
                             ForEach(dailyRecords_withContent.indices, id:\.self) { idx in
-                                VStack {
+                                
+//                                VStack {
                                     //                            if let date = dr.date {
-                                    DailyRecordInShort(dailyRecord: dailyRecords_withContent[idx])
+                                    DailyRecordInShort(
+                                        dailyRecord: dailyRecords_withContent[idx],
+                                        showHiddenQuests: showHiddenQuests
+                                        
+                                    )
                                     //                            } else {
                                     //                            Text("nil dailyRecord")
                                     //                            }
-                                }
+//                                }
                                 .containerRelativeFrame([.horizontal, .vertical])
                                 .id(idx)
                             }
@@ -66,10 +97,10 @@ struct RecordInDetailView_new: View {
         }
         .onAppear() {
 //                print(selectedDrDate)
-            DispatchQueue.main.async {
-                selectedDrIdx = dailyRecords_withContent.firstIndex(of: selectedDailyRecord!) ?? 0
-//                    selectedDrDate = selectedDailyRecord?.date ?? nil
-            }
+//            DispatchQueue.main.async {
+//                selectedDrIdx = dailyRecords_withContent.firstIndex(of: selectedDailyRecord!) ?? 0
+////                    selectedDrDate = selectedDailyRecord?.date ?? nil
+//            }
         }
             
 
@@ -91,7 +122,7 @@ struct DailyRecordInShort: View {
 
     var dailyRecord: DailyRecord
     
-
+    var showHiddenQuests: Bool
 
     var body: some View {
         
@@ -214,7 +245,7 @@ struct DailyRecordInShort: View {
                         }
                         ForEach(dailyRecord.dailyQuestList!, id:\.self) { questdata in
                             
-                            if !questNames_hidden.contains(questdata.questName) && questdata.data != 0 {
+                            if (showHiddenQuests || !questNames_hidden.contains(questdata.questName)) && questdata.data != 0 {
                                 let text:String = dataTypeFrom(questdata.dataType) != DataType.ox ? "\(questdata.questName)  \(DataType.string_fullRepresentableNotation(data: questdata.data, dataType: dataTypeFrom(questdata.dataType), customDataTypeNotation: questdata.customDataTypeNotation))" : questdata.questName
                                 HStack {
                                     if !questdata.defaultPurposes.isEmpty {

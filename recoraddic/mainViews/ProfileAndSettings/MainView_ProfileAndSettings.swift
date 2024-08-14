@@ -175,6 +175,8 @@ struct FilteredQuests: View {
     @Binding var popUp_quest: Bool
     @Binding var alert_delete: Bool
     
+    @State var alert_sameName:Bool = false
+    
     var body: some View {
         
         let quests_filtered:[Quest] = {
@@ -192,13 +194,16 @@ struct FilteredQuests: View {
             }
         }()
         
+        let questNames = quests.filter({!$0.inTrashCan}).map { $0.name }
+
         
         GeometryReader { geometry in
             let geoWidth: CGFloat = geometry.size.width
             let geoHeight: CGFloat = geometry.size.height
         
-            let gridItemSize = geoWidth*0.26
-            let gridItemSpacing = gridItemSize/5
+            let gridWidth = geoWidth*0.4
+            let gridHeight = gridWidth / 1.618
+            let gridItemSpacing = gridWidth/5
         
             if quests_filtered.count == 0 {
                 Text("퀘스트 없음")
@@ -206,7 +211,7 @@ struct FilteredQuests: View {
             }
             else {
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum:gridItemSize))], spacing: gridItemSpacing) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum:gridWidth))], spacing: gridItemSpacing) {
                         
                         ForEach(quests_filtered, id: \.createdTime) { quest in
                             //            GeometryReader { geometry in
@@ -216,11 +221,15 @@ struct FilteredQuests: View {
                             })
                             {
                                 QuestThumbnailView(quest: quest)
-                                    .frame(width:gridItemSize, height: gridItemSize)
+                                    .frame(width:gridWidth, height: gridHeight)
                                 
                             }
                             .contextMenu(ContextMenu(menuItems: {
                                 Button("되돌리기") {
+                                    if quest.inTrashCan && questNames.contains(quest.name) {
+                                        alert_sameName.toggle()
+                                        return
+                                    }
                                     quest.isArchived = false
                                     quest.isHidden = false
                                     quest.inTrashCan = false
@@ -260,6 +269,7 @@ struct FilteredQuests: View {
 //                                    
 //                                }
                             }))
+                            
                             .sheet(
                                 isPresented: $popUp_quest,
                                 content: {
@@ -272,7 +282,7 @@ struct FilteredQuests: View {
                         }
                         
                     }
-                    .padding(.top, gridItemSize*0.1)
+                    .padding(.top, gridHeight*0.1)
                     
                     
                     
@@ -291,6 +301,11 @@ struct FilteredQuests: View {
                     }
                     Button("취소") {
                         alert_delete.toggle()
+                    }
+                }
+                .alert("같은 이름의 퀘스트가 존재합니다.",isPresented: $alert_sameName) {
+                    Button("확인") {
+                        alert_sameName.toggle()
                     }
                 }
 

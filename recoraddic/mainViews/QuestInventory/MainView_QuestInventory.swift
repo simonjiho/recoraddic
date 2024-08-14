@@ -242,7 +242,7 @@ struct MainView_QuestInventory: View {
                                 } // lazyVGrid
                                 .frame(width:gridViewFrameWidth)
                                 .padding(gridInnerPadding)
-                                .background(.quaternary)
+//                                .background(.quaternary)
                                 .clipShape(.rect(cornerRadius: gridItemWidth/20))
 //                                .padding(.top, gridItemSpacing)
                                 .padding(.horizontal, gridHorizontalPadding)

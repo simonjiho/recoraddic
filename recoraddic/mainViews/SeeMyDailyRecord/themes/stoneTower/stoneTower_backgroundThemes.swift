@@ -171,7 +171,7 @@ struct StoneTowerBackground_1:View {
                     .frame(width: geoWidth/5)
                     .foregroundStyle(colorScheme == .light ? .white : .gray)
                     .opacity(0.5)
-                    .position(x:isAnimating ? -geoWidth*0.2 : geoWidth*1.2, y: totalSkyHeight/2 )
+                    .position(x:isAnimating ? -geoWidth*0.15 : geoWidth*1.15, y: UIScreen.main.bounds.height*0.4/*totalSkyHeight/2*/ )
                     .animation(.linear(duration: 25.0).repeatForever(autoreverses: false), value: isAnimating)
                     .onAppear() {
                         isAnimating = true

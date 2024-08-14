@@ -171,7 +171,7 @@ class DailyQuest: Hashable, Equatable, Identifiable {
     var createdTime: Date = Date()
     
     var questName: String = ""
-    var questSubName: String? //MARK: 아직 사용하지는 않지만, 일단 만들어둠. 쓸까 말까..
+    var questSubName: String?
     var data: Int = 0
     var dataType: Int = 1
     var defaultPurposes: Set<String> = []
@@ -754,7 +754,7 @@ class Profile {
     
     var adjustedThemeSetName: String = "default1" // deprecated....
     
-    
+    var memo: String = ""
     
 
     
