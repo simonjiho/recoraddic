@@ -20,15 +20,21 @@ struct MainView_Memo:View {
     var body: some View {
 //        MarkdownEditor(text: $profile.memo)
         VStack {
+            
             HStack {
-                Button("완료"){
-                    isEditing = false
+                if isEditing {
+                    Button("완료"){
+                        isEditing = false
+                    }
+                    .disabled(!isEditing)
+                    .opacity(isEditing ? 1.0 : 0.0)
                 }
-                .disabled(!isEditing)
-                .opacity(isEditing ? 1.0 : 0.0)
+                else {
+                    Image(systemName: "note.text")
+                }
             }
-                .padding(.trailing)
-                .frame(width: UIScreen.main.bounds.width,alignment: .trailing)
+            .padding(isEditing ? .trailing : .horizontal)
+            .frame(width: UIScreen.main.bounds.width,alignment: isEditing ? .trailing : .center)
             TextEditor(text: $profile.memo)
                 .padding()
                 .focused($isEditing)

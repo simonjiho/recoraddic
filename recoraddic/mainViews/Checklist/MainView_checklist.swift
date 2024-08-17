@@ -321,6 +321,7 @@ struct MainView_checklist: View {
                                         }
                                         
                                     } // LazyVGrid
+                                    .padding(.top,10)
                                 } // ScrollView
                                 .frame(width: popUp_changeMood_width*0.95, height: popUp_changeMood_height*0.9)
                             }

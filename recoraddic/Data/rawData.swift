@@ -75,7 +75,7 @@ final class DefaultPurpose {
     
     static func inKorean(_ input: String) -> String {
         if input == DefaultPurpose.atr {
-            return "나의 매력"
+            return "매력"
         }
         else if input == DefaultPurpose.inq {
             return "탐구심"
@@ -84,10 +84,10 @@ final class DefaultPurpose {
             return "행복/즐거움"
         }
         else if input == DefaultPurpose.hlt {
-            return "나의 건강"
+            return "건강"
         }
         else if input == DefaultPurpose.ftr {
-            return "나의 미래"
+            return "미래"
         }
         else if input == DefaultPurpose.ach {
             return "성취감"
@@ -98,7 +98,7 @@ final class DefaultPurpose {
         
         
         else if input == DefaultPurpose.sgn {
-            return "사랑하는 사람"
+            return "사랑"
         }
         else if input == DefaultPurpose.fml {
             return "가족"

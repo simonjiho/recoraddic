@@ -181,99 +181,107 @@ extension Quest {
         }.last!.key
         let unactivatedPeriod: Int = calculateDaysBetweenTwoDates(from:latestRecordDate, to: today)
         
-        // activate here later... -> 11~31까지의 불을 다 만든 후 활성화하기
-//        if unactivatedPeriod == 0 { // try finding if there's special(extreme high) momentumLevel
-//            if checkMomentumLevel(ratio: 1.0, termLength: 100, latestRecordDate: latestRecordDate) {
-//                return 31
-//            }
-//            else if checkMomentumLevel(ratio: 1.0, termLength: 50, latestRecordDate: latestRecordDate) {
-//                return 30
-//            }
-//            else if checkMomentumLevel(ratio: 1.0, termLength: 20, latestRecordDate: latestRecordDate) {
-//                return 29
-//            }
-//            else if checkMomentumLevel(ratio: 1.0, termLength: 5, latestRecordDate: latestRecordDate) {
-//                return 28
-//            }
-//        }
-//        else if unactivatedPeriod < 10 { // try finding if there's special(high) momentumLevel
-//            if checkMomentumLevel(ratio: 0.85, termLength: 100, latestRecordDate: latestRecordDate) {
-//                return 27
-//            }
-//            else if checkMomentumLevel(ratio: 0.85, termLength: 50, latestRecordDate: latestRecordDate) {
-//                return 26
-//            }
-//            else if checkMomentumLevel(ratio: 0.85, termLength: 20, latestRecordDate: latestRecordDate) {
-//                return 25
-//            }
-//            else if checkMomentumLevel(ratio: 0.85, termLength: 5, latestRecordDate: latestRecordDate) {
-//                return 24
-//            }
-//            else if checkMomentumLevel(ratio: 0.7, termLength: 100, latestRecordDate: latestRecordDate) {
-//                return 23
-//            }
-//            else if checkMomentumLevel(ratio: 0.7, termLength: 50, latestRecordDate: latestRecordDate) {
-//                return 22
-//            }
-//            else if checkMomentumLevel(ratio: 0.7, termLength: 20, latestRecordDate: latestRecordDate) {
-//                return 21
-//            }
-//            else if checkMomentumLevel(ratio: 0.7, termLength: 5, latestRecordDate: latestRecordDate) {
-//                return 20
-//            }
-//
-//
-//        }
-//        else if unactivatedPeriod < 20 {  // try finding if there's special(middle) momentumLevel
-//            if checkMomentumLevel(ratio: 0.5, termLength: 180, latestRecordDate: latestRecordDate) {
-//                return 19
-//            }
-//            else if checkMomentumLevel(ratio: 0.5, termLength: 120, latestRecordDate: latestRecordDate) {
-//                return 18
-//            }
-//            else if checkMomentumLevel(ratio: 0.5, termLength: 80, latestRecordDate: latestRecordDate) {
-//                return 17
-//            }
-//            else if checkMomentumLevel(ratio: 0.3, termLength: 180, latestRecordDate: latestRecordDate) {
-//                return 16
-//            }
-//            else if checkMomentumLevel(ratio: 0.3, termLength: 120, latestRecordDate: latestRecordDate) {
-//                return 15
-//            }
-//            else if checkMomentumLevel(ratio: 0.3, termLength: 80, latestRecordDate: latestRecordDate) {
-//                return 14
-//            }
-//        }
-//        
-//        else if unactivatedPeriod < 30 {  // try finding if there's special(low) momentumLevel
-//
-//            if checkMomentumLevel(ratio: 0.1, termLength: 180, latestRecordDate: latestRecordDate) {
-//                return 13
-//            }
-//            else if checkMomentumLevel(ratio: 0.1, termLength: 120, latestRecordDate: latestRecordDate) {
-//                return 12
-//            }
-//            else if checkMomentumLevel(ratio: 0.1, termLength: 80, latestRecordDate: latestRecordDate) {
-//                return 11
-//            }
-//
-//        }
+        if unactivatedPeriod == 0 { // try finding if there's special(extreme high) momentumLevel
+            if checkMomentumLevel(ratio: 1.0, termLength: 120, today: latestRecordDate) {
+                return 34
+            }
+            else if checkMomentumLevel(ratio: 1.0, termLength: 80, today: latestRecordDate) {
+                return 33
+            }
+            else if checkMomentumLevel(ratio: 1.0, termLength: 50, today: latestRecordDate) {
+                return 32
+            }
+            else if checkMomentumLevel(ratio: 1.0, termLength: 20, today: latestRecordDate) {
+                return 31
+            }
+            else if checkMomentumLevel(ratio: 1.0, termLength: 7, today: latestRecordDate) {
+                return 30
+            }
+            else if checkMomentumLevel(ratio: 1.0, termLength: 3, today: latestRecordDate) {
+                return 29
+            }
+        }
+        else if unactivatedPeriod < 10 { // try finding if there's special(high) momentumLevel
+            if checkMomentumLevel(ratio: 0.85, termLength: 120, today: latestRecordDate) {
+                return 28
+            }
+            else if checkMomentumLevel(ratio: 0.85, termLength: 80, today: latestRecordDate) {
+                return 27
+            }
+            else if checkMomentumLevel(ratio: 0.85, termLength: 50, today: latestRecordDate) {
+                return 26
+            }
+            else if checkMomentumLevel(ratio: 0.85, termLength: 20, today: latestRecordDate) {
+                return 25
+            }
+            else if checkMomentumLevel(ratio: 0.85, termLength: 7, today: latestRecordDate) {
+                return 24
+            }
+            else if checkMomentumLevel(ratio: 0.7, termLength: 120, today: latestRecordDate) {
+                return 23
+            }
+            else if checkMomentumLevel(ratio: 0.7, termLength: 80, today: latestRecordDate) {
+                return 22
+            }
+            else if checkMomentumLevel(ratio: 0.7, termLength: 50, today: latestRecordDate) {
+                return 21
+            }
+            else if checkMomentumLevel(ratio: 0.7, termLength: 20, today: latestRecordDate) {
+                return 20
+            }
+            else if checkMomentumLevel(ratio: 0.7, termLength: 7, today: latestRecordDate) {
+                return 19
+            }
+
+
+        }
+        else if unactivatedPeriod < 20 {  // try finding if there's special(middle) momentumLevel
+            if checkMomentumLevel(ratio: 0.5, termLength: 120, today: latestRecordDate) {
+                return 18
+            }
+            else if checkMomentumLevel(ratio: 0.5, termLength: 80, today: latestRecordDate) {
+                return 17
+            }
+            else if checkMomentumLevel(ratio: 0.5, termLength: 50, today: latestRecordDate) {
+                return 16
+            }
+            else if checkMomentumLevel(ratio: 0.5, termLength: 20, today: latestRecordDate) {
+                return 15
+            }
+            else if checkMomentumLevel(ratio: 0.3, termLength: 120, today: latestRecordDate) {
+                return 14
+            }
+            else if checkMomentumLevel(ratio: 0.3, termLength: 80, today: latestRecordDate) {
+                return 13
+            }
+            else if checkMomentumLevel(ratio: 0.3, termLength: 50, today: latestRecordDate) {
+                return 12
+            }
+            else if checkMomentumLevel(ratio: 0.3, termLength: 20, today: latestRecordDate) {
+                return 11
+            }
+        }
+        
+        else if unactivatedPeriod < 30 {  // try finding if there's special(low) momentumLevel
+
+            if checkMomentumLevel(ratio: 0.1, termLength: 120, today: latestRecordDate) {
+                return 10
+            }
+            else if checkMomentumLevel(ratio: 0.1, termLength: 80, today: latestRecordDate) {
+                return 9
+            }
+            else if checkMomentumLevel(ratio: 0.1, termLength: 50, today: latestRecordDate) {
+                return 8
+            }
+            else if checkMomentumLevel(ratio: 0.1, termLength: 20, today: latestRecordDate) {
+                return 7
+            }
+
+        }
         
         
         // if no special level, then check normal momentum level (비율에서 다 0.001뺌 혹시 몰라서)
-        if checkMomentumLevel(ratio: 0.299, termLength: 50, today: today) {
-            return 10
-        }
-        else if checkMomentumLevel(ratio: 0.299, termLength: 40, today: today) {
-            return 9
-        }
-        else if checkMomentumLevel(ratio: 0.332, termLength: 30, today: today) {
-            return 8
-        }
-        else if checkMomentumLevel(ratio: 0.399, termLength: 20, today: today) {
-            return 7
-        }
-        else if checkMomentumLevel(ratio: 0.428, termLength: 14, today: today) {
+        if checkMomentumLevel(ratio: 0.428, termLength: 14, today: today) {
             return 6
         }
         else if checkMomentumLevel(ratio: 0.499, termLength: 10, today: today) {

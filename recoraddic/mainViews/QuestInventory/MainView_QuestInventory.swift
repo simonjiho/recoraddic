@@ -1066,44 +1066,74 @@ struct QuestHelpView: View {
     
     @Binding var popUp_help: Bool
     
-    let options: [String] = ["일반단위", "시간"]
-    @State var selectedOption: String = "일반단위"
+    let options: [String] = ["시간", "시간x"]
+    @State var selectedOption: String = "시간"
     
     
     let notHourTierGuideLines: [String] = [
-        "0회","1회", "2회", "3회", "4회",
-        "5회" , "6회", "7회", "8회", "9회",
-        "10~15회","16~21회", "22~27회", "28~33회", "34~39회",
-        "40~51회", "52~63회", "64~75회", "76~87회", "88~99회",
-        "100~159회", "160~219회", "220회~279회", "280~339회", "340~399회",
-        "400~519회", "520~639회", "640~759회", "760~879회", "880~999회",
-        "1000~1599회", "1600~2199회", "2200~2799회", "2800~3399회", "3400~3999회",
-        "4000~5199회", "5200~6399회", "6400~7599회", "7600~8799회", "8800~9999회",
-        "10000회 이상"
+        "0회~",
+        "5회~",
+        "10회~",
+        "40회~",
+        "100회~",
+        "400회~",
+        "1000회~",
+        "4000회~",
+        "10000회~"
     ]
     let hourTierGuideLines: [String] = [
-        "0시간","1시간", "2시간", "3시간", "4시간",
-        "5시간" , "6시간", "7시간", "8시간", "9시간",
-        "10~15시간","16~21시간", "22~27시간", "28~33시간", "34~39시간",
-        "40~51시간", "52~63시간", "64~75시간", "76~87시간", "88~99시간",
-        "100~159시간", "160~219시간", "220시간~279시간", "280~339시간", "340~399시간",
-        "400~519시간", "520~639시간", "640~759시간", "760~879시간", "880~999시간",
-        "1000~1599시간", "1600~2199시간", "2200~2799시간", "2800~3399시간", "3400~3999시간",
-        "4000~5199시간", "5200~6399시간", "6400~7599시간", "7600~8799시간", "8800~9999시간",
-        "10000시간 이상"
+        "0시간~",
+        "5시간~",
+        "10시간~",
+        "40시간~",
+        "100시간~",
+        "400시간~",
+        "1000시간~",
+        "4000시간~",
+        "10000시간~"
     ]
     
-    let fireGuideLines: [String] = [
-        "최근 1일 중 1일 실행",
-        "최근 3일 중 2일 이상 실행",
-        "최근 5일 중 3일 이상 실행",
-        "최근 7일 중 4일 이상 실행",
-        "최근 10일 중 5일 이상 실행",
-        "최근 14일 중 6일 이상 실행",
-        "최근 20일 중 8일 이상 실행",
-        "최근 30일 중 10일 이상 실행",
-        "최근 40일 중 12일 이상 실행",
-        "최근 50일 중 15일 이상 실행",
+//    let momentumLevelDays:[Int:Int] = [1:1,3]
+    
+    let defaultFireGuideLines: [String] = [
+        "1일 1회",
+        "3일 2회",
+        "5일 3회",
+        "7일 4회",
+        "10일 5회",
+        "14일 6회",
+//        "최근 20일 중 8일 이상 실행",
+//        "최근 30일 중 10일 이상 실행",
+//        "최근 40일 중 12일 이상 실행",
+//        "최근 50일 중 15일 이상 실행",
+        "20일",
+        "50일",
+        "80일",
+        "120일",
+        "20일",
+        "50일",
+        "80일",
+        "120일",
+        "20일",
+        "50일",
+        "80일",
+        "120일",
+        "7일",
+        "20일",
+        "50일",
+        "80일",
+        "120일",
+        "7일",
+        "20일",
+        "50일",
+        "80일",
+        "120일",
+        "3일",
+        "7일",
+        "20일",
+        "50일",
+        "80일",
+        "120일",
     ]
 
 
@@ -1115,41 +1145,229 @@ struct QuestHelpView: View {
             let fireViewSize: CGFloat = geoWidth*0.2
             
             VStack {
-                Picker("hour or times", selection: $selectedOption, content: {
-                    ForEach(options,id:\.self) { option in
-                        Text(option)
-                    }
-                })
-                .pickerStyle(.segmented)
+                Text("퀘스트 분류")
                 HStack(alignment: .top) {
-                    ScrollView {
-                        ForEach(0...40, id:\.self) { tier in
-                            VStack {
-                                QuestTierView(tier: tier)
-                                    .frame(width:tierViewSize, height: tierViewSize)
-                                Text(selectedOption == "일반단위" ?  notHourTierGuideLines[tier]: hourTierGuideLines[tier])
+                    VStack {
+                        Text("누적 등급")
+                            .font(.caption)
+                        Picker("", selection: $selectedOption, content: {
+                            ForEach(options,id:\.self) { option in
+                                Text(option)
                             }
-                            .frame(width: geoWidth/2)
-                            .padding(.vertical,tierViewSize*0.1)
-                        }
-                    }
-                    .frame(width:geoWidth/2)
+                        })
+                        .labelsHidden()
+                        .pickerStyle(.segmented)
+                        ScrollView {
+                            ForEach(0...8, id:\.self) { tier in
+                                VStack {
+                                    QuestTierView(tier: tier*5)
+                                        .frame(width:tierViewSize, height: tierViewSize)
+                                    Text(selectedOption == "시간x" ?  notHourTierGuideLines[tier]: hourTierGuideLines[tier])
+                                        .font(.caption)
 
-                    ScrollView {
-                        ForEach(1...10, id:\.self) { momentumLevel in
+                                }
+                                .frame(width: geoWidth/2)
+                                .padding(.vertical,tierViewSize*0.1)
+                            }
+                        }
+                        .frame(width:geoWidth*0.48 - 1)
+                    }
+
+                    Spacer()
+                        .frame(width: 1,height: geoHeight*0.7)
+                        .background(.gray.opacity(0.5))
+                        .padding(.horizontal,geoWidth*0.01)
+                    
+                    
+                    
+                    VStack {
+                        Text("불꽃")
+                            .font(.caption)
+                        ScrollView(.vertical) {
+                            VStack {
+                                Text("기본 불꽃")
+                                    .font(.caption)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        
+                                        ForEach(1...6, id:\.self) { momentumLevel in
+                                            VStack(spacing:0.0) {
+                                                FireView(momentumLevel: momentumLevel)
+                                                    .frame(width:fireViewSize, height: fireViewSize)
+                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                    .font(.caption2)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(10)
+                            .background(.gray.opacity(0.2))
+                            .clipShape(.buttonBorder)
+                            .padding(.bottom,30)
                             
                             VStack {
-                                FireView(momentumLevel: momentumLevel)
-                                        .frame(width:fireViewSize, height: fireViewSize)
-                                Text(fireGuideLines[momentumLevel-1])
+                                Text("꾸준함의 불꽃(10%)")
                                     .font(.caption)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        ForEach(7...10, id:\.self) { momentumLevel in
+                                            VStack(spacing:0.0) {
+                                                FireView(momentumLevel: momentumLevel)
+                                                    .frame(width:fireViewSize, height: fireViewSize)
+                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                    .font(.caption2)
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            .frame(width: geoWidth/2)
-                            .padding(.vertical,fireViewSize*0.1)
+                            .padding(10)
+                            .background(.gray.opacity(0.2))
+                            .clipShape(.buttonBorder)
+                            .padding(.bottom,30)
 
+                            VStack {
+                                Text("꾸준함의 불꽃(30%)")
+                                    .font(.caption)
+
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        
+                                        ForEach(11...14, id:\.self) { momentumLevel in
+                                            VStack(spacing:0.0) {
+                                                FireView(momentumLevel: momentumLevel)
+                                                    .frame(width:fireViewSize, height: fireViewSize)
+                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                    .font(.caption2)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(10)
+                            .background(.gray.opacity(0.2))
+                            .clipShape(.buttonBorder)
+                            .padding(.bottom,30)
+                            
+                            VStack {
+                                Text("꾸준함의 불꽃(50%)")
+                                    .font(.caption)
+                                
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        
+                                        ForEach(15...18, id:\.self) { momentumLevel in
+                                            VStack(spacing:0.0) {
+                                                FireView(momentumLevel: momentumLevel)
+                                                    .frame(width:fireViewSize, height: fireViewSize)
+                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                    .font(.caption2)
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                            }
+                            .padding(10)
+                            .background(.gray.opacity(0.2))
+                            .clipShape(.buttonBorder)
+                            .padding(.bottom,30)
+
+                            
+                            VStack {
+                                Text("열정의 불꽃(70%)")
+                                    .font(.caption)
+                                
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        
+                                        ForEach(19...23, id:\.self) { momentumLevel in
+                                            VStack(spacing:0.0) {
+                                                FireView(momentumLevel: momentumLevel)
+                                                    .frame(width:fireViewSize, height: fireViewSize)
+                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                    .font(.caption2)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(10)
+                            .background(.gray.opacity(0.2))
+                            .clipShape(.buttonBorder)
+                            .padding(.bottom,30)
+                            
+                            
+                            VStack {
+                                Text("열정의 불꽃(85%)")
+                                    .font(.caption)
+                                
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        
+                                        ForEach(24...28, id:\.self) { momentumLevel in
+                                            VStack(spacing:0.0) {
+                                                FireView(momentumLevel: momentumLevel)
+                                                    .frame(width:fireViewSize, height: fireViewSize)
+                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                    .font(.caption2)
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                            }
+                            .padding(10)
+                            .background(.gray.opacity(0.2))
+                            .clipShape(.buttonBorder)
+                            .padding(.bottom,30)
+                            
+                            
+                            VStack {
+                                Text("연속의 불꽃(100%)")
+                                    .font(.caption)
+                                
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        
+                                        ForEach(29...34, id:\.self) { momentumLevel in
+                                            VStack(spacing:0.0) {
+                                                FireView(momentumLevel: momentumLevel)
+                                                    .frame(width:fireViewSize, height: fireViewSize)
+                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                    .font(.caption2)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(10)
+                            .background(.gray.opacity(0.2))
+                            .clipShape(.buttonBorder)
+                            .padding(.bottom,30)
+                            
+                            
+                            
+                            
+                            
+                            //                        ForEach(1...10, id:\.self) { momentumLevel in
+                            //
+                            //                            VStack {
+                            //
+                            //
+                            //                                FireView(momentumLevel: momentumLevel)
+                            //                                        .frame(width:fireViewSize, height: fireViewSize)
+                            //                                Text(fireGuideLines[momentumLevel-1])
+                            //                                    .font(.caption)
+                            //                            }
+                            //                            .frame(width: geoWidth/2)
+                            //                            .padding(.vertical,fireViewSize*0.1)
+                            //
+                            //                        }
                         }
+                        .frame(width:geoWidth*0.48)
                     }
-                    .frame(width:geoWidth/2)
 
                 }
                 .frame(width:geoWidth)
