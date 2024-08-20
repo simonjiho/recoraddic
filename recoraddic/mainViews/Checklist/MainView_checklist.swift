@@ -50,7 +50,7 @@ struct MainView_checklist: View {
     @State var forceToChooseMood: Bool = false
     @State var selectedClassification: String = "전체"
     
-    @StateObject private var notificationManager = NotificationManager()
+//    @StateObject private var notificationManager = NotificationManager()
 
     
     private var keyboardHeightPublisher: AnyPublisher<CGFloat, Never> {
@@ -460,10 +460,10 @@ struct MainView_checklist: View {
                     forceToChooseMood = false
                 }
             }
-            .onReceive(notificationManager.$notificationData) { userInfo in
-                
-//                updateDailyQuestAlerm()
-            }
+//            .onReceive(notificationManager.$notificationData) { userInfo in
+//                
+////                updateDailyQuestAlerm()
+//            }
             .popover(isPresented: $popUp_addDailyQuest) {
                 EditCheckListView(
                     currentDailyRecord: currentDailyRecord,
@@ -748,8 +748,8 @@ struct ChecklistView: View {
 
     var body: some View {
         
-        let shadowColor:Color = getShadowColor(colorScheme)
-        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+//        let shadowColor:Color = getShadowColor(colorScheme)
+//        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
 
 
@@ -1224,7 +1224,7 @@ struct ChecklistView: View {
     func removeDailyText() -> Void {
         currentDailyRecord.dailyText = nil
         currentDailyRecord.dailyTextType = nil
-        currentDailyRecord.diaryImage = nil
+//        currentDailyRecord.diaryImage = nil
         if !currentDailyRecord.hasContent {
             currentDailyRecord.dailyRecordSet?.updateDailyRecordsMomentum()
         }

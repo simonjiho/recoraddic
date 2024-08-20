@@ -164,9 +164,9 @@ struct InShortView: View {
                         
                     }
             )
-            .onChange(of: currentDailyRecord) {
-                inShortText = currentDailyRecord.dailyText!
-            }
+//            .onChange(of: currentDailyRecord) {
+//                inShortText = currentDailyRecord.dailyText!
+//            }
 
 
 

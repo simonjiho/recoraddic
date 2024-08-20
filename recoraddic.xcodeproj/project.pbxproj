@@ -29,10 +29,7 @@
 		B260A39A2A9C759B00D73208 /* MainView_SeeMyDailyRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3992A9C759B00D73208 /* MainView_SeeMyDailyRecord.swift */; };
 		B262F2432A86460E00868F27 /* rawData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2422A86460E00868F27 /* rawData.swift */; };
 		B262F2452A86464700868F27 /* metaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2442A86464700868F27 /* metaData.swift */; };
-		B262F2472A86466700868F27 /* uiData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2462A86466700868F27 /* uiData.swift */; };
-		B262F2492A86467E00868F27 /* simpleMetaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2482A86467E00868F27 /* simpleMetaData.swift */; };
 		B265D26C2B032D30002E51A8 /* randomColorFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B265D26B2B032D30002E51A8 /* randomColorFunc.swift */; };
-		B265D27B2B04976E002E51A8 /* themeData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B265D27A2B04976E002E51A8 /* themeData.swift */; };
 		B265D27D2B0497D0002E51A8 /* callTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B265D27C2B0497D0002E51A8 /* callTheme.swift */; };
 		B265D2812B049DF9002E51A8 /* dailyRecordStoneAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B265D2802B049DF9002E51A8 /* dailyRecordStoneAction.swift */; };
 		B265D2852B049FBA002E51A8 /* theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B265D2842B049FBA002E51A8 /* theme.swift */; };
@@ -151,10 +148,7 @@
 		B260A39D2A9C7FAA00D73208 /* note.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = note.md; sourceTree = "<group>"; };
 		B262F2422A86460E00868F27 /* rawData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rawData.swift; sourceTree = "<group>"; };
 		B262F2442A86464700868F27 /* metaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = metaData.swift; sourceTree = "<group>"; };
-		B262F2462A86466700868F27 /* uiData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = uiData.swift; sourceTree = "<group>"; };
-		B262F2482A86467E00868F27 /* simpleMetaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = simpleMetaData.swift; sourceTree = "<group>"; };
 		B265D26B2B032D30002E51A8 /* randomColorFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = randomColorFunc.swift; sourceTree = "<group>"; };
-		B265D27A2B04976E002E51A8 /* themeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = themeData.swift; sourceTree = "<group>"; };
 		B265D27C2B0497D0002E51A8 /* callTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = callTheme.swift; sourceTree = "<group>"; };
 		B265D2802B049DF9002E51A8 /* dailyRecordStoneAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dailyRecordStoneAction.swift; sourceTree = "<group>"; };
 		B265D2842B049FBA002E51A8 /* theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = theme.swift; sourceTree = "<group>"; };
@@ -302,10 +296,7 @@
 			children = (
 				B27A5CED2B14764A0042ADF6 /* dataType.swift */,
 				B262F2422A86460E00868F27 /* rawData.swift */,
-				B265D27A2B04976E002E51A8 /* themeData.swift */,
 				B262F2442A86464700868F27 /* metaData.swift */,
-				B262F2462A86466700868F27 /* uiData.swift */,
-				B262F2482A86467E00868F27 /* simpleMetaData.swift */,
 				B2D8F96E2B75F46A00423AFC /* dataFunctions.swift */,
 				B260A39D2A9C7FAA00D73208 /* note.md */,
 			);
@@ -698,7 +689,6 @@
 				B247D24B2A6D1DA100E457FB /* customMathFunc.swift in Sources */,
 				B25BF9052B1C886E0039F1F9 /* ResizableText.swift in Sources */,
 				B265D27D2B0497D0002E51A8 /* callTheme.swift in Sources */,
-				B262F2492A86467E00868F27 /* simpleMetaData.swift in Sources */,
 				B220DA3C2B6268260039160C /* RecordInDetailView.swift in Sources */,
 				B2BA88FA2B2B0D4500A3D50E /* defaultVariables.swift in Sources */,
 				B265D2812B049DF9002E51A8 /* dailyRecordStoneAction.swift in Sources */,
@@ -708,7 +698,6 @@
 				B220DA442B6519C20039160C /* stoneTower_backgroundThemes.swift in Sources */,
 				B282D1222C70826E008F6F7A /* MainView_Memo.swift in Sources */,
 				B2E6C6372C4674220082B000 /* EditCheckListView.swift in Sources */,
-				B265D27B2B04976E002E51A8 /* themeData.swift in Sources */,
 				B2F017352C3D157600765EF6 /* recoraddicWidgetAttributes.swift in Sources */,
 				B2C059F92C52A610001BEE77 /* StoneTower.swift in Sources */,
 				B2D7AD052B92E29D0045C9EA /* logger.swift in Sources */,
@@ -718,7 +707,6 @@
 				B24C29922C329B7B000F3EEE /* test.swift in Sources */,
 				B2ABC2652B4293680056C637 /* purposeTags.swift in Sources */,
 				B262F2452A86464700868F27 /* metaData.swift in Sources */,
-				B262F2472A86466700868F27 /* uiData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

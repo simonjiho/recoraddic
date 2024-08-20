@@ -61,7 +61,6 @@ struct ContentView: View {
     @AppStorage("iCloudAvailable_forTheFirstTime") var iCloudAvailable: Bool = false
     @AppStorage("initialization") var initialization: Bool = true
     @AppStorage("fetchDone") var fetchDone: Bool = false
-    @AppStorage("update_240809") var update_240809: Bool = false
 
 
     @StateObject var netWorkMonitor: NetworkMonitor = NetworkMonitor()
@@ -138,7 +137,7 @@ struct ContentView: View {
                      .tag(mainViews[0])
                      .ignoresSafeArea(.keyboard)
                      
-                     MainView_QuestInventory()
+                     MainView_QuestInventory(selectedView:$selectedView)
                      .tabItem {
                          Image(systemName: images[mainViews[1]]!)
                      }
@@ -191,35 +190,7 @@ struct ContentView: View {
                          }
                      }
 
-//                      codes used for data transition
-                     if UserDefaults.standard.value(forKey: "update_240809") == nil {
-                         UserDefaults.standard.setValue(false, forKey: "update_240809")
-                     }
-                     if !update_240809 {
-                         let dateComponents = DateComponents(calendar: Calendar.current, year:2024, month: 8, day: 7, hour:10, minute: 15)
-                         for dailyQuest in dailyQuests {
-                             if dailyQuest.createdTime < Calendar.current.date(from: dateComponents)! {
-                                 if dailyQuest.dataType == DataType.custom.rawValue {
-                                     dailyQuest.dataType = DataType.ox.rawValue
-                                 }
-                                 else if dailyQuest.dataType == DataType.ox.rawValue {
-                                     dailyQuest.dataType = DataType.custom.rawValue
-                                 }
-                             }
-                         }
-                         
-                         for quest in quests {
-                             if quest.createdTime < Calendar.current.date(from: dateComponents)! {
-                                 if quest.dataType == DataType.custom.rawValue {
-                                     quest.dataType = DataType.ox.rawValue
-                                 }
-                                 else if quest.dataType == DataType.ox.rawValue {
-                                     quest.dataType = DataType.custom.rawValue
-                                 }
-                             }
-                         }
-                         UserDefaults.standard.setValue(true, forKey: "update_240809")
-                     }
+
                      
                  }
                  .onChange(of: selectedView) { oldValue, newValue in //여기에 다양한 것 넣어주기
@@ -313,6 +284,8 @@ struct ContentView: View {
                                 mainDR.todoList! += dr.todoList!
                                 if mainDR.dailyText != nil && dr.dailyText != nil {
                                     mainDR.dailyText! += dr.dailyText!
+                                } else if mainDR.dailyText == nil {
+                                    mainDR.dailyText = dr.dailyText
                                 }
                                 modelContext.delete(dr)
                             } else {
@@ -341,6 +314,8 @@ struct ContentView: View {
                         mainDR.todoList! += dr.todoList!
                         if mainDR.dailyText != nil && dr.dailyText != nil {
                             mainDR.dailyText! += dr.dailyText!
+                        } else if mainDR.dailyText == nil {
+                            mainDR.dailyText = dr.dailyText
                         }
                         modelContext.delete(dr)
                     }

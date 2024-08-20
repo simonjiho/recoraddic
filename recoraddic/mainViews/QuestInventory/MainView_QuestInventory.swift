@@ -22,7 +22,7 @@ struct MainView_QuestInventory: View {
     @Environment(\.colorScheme) var colorScheme
     @Query var quests:[Quest]
     
-
+    @Binding var selectedView: MainViewName
     
 //    @State var chooseQuestToHide:Bool = false
     
@@ -49,8 +49,8 @@ struct MainView_QuestInventory: View {
     // @State enum -> 보관 / 숨기기 / 휴지통 하시겠습니까? -> enum에 따른 함수 구분해서 바꿔주기
     
     var body: some View {
-        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+//        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+//        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
         
         let quest_sorted_visible = quests.filter({$0.isVisible()}).sorted(by: {
             if $0.momentumLevel != $1.momentumLevel {
@@ -74,7 +74,7 @@ struct MainView_QuestInventory: View {
             let gridHeight = gridWidth / 1.618
             let gridItemWidth = gridWidth * 0.85
             let gridItemHeight = gridHeight * 0.85
-            let gridItemSpacing = gridItemWidth*0.3
+//            let gridItemSpacing = gridItemWidth*0.3
             let gridVerticalSpacing = gridWidth*0.08
         
             
@@ -396,6 +396,10 @@ struct MainView_QuestInventory: View {
                     }
                 }
             }
+            .onChange(of: selectedView) {
+                popUp_help = false
+            }
+            
 
         } // geometryRecord
         
@@ -602,7 +606,7 @@ struct QuestTierView: View {
     
     var body: some View {
         
-        let shadowColor:Color = getShadowColor(colorScheme)
+//        let shadowColor:Color = getShadowColor(colorScheme)
         
         let tierColor:Color = getTierColorOf(tier: tier)
         
@@ -1064,76 +1068,64 @@ struct CreateNewQuest: View {
 
 struct QuestHelpView: View {
     
+    @Environment(\.colorScheme) var colorScheme
+    
     @Binding var popUp_help: Bool
     
-    let options: [String] = ["시간", "시간x"]
-    @State var selectedOption: String = "시간"
-    
-    
-    let notHourTierGuideLines: [String] = [
-        "0회~",
-        "5회~",
-        "10회~",
-        "40회~",
-        "100회~",
-        "400회~",
-        "1000회~",
-        "4000회~",
-        "10000회~"
-    ]
-    let hourTierGuideLines: [String] = [
-        "0시간~",
-        "5시간~",
-        "10시간~",
-        "40시간~",
-        "100시간~",
-        "400시간~",
-        "1000시간~",
-        "4000시간~",
-        "10000시간~"
-    ]
+
+        let tierGuideLines: [String] = [
+            "0시간/회~",
+            "5시간/회~",
+            "10시간/회~",
+            "40시간/회~",
+            "100시간/회~",
+            "400시간/회~",
+            "1000시간/회~",
+            "4000시간/회~",
+            "10000시간/회~"
+        ]
     
 //    let momentumLevelDays:[Int:Int] = [1:1,3]
     
-    let defaultFireGuideLines: [String] = [
-        "1일 1회",
-        "3일 2회",
-        "5일 3회",
-        "7일 4회",
-        "10일 5회",
-        "14일 6회",
+    let fireGuideLines: [String] = [
+        "1회",
+        "2회",
+        "3회",
+        "4회",
+        "5회",
+        "6회",
 //        "최근 20일 중 8일 이상 실행",
 //        "최근 30일 중 10일 이상 실행",
 //        "최근 40일 중 12일 이상 실행",
 //        "최근 50일 중 15일 이상 실행",
-        "20일",
-        "50일",
-        "80일",
-        "120일",
-        "20일",
-        "50일",
-        "80일",
-        "120일",
-        "20일",
-        "50일",
-        "80일",
-        "120일",
+        "1개월",
+        "2개월",
+        "3개월",
+        "6개월",
+        "1개월",
+        "2개월",
+        "3개월",
+        "6개월",
+        "1개월",
+        "2개월",
+        "3개월",
+        "6개월",
         "7일",
-        "20일",
-        "50일",
-        "80일",
-        "120일",
+        "1개월",
+        "2개월",
+        "3개월",
+        "6개월",
         "7일",
-        "20일",
-        "50일",
-        "80일",
-        "120일",
+        "1개월",
+        "2개월",
+        "3개월",
+        "6개월",
         "3일",
         "7일",
-        "20일",
-        "50일",
-        "80일",
-        "120일",
+        "1개월",
+        "2개월",
+        "3개월",
+        "6개월",
     ]
 
 
@@ -1144,17 +1136,20 @@ struct QuestHelpView: View {
             let tierViewSize: CGFloat = geoWidth*0.2
             let fireViewSize: CGFloat = geoWidth*0.2
             
-            VStack {
+            VStack(spacing:0.0) {
                 Text("퀘스트 분류")
+                    .bold()
+                    .frame(height:40)
+//                    .padding(.bottom,10)
                 HStack(alignment: .top) {
                     VStack {
                         Text("누적 등급")
                             .font(.caption)
-                        Picker("", selection: $selectedOption, content: {
-                            ForEach(options,id:\.self) { option in
-                                Text(option)
-                            }
-                        })
+//                        Picker("", selection: $selectedOption, content: {
+//                            ForEach(options,id:\.self) { option in
+//                                Text(option)
+//                            }
+//                        })
                         .labelsHidden()
                         .pickerStyle(.segmented)
                         ScrollView {
@@ -1162,30 +1157,35 @@ struct QuestHelpView: View {
                                 VStack {
                                     QuestTierView(tier: tier*5)
                                         .frame(width:tierViewSize, height: tierViewSize)
-                                    Text(selectedOption == "시간x" ?  notHourTierGuideLines[tier]: hourTierGuideLines[tier])
+//                                    Text(selectedOption == "시간x" ?  notHourTierGuideLines[tier]: hourTierGuideLines[tier])
+//                                        .font(.caption)
+                                    Text(tierGuideLines[tier])
                                         .font(.caption)
+                                        .foregroundStyle(colorScheme == .light ? getDarkTierColorOf(tier: tier*5) : getBrightTierColorOf(tier: tier*5))
 
                                 }
                                 .frame(width: geoWidth/2)
                                 .padding(.vertical,tierViewSize*0.1)
                             }
                         }
-                        .frame(width:geoWidth*0.48 - 1)
+                        .frame(width:geoWidth*0.5-21)
                     }
+                    .padding(.horizontal,10)
 
                     Spacer()
-                        .frame(width: 1,height: geoHeight*0.7)
+                        .frame(width: 2,height: geoHeight-80)
+//                        .containerRelativeFrame(.vertical)
                         .background(.gray.opacity(0.5))
-                        .padding(.horizontal,geoWidth*0.01)
                     
                     
                     
                     VStack {
                         Text("불꽃")
                             .font(.caption)
+                        
                         ScrollView(.vertical) {
                             VStack {
-                                Text("기본 불꽃")
+                                Text("기본 불꽃 (최근 30일)")
                                     .font(.caption)
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
@@ -1194,7 +1194,7 @@ struct QuestHelpView: View {
                                             VStack(spacing:0.0) {
                                                 FireView(momentumLevel: momentumLevel)
                                                     .frame(width:fireViewSize, height: fireViewSize)
-                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
                                             }
                                         }
@@ -1202,12 +1202,13 @@ struct QuestHelpView: View {
                                 }
                             }
                             .padding(10)
-                            .background(.gray.opacity(0.2))
+//                            .background(.gray.opacity(0.2))
+                            .background(.red.opacity(0.3))
                             .clipShape(.buttonBorder)
                             .padding(.bottom,30)
                             
                             VStack {
-                                Text("꾸준함의 불꽃(10%)")
+                                Text("꾸준함의 불꽃(20%)")
                                     .font(.caption)
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
@@ -1215,7 +1216,7 @@ struct QuestHelpView: View {
                                             VStack(spacing:0.0) {
                                                 FireView(momentumLevel: momentumLevel)
                                                     .frame(width:fireViewSize, height: fireViewSize)
-                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
                                             }
                                         }
@@ -1223,9 +1224,12 @@ struct QuestHelpView: View {
                                 }
                             }
                             .padding(10)
-                            .background(.gray.opacity(0.2))
+//                            .background(.gray.opacity(0.2))
+                            .background(Color.yellow.opacity(0.2).background(.green.opacity(0.2)))
+//                            .background(colorScheme == .light ? .green.opacity(0.3) : .yellow.opacity(0.3))
                             .clipShape(.buttonBorder)
                             .padding(.bottom,30)
+                            
 
                             VStack {
                                 Text("꾸준함의 불꽃(30%)")
@@ -1238,7 +1242,7 @@ struct QuestHelpView: View {
                                             VStack(spacing:0.0) {
                                                 FireView(momentumLevel: momentumLevel)
                                                     .frame(width:fireViewSize, height: fireViewSize)
-                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
                                             }
                                         }
@@ -1246,7 +1250,9 @@ struct QuestHelpView: View {
                                 }
                             }
                             .padding(10)
-                            .background(.gray.opacity(0.2))
+//                            .background(.gray.opacity(0.2))
+//                            .background(.cyan.opacity(0.3))
+                            .background(.mint.opacity(0.3))
                             .clipShape(.buttonBorder)
                             .padding(.bottom,30)
                             
@@ -1261,7 +1267,7 @@ struct QuestHelpView: View {
                                             VStack(spacing:0.0) {
                                                 FireView(momentumLevel: momentumLevel)
                                                     .frame(width:fireViewSize, height: fireViewSize)
-                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
                                             }
                                         }
@@ -1270,7 +1276,8 @@ struct QuestHelpView: View {
                                 
                             }
                             .padding(10)
-                            .background(.gray.opacity(0.2))
+//                            .background(.gray.opacity(0.2))
+                            .background(.blue.opacity(0.3))
                             .clipShape(.buttonBorder)
                             .padding(.bottom,30)
 
@@ -1286,7 +1293,7 @@ struct QuestHelpView: View {
                                             VStack(spacing:0.0) {
                                                 FireView(momentumLevel: momentumLevel)
                                                     .frame(width:fireViewSize, height: fireViewSize)
-                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
                                             }
                                         }
@@ -1294,7 +1301,8 @@ struct QuestHelpView: View {
                                 }
                             }
                             .padding(10)
-                            .background(.gray.opacity(0.2))
+//                            .background(.gray.opacity(0.2))
+                            .background(.indigo.opacity(0.3))
                             .clipShape(.buttonBorder)
                             .padding(.bottom,30)
                             
@@ -1310,7 +1318,7 @@ struct QuestHelpView: View {
                                             VStack(spacing:0.0) {
                                                 FireView(momentumLevel: momentumLevel)
                                                     .frame(width:fireViewSize, height: fireViewSize)
-                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
                                             }
                                         }
@@ -1319,7 +1327,8 @@ struct QuestHelpView: View {
                                 
                             }
                             .padding(10)
-                            .background(.gray.opacity(0.2))
+//                            .background(.gray.opacity(0.2))
+                            .background(.purple.opacity(0.3))
                             .clipShape(.buttonBorder)
                             .padding(.bottom,30)
                             
@@ -1335,7 +1344,7 @@ struct QuestHelpView: View {
                                             VStack(spacing:0.0) {
                                                 FireView(momentumLevel: momentumLevel)
                                                     .frame(width:fireViewSize, height: fireViewSize)
-                                                Text("최근 \(defaultFireGuideLines[momentumLevel-1])")
+                                                Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
                                             }
                                         }
@@ -1343,7 +1352,8 @@ struct QuestHelpView: View {
                                 }
                             }
                             .padding(10)
-                            .background(.gray.opacity(0.2))
+//                            .background(.gray.opacity(0.2))
+                            .background(colorScheme == .light ? .black.opacity(0.3) : .white.opacity(0.3))
                             .clipShape(.buttonBorder)
                             .padding(.bottom,30)
                             
@@ -1366,20 +1376,25 @@ struct QuestHelpView: View {
                             //
                             //                        }
                         }
-                        .frame(width:geoWidth*0.48)
+                        .frame(width:geoWidth*0.5-21)
                     }
+                    .padding(.horizontal,10)
+
 
                 }
-                .frame(width:geoWidth)
+//                .frame(width:geoWidth)
+                .frame(width:geoWidth, height: geoHeight-80)
+
                 Button(action:{
                     popUp_help.toggle()
                 }) {
                     Image(systemName: "xmark")
                 }
-                .padding(.vertical, geoHeight*0.02)
+                .frame(height:40)
+//                .padding(.vertical, geoHeight*0.02)
 
             }
-            .frame(width: geoWidth, height: geoHeight)
+            .frame(width: geoWidth, height: geoHeight, alignment: .top)
 
         }
     }

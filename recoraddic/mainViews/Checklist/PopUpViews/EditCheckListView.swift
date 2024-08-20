@@ -43,7 +43,7 @@ struct EditCheckListView: View {
         case quest
         case todo
         var id: String { self.rawValue }
-        static let appendOption_kor:[AppendOption:String] = [.quest:"누적퀘스트",.todo:"일반퀘스트"]
+        static let appendOption_kor:[AppendOption:String] = [.quest:"누적퀘스트",.todo:"자주 하는 일"]
 
     }
 
@@ -148,7 +148,7 @@ struct EditCheckListView: View {
                                 Group {
 
                                     if (!createNewPreset && todos_preset.isEmpty) {
-                                        Text("자주 사용하는 일일퀘스트가 있다면")
+                                        Text("자주 하는 일이 있다면")
                                             .opacity(0.5)
                                         Text("하단의 + 버튼을 눌러 생성하세요!")
                                             .opacity(0.5)

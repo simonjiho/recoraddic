@@ -9,8 +9,7 @@ import Foundation
 import SwiftUI
 import Charts
 import SwiftData
-
-
+import ActivityKit
 
 
 
@@ -60,369 +59,366 @@ struct QuestInDetail: View {
             let questTier: Int = selectedQuest?.tier ?? 0
             let nextTier: Int = (questTier/5 + 1)*5
             
-            if selectedQuest == nil {
-                Spacer()
-            }
-            else {
-//                NavigationView {
-                    
-                    VStack(spacing:0.0) {
-                        VStack {
+            if let quest = selectedQuest {
+                VStack(spacing:0.0) {
+                    VStack {
+                        
+                        Group {
                             
-                            Group {
-                                
-                                Text(selectedQuest!.name)
-                                    .frame(width: geoWidth)
-                                    .font(.title)
-                                    .padding(.top, geoHeight*0.02)
-                                if let startDate: Date  = selectedQuest?.dailyData.keys.sorted().first {
-                                    Text("시작일: \(yyyymmddFormatOf(startDate))")
-                                }
-                                
-                            }.foregroundStyle(tierColor_dark)
-                            
-                            Spacer()
-                                .frame(height:geoHeight*0.02)
-                            
-                            if selectedQuest!.inTrashCan {
-                                HStack(spacing:geoWidth/4) {
-                                    Button("되돌리기") {
-                                        alert_restore.toggle()
-                                    }
-                                    .alert("퀘스트 '\(selectedQuest?.name ?? "")' 를 복구하시겠습니까?", isPresented: $alert_restore) {
-                                        Button("복구") {
-                                            if questNames.contains(selectedQuest?.name ?? "") {
-                                                alert_sameName.toggle()
-                                            } else {
-                                                selectedQuest?.inTrashCan = false
-                                                popUp_questStatisticsInDetail.toggle()
-                                            }
-                                            alert_restore.toggle()
-                                        }
-                                        Button("취소") {
-                                            alert_restore.toggle()
-                                        }
-                                    }
-                                    .alert("같은 이름의 퀘스트가 존재합니다.",isPresented: $alert_sameName) {
-                                        Button("확인") {
-                                            alert_sameName.toggle()
-                                        }
-                                    }
-                                    
-                                    
-                                    
-                                    Button("영구적으로 삭제") {
-                                        alert_delete.toggle()
-                                    }
-                                    .foregroundStyle(.red)
-                                    .alert("퀘스트 '\(selectedQuest?.name ?? "")' 를 영구적으로 삭제하시겠습니까?", isPresented: $alert_delete) {
-                                        Button("영구적으로 삭제") {
-                                            
-                                            let targetQuest: Quest = selectedQuest ?? Quest(name: "tmp", dataType: 0)
-                                            selectedQuest = nil
-                                            
-                                            popUp_questStatisticsInDetail.toggle()
-                                            alert_delete.toggle()
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                                modelContext.delete(targetQuest)
-                                            }
-                                        }
-                                        Button("취소") {
-                                            alert_delete.toggle()
-                                        }
-                                    }
-
-                                    
-                                }
-                                .padding(.bottom,geoHeight*0.01)
-                                
-                                
-                            } // 휴지통에 있을 때의 메뉴
-                            else {
-                                let current: Int = {
-                                    if selectedQuest?.dataType == DataType.hour.rawValue {
-                                        return DataType.cumulative_integratedValueNotation(data: (selectedQuest?.cumulative() ?? 0), dataType: dataTypeFrom(selectedQuest?.dataType ?? DataType.hour.rawValue))
-                                    }
-                                    else {
-                                        return selectedQuest?.dailyData.count ?? 0
-                                    }
-                                }()
-                                let next: Int = DataType.cumulative_integratedValueNotation(data: (selectedQuest?.getNextTierCondition() ?? 0), dataType: dataTypeFrom(selectedQuest?.dataType ?? DataType.hour.rawValue))
-                                HStack(spacing:0.0) {
-                                    Text("다음 단계")
-                                        .font(.title3)
-                                    
-                                    //                                QuestTierView(tier: (questTier/5 + 1)*5)
-                                    //                                    .frame(width: geoHeight*0.035, height: geoHeight*0.035)
-                                    
-                                    
-                                    Text(" : \(current)/\(next)")
-                                        .font(.title3)
-                                    
-                                    
-                                    if selectedQuest?.dataType == DataType.hour.rawValue {
-                                        Text("시간")
-                                    }
-                                    else {
-                                        Text("회 기록")
-                                            .font(.title3)
-                                        
-                                    }
-                                    //                                .background(
-                                    //                                    QuestTierView(tier: nextTier)
-                                    //                                )
-                                }
-                                .frame(width:contentWidth1, height: titleHeight*0.2)
-                                .foregroundStyle(getDarkTierColorOf(tier: questTier))
-                                .background(
-                                    
-                                    HStack(spacing:0.0) {
-                                        let ratio: CGFloat = CGFloat(current) / CGFloat(next)
-                                        if ratio.isFinite && ratio >= 0 && ratio <= 1 {
-                                            //                                    QuestTierView(tier: nextTier)
-                                            getTierColorOf(tier: nextTier).colorExpressionIntegration()
-                                                .frame(width: contentWidth1*ratio)
-//                                            tierColor_dark
-                                            getTierColorOf(tier: questTier)
-                                                .frame(width: contentWidth1*(1-ratio))
-                                        }
-                                        
-
-                                    }
-                                        .frame(width:contentWidth1, height: titleHeight*0.2)
-                                        .clipShape(.buttonBorder)
-                                        .shadow(color:getDarkTierColorOf(tier: questTier), radius: 0.5)
-
-                                )
-                                .padding(.bottom,geoHeight*0.01)
-                                
+                            Text(quest.name)
+                                .padding(.horizontal,40)
+                                .frame(width: geoWidth)
+                                .font(.title)
+                                .padding(.top, geoHeight*0.02)
+                                .minimumScaleFactor(0.5)
+                            if let startDate: Date  = quest.dailyData.keys.sorted().first {
+                                Text("시작일: \(yyyymmddFormatOf(startDate))")
                             }
                             
-                            
-                            
-                        }
-                        .frame(height:titleHeight, alignment: .center)
+                        }.foregroundStyle(tierColor_dark)
                         
                         Spacer()
-                            .frame(width: contentWidth1, height: 1)
-                            .background(tierColor_dark.opacity(0.35))
+                            .frame(height:geoHeight*0.02)
                         
-                            
-                        if currentPage == 0 {
-                            VStack(spacing:0.0) {
-                                Spacer()
-                                    .frame(height:contentHeight*0.05)
-                                
-                                Image(systemName: "calendar")
-                                    .foregroundStyle(tierColor_dark)
-                                    .padding(10)
-                                VStack {
-                                    HStack(spacing:0.0) {
-                                        Text("일")
-                                            .font(.subheadline)
-                                            .frame(width:contentWidth3)
-                                        Text("월")
-                                            .font(.subheadline)
-                                            .frame(width:contentWidth3)
-                                        Text("화")
-                                            .font(.subheadline)
-                                            .frame(width:contentWidth3)
-                                        Text("수")
-                                            .font(.subheadline)
-                                            .frame(width:contentWidth3)
-                                        Text("목")
-                                            .font(.subheadline)
-                                            .frame(width:contentWidth3)
-                                        Text("금")
-                                            .font(.subheadline)
-                                            .frame(width:contentWidth3)
-                                        Text("토")
-                                            .font(.subheadline)
-                                            .frame(width:contentWidth3)
-                                    } // 요일
-                                    .padding(.top,geoHeight*0.02)
-                                    .foregroundStyle(tierColor_bright)
-                                    //                        .padding(.bottom,geoHeight*0.005)
-                                    
-                                    ZStack { // for scroll
-                                        ScrollView {
-                                            
-                                            let elementSize:CGFloat = contentWidth2/7
-                                            let (startDate,endDate): (Date,Date) = {
-                                                let sorted_dates: [Date] = selectedQuest!.dailyData.keys.sorted()
-                                                
-                                                if sorted_dates.isEmpty {
-                                                    return (.now, .now)
-                                                }
-                                                else {
-                                                    return (sorted_dates.first!, sorted_dates.last!)
-                                                }
-                                                
-                                            }()
-                                            let numberOfRows:Int = (calculateDaysBetweenTwoDates(from: startDate, to: endDate) + 8) / 7 + 1
-                                            
-                                            let scrollViewHeight:CGFloat = elementSize * CGFloat(numberOfRows)
-                                            
-                                            SerialVisualization(data: selectedQuest!.dailyData, tier: questTier)
-                                                .frame(width: contentWidth2, height: scrollViewHeight, alignment: .center)
-                                                .padding(.horizontal, (contentWidth1-contentWidth2)/2)
-                                            
+                        if quest.inTrashCan {
+                            HStack(spacing:geoWidth/4) {
+                                Button("되돌리기") {
+                                    alert_restore.toggle()
+                                }
+                                .alert("퀘스트 '\(quest.name)' 를 복구하시겠습니까?", isPresented: $alert_restore) {
+                                    Button("복구") {
+                                        if questNames.contains(quest.name) {
+                                            alert_sameName.toggle()
+                                        } else {
+                                            quest.inTrashCan = false
+                                            popUp_questStatisticsInDetail.toggle()
                                         }
-                                        .frame(width:contentWidth1)
-                                        .defaultScrollAnchor(.bottom)
+                                        alert_restore.toggle()
+                                    }
+                                    Button("취소") {
+                                        alert_restore.toggle()
+                                    }
+                                }
+                                .alert("같은 이름의 퀘스트가 존재합니다.",isPresented: $alert_sameName) {
+                                    Button("확인") {
+                                        alert_sameName.toggle()
+                                    }
+                                }
+                                
+                                
+                                
+                                Button("영구적으로 삭제") {
+                                    alert_delete.toggle()
+                                }
+                                .foregroundStyle(.red)
+                                .alert("퀘스트 '\(quest.name)' 를 영구적으로 삭제하시겠습니까?", isPresented: $alert_delete) {
+                                    Button("영구적으로 삭제") {
+                                        
+                                        let targetQuest: Quest = quest
+                                        selectedQuest = nil
+                                        
+                                        popUp_questStatisticsInDetail.toggle()
+                                        alert_delete.toggle()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                            modelContext.delete(targetQuest)
+                                        }
+                                    }
+                                    Button("취소") {
+                                        alert_delete.toggle()
+                                    }
+                                }
+
+                                
+                            }
+                            .padding(.bottom,geoHeight*0.01)
+                            
+                            
+                        } // 휴지통에 있을 때의 메뉴
+                        else {
+                            let current: Int = {
+                                if quest.dataType == DataType.hour.rawValue {
+                                    return DataType.cumulative_integratedValueNotation(data: (quest.cumulative()), dataType: dataTypeFrom(quest.dataType))
+                                }
+                                else {
+                                    return quest.dailyData.count
+                                }
+                            }()
+                            let next: Int = DataType.cumulative_integratedValueNotation(data: (quest.getNextTierCondition()), dataType: dataTypeFrom(quest.dataType))
+                            HStack(spacing:0.0) {
+                                Text("다음 단계")
+                                    .font(.title3)
+                                
+                                //                                QuestTierView(tier: (questTier/5 + 1)*5)
+                                //                                    .frame(width: geoHeight*0.035, height: geoHeight*0.035)
+                                
+                                
+                                Text(" : \(current)/\(next)")
+                                    .font(.title3)
+                                
+                                
+                                if quest.dataType == DataType.hour.rawValue {
+                                    Text("시간")
+                                }
+                                else {
+                                    Text("회 기록")
+                                        .font(.title3)
+                                    
+                                }
+                                //                                .background(
+                                //                                    QuestTierView(tier: nextTier)
+                                //                                )
+                            }
+                            .frame(width:contentWidth1, height: titleHeight*0.2)
+                            .foregroundStyle(getDarkTierColorOf(tier: questTier))
+                            .background(
+                                
+                                HStack(spacing:0.0) {
+                                    let ratio: CGFloat = CGFloat(current) / CGFloat(next)
+                                    if ratio.isFinite && ratio >= 0 && ratio <= 1 {
+                                        //                                    QuestTierView(tier: nextTier)
+                                        getTierColorOf(tier: nextTier).colorExpressionIntegration()
+                                            .frame(width: contentWidth1*ratio)
+//                                            tierColor_dark
+                                        getTierColorOf(tier: questTier)
+                                            .frame(width: contentWidth1*(1-ratio))
                                     }
                                     
-                                } // 달력
-                                .frame(width:contentWidth1, height: contentHeight*0.8)
-                                .background(tierColor_dark)
-                                .clipShape(RoundedRectangle(cornerSize: CGSize(width: geoWidth*0.05, height: geoWidth*0.05)))
-                                
-                                
-                                
-                                
-                                
-                            }
+
+                                }
+                                    .frame(width:contentWidth1, height: titleHeight*0.2)
+                                    .clipShape(.buttonBorder)
+                                    .shadow(color:getDarkTierColorOf(tier: questTier), radius: 0.5)
+
+                            )
+                            .padding(.bottom,geoHeight*0.01)
                             
-                            //                        .padding(.top, contentHeight*0.05)
-                            .frame(width:geoWidth, height: contentHeight, alignment: .top)
+                        }
+                        
+                        
+                        
+                    }
+                    .frame(height:titleHeight, alignment: .center)
+                    
+                    Spacer()
+                        .frame(width: contentWidth1, height: 1)
+                        .background(tierColor_dark.opacity(0.35))
+                    
+                        
+                    if currentPage == 0 {
+                        VStack(spacing:0.0) {
+                            Spacer()
+                                .frame(height:contentHeight*0.05)
+                            
+                            Image(systemName: "calendar")
+                                .foregroundStyle(tierColor_dark)
+                                .padding(10)
+                            VStack {
+                                HStack(spacing:0.0) {
+                                    Text("일")
+                                        .font(.subheadline)
+                                        .frame(width:contentWidth3)
+                                    Text("월")
+                                        .font(.subheadline)
+                                        .frame(width:contentWidth3)
+                                    Text("화")
+                                        .font(.subheadline)
+                                        .frame(width:contentWidth3)
+                                    Text("수")
+                                        .font(.subheadline)
+                                        .frame(width:contentWidth3)
+                                    Text("목")
+                                        .font(.subheadline)
+                                        .frame(width:contentWidth3)
+                                    Text("금")
+                                        .font(.subheadline)
+                                        .frame(width:contentWidth3)
+                                    Text("토")
+                                        .font(.subheadline)
+                                        .frame(width:contentWidth3)
+                                } // 요일
+                                .padding(.top,geoHeight*0.02)
+                                .foregroundStyle(tierColor_bright)
+                                //                        .padding(.bottom,geoHeight*0.005)
+                                
+                                ZStack { // for scroll
+                                    ScrollView {
+                                        
+                                        let elementSize:CGFloat = contentWidth2/7
+                                        let (startDate,endDate): (Date,Date) = {
+                                            let sorted_dates: [Date] = quest.dailyData.keys.sorted()
+                                            
+                                            if sorted_dates.isEmpty {
+                                                return (.now, .now)
+                                            }
+                                            else {
+                                                return (sorted_dates.first!, sorted_dates.last!)
+                                            }
+                                            
+                                        }()
+                                        let numberOfRows:Int = (calculateDaysBetweenTwoDates(from: startDate, to: endDate) + 8) / 7 + 1
+                                        
+                                        let scrollViewHeight:CGFloat = elementSize * CGFloat(numberOfRows)
+                                        
+                                        SerialVisualization(data: quest.dailyData, tier: questTier)
+                                            .frame(width: contentWidth2, height: scrollViewHeight, alignment: .center)
+                                            .padding(.horizontal, (contentWidth1-contentWidth2)/2)
+                                        
+                                    }
+                                    .frame(width:contentWidth1)
+                                    .defaultScrollAnchor(.bottom)
+                                }
+                                
+                            } // 달력
+                            .frame(width:contentWidth1, height: contentHeight*0.8)
+                            .background(tierColor_dark)
+                            .clipShape(RoundedRectangle(cornerSize: CGSize(width: geoWidth*0.05, height: geoWidth*0.05)))
+                            
+                            
+                            
+                            
+                            
+                        }
+                        
+                        //                        .padding(.top, contentHeight*0.05)
+                        .frame(width:geoWidth, height: contentHeight, alignment: .top)
+                        .tabItem {
+                            Image(systemName: "calendar")
+                        }
+                        .background(Color.clear.opacity(0.01))
+                    }
+                    else {
+                        
+                        QuestStatistics_inTerm(selectedQuest: quest)
+                            .frame(width:geoWidth, height: contentHeight)
+                            .scrollTargetLayout()
+                        //                            .border(.red)
                             .tabItem {
-                                Image(systemName: "calendar")
+                                Image(systemName: "chart.line.uptrend.xyaxis")
                             }
                             .background(Color.clear.opacity(0.01))
-                        }
-                        else {
-                            
-                            QuestStatistics_inTerm(selectedQuest: selectedQuest!)
-                                .frame(width:geoWidth, height: contentHeight)
-                                .scrollTargetLayout()
-                            //                            .border(.red)
-                                .tabItem {
-                                    Image(systemName: "chart.line.uptrend.xyaxis")
-                                }
-                                .background(Color.clear.opacity(0.01))
-                            
-                        }
-                            
                         
-                        // TODO: custom picker로 바꿔서 색 적용시키기
-                        Picker("",selection: $currentPage) {
-                            Image(systemName: "calendar")
+                    }
+                        
+                    
+                    // TODO: custom picker로 바꿔서 색 적용시키기
+                    Picker("",selection: $currentPage) {
+                        Image(systemName: "calendar")
 //                                .background(tierColor_dark)
 
 //                                .tint(tierColor_dark)
 //                                .foregroundStyle(tierColor_dark)
-                                .tag(0)
+                            .tag(0)
 
-                            Image(systemName: "chart.line.uptrend.xyaxis")
+                        Image(systemName: "chart.line.uptrend.xyaxis")
 //                                .background(tierColor_dark)
 //                                .foregroundStyle(tierColor_dark)
-                                .tag(1)
+                            .tag(1)
 
-                        }
-                        .frame(width: contentWidth1)
+                    }
+                    .frame(width: contentWidth1)
 //                        .background(tierColor_dark)
 //                        .tint(tierColor_dark)
 //                        .foregroundStyle(tierColor_dark)
-                        .labelsHidden()
-                        .pickerStyle(.palette)
+                    .labelsHidden()
+                    .pickerStyle(.palette)
 
 
-                            
-                            
-                            
-                            
-                            
+                        
+                        
+                        
+                        
+                        
 //                        }
 //                        .frame(width: geoWidth, height: contentHeight)
-                        
+                    
 //                        .tabViewStyle(PageTabViewStyle())
-                        //                    .border(.red)
+                    //                    .border(.red)
 //                        .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
-                        
-                        
-                        if !selectedQuest!.inTrashCan {
-                            VStack(spacing:0.0) {
-                                Spacer()
-                                    .frame(width: contentWidth1, height: 1)
-                                    .background(tierColor_dark.opacity(0.35))
-                                
-                                HStack(spacing: geoWidth*0.1) {
-                                    if !selectedQuest!.isArchived {
-                                        Button("보관",systemImage: "archivebox") {
-                                            selectedQuest?.isArchived = true
-                                            selectedQuest?.isHidden = false
-                                        }
-                                        .foregroundStyle(tierColor_dark)
+                    
+                    
+                    if !quest.inTrashCan {
+                        VStack(spacing:0.0) {
+                            Spacer()
+                                .frame(width: contentWidth1, height: 1)
+                                .background(tierColor_dark.opacity(0.35))
+                            
+                            HStack(spacing: geoWidth*0.1) {
+                                if !quest.isArchived {
+                                    Button("보관",systemImage: "archivebox") {
+                                        quest.isArchived = true
+                                        quest.isHidden = false
                                     }
-                                    else {
-                                        Button("되돌리기") {
-                                            selectedQuest?.isArchived = false
-                                            selectedQuest?.isHidden = false
-                                        }
-                                        .foregroundStyle(tierColor_dark)
-                                    }
-                                    if !selectedQuest!.isHidden {
-                                        Button("숨김",systemImage: "eye.slash") {
-                                            selectedQuest?.isArchived = false
-                                            selectedQuest?.isHidden = true
-                                        }
-                                        .foregroundStyle(tierColor_dark)
-                                    }
-                                    else {
-                                        Button("되돌리기") {
-                                            selectedQuest?.isArchived = false
-                                            selectedQuest?.isHidden = false
-                                        }
-                                        .foregroundStyle(tierColor_dark)
-                                    }
-                                    Button("휴지통",systemImage: "trash") {
-                                        alert_inTrashCan.toggle()
-                                    }
-                                    .foregroundStyle(.red)
+                                    .foregroundStyle(tierColor_dark)
                                 }
-                                .frame(height: menuHeight*0.29)
-                                .padding(.top, menuHeight*0.2)
-                                .padding(.bottom, menuHeight*0.1)
-                                .alert("퀘스트 '\(selectedQuest?.name ?? "")' 를 삭제하시겠습니까?", isPresented: $alert_inTrashCan) {
-                                    Button("휴지통으로 이동") {
-                                        selectedQuest?.isArchived = false
-                                        selectedQuest?.isHidden = false
-                                        selectedQuest?.inTrashCan = true
-                                        alert_inTrashCan.toggle()
-                                        popUp_questStatisticsInDetail.toggle()
+                                else {
+                                    Button("되돌리기") {
+                                        quest.isArchived = false
+                                        quest.isHidden = false
                                     }
-                                    .foregroundStyle(.red)
-                                    Button("취소") {
-                                        alert_inTrashCan.toggle()
-                                    }
-                                } message: {
-                                    Text("삭제한 퀘스트는 휴지통으로 이동됩니다.")
+                                    .foregroundStyle(tierColor_dark)
                                 }
+                                if !quest.isHidden {
+                                    Button("숨김",systemImage: "eye.slash") {
+                                        quest.isArchived = false
+                                        quest.isHidden = true
+                                    }
+                                    .foregroundStyle(tierColor_dark)
+                                }
+                                else {
+                                    Button("되돌리기") {
+                                        quest.isArchived = false
+                                        quest.isHidden = false
+                                    }
+                                    .foregroundStyle(tierColor_dark)
+                                }
+                                Button("휴지통",systemImage: "trash") {
+                                    alert_inTrashCan.toggle()
+                                }
+                                .foregroundStyle(.red)
                             }
-                            .frame(width: geoWidth, height: menuHeight, alignment: .bottom)
+                            .frame(height: menuHeight*0.29)
+                            .padding(.top, menuHeight*0.2)
+                            .padding(.bottom, menuHeight*0.1)
+                            .alert("퀘스트 '\(quest.name)' 를 삭제하시겠습니까?", isPresented: $alert_inTrashCan) {
+                                Button("휴지통으로 이동") {
+                                    alert_inTrashCan.toggle()
+                                    popUp_questStatisticsInDetail.toggle()
+                                    quest.isArchived = false
+                                    quest.isHidden = false
+                                    quest.inTrashCan = true
+                                }
+                                .foregroundStyle(.red)
+                                Button("취소") {
+                                    alert_inTrashCan.toggle()
+                                }
+                            } message: {
+                                Text("삭제한 퀘스트는 휴지통으로 이동됩니다.")
+                            }
                         }
-                        
+                        .frame(width: geoWidth, height: menuHeight, alignment: .bottom)
                     }
-                    .frame(width: geoWidth, height: geoHeight, alignment: .top)
-                    .background(LinearGradient(colors: getGradientColorsOf(tier: selectedQuest?.tier ?? 0, type: 1), startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .fullScreenCover(isPresented: $popUp_editQuest) {
-                        if let quest = selectedQuest {
-                            EditQuest(
-                                popUp_editQuest: $popUp_editQuest,
-                                quest: quest,
-                                questName: quest.name,
-                                questDataType: DataType(rawValue: quest.dataType) ?? .hour ,
-                                customDataTypeNotation:quest.customDataTypeNotation,
-                                customDataTypeNotation_textField: quest.customDataTypeNotation ?? "",
-                                addSubName: quest.subName != nil,
-                                questSubname: quest.subName ?? "",
-                                addPastCumulative: quest.pastCumulatve != 0,
-                                pastCumulative: quest.pastCumulatve/60,
-                                pastCumulative_str: String(quest.pastCumulatve/60)
-                            )
-                        }
-                    }
-                    .overlay {
+                    
+                }
+                .frame(width: geoWidth, height: geoHeight, alignment: .top)
+                .background(LinearGradient(colors: getGradientColorsOf(tier: quest.tier, type: 1), startPoint: .topLeading, endPoint: .bottomTrailing))
+                .fullScreenCover(isPresented: $popUp_editQuest) {
+//                    if let quest = selectedQuest {
+                    EditQuest(
+                        popUp_editQuest: $popUp_editQuest,
+                        quest: quest,
+                        questName: quest.name,
+                        questDataType: DataType(rawValue: quest.dataType) ?? .hour ,
+                        customDataTypeNotation:quest.customDataTypeNotation,
+                        customDataTypeNotation_textField: quest.customDataTypeNotation ?? "",
+                        addSubName: quest.subName != nil,
+                        questSubname: quest.subName ?? "",
+                        addPastCumulative: quest.pastCumulatve != 0,
+                        pastCumulative: quest.pastCumulatve/60,
+                        pastCumulative_str: String(quest.pastCumulatve/60)
+                    )
+//                    }
+                }
+                .overlay {
 //                        if let quest = selectedQuest {
 //                            NavigationLink(destination: EditQuest(
 //                                popUp_editQuest: $popUp_editQuest,
@@ -446,22 +442,23 @@ struct QuestInDetail: View {
 //                            .zIndex(3)
 //                            .buttonStyle(.plain)
 //                        }
-                        if let quest = selectedQuest {
-                            
-                            if !quest.inTrashCan {
-                                Button(action:{popUp_editQuest.toggle()}) {
-                                    Image(systemName: "square.and.pencil")
-                                        .foregroundStyle(tierColor_dark)
-                                }
-                                .padding(10)
-                                .frame(width: geoWidth,height: geoHeight, alignment: .topTrailing)
-                                //                        .zIndex(3)
-                                .buttonStyle(.plain)
+                    if let quest = selectedQuest {
+                        
+                        if !quest.inTrashCan {
+                            Button(action:{popUp_editQuest.toggle()}) {
+                                Image(systemName: "square.and.pencil")
+                                    .foregroundStyle(tierColor_dark)
                             }
+                            .padding(10)
+                            .frame(width: geoWidth,height: geoHeight, alignment: .topTrailing)
+                            //                        .zIndex(3)
+                            .buttonStyle(.plain)
                         }
                     }
-//                }
-            
+                }
+            }
+            else {
+                Spacer()
                 
             }
 
@@ -1262,7 +1259,7 @@ struct EditQuest: View {
         let predicate = #Predicate<DailyQuest> { dailyQuest in
             dailyQuest.questName == oldName
         }
-        var descriptor = FetchDescriptor(predicate: predicate)
+        let descriptor = FetchDescriptor(predicate: predicate)
         try! modelContext.enumerate(
             descriptor,
             batchSize: 5000,
@@ -1287,7 +1284,6 @@ struct EditQuest: View {
 
         
         
-        
         quest.name = newName
         if addSubName { quest.subName = newSubName }
         else { quest.subName = nil }
@@ -1304,8 +1300,37 @@ struct EditQuest: View {
         }
         quest.updateTier()
         
+        
+        
+        if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == oldGetName }) {
+            
+            let startTime = targetActivity.attributes.startTime
+            let containedDate = targetActivity.attributes.containedDate
+            let tier = targetActivity.attributes.tier
+            let dailyGoal = targetActivity.content.state.goal
+            
+            let dismissalPolicy: ActivityUIDismissalPolicy = .immediate
+            Task {
+                await targetActivity.end(ActivityContent(state: targetActivity.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
+            }
+            
+            let attributes = RecoraddicWidgetAttributes(questName: newGetName, startTime:startTime, containedDate:containedDate, tier: tier)
+            let initialContentState = RecoraddicWidgetAttributes.ContentState(goal: dailyGoal)
+            do {
+                let activity = try Activity<RecoraddicWidgetAttributes>.request(
+                    attributes: attributes,
+                    content: ActivityContent(state: initialContentState, staleDate: nil),
+                    pushType: nil
+                )
+            } catch {
+                print("Failed to rename activity: \(error.localizedDescription)")
+            }
+            
+        }
      
+        
         popUp_editQuest.toggle()
+        
     }
     
     

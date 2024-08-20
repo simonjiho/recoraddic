@@ -125,7 +125,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     private func setupNotificationCategories() {
         let customCategory = UNNotificationCategory(
-            identifier: "customNotificationCategory",
+            identifier: "dailyQuestNotification",
             actions: [],
             intentIdentifiers: [],
             options: .customDismissAction

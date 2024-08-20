@@ -137,7 +137,7 @@ struct DailyRecordInShort: View {
             let geoHeight = geometry.size.height
             
             let imageOrStoneHeight = geometry.size.height*0.16
-            let imageOrStoneWidth = dailyRecord.diaryImage != nil ? geometry.size.width*0.8 : imageOrStoneHeight*1.5
+//            let imageOrStoneWidth = dailyRecord.diaryImage != nil ? geometry.size.width*0.8 : imageOrStoneHeight*1.5
             
             let questBoxWidth = geometry.size.width*0.9
             let questBoxHeight = 40.0
@@ -210,12 +210,12 @@ struct DailyRecordInShort: View {
                 
                 ScrollView {
                     VStack {
-                        if dailyRecord.diaryImage != nil {
-                            Image(uiImage: UIImage(data:dailyRecord.diaryImage!)!)
-                                .resizable()
-                                .aspectRatio(contentMode:.fit)
-                                .frame(width: imageOrStoneWidth, height: imageOrStoneHeight)
-                        }
+//                        if dailyRecord.diaryImage != nil {
+//                            Image(uiImage: UIImage(data:dailyRecord.diaryImage!)!)
+//                                .resizable()
+//                                .aspectRatio(contentMode:.fit)
+//                                .frame(width: imageOrStoneWidth, height: imageOrStoneHeight)
+//                        }
                         
                         
                         if dailyRecord.dailyText != nil && dailyRecord.dailyText != "" {
@@ -400,7 +400,7 @@ struct RecordInDetailView: View {
             let geoHeight = geometry.size.height
             
             let imageOrStoneHeight = geometry.size.height*0.16
-            let imageOrStoneWidth = record.diaryImage != nil ? geometry.size.width*0.8 : imageOrStoneHeight*1.5
+//            let imageOrStoneWidth = record.diaryImage != nil ? geometry.size.width*0.8 : imageOrStoneHeight*1.5
             
             let questBoxWidth = geometry.size.width*0.9
             let questBoxHeight = geometry.size.height*0.07
@@ -436,7 +436,7 @@ struct RecordInDetailView: View {
                                 )
                         }
                         .frame(width:facialExpressionSize, height: facialExpressionSize)
-                        Text(kor_yyyymmddFormatOf(record.date!))
+                        Text(kor_yyyymmddFormatOf(record.date ?? .now))
                         //                        .frame(width: geoWidth)
                             .font(.title3)
                             .bold()
@@ -448,12 +448,12 @@ struct RecordInDetailView: View {
                     
                     ScrollView {
                         VStack {
-                            if record.diaryImage != nil {
-                                Image(uiImage: UIImage(data:record.diaryImage!)!)
-                                    .resizable()
-                                    .aspectRatio(contentMode:.fit)
-                                    .frame(width: imageOrStoneWidth, height: imageOrStoneHeight)
-                            }
+//                            if record.diaryImage != nil {
+//                                Image(uiImage: UIImage(data:record.diaryImage!)!)
+//                                    .resizable()
+//                                    .aspectRatio(contentMode:.fit)
+//                                    .frame(width: imageOrStoneWidth, height: imageOrStoneHeight)
+//                            }
                             
                             
                             if record.dailyText != nil && record.dailyText != "" {

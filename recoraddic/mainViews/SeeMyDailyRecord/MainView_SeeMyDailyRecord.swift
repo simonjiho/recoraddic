@@ -51,12 +51,12 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     
     @State var updateSelectedDailyRecordSet: Bool = false
     
-    @State var dailyRecordHiddenOrDeleted: Bool = false
-    @State var alert_drsHidden: Bool = false
-    @State var alert_drsInTrashCan: Bool = false
+//    @State var dailyRecordHiddenOrDeleted: Bool = false
+//    @State var alert_drsHidden: Bool = false
+//    @State var alert_drsInTrashCan: Bool = false
 //    @State var dailyRecordDeleted: Bool = false
 //    @State var dailyRecordUnhidden: Bool = false
-    @State var hiddenOrDeletedIndex: Int = 0
+//    @State var hiddenOrDeletedIndex: Int = 0
     @State var recalculatingVisualValues_themeChanged: Bool = false // not used yet. Will be used to hide when calculation is on process
     
     @State var dailyRecordSetHiddenOrDeleted: Bool = false
@@ -73,6 +73,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     
     @State var selectedDrIdx:Int? = nil
 
+    @State var drsDeleted: Bool = false
     
     var body: some View {
         
@@ -81,10 +82,15 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
 
         let dailyRecords_withContent:[DailyRecord] = {
             if showHiddenQuests {
-                return selectedDailyRecordSet.dailyRecords!.filter({$0.hasContent}).sorted(by: {$0.date! < $1.date!})
+                return selectedDailyRecordSet.dailyRecords!.filter({$0.hasContent}).sorted(by: {
+                    if $0.date != nil && $1.date != nil {
+                        return $0.date! < $1.date!
+                    } else { return false }
+                })
             } else {
 //                print(hiddenQuestNames)
-                return selectedDailyRecordSet.dailyRecords!.filter({$0.hasContent && !Set($0.dailyQuestList!.map{$0.questName}).subtracting(hiddenQuestNames).isEmpty}).sorted(by: {$0.date! < $1.date!})
+                return selectedDailyRecordSet.dailyRecords!.filter({$0.hasContent && !Set($0.dailyQuestList!.map{$0.questName}).subtracting(hiddenQuestNames).isEmpty}).sorted(by:     { if $0.date != nil && $1.date != nil { return $0.date! < $1.date! } else { return false } }
+                )
             }
         }()
         
@@ -168,6 +174,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                             popUp_changeStyle: $popUp_changeStyle,
                             isEditingTermGoals: $isEditingTermGoals,
                             undoNewDRS: $undoNewDRS,
+                            drsDeleted: $drsDeleted,
                             startDate: $startDate,
                             endDate: $endDate,
                             prevDRS_start: prevDRS_start,
@@ -431,6 +438,22 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 }
             }
 
+        }
+        
+        .onChange(of: drsDeleted) {
+            if drsDeleted && selectedDrsIdx > 0 {
+                let prevDrs:DailyRecordSet = dailyRecordSets[selectedDrsIdx-1]
+                for dr in selectedDailyRecordSet.dailyRecords! {
+                    dr.dailyRecordSet = prevDrs
+                }
+                prevDrs.end = selectedDailyRecordSet.end
+                let deleteTarget: DailyRecordSet = selectedDailyRecordSet
+                selectedDrsIdx -= 1
+                modelContext.delete(deleteTarget)
+                
+                drsDeleted = false
+                
+            }
         }
 //        .onChange(of: popUp_recordInDetail) {
 ////            if popUp_recordInDetail && selectedDrIdx == nil && selectedRecord != nil {

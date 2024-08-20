@@ -392,7 +392,7 @@ final class DailyRecordSet: Equatable {
     func getLocalStart() -> Date {
         let date = self.start
         var calendar = Calendar.current
-        calendar.timeZone = TimeZone(identifier: "UTC")!
+        calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
         // Extract year, month, and day components in UTC
         let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
         // Set calendar to local time zone
@@ -405,7 +405,7 @@ final class DailyRecordSet: Equatable {
     func getLocalEnd() -> Date? {
         if let date = self.end {
             var calendar = Calendar.current
-            calendar.timeZone = TimeZone(identifier: "UTC")!
+            calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
             // Extract year, month, and day components in UTC
             let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
             // Set calendar to local time zone
@@ -468,7 +468,7 @@ final class DailyRecord: Equatable, Identifiable, Hashable {
     @Relationship(deleteRule:.cascade, inverse: \Todo.dailyRecord)
     var todoList:[Todo]? = []
     
-    var diaryImage: Data?
+//    var diaryImage: Data?
     var dailyTextType: String? // diary or inShort
     var dailyText: String?
 
@@ -558,7 +558,7 @@ final class DailyRecord: Equatable, Identifiable, Hashable {
     func getLocalDate() -> Date? {
         if let date = self.date {
             var calendar = Calendar.current
-            calendar.timeZone = TimeZone(identifier: "UTC")!
+            calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
             // Extract year, month, and day components in UTC
             let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
             // Set calendar to local time zone
@@ -744,15 +744,15 @@ class Profile {
     var email: String = ""
     
     // need other cumulative times also..
-    var cumulativeRecordHours: Int = 0 // will be used later..
-    var numberOfDailyRecords: Int = 0
+//    var cumulativeRecordHours: Int = 0  // will be used later..
+//    var numberOfDailyRecords: Int = 0
     //    var cumulativeRecord
     // unit of sleepingTime: 1 -> 5min, 12 -> 1hour
-    var sleepingTime: Int = 0 // deprecated...
+//    var sleepingTime: Int = 0 // deprecated...
     
     var showHiddenQuests: Bool = false
     
-    var adjustedThemeSetName: String = "default1" // deprecated....
+//    var adjustedThemeSetName: String = "default1" // deprecated....
     
     var memo: String = ""
     

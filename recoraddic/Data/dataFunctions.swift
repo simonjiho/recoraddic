@@ -112,7 +112,7 @@ extension Quest {
     }
 
     func representingDataToString() -> String {
-        let calendar = Calendar.current
+//        let calendar = Calendar.current
         
 //        let currentDate = (dailyData.isEmpty || dailyData.keys.contains(getStandardDateOfNow())) ? getStartDateOfNow() : calendar.date(byAdding: .day, value: -1, to: getStartDateOfNow())!
         // 오늘기록완료시(get d -> 마지막기록날짜 / 기록완료 안했을 시: 전날
@@ -182,16 +182,16 @@ extension Quest {
         let unactivatedPeriod: Int = calculateDaysBetweenTwoDates(from:latestRecordDate, to: today)
         
         if unactivatedPeriod == 0 { // try finding if there's special(extreme high) momentumLevel
-            if checkMomentumLevel(ratio: 1.0, termLength: 120, today: latestRecordDate) {
+            if checkMomentumLevel(ratio: 1.0, termLength: 180, today: latestRecordDate) {
                 return 34
             }
-            else if checkMomentumLevel(ratio: 1.0, termLength: 80, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 1.0, termLength: 90, today: latestRecordDate) {
                 return 33
             }
-            else if checkMomentumLevel(ratio: 1.0, termLength: 50, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 1.0, termLength: 60, today: latestRecordDate) {
                 return 32
             }
-            else if checkMomentumLevel(ratio: 1.0, termLength: 20, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 1.0, termLength: 30, today: latestRecordDate) {
                 return 31
             }
             else if checkMomentumLevel(ratio: 1.0, termLength: 7, today: latestRecordDate) {
@@ -202,31 +202,31 @@ extension Quest {
             }
         }
         else if unactivatedPeriod < 10 { // try finding if there's special(high) momentumLevel
-            if checkMomentumLevel(ratio: 0.85, termLength: 120, today: latestRecordDate) {
+            if checkMomentumLevel(ratio: 0.85, termLength: 180, today: latestRecordDate) {
                 return 28
             }
-            else if checkMomentumLevel(ratio: 0.85, termLength: 80, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.85, termLength: 90, today: latestRecordDate) {
                 return 27
             }
-            else if checkMomentumLevel(ratio: 0.85, termLength: 50, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.85, termLength: 60, today: latestRecordDate) {
                 return 26
             }
-            else if checkMomentumLevel(ratio: 0.85, termLength: 20, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.85, termLength: 30, today: latestRecordDate) {
                 return 25
             }
             else if checkMomentumLevel(ratio: 0.85, termLength: 7, today: latestRecordDate) {
                 return 24
             }
-            else if checkMomentumLevel(ratio: 0.7, termLength: 120, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.7, termLength: 180, today: latestRecordDate) {
                 return 23
             }
-            else if checkMomentumLevel(ratio: 0.7, termLength: 80, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.7, termLength: 90, today: latestRecordDate) {
                 return 22
             }
-            else if checkMomentumLevel(ratio: 0.7, termLength: 50, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.7, termLength: 60, today: latestRecordDate) {
                 return 21
             }
-            else if checkMomentumLevel(ratio: 0.7, termLength: 20, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.7, termLength: 30, today: latestRecordDate) {
                 return 20
             }
             else if checkMomentumLevel(ratio: 0.7, termLength: 7, today: latestRecordDate) {
@@ -236,44 +236,44 @@ extension Quest {
 
         }
         else if unactivatedPeriod < 20 {  // try finding if there's special(middle) momentumLevel
-            if checkMomentumLevel(ratio: 0.5, termLength: 120, today: latestRecordDate) {
+            if checkMomentumLevel(ratio: 0.5, termLength: 180, today: latestRecordDate) {
                 return 18
             }
-            else if checkMomentumLevel(ratio: 0.5, termLength: 80, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.5, termLength: 90, today: latestRecordDate) {
                 return 17
             }
-            else if checkMomentumLevel(ratio: 0.5, termLength: 50, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.5, termLength: 60, today: latestRecordDate) {
                 return 16
             }
-            else if checkMomentumLevel(ratio: 0.5, termLength: 20, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.5, termLength: 30, today: latestRecordDate) {
                 return 15
             }
-            else if checkMomentumLevel(ratio: 0.3, termLength: 120, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.3, termLength: 180, today: latestRecordDate) {
                 return 14
             }
-            else if checkMomentumLevel(ratio: 0.3, termLength: 80, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.3, termLength: 90, today: latestRecordDate) {
                 return 13
             }
-            else if checkMomentumLevel(ratio: 0.3, termLength: 50, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.3, termLength: 60, today: latestRecordDate) {
                 return 12
             }
-            else if checkMomentumLevel(ratio: 0.3, termLength: 20, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.3, termLength: 30, today: latestRecordDate) {
                 return 11
             }
         }
         
         else if unactivatedPeriod < 30 {  // try finding if there's special(low) momentumLevel
 
-            if checkMomentumLevel(ratio: 0.1, termLength: 120, today: latestRecordDate) {
+            if checkMomentumLevel(ratio: 0.2, termLength: 180, today: latestRecordDate) {
                 return 10
             }
-            else if checkMomentumLevel(ratio: 0.1, termLength: 80, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.2, termLength: 90, today: latestRecordDate) {
                 return 9
             }
-            else if checkMomentumLevel(ratio: 0.1, termLength: 50, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.2, termLength: 60, today: latestRecordDate) {
                 return 8
             }
-            else if checkMomentumLevel(ratio: 0.1, termLength: 20, today: latestRecordDate) {
+            else if checkMomentumLevel(ratio: 0.2, termLength: 30, today: latestRecordDate) {
                 return 7
             }
 
@@ -281,22 +281,22 @@ extension Quest {
         
         
         // if no special level, then check normal momentum level (비율에서 다 0.001뺌 혹시 몰라서)
-        if checkMomentumLevel(ratio: 0.428, termLength: 14, today: today) {
+        if checkMomentumLevel(ratio: 6/30.0 - 0.01, termLength: 30, today: today) {
             return 6
         }
-        else if checkMomentumLevel(ratio: 0.499, termLength: 10, today: today) {
+        else if checkMomentumLevel(ratio: 5/30.0 - 0.01, termLength: 30, today: today) {
             return 5
         }
-        else if checkMomentumLevel(ratio: 0.570, termLength: 7, today: today) {
+        else if checkMomentumLevel(ratio: 4/30.0 - 0.01, termLength: 30, today: today) {
             return 4
         }
-        else if checkMomentumLevel(ratio: 0.599, termLength: 5, today: today) {
+        else if checkMomentumLevel(ratio: 3/30.0 - 0.01, termLength: 30, today: today) {
             return 3
         }
-        else if checkMomentumLevel(ratio: 0.666, termLength: 3, today: today) {
+        else if checkMomentumLevel(ratio: 2/30.0 - 0.01, termLength: 30, today: today) {
             return 2
         }
-        else if checkMomentumLevel(ratio: 1, termLength: 1, today: today) {
+        else if checkMomentumLevel(ratio: 1/30.0 - 0.01, termLength: 30, today: today) {
             return 1
         }
         else {
@@ -311,7 +311,7 @@ extension Quest {
         // 기준이 되는 날짜: 오늘 것을 기록했을 때는 오늘, 아직 기록 안했으면 어제 것 기준으로 계산
         
         
-        let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: today)!
+        let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: today) ?? Date()
         
         let numberOfRecordedDates:Int = self.dailyData.filter({ element in
             calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0

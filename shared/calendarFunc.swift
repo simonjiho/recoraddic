@@ -30,7 +30,7 @@ let dueTime:Int = 10 // 10AM
 func getStartDateOfNow() -> Date {
     let now = Date()
     var calendar = Calendar.current
-    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
+    calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? .current
     
     return calendar.startOfDay(for: now)
 }
@@ -38,8 +38,8 @@ func getStartDateOfNow() -> Date {
 func getStartDateOfYesterday() -> Date {
     let now = Date()
     var calendar = Calendar.current
-    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
-    let yesterday = calendar.date(byAdding: .day, value: -1, to: now)!
+    calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? .current
+    let yesterday = calendar.date(byAdding: .day, value: -1, to: now) ?? Date()
     
     return calendar.startOfDay(for: yesterday)
 }
@@ -48,13 +48,13 @@ func getStandardDate(from date: Date) -> Date {
     let dateComponents =  Calendar.current.dateComponents([.year, .month,.day], from: date)
     
     var calendar = Calendar.current
-    calendar.timeZone = TimeZone(identifier: "UTC")!
+    calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
     
     return calendar.date(from: dateComponents) ?? date
 }
 
 func getStandardDateOfYesterday() -> Date {
-    let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+    let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
 
     let dateComponents =  Calendar.current.dateComponents([.year, .month,.day], from: yesterday)
 
@@ -69,14 +69,14 @@ func getStandardDateOfNow() -> Date {
     let dateComponents =  Calendar.current.dateComponents([.year, .month,.day], from: Date())
     
     var calendar = Calendar.current
-    calendar.timeZone = TimeZone(identifier: "UTC")!
+    calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
     
     return calendar.date(from: dateComponents) ?? Date()
 }
 
 func standardDateToLocalStartOfDay(std date: Date) -> Date {
     var calendar = Calendar.current
-    calendar.timeZone = TimeZone(identifier: "UTC")!
+    calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
     
     // Extract year, month, and day components in UTC
     let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
@@ -89,34 +89,28 @@ func standardDateToLocalStartOfDay(std date: Date) -> Date {
 }
 
 func standardDateToLocalStartOfDay(std date: Date?) -> Date? {
-    if date == nil {return nil}
-    else {
+    if let date_nonNil = date {
         var calendar = Calendar.current
-        calendar.timeZone = TimeZone(identifier: "UTC")!
+        calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
         
         // Extract year, month, and day components in UTC
-        let dateComponents = calendar.dateComponents([.year, .month, .day], from: date!)
+        let dateComponents = calendar.dateComponents([.year, .month, .day], from: date_nonNil)
         
         // Set calendar to local time zone
         calendar.timeZone = TimeZone.current
         
         // Create a date from the components, now interpreted in the local time zone
         return calendar.date(from: dateComponents)
-    }
+    } else {return nil}
 }
 
 
-//func getYesterdayOf(_ date: Date) -> Date {
-//    var calendar = Calendar.current
-//    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
-//    let yesterday = calendar.date(byAdding: .day, value: -1, to: date)!
-//    return calendar.startOfDay(for: yesterday)
-//}
+
 
 func getTomorrowOf(_ date: Date) -> Date {
     var calendar = Calendar.current
-    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
-    let tomorrow = calendar.date(byAdding: .day, value: 1, to: date)!
+    calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? .current
+    let tomorrow = calendar.date(byAdding: .day, value: 1, to: date) ?? Date()
     return calendar.startOfDay(for: tomorrow)
 }
 
@@ -172,7 +166,7 @@ func getDateList(from startDate: Date, to endDate: Date) -> [Date] {
 
     while currentDate <= endDate {
         dates.append(calendar.startOfDay(for: currentDate))
-        currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+        currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate) ?? Date()
     }
 
     return dates
@@ -252,14 +246,20 @@ func nDates(from date :Date, n:Int) -> [Date] {
     dateComponents.day = 1
     let calendar = Calendar.current
     for _ in 1...200 {
-        let nextDay = calendar.date(byAdding: dateComponents, to: dates.last!)
-
-        dates.append(nextDay!)
+        if let nextDay = calendar.date(byAdding: dateComponents, to: dates.last ?? Date()) {
+            dates.append(nextDay)
+        }
     }
     print("dates:\(dates)")
 
     return dates
     
+}
+
+func hhmmFormatOf(from date: Date) -> String {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "HH:mm"
+    return formatter.string(from: date)
 }
 
 
@@ -328,7 +328,7 @@ extension Date {
     }
     
     var isEndOfMonth_local: Bool {
-        let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: self)!
+        let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: self) ?? Date()
         return !Calendar.current.isDate(nextDay, equalTo: self, toGranularity: .month)
     }
     
@@ -369,24 +369,27 @@ extension Date {
         return timeString
     }
     
+
+    
     var isStartOfMonth_std: Bool {
         var calendar = Calendar.current
-        calendar.timeZone = TimeZone(identifier: "UTC")!
+        calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
         let components = calendar.dateComponents([.year, .month, .day], from: self)
         return components.day == 1
     }
     
     var isEndOfMonth_std: Bool {
         var calendar = Calendar.current
-        calendar.timeZone = TimeZone(identifier: "UTC")!
-        let nextDay = calendar.date(byAdding: .day, value: 1, to: self)!
-        return !Calendar.current.isDate(nextDay, equalTo: self, toGranularity: .month)
+        calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
+        if let nextDay = calendar.date(byAdding: .day, value: 1, to: self) {
+            return !Calendar.current.isDate(nextDay, equalTo: self, toGranularity: .month)
+        } else {return false}
     }
     
     
     var isExpired_std: Bool {
         var calendar = Calendar.current
-        calendar.timeZone = TimeZone(identifier: "UTC")!
+        calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
         
         // Compare the components of the date up to the minute
         let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]

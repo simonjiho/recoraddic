@@ -18,7 +18,7 @@ func scheduleNotification(at date: Date, for questName: String, goal: Int?, data
     }
     content.sound = .default
 
-    content.categoryIdentifier = "customNotificationCategory"
+    content.categoryIdentifier = "dailyQuestNotification"
 
 
     let trigger = UNCalendarNotificationTrigger(dateMatching: Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date), repeats: false)
@@ -40,7 +40,7 @@ func removeNotification(at date: Date, for questName: String) {
                 let calendar = Calendar.current
                 let components: Set<Calendar.Component> = [.year, .month, .day, .hour, .minute]
                 let inputDateComponents = calendar.dateComponents(components, from: date)
-                return content.categoryIdentifier == "customNotificationCategory" && content.title == questName && trigger.dateComponents == inputDateComponents
+                return content.categoryIdentifier == "dailyQuestNotification" && content.title == questName && trigger.dateComponents == inputDateComponents
             }
             return false
         }.map { $0.identifier }
@@ -53,9 +53,9 @@ func removeNotification(for questName: String) {
     let center = UNUserNotificationCenter.current()
     center.getPendingNotificationRequests { (requests) in
         let identifiersToRemove = requests.filter { request in
-            if let trigger = request.trigger as? UNCalendarNotificationTrigger {
+            if let _ = request.trigger as? UNCalendarNotificationTrigger {
                 let content = request.content
-                return content.categoryIdentifier == "customNotificationCategory" && content.title == questName
+                return content.categoryIdentifier == "dailyQuestNotification" && content.title == questName
             }
             return false
         }.map { $0.identifier }
@@ -65,18 +65,18 @@ func removeNotification(for questName: String) {
 }
 
 
-import Combine
-
-class NotificationManager: ObservableObject {
-    @Published var notificationData: [AnyHashable: Any]? = nil
-
-    init() {
-        NotificationCenter.default.addObserver(self, selector: #selector(handleNotification(_:)), name: Notification.Name("NotificationReceived"), object: nil)
-    }
-
-    @objc private func handleNotification(_ notification: Notification) {
-        if let userInfo = notification.userInfo {
-            self.notificationData = userInfo
-        }
-    }
-}
+//import Combine
+//
+//class NotificationManager: ObservableObject {
+//    @Published var notificationData: [AnyHashable: Any]? = nil
+//
+//    init() {
+//        NotificationCenter.default.addObserver(self, selector: #selector(handleNotification(_:)), name: Notification.Name("NotificationReceived"), object: nil)
+//    }
+//
+//    @objc private func handleNotification(_ notification: Notification) {
+//        if let userInfo = notification.userInfo {
+//            self.notificationData = userInfo
+//        }
+//    }
+//}

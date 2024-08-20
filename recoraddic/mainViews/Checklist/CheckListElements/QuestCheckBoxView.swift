@@ -93,7 +93,7 @@ struct QuestCheckBoxView: View {
         let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= width +  0.1) ? xOffset : width, height: height), transform: nil))
         let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
         
-        let isRecent: Bool = getStartDateOfYesterday() <= dailyQuest.dailyRecord!.getLocalDate()!
+//        let isRecent: Bool = getStartDateOfYesterday() <= dailyQuest.dailyRecord!.getLocalDate()!
         
         HStack(spacing:0.0) {
             
@@ -209,7 +209,7 @@ struct QuestCheckBoxView: View {
                     
                 }
                 .onEnded { value in
-                    if !(value.translation.width > 0 && !showMenu) {
+                    if value.translation.width <= 0 || showMenu {
                         if value.translation.width < -width*0.05 {
                             targetDailyQuest = dailyQuest
                             withAnimation {
@@ -223,6 +223,12 @@ struct QuestCheckBoxView: View {
                             withAnimation {
                                 offset = 0
                             }
+                        }
+                    } else {
+                        targetDailyQuest = nil
+                        showMenu = false
+                        withAnimation {
+                            offset = 0
                         }
                     }
                     
@@ -470,17 +476,24 @@ struct QuestCheckBoxContent_HOUR:View {
     let sheetHeight:CGFloat = UIScreen.main.bounds.height * 0.4
 
     
+    /// <#Description#>
     var body: some View {
-        let isRecent: Bool = getStartDateOfYesterday() <= dailyQuest.dailyRecord!.getLocalDate()!
+        let isRecent: Bool = {
+            if let date = dailyQuest.dailyRecord?.getLocalDate() {
+                return getStartDateOfYesterday() <= date
+            } else { return false }
+        }()
+//        let isRecent: Bool = getStandardDateOfYesterday() <= dailyQuest.dailyRecord!.date!
+
 
         
         let questName = dailyQuest.getName()
 
-        let dataType = dailyQuest.dataType
-        let customDataTypeNotation = dailyQuest.customDataTypeNotation
+//        let dataType = dailyQuest.dataType
+//        let customDataTypeNotation = dailyQuest.customDataTypeNotation
 
         let tier: Int = dailyQuest.currentTier
-        let tierColor_dark = getDarkTierColorOf(tier: tier)
+//        let tierColor_dark = getDarkTierColorOf(tier: tier)
         
         GeometryReader { geometry in
             
@@ -489,7 +502,6 @@ struct QuestCheckBoxContent_HOUR:View {
 
             HStack(spacing:0.0) {
                 
-                let isRecent: Bool = getStandardDateOfYesterday() <= dailyQuest.dailyRecord!.date!
 
                 if stopwatch.isRunning {
                     Button(action:stopStopWatch) {
@@ -698,7 +710,7 @@ struct QuestCheckBoxContent_HOUR:View {
     func startStopWatch() -> Void {
         
         let calendar = Calendar.current
-        let startTime = calendar.date(byAdding: .minute, value: -(value), to: .now)!
+        let startTime = calendar.date(byAdding: .minute, value: -(value), to: .now) ?? Date()
         dailyQuest.timerStart = startTime
         stopwatch.setTotalSec(value*60)
 
@@ -734,7 +746,7 @@ struct QuestCheckBoxContent_HOUR:View {
     }
     
     func deleteOutdatedActivity() -> Void {
-        let startTime: Date = dailyQuest.timerStart!
+        let startTime: Date = dailyQuest.timerStart ?? Date()
         
         if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
             let dismissalPolicy: ActivityUIDismissalPolicy = .immediate
@@ -754,7 +766,7 @@ struct QuestCheckBoxContent_HOUR:View {
     
     func autoCheckActivityAndAdjustToStopWatch() -> Void {
         
-        let startTime: Date = dailyQuest.timerStart!
+        let startTime: Date = dailyQuest.timerStart ?? Date()
         
         if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
             stopwatch.setTotalSec(Int(Date().timeIntervalSince(startTime)))
@@ -1432,11 +1444,20 @@ struct NotificationButton: View {
             }) {
                 if let alermTime = dailyQuest.alermTime {
                     VStack(spacing:3.0) {
-                        ClockView(hour: Calendar.current.component(.hour, from: alermTime), minute: Calendar.current.component(.minute, from: alermTime))
-                            .frame(width:25, height: 25)
-                        Text(Calendar.current.component(.hour, from: alermTime) < 12 ? "am" : "pm")
+                        Text(hhmmFormatOf(from: alermTime))
                             .font(.system(size: 12.0))
+                            .bold()
+                        Text(Calendar.current.component(.hour, from: alermTime) < 12 ? "am" : "pm")
+                            .font(.system(size: 9.0))
+                            .bold()
                     }
+                    
+//                    VStack(spacing:3.0) {
+//                        ClockView(hour: Calendar.current.component(.hour, from: alermTime), minute: Calendar.current.component(.minute, from: alermTime))
+//                            .frame(width:25, height: 25)
+//                        Text(Calendar.current.component(.hour, from: alermTime) < 12 ? "am" : "pm")
+//                            .font(.system(size: 12.0))
+//                    }
                 } else {
                     Image(systemName: setAlready ? "bell" : "bell.slash")
                         .opacity(0.7)

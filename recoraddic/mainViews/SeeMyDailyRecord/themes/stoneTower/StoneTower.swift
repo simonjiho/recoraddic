@@ -32,9 +32,10 @@ struct StoneTower: View {
     @Binding var popUp_changeStyle: Bool
     @Binding var isEditingTermGoals: Bool
     @Binding var undoNewDRS: Bool
+    @Binding var drsDeleted: Bool
     @Binding var startDate: Date
     @Binding var endDate: Date
-    
+
     
     let prevDRS_start: Date?
     let nextDRS_start: Date?
@@ -83,11 +84,11 @@ struct StoneTower: View {
         GeometryReader { geometry in
             
             let haveSelectedRecord: Bool = {
-                if selectedDailyRecord == nil {
-                    return false
+                if let dr = selectedDailyRecord {
+                    return dailyRecords_withContent.contains(dr)
                 }
                 else {
-                    return dailyRecords_withContent.contains(selectedDailyRecord!)
+                    return false
                 }
             }() //MARK: 다른기기에서 selectedRecord에 할당된 데이터를 지워 cloud상에서 삭제되었음에도, view의 selectedRecord에 할당되어 있을 때
             
@@ -100,7 +101,7 @@ struct StoneTower: View {
             let selectedStoneWidth:CGFloat = stoneWidth*1.4
             let heightGap:CGFloat = haveSelectedRecord ? (selectedStoneHeight - stoneHeight) : 0.0
             let horizontalUnitWidth:CGFloat = stoneWidth*0.07 // 최대 *9번 갈 수 있음( calculateVisualValue3() 에서)
-            let questionMarkSize: CGFloat = geoWidth*0.05
+//            let questionMarkSize: CGFloat = geoWidth*0.05
             
             let groundHeight:CGFloat = geoHeight/2 - stoneHeight/2
             let towerHeight:CGFloat = stoneHeight*CGFloat(numberOfStones) + heightGap
@@ -108,7 +109,7 @@ struct StoneTower: View {
             let aboveSkyHeight:CGFloat = (groundAndTowerHeight-stoneHeight/2 > geoHeight/2 ? (geoHeight/2 - stoneHeight/2) : geoHeight - groundAndTowerHeight) - heightGap
             let totalSkyHeight:CGFloat = aboveSkyHeight + towerHeight
 
-            let buttonWidth:CGFloat = geoWidth*0.25
+//            let buttonWidth:CGFloat = geoWidth*0.25
             let buttonWidth2:CGFloat = geoWidth*0.1
             
             let detailTextBoxSize: CGFloat = geoWidth*0.25
@@ -426,8 +427,13 @@ struct StoneTower: View {
 //                                            Text("목표 \(noTermGoals ? "설정" : "편집")")
 //                                        }
 //                                        .disabled(isEditingTermGoals)
+                                        if selectedDrsIdx != 0 {
+                                            Button("직전 탑과 합치기") { // 나중에 theme, theme별 선택 가능 요소(색,배경 등등들 다 바꿀 수 있게 하기
+                                                drsDeleted.toggle()
+                                            }
+                                        }
+                                        // TODO: 분리하기
                                         
-
                                         if isLatestDailyRecordSet {
                                             Button(action: {
                                                 popUp_startNewRecordSet.toggle()
@@ -878,64 +884,64 @@ struct StoneTower_stone: View {
 }
 
 
-struct RecordStoneShadowView: View {
-    var adjustedThemeSet: ThemeSet
-    var dailyRecordThemeNum: Int
-    
-    
-    var body: some View {
-        
-        GeometryReader { geometry in
-            let shapeNum = dailyRecordThemeNum >= 0 ? dailyRecordThemeNum : 0
-            
-            let shape: Path = {
-                var returnShape: Path? = nil
-                if shapeNum <= 2 {
-                    returnShape = Path { path in
-                        let width = geometry.size.width
-                        let height = geometry.size.height
-                        path.addLines(
-                            {
-                                var returnList:[CGPoint] = []
-                                for ratio in adjustedThemeSet.shapes[shapeNum]!  {
-                                    returnList.append(CGPoint(x: ratio.x * width, y: ratio.y * height))
-                                }
-                                return returnList
-                            }()
-                        )
-                        path.closeSubpath()
-                    }
-                    
-                }
-                else {
-                    returnShape = Path(roundedRect: CGRect(x:0, y:0,width: geometry.size.width, height: geometry.size.height), cornerSize: CGSize(width: geometry.size.width*0.1, height:geometry.size.height*0.1))
-                    
-                }
-                
-                return returnShape!
-                
-                
-            }()
-            
-            
-            
-            
-            ZStack {
-
-                
-                Color.white
-                    .clipShape(shape)
-                    .shadow(radius: 7)
-                
-                
-                
-            }   // zstack
-            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
-        }
-
-    }
-}
-
+//struct RecordStoneShadowView: View {
+//    var adjustedThemeSet: ThemeSet
+//    var dailyRecordThemeNum: Int
+//    
+//    
+//    var body: some View {
+//        
+//        GeometryReader { geometry in
+//            let shapeNum = dailyRecordThemeNum >= 0 ? dailyRecordThemeNum : 0
+//            
+//            let shape: Path = {
+//                var returnShape: Path? = nil
+//                if shapeNum <= 2 {
+//                    returnShape = Path { path in
+//                        let width = geometry.size.width
+//                        let height = geometry.size.height
+//                        path.addLines(
+//                            {
+//                                var returnList:[CGPoint] = []
+//                                for ratio in adjustedThemeSet.shapes[shapeNum]!  {
+//                                    returnList.append(CGPoint(x: ratio.x * width, y: ratio.y * height))
+//                                }
+//                                return returnList
+//                            }()
+//                        )
+//                        path.closeSubpath()
+//                    }
+//                    
+//                }
+//                else {
+//                    returnShape = Path(roundedRect: CGRect(x:0, y:0,width: geometry.size.width, height: geometry.size.height), cornerSize: CGSize(width: geometry.size.width*0.1, height:geometry.size.height*0.1))
+//                    
+//                }
+//                
+//                return returnShape!
+//                
+//                
+//            }()
+//            
+//            
+//            
+//            
+//            ZStack {
+//
+//                
+//                Color.white
+//                    .clipShape(shape)
+//                    .shadow(radius: 7)
+//                
+//                
+//                
+//            }   // zstack
+//            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
+//        }
+//
+//    }
+//}
+//
 
 
 
