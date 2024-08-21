@@ -13,6 +13,6 @@
 		<string>remote-notification</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string> </string>
 </dict>
 </plist>

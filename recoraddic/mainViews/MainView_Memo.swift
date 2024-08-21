@@ -19,41 +19,50 @@ struct MainView_Memo:View {
     
     var body: some View {
 //        MarkdownEditor(text: $profile.memo)
-        VStack {
-            
-            HStack {
-                if isEditing {
-                    Button("완료"){
-                        isEditing = false
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            let topBarTopPadding = geoHeight*0.035
+            let facialExpressionSize = geoHeight*0.04
+            let topBarBottomPadding = geoHeight*0.005
+            VStack(spacing:0.0) {
+                
+                HStack {
+                    if isEditing {
+                        Button("완료"){
+                            isEditing = false
+                        }
+                        .disabled(!isEditing)
+                        .opacity(isEditing ? 1.0 : 0.0)
                     }
-                    .disabled(!isEditing)
-                    .opacity(isEditing ? 1.0 : 0.0)
+                    else {
+                        Image(systemName: "note.text")
+                    }
                 }
-                else {
-                    Image(systemName: "note.text")
-                }
+                .padding(isEditing ? .trailing : .horizontal)
+                .frame(width: UIScreen.main.bounds.width,height:facialExpressionSize,alignment: isEditing ? .trailing : .center)
+                .padding(.top,topBarTopPadding)
+                .padding(.bottom,topBarBottomPadding)
+                TextEditor(text: $profile.memo)
+                    .padding()
+                    .focused($isEditing)
+//                    .textEditorStyle(.plain)
+//                    .background(.tertiary)
+                    .overlay {
+                        if profile.memo == "" {
+                            Text("탭해서 간단히 메모해둘 내용을 적어보세요")
+                                .opacity(0.5)
+                            //                            .containerRelativeFrame([.vertical,.horizontal], alignment: .topLeading)
+                            //                            .frame(alignment:.topLeading)
+                        }
+                    }
             }
-            .padding(isEditing ? .trailing : .horizontal)
-            .frame(width: UIScreen.main.bounds.width,alignment: isEditing ? .trailing : .center)
-            TextEditor(text: $profile.memo)
-                .padding()
-                .focused($isEditing)
-                .textEditorStyle(.plain)
-                .overlay {
-                    if profile.memo == "" {
-                        Text("탭해서 간단히 메모해둘 내용을 적어보세요")
-                            .opacity(0.5)
-//                            .containerRelativeFrame([.vertical,.horizontal], alignment: .topLeading)
-//                            .frame(alignment:.topLeading)
-                    }
-                }
+            //        .padding(.horizontal,10)
+            .frame(width: UIScreen.main.bounds.width, height: geoHeight)
+            //        .background(.quaternary)
+            //        .border(.red)
+            
         }
-//        .padding(.horizontal,10)
-        .frame(width: UIScreen.main.bounds.width)
-//        .background(.quaternary)
-//        .border(.red)
-
-
 
             
             

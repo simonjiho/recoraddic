@@ -103,8 +103,9 @@ struct ContentView: View {
      var body: some View {
 
          if initialization {
-             Text("초기화 중")
-             .onAppear() {
+             LoadingView_initialization()
+                 .containerRelativeFrame([.horizontal,.vertical])
+                 .onAppear() {
                  print("initializing")
                  initialize()
              }

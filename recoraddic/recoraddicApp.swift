@@ -31,41 +31,49 @@ struct recoraddicApp: App {
 
     var syncManager: SyncManager = SyncManager()
 
+    @State private var isActive: Bool = false
+
+    
     
     var body: some Scene {
 
         
         WindowGroup {
-            ContentView()
-//                .environmentObject(activityManager)
-                .onAppear() {
-                    print("App started")
-                    if UserDefaults.standard.value(forKey: "stateSerialization") == nil {
-                        UserDefaults.standard.setValue(nil, forKey: "stateSerialization")
+            if isActive {
+                ContentView()
+                //                .environmentObject(activityManager)
+                    .onAppear() {
+                        print("App started")
+                        if UserDefaults.standard.value(forKey: "stateSerialization") == nil {
+                            UserDefaults.standard.setValue(nil, forKey: "stateSerialization")
+                        }
+                        
+                        if UserDefaults.standard.value(forKey: "initialization") == nil {
+                            UserDefaults.standard.setValue(true, forKey: "initialization")
+                        }
+                        if UserDefaults.standard.value(forKey: "shouldBlockTheView") == nil {
+                            UserDefaults.standard.setValue(false,forKey: "shouldBlockTheView") // at initial, it starts with true
+                        }
+                        if UserDefaults.standard.value(forKey: "iCloudAvailable_forTheFirstTime") == nil {
+                            UserDefaults.standard.setValue(false,forKey: "iCloudAvailable_forTheFirstTime")
+                        }
+                        if UserDefaults.standard.value(forKey: "fetchDone") == nil {
+                            UserDefaults.standard.setValue(false,forKey: "fetchDone")
+                        }
+                    }
+            }
+            else {
+                LoadingView()
+                    .containerRelativeFrame([.horizontal,.vertical])
+                    .onAppear() {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            withAnimation {
+                                self.isActive = true
+                            }
+                        }
                     }
 
-                    if UserDefaults.standard.value(forKey: "initialization") == nil {
-                        UserDefaults.standard.setValue(true, forKey: "initialization")
-                    }
-                    if UserDefaults.standard.value(forKey: "shouldBlockTheView") == nil {
-                        UserDefaults.standard.setValue(false,forKey: "shouldBlockTheView") // at initial, it starts with true
-                    }
-                    if UserDefaults.standard.value(forKey: "iCloudAvailable_forTheFirstTime") == nil {
-                        UserDefaults.standard.setValue(false,forKey: "iCloudAvailable_forTheFirstTime")
-                    }
-                    if UserDefaults.standard.value(forKey: "fetchDone") == nil {
-                        UserDefaults.standard.setValue(false,forKey: "fetchDone")
-                    }
-                    
-                    
-                    
-//                    NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidMergeChangesObjectIDs, object: nil, queue: .main) { (notification) in
-//                        print("didSave")
-//                        
-//                        UserDefaults.standard.setValue(false, forKey: "shouldBlockTheView") // MARK: 너무 빨리 풀면 query가 적용이 안됨...swiftData와 cloudSyncEngine의 문제인가? 로그인 후 설치는 괜찮지만 설치 후 로그인은 문제가 됨.... ㅅㅂ?
-//                    }
                 }
-//                .onChange(of: <#T##V#>, <#T##(V, V) -> Void#>)
         }
 
         .modelContainer(Self.container)

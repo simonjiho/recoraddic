@@ -77,6 +77,9 @@ struct MainView_QuestInventory: View {
 //            let gridItemSpacing = gridItemWidth*0.3
             let gridVerticalSpacing = gridWidth*0.08
         
+            let topBarTopPadding = geoHeight*0.035
+            let facialExpressionSize = geoHeight*0.04
+            let topBarBottomPadding = geoHeight*0.005
             
             let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
             let shadowColor: Color = getShadowColor(colorScheme)
@@ -89,34 +92,23 @@ struct MainView_QuestInventory: View {
                                 Text("누적 퀘스트 목록")
                                     .bold()
                                     .fontDesign(.serif)
-                                    .frame(height: geoHeight*0.07)
+//                                    .frame(height: geoHeight*0.07)
                                     .padding(.trailing, 10)
-                                Button("", systemImage: "questionmark.circle", action: {
+                                Button("", systemImage: "flame.circle", action: {
                                     popUp_help.toggle()
                                 })
-                                
-                                //                            }
-                                //                            else {
-                                //                                Button(action:{}){Image(systemName: "trash")}.foregroundStyle(.red)
-                                //                                    .frame(width:geoWidth*0.05)
-                                //                                Text("\(selectedQuestNames.count)개의 퀘스트 선택")
-                                //                                    .frame(width:geoWidth*0.7,alignment: .center)
-                                //                                Button(action:{}){Image(systemName: "archivebox")}
-                                //                                    .frame(width:geoWidth*0.05,alignment: .center)
-                                //                                    .padding()
-                                //                                Button(action:{}){Image(systemName: "eye.slash")}
-                                //                                    .frame(width:geoWidth*0.05, alignment: .center)
-                                //                                    .padding(.trailing, geoWidth*0.15)
-                                //
-                                //                            }
+//                                .buttonStyle(.plain)
+
                             }
                             Button(isEdit ? "취소" : "편집") {
                                 isEdit.toggle()
                                 resetEditData()
                             }
-                            .frame(width: geoWidth*0.95, height: geoHeight*0.07, alignment: .trailing)
+                            .frame(width: geoWidth*0.95, alignment: .trailing)
                         }
-                        .frame(width: geoWidth*0.95, height: geoHeight*0.07)
+                        .frame(width: geoWidth*0.95, height: facialExpressionSize)
+                        .padding(.top,topBarTopPadding)
+                        .padding(.bottom,topBarBottomPadding)
                         
                         
                         ZStack {

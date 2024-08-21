@@ -1447,9 +1447,9 @@ struct NotificationButton: View {
                         Text(hhmmFormatOf(from: alermTime))
                             .font(.system(size: 12.0))
                             .bold()
-                        Text(Calendar.current.component(.hour, from: alermTime) < 12 ? "am" : "pm")
-                            .font(.system(size: 9.0))
-                            .bold()
+//                        Text(Calendar.current.component(.hour, from: alermTime) < 12 ? "am" : "pm")
+//                            .font(.system(size: 9.0))
+//                            .bold()
                     }
                     
 //                    VStack(spacing:3.0) {

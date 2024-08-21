@@ -36,7 +36,7 @@ struct MainView_checklist: View {
     
     @State var currentDailyRecord: DailyRecord = DailyRecord()
     
-    @State var selectedDate: Date = getStandardDateOfNow()
+    @State var selectedDate: Date = getStartDateOfNow()
     @State var popUp_addDailyQuest: Bool = false
     @State var popUp_changePurpose: Bool = false
     @State var editDiary = false
@@ -90,7 +90,7 @@ struct MainView_checklist: View {
         
 //        let shadowColor:Color = getShadowColor(colorScheme)
 
-        let middleColor:Color = colorScheme == .light ? Color.black.adjust(brightness: 0.2) : Color.white
+//        let middleColor:Color = colorScheme == .light ? Color.black.adjust(brightness: 0.2) : Color.white
 //        let linearGradient1: LinearGradient =
 //        LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .leading, endPoint: .trailing)
 //        let linearGradient2: LinearGradient =
@@ -119,14 +119,35 @@ struct MainView_checklist: View {
             
             let popUp_changeMood_width = geoWidth * 0.7
             let popUp_changeMood_height = geoHeight * 0.7
-
-            let facialExpressionSize = geoWidth*0.085
+            
+            let topBarTopPadding = geoHeight*0.035
+            let facialExpressionSize = geoHeight*0.04
+            let topBarBottomPadding = geoHeight*0.005
+//            let topBarHeight = facialExpressionSize + topBarBottomPadding
 //            facialExpressionSize*0.7
 //            let isNotToday: Bool = getStartOfDate(date: selectedDate) != getStartDateOfNow()
             
             ZStack {
 
                 VStack(spacing:0.0) {
+                    let dateGap: Int = calculateDaysBetweenTwoDates(from: getStartDateOfNow(), to: selectedDate)
+                    HStack {
+                        Circle().frame(width:5,height:5).opacity((dateGap == -3) ? 1.0 : 0.0)
+                        Circle().frame(width:5,height:5).opacity((dateGap == -2 || dateGap == -3) ? 1.0 : 0.0)
+                        Circle().frame(width:5,height:5).opacity((dateGap <= -1 && dateGap >= -3) ? 1.0 : 0.0)
+                        if dateGap <= 3 && dateGap >= -3 {
+                            Rectangle().frame(width:1,height:12).opacity(dateGap == 0 ? 0.0 : 1.0)
+                        } else {
+                            Text("\(dateGap)")
+                                .font(.system(size: 15.0))
+                                .bold()
+                        }
+                        Circle().frame(width:5,height:5).opacity((dateGap >= 1 && dateGap <= 3) ? 1.0 : 0.0)
+                        Circle().frame(width:5,height:5).opacity((dateGap == 2 || dateGap == 3) ? 1.0 : 0.0)
+                        Circle().frame(width:5,height:5).opacity((dateGap == 3) ? 1.0 : 0.0)
+                    }
+                    .frame(height:topBarTopPadding)
+                    .foregroundStyle(topForegroundColor)
 
                     HStack(spacing:0.0) {
                         if currentDailyRecord.dailyText == nil {
@@ -147,21 +168,7 @@ struct MainView_checklist: View {
                         }
                         
                         HStack(spacing: 0.0) {
-//                            HStack(spacing:10.0) {
-//                                if getStartOfDate(date: selectedDate) > getStartDateOfNow() {
-//                                    Button(action: {selectedDate = getStartDateOfNow()}) {
-//                                        Image(systemName: "arrow.uturn.left")
-//                                    }
-//            //                        .frame(height: geoHeight*0.05)
-//                                }
-//                                Button(action:{selectedDate = selectedDate.addingDays(-1)}) {
-//                                    Image(systemName: "chevron.left")
-//                                }
-//                                .buttonStyle(.plain)
-//
-//                            }
-//                            .padding(.trailing,7)
-//                            .frame(width: geoWidth*0.15, alignment: .trailing)
+
 
                             if getStartOfDate(date: selectedDate) > getStartDateOfNow() {
                                 Button(action: {selectedDate = getStartDateOfNow()}) {
@@ -180,22 +187,7 @@ struct MainView_checklist: View {
                             DatePicker(selection: $selectedDate,displayedComponents: [.date]) {}
                                 .labelsHidden()
                                 .foregroundStyle(topForegroundColor)
-//                                .frame(width: geoWidth*0.5)
-//                            HStack(spacing:10.0) {
-//                                Button(action:{selectedDate = selectedDate.addingDays(1)}) {
-//                                    Image(systemName: "chevron.right")
-//                                }
-//                                .buttonStyle(.plain)
-//                                if getStartOfDate(date: selectedDate) < getStartDateOfNow() {
-//                                    Button(action: {selectedDate = getStartDateOfNow()}) {
-//                                        Image(systemName: "arrow.uturn.right")
-//                                    }
-//                                    .buttonStyle(.plain)
-//            //                        .frame(height: geoHeight*0.05)
-//                                }
-//                            }
-//                            .padding(.leading,7)
-//                            .frame(width: geoWidth*0.15, alignment: .leading)
+
                             if getStartOfDate(date: selectedDate) < getStartDateOfNow() {
                                 Button(action: {selectedDate = getStartDateOfNow()}) {
                                     Image(systemName: "arrow.uturn.right")
@@ -335,9 +327,9 @@ struct MainView_checklist: View {
                         
                         // use "in:" to add date range
                     }
-//                    .frame(width: geoWidth, height: 100)
-                    .padding(.top,geoHeight*0.035)
-                    .padding(.bottom, geoHeight*0.005)
+                    .frame(height: facialExpressionSize)
+//                    .padding(.top,geoHeight*0.035)
+                    .padding(.bottom, topBarBottomPadding)
                     .foregroundStyle(topForegroundColor) // 너무 튀는 것 같기도 하고..
 //                    .foregroundStyle(reversedColorSchemeColor.opacity(getStartOfDate(date: selectedDate) == getStartDateOfNow() ? 1.0 : 0.6))
                     

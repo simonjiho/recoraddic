@@ -58,6 +58,7 @@
 		B2BA89102B36BDC600A3D50E /* SaveDailyRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2BA890F2B36BDC600A3D50E /* SaveDailyRecordView.swift */; };
 		B2BAEDD92AE65DD50099489B /* steppedForward_default.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2BAEDD82AE65DD50099489B /* steppedForward_default.xcassets */; };
 		B2C059F92C52A610001BEE77 /* StoneTower.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C059F82C52A610001BEE77 /* StoneTower.swift */; };
+		B2C3BAB12C770B9200A7F9A5 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3BAB02C770B9200A7F9A5 /* LoadingView.swift */; };
 		B2D7AD032B91C5440045C9EA /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7AD022B91C5440045C9EA /* SyncManager.swift */; };
 		B2D7AD052B92E29D0045C9EA /* logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7AD042B92E29D0045C9EA /* logger.swift */; };
 		B2D7AD082B9451920045C9EA /* StartNewRecordSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7AD072B9451920045C9EA /* StartNewRecordSet.swift */; };
@@ -179,6 +180,7 @@
 		B2BA890F2B36BDC600A3D50E /* SaveDailyRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveDailyRecordView.swift; sourceTree = "<group>"; };
 		B2BAEDD82AE65DD50099489B /* steppedForward_default.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = steppedForward_default.xcassets; sourceTree = "<group>"; };
 		B2C059F82C52A610001BEE77 /* StoneTower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower.swift; sourceTree = "<group>"; };
+		B2C3BAB02C770B9200A7F9A5 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		B2D7AD022B91C5440045C9EA /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
 		B2D7AD042B92E29D0045C9EA /* logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = logger.swift; sourceTree = "<group>"; };
 		B2D7AD072B9451920045C9EA /* StartNewRecordSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartNewRecordSet.swift; sourceTree = "<group>"; };
@@ -361,6 +363,7 @@
 				B2ABC2642B4293680056C637 /* purposeTags.swift */,
 				B220DA452B6524F50039160C /* themeNames.swift */,
 				B2D8F96C2B75ECB800423AFC /* FireView.swift */,
+				B2C3BAB02C770B9200A7F9A5 /* LoadingView.swift */,
 			);
 			path = shared;
 			sourceTree = "<group>";
@@ -693,6 +696,7 @@
 				B2BA88FA2B2B0D4500A3D50E /* defaultVariables.swift in Sources */,
 				B265D2812B049DF9002E51A8 /* dailyRecordStoneAction.swift in Sources */,
 				B2B28DBD2AC5D69D0071531B /* MainView_ProfileAndSettings.swift in Sources */,
+				B2C3BAB12C770B9200A7F9A5 /* LoadingView.swift in Sources */,
 				B2E6C63B2C47AA1B0082B000 /* SunriseSunsetViewModel.swift in Sources */,
 				B2FB22002B1367DC00AB17FA /* buttonsView.swift in Sources */,
 				B220DA442B6519C20039160C /* stoneTower_backgroundThemes.swift in Sources */,
