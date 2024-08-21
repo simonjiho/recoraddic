@@ -572,9 +572,9 @@ struct MainView_checklist: View {
             currentDailyRecord.dailyRecordSet = findDailyRecordSet(selectedDate)
             let newNilDailyRecord: DailyRecord = DailyRecord()
             modelContext.insert(newNilDailyRecord)
-            print("no!!!!")
+//            print("no!!!!")
         } else { // no buffer dailyRecord
-            print("no!!!!!!!")
+//            print("no!!!!!!!")
             let newDailyRecord: DailyRecord = DailyRecord(date: getStandardDate(from: selectedDate))
             currentDailyRecord = newDailyRecord
             currentDailyRecord.dailyRecordSet = findDailyRecordSet(selectedDate)
@@ -757,13 +757,13 @@ struct ChecklistView: View {
         let hiddenQuestNames: [String] = showHiddenQuests ? [] : quests.filter({$0.isHidden}).map({$0.name})
         
         let dailyQuests_notHidden_sorted = currentDailyRecord.dailyQuestList!.filter({!hiddenQuestNames.contains($0.questName)}).sorted(by:{
-            if $0.alermTime != nil && $1.alermTime != nil {
-                return $0.alermTime! <= $1.alermTime!
+            if $0.notfTime != nil && $1.notfTime != nil {
+                return $0.notfTime! <= $1.notfTime!
             }
-            else if $0.alermTime != nil && $1.alermTime == nil {
+            else if $0.notfTime != nil && $1.notfTime == nil {
                 return true
             }
-            else if $0.alermTime == nil && $1.alermTime != nil {
+            else if $0.notfTime == nil && $1.notfTime != nil {
                 return false
             }
             else if $0.dataType != $1.dataType {
@@ -1038,8 +1038,8 @@ struct ChecklistView: View {
                                     
                                 }
                                 .onAppear() {
-                                    print("hohoh")
-                                    print(todoList_sorted.map({$0.idx}))
+//                                    print("hohoh")
+//                                    print(todoList_sorted.map({$0.idx}))
                                 }
                                 
                                 if editingIndex != nil {
@@ -1195,7 +1195,7 @@ struct ChecklistView: View {
         
         if let dailyQuest = dailyQuestToDelete {
             updateQuest_onDelete(for: dailyQuest)
-            if let alermTime = dailyQuest.alermTime {
+            if let alermTime = dailyQuest.notfTime {
                 removeNotification(at: alermTime, for: dailyQuest.getName()) // MARK: questName 변경 시 지울 수 없음
             }
             modelContext.delete(dailyQuest)
@@ -1380,7 +1380,7 @@ struct PurposeOfDailyQuestView: View {
 //            Group {
                 Group {
                     // purpose 0개일 때
-                    if dailyQuest.defaultPurposes.count == 0 {
+                    if dailyQuest.purposes.isEmpty {
                         Color.white.opacity(0.01)
                             .overlay(
                                 Image(systemName:"questionmark.square")
@@ -1391,7 +1391,7 @@ struct PurposeOfDailyQuestView: View {
                         // MARK: 이렇게 안 하면 외부의 zIndex가 작동 안 함.
                     }
                     else {
-                        PurposeTagsView_vertical(purposes:dailyQuest.defaultPurposes)
+                        PurposeTagsView_vertical(purposes:dailyQuest.purposes)
                             .frame(width: geoWidth, height:geoHeight)
                     }
                     
@@ -1408,9 +1408,9 @@ struct PurposeOfDailyQuestView: View {
                         .presentationCompactAdaptation(.popover)
                         .onDisappear() {
                             if let quest = quests.first(where:{$0.name == dailyQuest.questName && !$0.inTrashCan}) {
-                                quest.recentPurpose = dailyQuest.defaultPurposes
+                                quest.recentPurpose = dailyQuest.purposes
                             } else if let quest = quests.first(where:{$0.name == dailyQuest.questName}){
-                                quest.recentPurpose = dailyQuest.defaultPurposes
+                                quest.recentPurpose = dailyQuest.purposes
                             }
                         }
                     
@@ -1447,14 +1447,14 @@ struct PurposeOfTodoView: View {
             Group {
                 Group {
                     // purpose 0개일 때
-                    if todo.purpose.count == 0 {
+                    if todo.purposes.count == 0 {
                         Image(systemName:"questionmark.square")
                             .resizable()
                             .frame(width:tagSize, height:tagSize)
                             .foregroundStyle(reversedColorSchemeColor)
                     }
                     else {
-                        PurposeTagsView_vertical(purposes:todo.purpose)
+                        PurposeTagsView_vertical(purposes:todo.purposes)
                             .frame(width: geoWidth, height:geoHeight)
                     }
                     
@@ -1471,7 +1471,7 @@ struct PurposeOfTodoView: View {
                         .presentationCompactAdaptation(.popover)
                         .onDisappear() {
                             if let todo_preset = todos_preset.first(where:{$0.content == todo.content}) {
-                                todo_preset.purpose = todo.purpose
+                                todo_preset.purposes = todo.purposes
                             }
                         }
                     

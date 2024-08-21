@@ -248,8 +248,8 @@ struct DailyRecordInShort: View {
                             if (showHiddenQuests || !questNames_hidden.contains(questdata.questName)) && questdata.data != 0 {
                                 let text:String = dataTypeFrom(questdata.dataType) != DataType.ox ? "\(questdata.questName)  \(DataType.string_fullRepresentableNotation(data: questdata.data, dataType: dataTypeFrom(questdata.dataType), customDataTypeNotation: questdata.customDataTypeNotation))" : questdata.questName
                                 HStack {
-                                    if !questdata.defaultPurposes.isEmpty {
-                                        PurposeTagsView_vertical(purposes: questdata.defaultPurposes)
+                                    if !questdata.purposes.isEmpty {
+                                        PurposeTagsView_vertical(purposes: questdata.purposes)
                                             .frame(width:20, height:questBoxHeight*0.8)
                                     } else {
                                         Image(systemName: "checkmark.circle")
@@ -277,10 +277,10 @@ struct DailyRecordInShort: View {
                         
                         ForEach(dailyRecord.todoList!, id:\.self) { todo in
                             if todo.content != "" {
-                                let purposeCount2 = todo.purpose.count
+                                let purposeCount2 = todo.purposes.count
                                 HStack {
-                                    if todo.purpose.count != 0 {
-                                        PurposeTagsView_vertical(purposes: todo.purpose)
+                                    if todo.purposes.count != 0 {
+                                        PurposeTagsView_vertical(purposes: todo.purposes)
                                             .frame(width:20, height:todoHeight*0.9)
                                     } else {
                                         Image(systemName: "checkmark.circle")
@@ -486,13 +486,13 @@ struct RecordInDetailView: View {
                                     let text:String = dataTypeFrom(questdata.dataType) != DataType.ox ? "\(questdata.questName)  \(DataType.string_fullRepresentableNotation(data: questdata.data, dataType: dataTypeFrom(questdata.dataType), customDataTypeNotation: questdata.customDataTypeNotation))" : questdata.questName
                                     HStack {
                                         
-                                        let purposeCount = questdata.defaultPurposes.count
+                                        let purposeCount = questdata.purposes.count
                                         let totalWidth:CGFloat = tagSize * CGFloat(purposeCount) + (purposeCount > 0 ? spacing * CGFloat(purposeCount - 1) : 0.0)
                                         Text(text)
                                             .minimumScaleFactor(0.5)
                                             .lineLimit(2)
                                             .foregroundStyle(.black)
-                                        PurposeTagsView_horizontal(purposes: questdata.defaultPurposes, tagSize: tagSize, spacing:spacing, totalWidth: totalWidth)
+                                        PurposeTagsView_horizontal(purposes: questdata.purposes, tagSize: tagSize, spacing:spacing, totalWidth: totalWidth)
                                             .frame(width:totalWidth, height: tagSize)
                                         
                                     }
@@ -508,13 +508,13 @@ struct RecordInDetailView: View {
                             
                             ForEach(record.todoList!, id:\.self) { todo in
                                 if todo.content != "" {
-                                    let purposeCount2 = todo.purpose.count
+                                    let purposeCount2 = todo.purposes.count
                                     let totalWidth2:CGFloat = tagSize * CGFloat(purposeCount2) + (purposeCount2 > 0 ? spacing * CGFloat(purposeCount2 - 1) : 0.0)
                                     HStack {
                                         Image(systemName: "checkmark.circle")
                                         Text("\(todo.content)")
                                             .lineLimit(3)
-                                        PurposeTagsView_horizontal(purposes: todo.purpose, tagSize: tagSize, spacing:spacing, totalWidth: totalWidth2)
+                                        PurposeTagsView_horizontal(purposes: todo.purposes, tagSize: tagSize, spacing:spacing, totalWidth: totalWidth2)
                                             .frame(width:totalWidth2, height: tagSize)
                                         
                                         

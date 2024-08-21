@@ -41,7 +41,7 @@ struct MainView_Memo:View {
                 .textEditorStyle(.plain)
                 .overlay {
                     if profile.memo == "" {
-                        Text("탭해서 간단히 메모해둘 내용을 적어보세요!")
+                        Text("탭해서 간단히 메모해둘 내용을 적어보세요")
                             .opacity(0.5)
 //                            .containerRelativeFrame([.vertical,.horizontal], alignment: .topLeading)
 //                            .frame(alignment:.topLeading)

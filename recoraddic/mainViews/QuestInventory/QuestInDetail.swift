@@ -1265,7 +1265,7 @@ struct EditQuest: View {
             batchSize: 5000,
             allowEscapingMutations: false
         ) { dailyQuest in
-            if let alermTime = dailyQuest.alermTime {
+            if let alermTime = dailyQuest.notfTime {
                 if alermTime > Date() && oldGetName != newGetName {
                     removeNotification(at: alermTime, for: oldGetName)
                     scheduleNotification(at: alermTime, for: newGetName, goal: dailyQuest.dailyGoal, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation)

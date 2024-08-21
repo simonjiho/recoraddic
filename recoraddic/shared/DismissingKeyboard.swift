@@ -18,7 +18,7 @@ struct DismissingKeyboard: ViewModifier {
                     .compactMap { $0 }
                     .first?.windows
                     .filter { $0.isKeyWindow }.first
-                print( keyWindow == nil)
+//                print( keyWindow == nil)
                 keyWindow?.endEditing(true)
             }
     }

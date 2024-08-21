@@ -23,7 +23,8 @@ struct StartNewRecordSet:View {
     @Binding var newDailyRecordSetAdded: Bool
     @State var selectedDailyRecordThemeName:String?
     let minDate: Date
-    
+    @State var selectedDate: Date
+
     @State var dailyRecordSetThemeContainsDailyQuestions: Bool = false
     
     @State var numberOfQuestions: Int = 1
@@ -34,7 +35,6 @@ struct StartNewRecordSet:View {
     
     @State var steps: Int = 0
     
-    @State var selectedDate = getStartDateOfNow()
     
     var body: some View {
         
@@ -132,6 +132,7 @@ struct StartNewRecordSet:View {
         let newDailyRecordSet: DailyRecordSet = DailyRecordSet(start:getStandardDate(from:selectedDate))
         newDailyRecordSet.dailyRecordThemeName = selectedDailyRecordThemeName!
         modelContext.insert(newDailyRecordSet)
+        
         newDailyRecordSetAdded.toggle()
     }
 

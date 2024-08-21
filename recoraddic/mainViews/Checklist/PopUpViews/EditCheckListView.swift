@@ -159,7 +159,7 @@ struct EditCheckListView: View {
                                         HStack(spacing:0.0) {
                                             Button(action:{
                                                 let newTodo_tmp = Todo(content: todo_preset.content)
-                                                newTodo_tmp.purpose = todo_preset.purpose
+                                                newTodo_tmp.purposes = todo_preset.purposes
                                                 todos_tmp.append(newTodo_tmp)
                                             }) {
                                                 

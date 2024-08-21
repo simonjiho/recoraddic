@@ -145,7 +145,8 @@ struct ContentView: View {
                      .ignoresSafeArea(.keyboard)
                      .tag(mainViews[1])
 
-                     let currentDailyRecordSet: DailyRecordSet = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).last ?? DailyRecordSet(start: getStandardDate(from: Date().addingDays(1000))) // MARK: signOutErrorPrevention
+                     //
+                     let currentDailyRecordSet: DailyRecordSet = dailyRecordSets.filter({$0.start <= getStandardDateOfNow()}).last ?? DailyRecordSet(start: getStandardDate(from: Date().addingDays(1000))) // MARK: signOutErrorPrevention(alternative DRS shouldn't be selected)
                      let index = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).count > 0 ? dailyRecordSets.filter({$0.start < .now}).count-1 : 0
                      MainView_SeeMyDailyRecord(
                         selectedDrsIdx: index,

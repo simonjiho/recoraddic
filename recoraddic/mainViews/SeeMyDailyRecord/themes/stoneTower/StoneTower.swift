@@ -117,7 +117,7 @@ struct StoneTower: View {
             let scrollViewCenter_bottom:CGFloat = scrollViewCenterY + stoneHeight
             let scrollViewCenter_above:CGFloat = scrollViewCenterY - stoneHeight
             
-            let isLatestDailyRecordSet: Bool = selectedDailyRecordSet == dailyRecordSets.last
+            let isLatestDailyRecordSet: Bool = selectedDrsIdx == dailyRecordSets.count - 1
             
             let goalEditButtonSize:CGFloat = groundHeight/10
             let plusMinusButtonSize:CGFloat = groundHeight/12
@@ -793,7 +793,7 @@ struct StoneTower_stone: View {
     //            print("0: ",mainColor_rgba.0)
     //            print("1: ",mainColor_rgba.1)
     //            print("2: ",mainColor_rgba.2)
-                print(3 - mainColor_rgba.0 - mainColor_rgba.1 - mainColor_rgba.2)
+//                print(3 - mainColor_rgba.0 - mainColor_rgba.1 - mainColor_rgba.2)
                 return 3 - mainColor_rgba.0 - mainColor_rgba.1 - mainColor_rgba.2
             }()
             

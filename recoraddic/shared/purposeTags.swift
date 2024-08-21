@@ -151,9 +151,9 @@ struct ChoosePurposeView3: View {
                             PurposeTagView(purpose: purpose)
                                 .frame(width: tagSize*0.7, height: tagSize*0.7)
                                 .onTapGesture {
-                                    if dailyQuest.defaultPurposes.contains(purpose) { dailyQuest.defaultPurposes.remove(purpose)}
-                                    else if dailyQuest.defaultPurposes.count < 3 {
-                                        dailyQuest.defaultPurposes.insert(purpose)
+                                    if dailyQuest.purposes.contains(purpose) { dailyQuest.purposes.remove(purpose)}
+                                    else if dailyQuest.purposes.count < 3 {
+                                        dailyQuest.purposes.insert(purpose)
                                     }
                                     
                                 }
@@ -162,12 +162,12 @@ struct ChoosePurposeView3: View {
                                 .padding(.horizontal,2)
                             //                                .frame(width: geometry.size.width*0.3)
                                 .minimumScaleFactor(0.5)
-                                .foregroundStyle(dailyQuest.defaultPurposes.contains(purpose) ? colorSchemeColor : reversedColorSchemeColor)
+                                .foregroundStyle(dailyQuest.purposes.contains(purpose) ? colorSchemeColor : reversedColorSchemeColor)
                             
                             
                         } // Vstack
                         .frame(width: tagSize, height: tagSize)
-                        .background(dailyQuest.defaultPurposes.contains(purpose) ? reversedColorSchemeColor : .gray.opacity(0.2))
+                        .background(dailyQuest.purposes.contains(purpose) ? reversedColorSchemeColor : .gray.opacity(0.2))
                         .clipShape(.buttonBorder)
                         
                         
@@ -205,9 +205,9 @@ struct ChoosePurposeView4: View {
                         PurposeTagView(purpose: purpose)
                             .frame(width: tagSize*0.7, height: tagSize*0.7)
                             .onTapGesture {
-                                if todo.purpose.contains(purpose) { todo.purpose.remove(purpose)}
-                                else if todo.purpose.count < 3 {
-                                    todo.purpose.insert(purpose)
+                                if todo.purposes.contains(purpose) { todo.purposes.remove(purpose)}
+                                else if todo.purposes.count < 3 {
+                                    todo.purposes.insert(purpose)
                                 }
                                 
                             }
@@ -216,12 +216,12 @@ struct ChoosePurposeView4: View {
                             .padding(.horizontal,2)
 //                                .frame(width: geometry.size.width*0.3)
                             .minimumScaleFactor(0.5)
-                            .foregroundStyle(todo.purpose.contains(purpose) ? colorSchemeColor : reversedColorSchemeColor)
+                            .foregroundStyle(todo.purposes.contains(purpose) ? colorSchemeColor : reversedColorSchemeColor)
                         
                         
                     } // Vstack
                     .frame(width: tagSize, height: tagSize)
-                    .background(todo.purpose.contains(purpose) ? reversedColorSchemeColor : .gray.opacity(0.2))
+                    .background(todo.purposes.contains(purpose) ? reversedColorSchemeColor : .gray.opacity(0.2))
                     .clipShape(.buttonBorder)
                     
                     

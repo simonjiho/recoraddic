@@ -678,13 +678,13 @@ struct QuestCheckBoxContent_HOUR:View {
             }
         
             .onAppear() {
-                if dailyQuest.timerStart != nil {
+                if dailyQuest.stopwatchStart != nil {
                     if isRecent {
                         autoCheckActivityAndAdjustToStopWatch()
                     }
                     else {
                         deleteOutdatedActivity()
-                        dailyQuest.timerStart = nil
+                        dailyQuest.stopwatchStart = nil
                     }
                 }
             }
@@ -711,7 +711,7 @@ struct QuestCheckBoxContent_HOUR:View {
         
         let calendar = Calendar.current
         let startTime = calendar.date(byAdding: .minute, value: -(value), to: .now) ?? Date()
-        dailyQuest.timerStart = startTime
+        dailyQuest.stopwatchStart = startTime
         stopwatch.setTotalSec(value*60)
 
 //        isAnimating = false
@@ -746,7 +746,7 @@ struct QuestCheckBoxContent_HOUR:View {
     }
     
     func deleteOutdatedActivity() -> Void {
-        let startTime: Date = dailyQuest.timerStart ?? Date()
+        let startTime: Date = dailyQuest.stopwatchStart ?? Date()
         
         if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
             let dismissalPolicy: ActivityUIDismissalPolicy = .immediate
@@ -766,7 +766,7 @@ struct QuestCheckBoxContent_HOUR:View {
     
     func autoCheckActivityAndAdjustToStopWatch() -> Void {
         
-        let startTime: Date = dailyQuest.timerStart ?? Date()
+        let startTime: Date = dailyQuest.stopwatchStart ?? Date()
         
         if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
             stopwatch.setTotalSec(Int(Date().timeIntervalSince(startTime)))
@@ -805,7 +805,7 @@ struct QuestCheckBoxContent_HOUR:View {
             await activity_activated.end(ActivityContent(state: activity_activated.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
         }
         activity = nil
-        dailyQuest.timerStart = nil
+        dailyQuest.stopwatchStart = nil
         DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
 
             withAnimation(.easeInOut(duration:0.2)) {
@@ -1422,7 +1422,7 @@ struct NotificationButton: View {
         let questName = dailyQuest.getName()
         let date = dailyQuest.dailyRecord?.getLocalDate() ?? Date()
 
-        let setAlready:Bool = dailyQuest.alermTime != nil
+        let setAlready:Bool = dailyQuest.notfTime != nil
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
@@ -1442,7 +1442,7 @@ struct NotificationButton: View {
                 }
 
             }) {
-                if let alermTime = dailyQuest.alermTime {
+                if let alermTime = dailyQuest.notfTime {
                     VStack(spacing:3.0) {
                         Text(hhmmFormatOf(from: alermTime))
                             .font(.system(size: 12.0))
@@ -1470,7 +1470,7 @@ struct NotificationButton: View {
 //            .border(.red)
             .popover(isPresented: $showNotficationTime, attachmentAnchor: .point(.topLeading)) {
                 HStack {
-                    Text(getNotificationTimeString(at:dailyQuest.alermTime, from: date))
+                    Text(getNotificationTimeString(at:dailyQuest.notfTime, from: date))
                         .padding(.horizontal)
                     Button("수정") {
                         showNotficationTime.toggle()
@@ -1481,11 +1481,11 @@ struct NotificationButton: View {
                     .buttonStyle(NotificationButtonStyle(dailyQuest.currentTier))
 
                     Button("해제") {
-                        if let previousAlermTime = dailyQuest.alermTime {
+                        if let previousAlermTime = dailyQuest.notfTime {
                             removeNotification(at: previousAlermTime, for: questName) // MARK: questName 변경 시 지울 수 없음
                         }
                         showNotficationTime.toggle()
-                        dailyQuest.alermTime = nil
+                        dailyQuest.notfTime = nil
                     }
                     .buttonStyle(NotificationButtonStyle_red(dailyQuest.currentTier))
 
@@ -1503,7 +1503,7 @@ struct NotificationButton: View {
             }
             .sheet(isPresented: $editNotificationTime) {
                 let alermTime = {
-                    if let alermTime = dailyQuest.alermTime { return alermTime}
+                    if let alermTime = dailyQuest.notfTime { return alermTime}
                     else if let date = dailyQuest.dailyRecord?.getLocalDate() {
                         if date == getStartDateOfNow() {
                             return Date()
@@ -1602,8 +1602,8 @@ struct EditNotificationTimeView: View {
         
         let questName = dailyQuest.getName()
 
-        let setAlready:Bool = dailyQuest.alermTime != nil
-        let notModifiedYet:Bool = setAlready && (dailyQuest.alermTime ?? selectedTime) == selectedTime
+        let setAlready:Bool = dailyQuest.notfTime != nil
+        let notModifiedYet:Bool = setAlready && (dailyQuest.notfTime ?? selectedTime) == selectedTime
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
@@ -1656,11 +1656,11 @@ struct EditNotificationTimeView: View {
                     
                     //                    Button((dailyQuest.alermTime ?? selectedTime) == selectedTime ? "취소" : (dailyQuest.alermTime == nil ? "알림 설정" : "알림 수정") ) {
                     
-                    Button(selectedTime <= Date() ? "달성 설정" :(dailyQuest.alermTime == nil ? "알림 설정" : "알림 수정")) {
-                        if let previousAlermTime = dailyQuest.alermTime {
+                    Button(selectedTime <= Date() ? "달성 설정" :(dailyQuest.notfTime == nil ? "알림 설정" : "알림 수정")) {
+                        if let previousAlermTime = dailyQuest.notfTime {
                             removeNotification(at: previousAlermTime, for: questName) // MARK: questName 변경 시 지울 수 없음
                         }
-                        dailyQuest.alermTime = selectedTime
+                        dailyQuest.notfTime = selectedTime
                         if selectedTime > Date() {
                             scheduleNotification(at: selectedTime, for: questName, goal: dailyQuest.dailyGoal, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation
                             )

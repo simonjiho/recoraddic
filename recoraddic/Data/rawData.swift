@@ -65,7 +65,7 @@ final class DefaultPurpose {
     static let rts = "relationship"
 
     // 타인지향
-    static let sgn = "significantOther" // 사랑하는, 소중한 사람 (sgn)
+    static let lov = "love" // 사랑하는, 소중한 사람 (sgn)
     static let fml = "family" // 가족 (fml)
     static let cmn = "community" // 공동체 (cmn)
     static let alt = "alturism" // 이타심 (alt)
@@ -97,7 +97,7 @@ final class DefaultPurpose {
         }
         
         
-        else if input == DefaultPurpose.sgn {
+        else if input == DefaultPurpose.lov {
             return "사랑"
         }
         else if input == DefaultPurpose.fml {
@@ -146,7 +146,6 @@ final class DefaultPurposeData {
     
     var cumulativeData: [String:[Date:Int]] = [:] // for each dataType, add data
     var cumulativeData_custom: [String:[Date:Int]] = [:]
-    // 1 week, 1 month, 3 months, 6 months, 1 years, 3 years, 10 years, cumulative
     
     var tier_notHour: Int = 0
     var tier_hour: Int = 0
@@ -174,11 +173,11 @@ class DailyQuest: Hashable, Equatable, Identifiable {
     var questSubName: String?
     var data: Int = 0
     var dataType: Int = 1
-    var defaultPurposes: Set<String> = []
+    var purposes: Set<String> = []
     var dailyGoal: Int? = nil
     var currentTier: Int = 0
-    var alermTime: Date? = nil
-    var timerStart: Date? = nil
+    var notfTime: Date? = nil
+    var stopwatchStart: Date? = nil
     var customDataTypeNotation: String?
     
     var dailyRecord: DailyRecord?
@@ -189,7 +188,7 @@ class DailyQuest: Hashable, Equatable, Identifiable {
         self.questName = questName
         self.data = data
         self.dataType = dataType
-        self.defaultPurposes = defaultPurposes
+        self.purposes = defaultPurposes
         self.customDataTypeNotation = customDataTypeNotation
         self.dailyGoal = dailyGoal
     }
@@ -246,7 +245,7 @@ final class Todo: Hashable, Identifiable, Equatable {
     var idx: Int = 0
     var content: String = ""
     var done: Bool = false
-    var purpose: Set<String> = []
+    var purposes: Set<String> = []
     
     var dailyRecord: DailyRecord?
     
@@ -286,7 +285,7 @@ final class Todo_preset: Hashable, Identifiable, Equatable {
     var createdTime: Date = Date()
 
     var content: String = ""
-    var purpose: Set<String> = []
+    var purposes: Set<String> = []
         
     init(content: String) {
         self.content = content
@@ -319,7 +318,7 @@ final class DailyRecordSet: Equatable {
     var start:Date = Date()
     var end:Date?
     
-    var dailyQuestions: [String] = []
+//    var dailyQuestions: [String] = []
 
     var dailyRecordThemeName: String = "StoneTower"
     var backgroundThemeName: String = "stoneTowerBackground_1" //MARK: backgroundSetting 하는 view에서 dailyRecordThemeName에 따라서 선택할 수 있는 backgroundThemeName 제한
@@ -493,9 +492,9 @@ final class DailyRecord: Equatable, Identifiable, Hashable {
 
 
     
-    var dailyRecordThemeNum: Int? // stone + background
-    var dailyRecordStoneActionNum: Int?
-    var dailyRecordStoneAccesseryNum: Int?
+//    var dailyRecordThemeNum: Int? // stone + background
+//    var dailyRecordStoneActionNum: Int?
+//    var dailyRecordStoneAccesseryNum: Int?
     
     var dailyRecordSet: DailyRecordSet?
     

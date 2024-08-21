@@ -111,6 +111,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         let startRange: ClosedRange<Date> = {
             if let min = prevDRS_start?.addingDays(-1) {
                 if let max = standardDateToLocalStartOfDay(std: selectedDailyRecordSet.end)  {
+                    print(min)
+                    print(max)
                     return min...max
                 }
                 else {
@@ -206,7 +208,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     StartNewRecordSet(
                         popUp_startNewRecordSet: $popUp_startNewRecordSet,
                         newDailyRecordSetAdded: $newDailyRecordSetAdded,
-                        minDate: selectedDailyRecordSet.start.addingDays(1)
+                        minDate: selectedDailyRecordSet.start.addingDays(1),
+                        selectedDate:selectedDailyRecordSet.start.addingDays(1)
                     )
                         .popUpViewLayout(width: geoWidth*0.9, height: (geoHeight-statusBarHeight)*0.6, color: backGroundColor)
                         .position(x:geoWidth/2,y: statusBarHeight + (geoHeight-statusBarHeight)/2 )

@@ -212,16 +212,20 @@ struct MainView_QuestInventory: View {
                                     
                                     // TODO: plus button
                                     if !isEdit {
-                                        ZStack {
                                             
-                                            NavigationLink(destination: CreateNewQuest(popUp_createNewQuest: $popUp_addNewQuest)
-) {
-                                                Image(systemName: "plus.square")
+                                        NavigationLink(destination: CreateNewQuest(popUp_createNewQuest: $popUp_addNewQuest)){
+                                           ZStack {
+                                                Image(systemName: "plus")
                                                     .resizable()
-                                                    .frame(width: gridItemWidth*0.3, height: gridItemWidth*0.3)
-                                                
+                                                    .frame(width: gridItemWidth*0.2, height: gridItemWidth*0.2)
                                             }
-                                            .buttonStyle(.plain)
+                                            .frame(width: gridItemWidth, height: gridItemHeight)
+                                            .background(.gray.opacity(0.3))
+                                            .clipShape(.rect(cornerSize: CGSize(width: gridItemWidth/20, height: gridItemHeight/20)))
+
+                                                
+                                        }
+                                        .buttonStyle(.plain)
                                             
                                             
                                             
@@ -233,8 +237,8 @@ struct MainView_QuestInventory: View {
                                             //                                                    .frame(width: gridItemWidth*0.4, height: gridItemWidth*0.4)
                                             //                                            }
                                             //                                            .buttonStyle(.plain)
-                                        }
-                                        .frame(width: gridItemWidth, height: gridItemHeight)
+                                        
+
                                     }
                                     
                                     
