@@ -473,7 +473,7 @@ struct QuestCheckBoxContent_HOUR:View {
     
     @State var lastTapTime: Date = Date()
     
-    let sheetHeight:CGFloat = UIScreen.main.bounds.height * 0.4
+    let sheetHeight:CGFloat = 380.0
 
     
     /// <#Description#>
@@ -1202,7 +1202,7 @@ struct DialForHours: View {
                 }
                 .frame(width: geometry.size.width)
                 .padding(.top, 10)
-                .padding(.bottom, geoHeight*0.1)
+                .padding(.bottom, geoHeight*0.06)
 
                 HStack(spacing:0.0) {
                     
@@ -1407,7 +1407,7 @@ struct NotificationButton: View {
     var popOverWidth: CGFloat
     var popOverHeight: CGFloat
 
-    let sheetHeight:CGFloat = UIScreen.main.bounds.height * 0.4
+    let sheetHeight:CGFloat = 360.0
     
     @State var showNotficationTime: Bool = false
     @State var editNotificationTime: Bool = false
