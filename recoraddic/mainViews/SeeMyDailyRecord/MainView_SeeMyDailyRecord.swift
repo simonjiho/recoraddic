@@ -82,14 +82,26 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
 
         let dailyRecords_withContent:[DailyRecord] = {
             if showHiddenQuests {
-                return selectedDailyRecordSet.dailyRecords!.filter({$0.hasContent}).sorted(by: {
-                    if $0.date != nil && $1.date != nil {
-                        return $0.date! < $1.date!
-                    } else { return false }
-                })
+                return selectedDailyRecordSet.dailyRecords!
+                    .filter({$0.hasContent})
+                    .sorted(by: {
+                        if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
+                        else { return false }
+                    })
             } else {
-//                print(hiddenQuestNames)
-                return selectedDailyRecordSet.dailyRecords!.filter({$0.hasContent && !Set($0.dailyQuestList!.map{$0.questName}).subtracting(hiddenQuestNames).isEmpty}).sorted(by:     { if $0.date != nil && $1.date != nil { return $0.date! < $1.date! } else { return false } }
+//                print("hiddenQuestNames:\(hiddenQuestNames)")
+//                print("dailyQuestList:\( Set(selectedRecord?.dailyQuestList!.map{$0.questName}) )")
+                return selectedDailyRecordSet.dailyRecords!
+                    .filter({
+                        $0.hasContent &&
+                        ($0.hasTodoOrDiary ||
+                         !Set($0.dailyQuestList!.filter({$0.data != 0}).map{$0.questName}).subtracting(hiddenQuestNames).isEmpty)
+                    })
+                    .sorted(by:{
+//                        print("\($0.dailyQuestList!.map{$0.questName})")
+                        if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
+                        else { return false }
+                    }
                 )
             }
         }()

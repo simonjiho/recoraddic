@@ -7,7 +7,7 @@
 import Foundation
 import ActivityKit
 
-struct RecoraddicWidgetAttributes: ActivityAttributes {
+struct RecoraddicActivityAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
         var goal: Int?
         

@@ -210,7 +210,7 @@ struct QuestCheckBoxView: View {
                 }
                 .onEnded { value in
                     if value.translation.width <= 0 || showMenu {
-                        if value.translation.width < -width*0.05 {
+                        if value.translation.width < -menuSize*0.1 {
                             targetDailyQuest = dailyQuest
                             withAnimation {
                                 offset = -menuSize
@@ -276,12 +276,26 @@ struct QuestCheckBoxView: View {
     //                }
                 }
             }
-            
 
-
-            
-            
         }
+        .onChange(of: stopwatch.isRunning) {
+            if dailyGoal == nil && value == 0 {
+                if stopwatch.isRunning {
+                    xOffset = width
+                } else if stopwatch.getTotalSec() < 60 {
+                    xOffset = 0.01
+                }
+            }
+        }
+//        .onChange(of: isAnimating, { oldValue, newValue in
+//            if dailyGoal == nil && value == 0 && stopwatch.isRunning {
+//                if newValue == true {
+//                    xOffset = width
+//                } else if stopwatch.totalSec < 60 && !stopwatch.isRunning {
+//                    xOffset = 0.01
+//                }
+//            }
+//        })
         .onChange(of: dailyGoal) {
             dailyQuest.dailyGoal = dailyGoal
             xOffset = CGFloat(value).map(from:range, to: 0...width)
@@ -466,7 +480,7 @@ struct QuestCheckBoxContent_HOUR:View {
     
 //    @ObservedObject var activityManager: ActivityManager
     @State var isEditing_hours: Bool = false
-    @State private var activity: Activity<RecoraddicWidgetAttributes>? = nil
+    @State private var activity: Activity<RecoraddicActivityAttributes>? = nil
 
     @State var highlightValue: Bool = false
     @State var highlightValue2: Int = 1
@@ -724,13 +738,13 @@ struct QuestCheckBoxContent_HOUR:View {
             }
         }
         
-        if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
+        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
             self.activity = targetActivity
         } else {
-            let attributes = RecoraddicWidgetAttributes(questName: dailyQuest.getName(), startTime:startTime, containedDate:dailyQuest.dailyRecord?.date ?? Date(), tier: dailyQuest.currentTier)
-            let initialContentState = RecoraddicWidgetAttributes.ContentState(goal: dailyGoal)
+            let attributes = RecoraddicActivityAttributes(questName: dailyQuest.getName(), startTime:startTime, containedDate:dailyQuest.dailyRecord?.date ?? Date(), tier: dailyQuest.currentTier)
+            let initialContentState = RecoraddicActivityAttributes.ContentState(goal: dailyGoal)
             do {
-                let activity = try Activity<RecoraddicWidgetAttributes>.request(
+                let activity = try Activity<RecoraddicActivityAttributes>.request(
                     attributes: attributes,
                     content: ActivityContent(state: initialContentState, staleDate: nil),
                     pushType: nil
@@ -748,7 +762,7 @@ struct QuestCheckBoxContent_HOUR:View {
     func deleteOutdatedActivity() -> Void {
         let startTime: Date = dailyQuest.stopwatchStart ?? Date()
         
-        if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
+        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
             let dismissalPolicy: ActivityUIDismissalPolicy = .immediate
             Task {
                 await targetActivity.end(ActivityContent(state: targetActivity.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
@@ -768,7 +782,7 @@ struct QuestCheckBoxContent_HOUR:View {
         
         let startTime: Date = dailyQuest.stopwatchStart ?? Date()
         
-        if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
+        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
             stopwatch.setTotalSec(Int(Date().timeIntervalSince(startTime)))
 //            isAnimating = false
             stopwatch.start(startTime:startTime)

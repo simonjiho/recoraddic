@@ -51,20 +51,21 @@ struct InShortView: View {
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
             
-            
+            let menuSize = geoWidth * 0.2
+
 
             let iconWidth: CGFloat = 20
             
             let iconHeight: CGFloat = 20
             
 
-            HStack {
+            HStack(spacing:0.0) {
 
                 HStack(spacing:0.0) {
                     Image(systemName: "book.closed.fill")
                         .frame(width:geoWidth*0.1)
-                                .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-                            
+                        .foregroundStyle(getReversedColorSchemeColor(colorScheme))
+                    
                     VStack(alignment: .trailing) {
                         TextField("하루를 요약해보세요",text:$inShortText)
                             .frame(width:geoWidth*(keyBoard ? 0.77 : 0.9), alignment: .trailing)
@@ -87,22 +88,21 @@ struct InShortView: View {
                         })
                         .frame(width:geoWidth*0.1)
                     }
-
-                        }
+                }
                 .frame(width: geoWidth, height: geoHeight, alignment: .leading)
-                .disabled(offset < -geoHeight*0.5)
+                .disabled(offset < -menuSize*0.5)
                 .offset(x: offset, y:0)
                 
                 HStack(spacing:0.0) {
                     Image(systemName: "xmark")
-                        .frame(width: geoHeight, height:geoHeight)
+                        .frame(width: menuSize, height:geoHeight)
                     Spacer()
-                        .frame(width: geoHeight*2, height:geoHeight)
+                        .frame(width: menuSize*2, height:geoHeight)
                 }
-                .frame(width: geoHeight*3, height:geoHeight)
+                .frame(width: menuSize*3, height:geoHeight)
                 .background(Color.red.blur(radius: 1))
                 .offset(x: offset, y:0)
-                .disabled(offset > -geoHeight*0.5)
+                .disabled(offset > -menuSize*0.5)
                 .onTapGesture {
                     applyDailyTextRemoval.toggle()
                 }
@@ -119,20 +119,20 @@ struct InShortView: View {
                         if showMenu {
                             if value.translation.width < 0 {
                                 let delta = log10(10 - value.translation.width*0.1)
-                                offset = (-geoHeight) * (delta)
+                                offset = (-menuSize) * (delta)
                             }
-                            else if value.translation.width > geoHeight {
-                                let delta = log10(1 + (value.translation.width - geoHeight)*0.01)
-                                offset = (geoHeight) * (delta)
+                            else if value.translation.width > menuSize {
+                                let delta = log10(1 + (value.translation.width - menuSize)*0.01)
+                                offset = (menuSize) * (delta)
                             }
                             else {
-                                offset = -geoHeight + value.translation.width
+                                offset = -menuSize + value.translation.width
                                 
                             }
                         } else {
-                            if value.translation.width < -geoHeight {
-                                let delta = log10(10 - (value.translation.width + geoHeight)*0.1)
-                                offset = (-geoHeight) * (delta)
+                            if value.translation.width < -menuSize {
+                                let delta = log10(10 - (value.translation.width + menuSize)*0.1)
+                                offset = (-menuSize) * (delta)
                             }
                             else if value.translation.width > 0 {
                             }
@@ -148,9 +148,9 @@ struct InShortView: View {
 //                        if keyBoard { return }
                         
                         if !(value.translation.width > 0 && !showMenu) {
-                            if value.translation.width < -geoWidth*0.05 {
+                            if value.translation.width < -menuSize*0.1 {
                                 withAnimation {
-                                    offset = -geoHeight
+                                    offset = -menuSize
                                 }
                                 showMenu = true
                                 
@@ -214,7 +214,8 @@ struct DiaryView: View {
             
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
-            
+            let menuSize = geoWidth * 0.2
+
             
             let iconWidth: CGFloat = isEdit ? 40 : 20
             let textBoxWidth: CGFloat = isEdit ? geometry.size.width*0.9 : (geometry.size.width-iconWidth)*0.8
@@ -224,7 +225,7 @@ struct DiaryView: View {
 //            let textBoxHeight: CGFloat = diaryViewWiden ? (geometry.size.height - imageHeight)*(isEdit ? 0.7 : 1.0) : geometry.size.height*0.8
 
 //            let iconAndDoneButtonHStackWidth:  CGFloat = iconWidth*2
-
+            
             let text = isEdit ? diaryText : String(describing: diaryText.prefix(30))
 
             let axisWiden = geometry.size.width/2
@@ -322,20 +323,20 @@ struct DiaryView: View {
 
                 }
                 .frame(width: geoWidth, height: geoHeight)
-                .disabled(offset < -geoHeight*0.5)
+                .disabled(offset < -menuSize*0.5)
                 .offset(x: offset, y:0)
 
                 
                 HStack(spacing:0.0) {
                     Image(systemName: "xmark")
-                        .frame(width: geoHeight, height:geoHeight)
+                        .frame(width: menuSize, height:geoHeight)
                     Spacer()
-                        .frame(width: geoHeight*2, height:geoHeight)
+                        .frame(width: menuSize*2, height:geoHeight)
                 }
-                .frame(width: geoHeight*3, height:geoHeight)
+                .frame(width: menuSize*3, height:geoHeight)
                 .background(Color.red.blur(radius: 1))
                 .offset(x: offset, y:0)
-                .disabled(offset > -geoHeight*0.5)
+                .disabled(offset > -menuSize*0.5)
                 .onTapGesture {
                     applyDiaryRemoval.toggle()
                 }
@@ -350,20 +351,20 @@ struct DiaryView: View {
                         if showMenu {
                             if value.translation.width < 0 {
                                 let delta = log10(10 - value.translation.width*0.1)
-                                offset = (-geoHeight) * (delta)
+                                offset = (-menuSize) * (delta)
                             }
-                            else if value.translation.width > geoHeight {
+                            else if value.translation.width > menuSize {
                                 let delta = log10(1 + (value.translation.width - geoHeight)*0.01)
-                                offset = (geoHeight) * (delta)
+                                offset = (menuSize) * (delta)
                             }
                             else {
-                                offset = -geoHeight + value.translation.width
+                                offset = -menuSize + value.translation.width
                                 
                             }
                         } else {
-                            if value.translation.width < -geoHeight {
-                                let delta = log10(10 - (value.translation.width + geoHeight)*0.1)
-                                offset = (-geoHeight) * (delta)
+                            if value.translation.width < -menuSize {
+                                let delta = log10(10 - (value.translation.width + menuSize)*0.1)
+                                offset = (-menuSize) * (delta)
                             }
                             else if value.translation.width > 0 {
                             }
@@ -379,9 +380,9 @@ struct DiaryView: View {
                         if isEdit { return }
                         
                         if !(value.translation.width > 0 && !showMenu) {
-                            if value.translation.width < -geoWidth*0.05 {
+                            if value.translation.width < -menuSize*0.1 {
                                 withAnimation {
-                                    offset = -geoHeight
+                                    offset = -menuSize
                                 }
                                 showMenu = true
                                 

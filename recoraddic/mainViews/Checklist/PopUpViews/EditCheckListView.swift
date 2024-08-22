@@ -16,12 +16,13 @@ struct EditCheckListView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
-
+    @Query(sort:\Profile.createdTime) var profiles: [Profile]
+    var showHiddenQuests: Bool { profiles.first?.showHiddenQuests ?? false }
     
     @Query var quests: [Quest]
-    var quests_visible: [Quest] {
-        quests.filter({$0.isVisible()})
-    }
+//    var quests_visible: [Quest] {
+//        quests.filter({$0.isVisible()})
+//    }
     @Query(sort:\Todo_preset.createdTime) var todos_preset: [Todo_preset]
     
     
@@ -54,7 +55,13 @@ struct EditCheckListView: View {
     
     var body: some View {
         
-        
+        let quests_visible =  {
+            if showHiddenQuests {
+                return quests.filter({$0.isVisible() || $0.isHidden })
+            } else {
+                return quests.filter({$0.isVisible()})
+            }
+        }()
         
         GeometryReader { geometry in
             let geoWidth = geometry.size.width

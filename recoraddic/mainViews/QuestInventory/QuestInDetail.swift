@@ -1302,7 +1302,7 @@ struct EditQuest: View {
         
         
         
-        if let targetActivity: Activity<RecoraddicWidgetAttributes> = Activity<RecoraddicWidgetAttributes>.activities.first(where: {$0.attributes.questName == oldGetName }) {
+        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.questName == oldGetName }) {
             
             let startTime = targetActivity.attributes.startTime
             let containedDate = targetActivity.attributes.containedDate
@@ -1314,10 +1314,10 @@ struct EditQuest: View {
                 await targetActivity.end(ActivityContent(state: targetActivity.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
             }
             
-            let attributes = RecoraddicWidgetAttributes(questName: newGetName, startTime:startTime, containedDate:containedDate, tier: tier)
-            let initialContentState = RecoraddicWidgetAttributes.ContentState(goal: dailyGoal)
+            let attributes = RecoraddicActivityAttributes(questName: newGetName, startTime:startTime, containedDate:containedDate, tier: tier)
+            let initialContentState = RecoraddicActivityAttributes.ContentState(goal: dailyGoal)
             do {
-                let activity = try Activity<RecoraddicWidgetAttributes>.request(
+                let activity = try Activity<RecoraddicActivityAttributes>.request(
                     attributes: attributes,
                     content: ActivityContent(state: initialContentState, staleDate: nil),
                     pushType: nil

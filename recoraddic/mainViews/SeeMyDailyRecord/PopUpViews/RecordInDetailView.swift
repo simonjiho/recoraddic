@@ -28,30 +28,8 @@ struct RecordInDetailView_new: View { // 해당 view의 심각한 문제점: ini
 //    @Binding var selectedDrDate: Date?
     @Binding var selectedDrIdx: Int?
     
-
-
-    
-    
-//    init(selectedDailyRecord: DailyRecord? = nil, popUp_recordInDetail: Bool, selectedDrIdx: Int? = nil) {
-//        self.selectedDailyRecord = selectedDailyRecord
-//        self.popUp_recordInDetail = popUp_recordInDetail
-//        self.dailyRecords_withContent =
-////        self.selectedDrIdx = dailyRecords_withContent.firstIndex(of: selectedDailyRecord?) ?? 0
-//    }
     
     var body: some View {
-        
-        
-//        let showHiddenQuests = profiles.first?.showHiddenQuests ?? false
-//        let hiddenQuestNames: Set<String> = showHiddenQuests ? [] : Set(quests.filter({$0.isHidden}).map({$0.name}))
-//        let dailyRecords_withContent = {
-//            if showHiddenQuests {
-//                return dailyRecords.filter({$0.hasContent})
-//            } else {
-//                print(hiddenQuestNames)
-//                return dailyRecords.filter({$0.hasContent && !Set($0.dailyQuestList!.map{$0.questName}).subtracting(hiddenQuestNames).isEmpty})
-//            }
-//        }()
         
         Group {
             if selectedDrIdx == nil {
@@ -60,31 +38,19 @@ struct RecordInDetailView_new: View { // 해당 view의 심각한 문제점: ini
                 VStack {
                     ScrollView(.horizontal) {
                         LazyHStack(spacing:0.0) {
-                            //                HStack(spacing:0.0) {
-                            //                    ForEach(dailyRecords_withContent, id:\.self) { dr in
                             ForEach(dailyRecords_withContent.indices, id:\.self) { idx in
-                                
-//                                VStack {
-                                    //                            if let date = dr.date {
                                     DailyRecordInShort(
                                         dailyRecord: dailyRecords_withContent[idx],
                                         showHiddenQuests: showHiddenQuests
                                         
                                     )
-                                    //                            } else {
-                                    //                            Text("nil dailyRecord")
-                                    //                            }
-//                                }
                                 .containerRelativeFrame([.horizontal, .vertical])
                                 .id(idx)
                             }
                         }
                         .scrollTargetLayout()
-                        
-                        
                     }
-                    .scrollPosition(id: $selectedDrIdx)
-                    //            .scrollPosition(id: $selectedDrDate)
+                    .scrollPosition(id: $selectedDrIdx) // 가볍게 해야 초기화 시 오래 안걸림. 초기화 시간 오래걸리면 해당 index로 바로 안넘어감
                     .scrollTargetBehavior(.paging)
                     .scrollIndicators(.never)
                     Button(action:{popUp_recordInDetail.toggle()}) {
@@ -154,8 +120,6 @@ struct DailyRecordInShort: View {
 
             let facialExpressionSize = geoWidth * 0.08
             
-//            let iconWidth: CGFloat = 20
-//            let iconHeight: CGFloat = 35
             
             VStack {
                 if dailyRecord.mood != 0 {
@@ -180,44 +144,16 @@ struct DailyRecordInShort: View {
                         .resizable()
                         .frame(width:facialExpressionSize, height: facialExpressionSize)
                 }
-//                HStack(spacing:0.0) {
-//                    ZStack {
-//                        Circle()
-//                            .stroke(lineWidth: geoWidth*0.002)
-//                            .frame(width:facialExpressionSize, height: facialExpressionSize)
-//                        reversedcolorSchemeColor
-//                            .frame(width:facialExpressionSize, height: facialExpressionSize)
-//                            .mask(
-//                                Image("facialExpression_\(dailyRecord.mood)")
-//                                    .resizable()
-//                                    .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
-//                            )
-//                    }
-//                    .frame(width:geoWidth*0.2, height: facialExpressionSize,alignment: .trailing)
-////                    .frame(width:facialExpressionSize, height: facialExpressionSize)
-//                    .opacity(dailyRecord.mood == 0 ? 0.0 : 1.0)
+
                     Text(kor_yyyymmddFormatOf(dailyRecord.date ?? Date()))
-                    //                        .frame(width: geoWidth)
                         .font(.title3)
                         .bold()
-//                        .frame(width: geoWidth*0.6)
-//                    Spacer()
-//                        .frame(width:geoWidth*0.2, height: facialExpressionSize)
-//                    
-//                }
-//                .padding(.top,30)
+
                 
                 
                 ScrollView {
                     VStack {
-//                        if dailyRecord.diaryImage != nil {
-//                            Image(uiImage: UIImage(data:dailyRecord.diaryImage!)!)
-//                                .resizable()
-//                                .aspectRatio(contentMode:.fit)
-//                                .frame(width: imageOrStoneWidth, height: imageOrStoneHeight)
-//                        }
-                        
-                        
+
                         if dailyRecord.dailyText != nil && dailyRecord.dailyText != "" {
 
                             Group {
