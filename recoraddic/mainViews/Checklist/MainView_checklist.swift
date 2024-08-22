@@ -406,6 +406,7 @@ struct MainView_checklist: View {
                 
             } // zstack
             .frame(width:geometry.size.width, height: geometry.size.height)
+//            .background(.quaternary)
             .onAppear {
                 
 //                updateExistency()

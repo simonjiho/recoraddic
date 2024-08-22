@@ -206,7 +206,6 @@
 		B2F0172B2C3D155500765EF6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B2F017342C3D157600765EF6 /* recoraddicWidgetAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recoraddicWidgetAttributes.swift; sourceTree = "<group>"; };
 		B2F0173D2C3D428F00765EF6 /* widgetImages.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = widgetImages.xcassets; sourceTree = "<group>"; };
-		B2F758A82B812FB2002A3B80 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B2FB21FF2B1367DC00AB17FA /* buttonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = buttonsView.swift; sourceTree = "<group>"; };
 		B2FB726E2A8762810012EBE1 /* customArrayFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customArrayFunc.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -396,7 +395,6 @@
 		B29C702C2A35C5E30046873E /* recoraddic */ = {
 			isa = PBXGroup;
 			children = (
-				B2F758A82B812FB2002A3B80 /* Info.plist */,
 				B2D8F9682B73AA6A00423AFC /* Localizable.xcstrings */,
 				B220DA472B652AA60039160C /* tmp */,
 				B265D2732B0495A0002E51A8 /* shared */,
@@ -963,6 +961,7 @@
 				INFOPLIST_FILE = recoraddic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = recoraddic;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "시간대를 확인하는 데 사용";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -1011,6 +1010,7 @@
 				INFOPLIST_FILE = recoraddic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = recoraddic;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "시간대를 확인하는 데 사용";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
