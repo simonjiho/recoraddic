@@ -962,7 +962,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = recoraddic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = recoraddic;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "시간대를 확인하는 데 사용";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
@@ -1011,7 +1011,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = recoraddic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = recoraddic;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "시간대를 확인하는 데 사용";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
