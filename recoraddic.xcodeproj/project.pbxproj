@@ -153,6 +153,7 @@
 		B265D27C2B0497D0002E51A8 /* callTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = callTheme.swift; sourceTree = "<group>"; };
 		B265D2802B049DF9002E51A8 /* dailyRecordStoneAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dailyRecordStoneAction.swift; sourceTree = "<group>"; };
 		B265D2842B049FBA002E51A8 /* theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = theme.swift; sourceTree = "<group>"; };
+		B2774E1A2C7721A200FCB297 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B27A5CED2B14764A0042ADF6 /* dataType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dataType.swift; sourceTree = "<group>"; };
 		B27A5CF02B15C9D50042ADF6 /* questBar.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = questBar.xcassets; sourceTree = "<group>"; };
 		B27CBB582BA41E6C00CD6CD3 /* recalculateVisualValues_dr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recalculateVisualValues_dr.swift; sourceTree = "<group>"; };
@@ -395,6 +396,7 @@
 		B29C702C2A35C5E30046873E /* recoraddic */ = {
 			isa = PBXGroup;
 			children = (
+				B2774E1A2C7721A200FCB297 /* Info.plist */,
 				B2D8F9682B73AA6A00423AFC /* Localizable.xcstrings */,
 				B220DA472B652AA60039160C /* tmp */,
 				B265D2732B0495A0002E51A8 /* shared */,
