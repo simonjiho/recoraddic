@@ -78,7 +78,7 @@ struct MainView_QuestInventory: View {
             let gridVerticalSpacing = gridWidth*0.08
         
             let topBarTopPadding = geoHeight*0.035
-            let facialExpressionSize = geoHeight*0.04
+            let topBarSize = geoHeight*0.05
             let topBarBottomPadding = geoHeight*0.005
             
             let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
@@ -106,7 +106,7 @@ struct MainView_QuestInventory: View {
                             }
                             .frame(width: geoWidth*0.95, alignment: .trailing)
                         }
-                        .frame(width: geoWidth*0.95, height: facialExpressionSize)
+                        .frame(width: geoWidth*0.95, height: topBarSize)
                         .padding(.top,topBarTopPadding)
                         .padding(.bottom,topBarBottomPadding)
                         

@@ -121,8 +121,11 @@ struct MainView_checklist: View {
             let popUp_changeMood_height = geoHeight * 0.7
             
             let topBarTopPadding = geoHeight*0.035
+            let topBarSize = geoHeight*0.05
             let facialExpressionSize = geoHeight*0.04
             let topBarBottomPadding = geoHeight*0.005
+            
+//            let textSize = topBarTopPadding * 0.8
 //            let topBarHeight = facialExpressionSize + topBarBottomPadding
 //            facialExpressionSize*0.7
 //            let isNotToday: Bool = getStartOfDate(date: selectedDate) != getStartDateOfNow()
@@ -136,10 +139,10 @@ struct MainView_checklist: View {
                         Circle().frame(width:5,height:5).opacity((dateGap == -2 || dateGap == -3) ? 1.0 : 0.0)
                         Circle().frame(width:5,height:5).opacity((dateGap <= -1 && dateGap >= -3) ? 1.0 : 0.0)
                         if dateGap <= 3 && dateGap >= -3 {
-                            Rectangle().frame(width:1,height:12).opacity(dateGap == 0 ? 0.0 : 1.0)
+                            Rectangle().frame(width:1,height:topBarTopPadding*0.7).opacity(dateGap == 0 ? 0.0 : 1.0)
                         } else {
-                            Text("\(dateGap)")
-                                .font(.system(size: 15.0))
+                            Text("\(dateGap > 0 ? "+" : "")\(dateGap)")
+                                .font(.system(size: topBarTopPadding*0.7))
                                 .bold()
                         }
                         Circle().frame(width:5,height:5).opacity((dateGap >= 1 && dateGap <= 3) ? 1.0 : 0.0)
@@ -148,6 +151,7 @@ struct MainView_checklist: View {
                     }
                     .frame(height:topBarTopPadding)
                     .foregroundStyle(topForegroundColor)
+//                    .border(.red)
 
                     HStack(spacing:0.0) {
                         if currentDailyRecord.dailyText == nil {
@@ -187,6 +191,7 @@ struct MainView_checklist: View {
                             DatePicker(selection: $selectedDate,displayedComponents: [.date]) {}
                                 .labelsHidden()
                                 .foregroundStyle(topForegroundColor)
+//                                .border(.red)
 
                             if getStartOfDate(date: selectedDate) < getStartDateOfNow() {
                                 Button(action: {selectedDate = getStartDateOfNow()}) {
@@ -327,7 +332,8 @@ struct MainView_checklist: View {
                         
                         // use "in:" to add date range
                     }
-                    .frame(height: facialExpressionSize)
+                    .frame(height: topBarSize)
+                    
 //                    .padding(.top,geoHeight*0.035)
                     .padding(.bottom, topBarBottomPadding)
                     .foregroundStyle(topForegroundColor) // 너무 튀는 것 같기도 하고..

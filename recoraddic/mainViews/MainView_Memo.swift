@@ -23,7 +23,7 @@ struct MainView_Memo:View {
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
             let topBarTopPadding = geoHeight*0.035
-            let facialExpressionSize = geoHeight*0.04
+            let topBarSize = geoHeight*0.05
             let topBarBottomPadding = geoHeight*0.005
             VStack(spacing:0.0) {
                 
@@ -40,13 +40,13 @@ struct MainView_Memo:View {
                     }
                 }
                 .padding(isEditing ? .trailing : .horizontal)
-                .frame(width: UIScreen.main.bounds.width,height:facialExpressionSize,alignment: isEditing ? .trailing : .center)
+                .frame(width: UIScreen.main.bounds.width,height:topBarSize,alignment: isEditing ? .trailing : .center)
                 .padding(.top,topBarTopPadding)
                 .padding(.bottom,topBarBottomPadding)
                 TextEditor(text: $profile.memo)
                     .padding()
                     .focused($isEditing)
-//                    .textEditorStyle(.plain)
+                    .textEditorStyle(.plain)
 //                    .background(.tertiary)
                     .overlay {
                         if profile.memo == "" {
