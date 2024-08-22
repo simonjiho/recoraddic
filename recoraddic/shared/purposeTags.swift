@@ -146,10 +146,10 @@ struct ChoosePurposeView3: View {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: tagSize))],spacing: tagSize*0.2) {
                     
                     ForEach(recoraddic.defaultPurposes, id:\.self) { purpose in
-                        VStack {
+                        VStack(spacing:3.0) {
                             
                             PurposeTagView(purpose: purpose)
-                                .frame(width: tagSize*0.7, height: tagSize*0.7)
+                                .frame(width: tagSize*0.65, height: tagSize*0.65)
                                 .onTapGesture {
                                     if dailyQuest.purposes.contains(purpose) { dailyQuest.purposes.remove(purpose)}
                                     else if dailyQuest.purposes.count < 3 {
@@ -200,10 +200,10 @@ struct ChoosePurposeView4: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: tagSize))],spacing: tagSize*0.2) {
 
                 ForEach(recoraddic.defaultPurposes, id:\.self) { purpose in
-                    VStack {
+                    VStack(spacing:3.0) {
                         
                         PurposeTagView(purpose: purpose)
-                            .frame(width: tagSize*0.7, height: tagSize*0.7)
+                            .frame(width: tagSize*0.65, height: tagSize*0.65)
                             .onTapGesture {
                                 if todo.purposes.contains(purpose) { todo.purposes.remove(purpose)}
                                 else if todo.purposes.count < 3 {
