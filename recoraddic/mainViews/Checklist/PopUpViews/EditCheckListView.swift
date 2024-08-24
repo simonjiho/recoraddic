@@ -139,8 +139,9 @@ struct EditCheckListView: View {
                                         //                                    .background(getBrightTierColorOf(tier: quest.tier))
                                         .background(
                                             Rectangle()
-                                                .fill (LinearGradient(colors: getGradientColorsOf(tier: quest.tier), startPoint: .topLeading, endPoint: .bottomTrailing)
-                                                      )
+//                                                .fill (LinearGradient(colors: getGradientColorsOf(tier: quest.tier), startPoint: .topLeading, endPoint: .bottomTrailing)
+//                                                      )                                                
+                                                .fill(getTierColorOf(tier: quest.tier))
                                         )
                                         .clipShape(.buttonBorder)
                                     }
@@ -264,7 +265,6 @@ struct EditCheckListView: View {
                     ScrollView {
                         ForEach(dailyQuests_tmp) { dailyQuest in
 
-                            
                             HStack(spacing:0.0) {
                                 Text(dailyQuest.getName())
                                     .padding()

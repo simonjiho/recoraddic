@@ -20,6 +20,17 @@
 		B229F0262C3E8AF400198445 /* notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = B229F0252C3E8AF400198445 /* notification.swift */; };
 		B229F0272C3EB11200198445 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B229F01B2C3E895F00198445 /* MainInterface.storyboard */; };
 		B2314BBF2AF4DD7400EDD5C7 /* stone_default1.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2314BBE2AF4DD7400EDD5C7 /* stone_default1.xcassets */; };
+		B241C0602C7AF84B00873985 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2F0171C2C3D155400765EF6 /* WidgetKit.framework */; };
+		B241C0612C7AF84B00873985 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2F0171E2C3D155400765EF6 /* SwiftUI.framework */; };
+		B241C0642C7AF84B00873985 /* recoraddicWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B241C0632C7AF84B00873985 /* recoraddicWidgetBundle.swift */; };
+		B241C0662C7AF84B00873985 /* recoraddicWidgetLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B241C0652C7AF84B00873985 /* recoraddicWidgetLiveActivity.swift */; };
+		B241C0682C7AF84B00873985 /* recoraddicWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B241C0672C7AF84B00873985 /* recoraddicWidget.swift */; };
+		B241C06A2C7AF84B00873985 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B241C0692C7AF84B00873985 /* AppIntent.swift */; };
+		B241C06C2C7AF84C00873985 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B241C06B2C7AF84C00873985 /* Assets.xcassets */; };
+		B241C0702C7AF84C00873985 /* recoraddicWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B241C05F2C7AF84B00873985 /* recoraddicWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B241C0742C7AF94700873985 /* calendarFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B283397C2AFB97E9009AEB2A /* calendarFunc.swift */; };
+		B241C0752C7AF94A00873985 /* colorFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA2D2B612EB60039160C /* colorFunc.swift */; };
+		B241C0772C7AFAF600873985 /* recoraddicActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F017342C3D157600765EF6 /* recoraddicActivityAttributes.swift */; };
 		B247D24B2A6D1DA100E457FB /* customMathFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B247D24A2A6D1DA100E457FB /* customMathFunc.swift */; };
 		B24C298E2C283331000F3EEE /* dailyQuestionsGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */; };
 		B24C29922C329B7B000F3EEE /* test.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24C29912C329B7B000F3EEE /* test.swift */; };
@@ -86,6 +97,13 @@
 			remoteGlobalIDString = B229F0122C3E895F00198445;
 			remoteInfo = recoraddicNotification;
 		};
+		B241C06E2C7AF84C00873985 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B29C70222A35C5E30046873E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B241C05E2C7AF84B00873985;
+			remoteInfo = recoraddicWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -95,6 +113,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				B241C0702C7AF84C00873985 /* recoraddicWidgetExtension.appex in Embed Foundation Extensions */,
 				B229F0212C3E895F00198445 /* recoraddicNotification.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -118,6 +137,14 @@
 		B2314BBA2AECD7DB00EDD5C7 /* idea&plan&simpleNote.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "idea&plan&simpleNote.md"; sourceTree = "<group>"; };
 		B2314BBE2AF4DD7400EDD5C7 /* stone_default1.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = stone_default1.xcassets; sourceTree = "<group>"; };
 		B234C6EC2BC564CA0031BAD7 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		B241C05F2C7AF84B00873985 /* recoraddicWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = recoraddicWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B241C0632C7AF84B00873985 /* recoraddicWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recoraddicWidgetBundle.swift; sourceTree = "<group>"; };
+		B241C0652C7AF84B00873985 /* recoraddicWidgetLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recoraddicWidgetLiveActivity.swift; sourceTree = "<group>"; };
+		B241C0672C7AF84B00873985 /* recoraddicWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recoraddicWidget.swift; sourceTree = "<group>"; };
+		B241C0692C7AF84B00873985 /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
+		B241C06B2C7AF84C00873985 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B241C06D2C7AF84C00873985 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B241C0782C7B1CBF00873985 /* recoraddicRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = recoraddicRelease.entitlements; sourceTree = "<group>"; };
 		B247D24A2A6D1DA100E457FB /* customMathFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customMathFunc.swift; sourceTree = "<group>"; };
 		B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dailyQuestionsGraph.swift; sourceTree = "<group>"; };
 		B24C29912C329B7B000F3EEE /* test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test.swift; sourceTree = "<group>"; };
@@ -193,6 +220,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B241C05C2C7AF84B00873985 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B241C0612C7AF84B00873985 /* SwiftUI.framework in Frameworks */,
+				B241C0602C7AF84B00873985 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B29C70272A35C5E30046873E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -228,6 +264,19 @@
 				B229F01E2C3E895F00198445 /* Info.plist */,
 			);
 			path = recoraddicNotification;
+			sourceTree = "<group>";
+		};
+		B241C0622C7AF84B00873985 /* recoraddicWidget */ = {
+			isa = PBXGroup;
+			children = (
+				B241C0632C7AF84B00873985 /* recoraddicWidgetBundle.swift */,
+				B241C0652C7AF84B00873985 /* recoraddicWidgetLiveActivity.swift */,
+				B241C0672C7AF84B00873985 /* recoraddicWidget.swift */,
+				B241C0692C7AF84B00873985 /* AppIntent.swift */,
+				B241C06B2C7AF84C00873985 /* Assets.xcassets */,
+				B241C06D2C7AF84C00873985 /* Info.plist */,
+			);
+			path = recoraddicWidget;
 			sourceTree = "<group>";
 		};
 		B247D2492A6D1D6400E457FB /* functions */ = {
@@ -340,6 +389,7 @@
 				B2600B062A35E1FF00E00D91 /* what_I_learned.md */,
 				B29C702C2A35C5E30046873E /* recoraddic */,
 				B229F0182C3E895F00198445 /* recoraddicNotification */,
+				B241C0622C7AF84B00873985 /* recoraddicWidget */,
 				B2F0171B2C3D155400765EF6 /* Frameworks */,
 				B29C702B2A35C5E30046873E /* Products */,
 			);
@@ -350,6 +400,7 @@
 			children = (
 				B29C702A2A35C5E30046873E /* recoraddic.app */,
 				B229F0132C3E895F00198445 /* recoraddicNotification.appex */,
+				B241C05F2C7AF84B00873985 /* recoraddicWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -357,6 +408,7 @@
 		B29C702C2A35C5E30046873E /* recoraddic */ = {
 			isa = PBXGroup;
 			children = (
+				B241C0782C7B1CBF00873985 /* recoraddicRelease.entitlements */,
 				B2774E1A2C7721A200FCB297 /* Info.plist */,
 				B2D8F9682B73AA6A00423AFC /* Localizable.xcstrings */,
 				B220DA472B652AA60039160C /* tmp */,
@@ -475,6 +527,23 @@
 			productReference = B229F0132C3E895F00198445 /* recoraddicNotification.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		B241C05E2C7AF84B00873985 /* recoraddicWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B241C0732C7AF84C00873985 /* Build configuration list for PBXNativeTarget "recoraddicWidgetExtension" */;
+			buildPhases = (
+				B241C05B2C7AF84B00873985 /* Sources */,
+				B241C05C2C7AF84B00873985 /* Frameworks */,
+				B241C05D2C7AF84B00873985 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = recoraddicWidgetExtension;
+			productName = recoraddicWidgetExtension;
+			productReference = B241C05F2C7AF84B00873985 /* recoraddicWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		B29C70292A35C5E30046873E /* recoraddic */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B29C70392A35C5E40046873E /* Build configuration list for PBXNativeTarget "recoraddic" */;
@@ -488,6 +557,7 @@
 			);
 			dependencies = (
 				B229F0202C3E895F00198445 /* PBXTargetDependency */,
+				B241C06F2C7AF84C00873985 /* PBXTargetDependency */,
 			);
 			name = recoraddic;
 			productName = recoraddiction;
@@ -505,6 +575,9 @@
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					B229F0122C3E895F00198445 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					B241C05E2C7AF84B00873985 = {
 						CreatedOnToolsVersion = 15.4;
 					};
 					B29C70292A35C5E30046873E = {
@@ -528,6 +601,7 @@
 			targets = (
 				B29C70292A35C5E30046873E /* recoraddic */,
 				B229F0122C3E895F00198445 /* recoraddicNotification */,
+				B241C05E2C7AF84B00873985 /* recoraddicWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -539,6 +613,14 @@
 			files = (
 				B229F01D2C3E895F00198445 /* Base in Resources */,
 				B229F0272C3EB11200198445 /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B241C05D2C7AF84B00873985 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B241C06C2C7AF84C00873985 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -568,6 +650,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				B229F01A2C3E895F00198445 /* NotificationViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B241C05B2C7AF84B00873985 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B241C0662C7AF84B00873985 /* recoraddicWidgetLiveActivity.swift in Sources */,
+				B241C06A2C7AF84B00873985 /* AppIntent.swift in Sources */,
+				B241C0772C7AFAF600873985 /* recoraddicActivityAttributes.swift in Sources */,
+				B241C0682C7AF84B00873985 /* recoraddicWidget.swift in Sources */,
+				B241C0642C7AF84B00873985 /* recoraddicWidgetBundle.swift in Sources */,
+				B241C0742C7AF94700873985 /* calendarFunc.swift in Sources */,
+				B241C0752C7AF94A00873985 /* colorFunc.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -638,6 +734,11 @@
 			target = B229F0122C3E895F00198445 /* recoraddicNotification */;
 			targetProxy = B229F01F2C3E895F00198445 /* PBXContainerItemProxy */;
 		};
+		B241C06F2C7AF84C00873985 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B241C05E2C7AF84B00873985 /* recoraddicWidgetExtension */;
+			targetProxy = B241C06E2C7AF84C00873985 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -677,10 +778,14 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -709,9 +814,89 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B241C0712C7AF84C00873985 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K5V8U9HR59;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = recoraddicWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = recoraddicWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic.recoraddicWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B241C0722C7AF84C00873985 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K5V8U9HR59;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = recoraddicWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = recoraddicWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic.recoraddicWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -851,7 +1036,7 @@
 				CODE_SIGN_ENTITLEMENTS = recoraddic/recoraddic.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 67;
+				CURRENT_PROJECT_VERSION = 69;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"recoraddic/Preview Content\"";
 				DEVELOPMENT_TEAM = K5V8U9HR59;
@@ -897,10 +1082,10 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = recoraddic/recoraddic.entitlements;
+				CODE_SIGN_ENTITLEMENTS = recoraddic/recoraddicRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 67;
+				CURRENT_PROJECT_VERSION = 69;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"recoraddic/Preview Content\"";
 				DEVELOPMENT_TEAM = K5V8U9HR59;
@@ -948,6 +1133,15 @@
 			buildConfigurations = (
 				B229F0232C3E895F00198445 /* Debug */,
 				B229F0242C3E895F00198445 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B241C0732C7AF84C00873985 /* Build configuration list for PBXNativeTarget "recoraddicWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B241C0712C7AF84C00873985 /* Debug */,
+				B241C0722C7AF84C00873985 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

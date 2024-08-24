@@ -34,6 +34,8 @@ struct QuestInDetail: View {
 
     @State var popUp_editQuest = false
     
+    @State var keyBoardAppeared = false
+    
     var body: some View {
         
         let questNames = quests.filter({!$0.inTrashCan}).map { $0.name }
@@ -44,7 +46,7 @@ struct QuestInDetail: View {
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
             
-            let titleHeight = geoHeight*0.2
+            let titleHeight = keyBoardAppeared ? geoHeight*0.1 : geoHeight*0.2
             let contentHeight = geoHeight*0.6
             let pickerHeight = geoHeight*0.1
             let menuHeight = geoHeight*0.15
@@ -62,9 +64,7 @@ struct QuestInDetail: View {
             if let quest = selectedQuest {
                 VStack(spacing:0.0) {
                     VStack {
-                        
                         Group {
-                            
                             Text(quest.name)
                                 .padding(.horizontal,40)
                                 .frame(width: geoWidth)
@@ -72,7 +72,9 @@ struct QuestInDetail: View {
                                 .padding(.top, geoHeight*0.02)
                                 .minimumScaleFactor(0.5)
                             if let startDate: Date  = quest.dailyData.keys.sorted().first {
-                                Text("시작일: \(yyyymmddFormatOf(startDate))")
+                                if !keyBoardAppeared {
+                                    Text("시작일: \(yyyymmddFormatOf(startDate))")
+                                }
                             }
                             
                         }.foregroundStyle(tierColor_dark)
@@ -134,7 +136,7 @@ struct QuestInDetail: View {
                             
                             
                         } // 휴지통에 있을 때의 메뉴
-                        else {
+                        else if !keyBoardAppeared {
                             let current: Int = {
                                 if quest.dataType == DataType.hour.rawValue {
                                     return DataType.cumulative_integratedValueNotation(data: (quest.cumulative()), dataType: dataTypeFrom(quest.dataType))
@@ -206,8 +208,8 @@ struct QuestInDetail: View {
                         
                     if currentPage == 0 {
                         VStack(spacing:0.0) {
-                            Spacer()
-                                .frame(height:contentHeight*0.05)
+//                            Spacer()
+//                                .frame(height:contentHeight*0.05)
                             
                             Image(systemName: "calendar")
                                 .foregroundStyle(tierColor_dark)
@@ -269,7 +271,7 @@ struct QuestInDetail: View {
                                 }
                                 
                             } // 달력
-                            .frame(width:contentWidth1, height: contentHeight*0.8)
+                            .frame(width:contentWidth1, height: contentHeight*0.85)
                             .background(tierColor_dark)
                             .clipShape(RoundedRectangle(cornerSize: CGSize(width: geoWidth*0.05, height: geoWidth*0.05)))
                             
@@ -278,17 +280,19 @@ struct QuestInDetail: View {
                             
                             
                         }
-                        
+                        .padding(.vertical)
                         //                        .padding(.top, contentHeight*0.05)
                         .frame(width:geoWidth, height: contentHeight, alignment: .top)
+//                        .border(.red)
                         .tabItem {
                             Image(systemName: "calendar")
                         }
                         .background(Color.clear.opacity(0.01))
                     }
-                    else {
+                    else if currentPage == 1 {
                         
                         QuestStatistics_inTerm(selectedQuest: quest)
+                            .padding(.vertical)
                             .frame(width:geoWidth, height: contentHeight)
                             .scrollTargetLayout()
                         //                            .border(.red)
@@ -297,6 +301,11 @@ struct QuestInDetail: View {
                             }
                             .background(Color.clear.opacity(0.01))
                         
+                    }
+                    else { // currentPage == 2
+                        QuestMemo(quest:quest,keyBoardAppeared: $keyBoardAppeared)
+                            .padding(.vertical)
+                            .frame(width:contentWidth1, height: contentHeight)
                     }
                         
                     
@@ -309,10 +318,14 @@ struct QuestInDetail: View {
 //                                .foregroundStyle(tierColor_dark)
                             .tag(0)
 
-                        Image(systemName: "chart.line.uptrend.xyaxis")
+                        if quest.dataType != DataType.ox.rawValue {
+                            Image(systemName: "chart.line.uptrend.xyaxis")
+                                .tag(1)
+                        }
 //                                .background(tierColor_dark)
 //                                .foregroundStyle(tierColor_dark)
-                            .tag(1)
+                        Image(systemName: "note.text")
+                            .tag(2)
 
                     }
                     .frame(width: contentWidth1)
@@ -467,7 +480,60 @@ struct QuestInDetail: View {
 }
 
 
+struct QuestMemo: View {
+    @Environment(\.modelContext) var modelContext
+    
+    @State var quest: Quest
+    
+    @FocusState var editing: Bool
+    
+    @Binding var keyBoardAppeared: Bool
+    
+    var body: some View {
+        VStack {
+            if editing {
+                Button("완료") {
+                    editing = false
+                }
+                .buttonStyle(QuestMemoButtonStyle(quest.tier))
+                .padding(.top, 10)
+            } else {
+                Image(systemName: "note.text")
+                    .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
+                    .padding(.top, 10)
+            }
+            TextEditor(text: $quest.memo)
+                .textEditorStyle(.plain)
+                .focused($editing)
+            //            .opacity(0.5)
+        }
+        .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
+        .background(.ultraThinMaterial.opacity(0.5))
+        .onChange(of: editing) { oldValue, newValue in
+            keyBoardAppeared = editing
+        }
+    }
+}
 
+struct QuestMemoButtonStyle: ButtonStyle {
+    @Environment(\.colorScheme) var colorScheme
+
+    var tier:Int
+
+    init(_ tier: Int) {
+        self.tier = tier
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 7)
+            .padding(.horizontal,10)
+            .foregroundStyle(getBrightTierColorOf(tier: tier))
+            .background(getDarkTierColorOf(tier: tier))
+            .clipShape(.buttonBorder)
+
+    }
+}
 
 struct QuestStatistics_inTerm: View {
     @Environment(\.modelContext) var modelContext
@@ -523,8 +589,8 @@ struct QuestStatistics_inTerm: View {
                 let contentWidth: CGFloat = geoWidth*0.8
                 VStack(spacing:0.0) {
                     
-                    Spacer()
-                        .frame(height:geoHeight*0.05)
+//                    Spacer()
+//                        .frame(height:geoHeight*0.05)
                     
                     Image(systemName: "chart.line.uptrend.xyaxis")
                         .foregroundStyle(tierColor_dark)
@@ -609,7 +675,7 @@ struct QuestStatistics_inTerm: View {
                             
                         }
                         .padding(contentWidth*0.05)
-                        .frame(width:contentWidth, height: geoHeight*0.35)
+                        .frame(width:contentWidth, height: geoHeight*0.4)
                         .foregroundStyle(tierColor_bright)
                         .background(tierColor_dark)
                         .chartXSelection(value: $rawSelectedDate)

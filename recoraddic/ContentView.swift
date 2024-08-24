@@ -74,9 +74,6 @@ struct ContentView: View {
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
 
     
-    
-    @Query var defaultPurposeDatas: [DefaultPurposeData]
-
     // 여기서 순서 지정
     let mainViews: [MainViewName] = [.checkList, .gritBoardAndStatistics, .seeMyRecord, .memo, .profileAndSettings]
     @State var selectedView: MainViewName = .checkList //HomeView
@@ -113,11 +110,17 @@ struct ContentView: View {
          else {
              
              // MARK: 이 조건문이 필요한가?
-             if profiles.count == 0 || dailyRecords.count == 0 || defaultPurposeDatas.count == 0 || dailyRecordSets.count == 0 {
+             if profiles.count == 0 || dailyRecords.count == 0 || dailyRecordSets.count == 0 {
                  // MARK: 설치 후 로그인하면 fetch 완료 후에도 local에 제대로 저장이 되지 않는 경우가 존재
-                 VStack {
-                     Text("새로 시작중")
-                 }
+                 LoadingView_initialization()
+                     .containerRelativeFrame([.horizontal,.vertical])
+                     .onAppear() {
+                         DispatchQueue.main.asyncAfter(deadline: .now()+5.0) {
+                             if profiles.count == 0 || dailyRecords.count == 0 || dailyRecordSets.count == 0 {
+                                 initializeDatas()
+                             }
+                         }
+                     }
                  
              }
              else {
@@ -198,7 +201,7 @@ struct ContentView: View {
                  .onChange(of: selectedView) { oldValue, newValue in //여기에 다양한 것 넣어주기
                      
                      let unSavedDailyRecords = dailyRecords.filter({$0.date == nil})
-                     print("unSavedDailyRecords.count: ",unSavedDailyRecords.count)
+//                     print("unSavedDailyRecords.count: ",unSavedDailyRecords.count)
                      if unSavedDailyRecords.count > 1 {
                          var unSavedDailyRecords_sorted = unSavedDailyRecords.sorted(by: {$0.createdTime < $1.createdTime})
                          unSavedDailyRecords_sorted.removeLast()
@@ -355,11 +358,6 @@ struct ContentView: View {
             }
             else {
                 defaultInitialization()
-            }
-        }
-        if defaultPurposeDatas.count == 0 {
-            for defaultPurpose in recoraddic.defaultPurposes {
-                modelContext.insert(DefaultPurposeData(name: defaultPurpose))
             }
         }
     }

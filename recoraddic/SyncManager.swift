@@ -22,7 +22,8 @@ import CoreData
 final actor SyncManager : Sendable, ObservableObject {
     
     /// The CloudKit container to sync with.
-    static let container: CKContainer = CKContainer.init(identifier: "iCloud.recoraddic")
+//    static let container: CKContainer = CKContainer.init(identifier: "iCloud.recoraddic") // ~24.08.25
+    static let container: CKContainer = CKContainer.init(identifier: "iCloud.com.ver1.recoraddic") // 24.08.25~
 
     /// The sync engine being used to sync.
     /// This is lazily initialized. You can re-initialize the sync engine by setting `_syncEngine` to nil then calling `self.syncEngine`.
@@ -142,7 +143,7 @@ extension SyncManager : CKSyncEngineDelegate {
         case .didFetchRecordZoneChanges:
             print("didFetchRecordZoneChanges")
             
-        case .sentDatabaseChanges, .willFetchRecordZoneChanges, .willSendChanges, .didSendChanges, .sentRecordZoneChanges:
+        case .sentDatabaseChanges, .willFetchRecordZoneChanges, .willSendChanges, .didSendChanges, .sentRecordZoneChanges, .willFetchChanges, .accountChange:
             // We don't do anything here in the sample app, but these events might be helpful if you need to do any setup/cleanup when sync starts/ends.
             break
             

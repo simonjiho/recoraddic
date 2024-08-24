@@ -11,7 +11,8 @@ import os.log
 
 
 extension Logger {
-    static let loggingSubsystem: String = "iCloud.recoraddic"
+//    static let loggingSubsystem: String = "iCloud.recoraddic"
+    static let loggingSubsystem: String = "iCloud.com.ver1.recoraddic"
     
     static let ui = Logger(subsystem: Self.loggingSubsystem, category: "UI")
     static let database = Logger(subsystem: Self.loggingSubsystem, category: "Database")
