@@ -122,7 +122,7 @@ struct MainView_checklist: View {
             
             let topBarTopPadding = geoHeight*0.035
             let topBarSize = geoHeight*0.05
-            let facialExpressionSize = geoHeight*0.04
+            let facialExpressionSize = 35.0
             let topBarBottomPadding = geoHeight*0.005
             
 //            let textSize = topBarTopPadding * 0.8
@@ -160,7 +160,6 @@ struct MainView_checklist: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: facialExpressionSize*0.7, height: facialExpressionSize*0.7)
-
                             }
                             .padding(.trailing)
                             .frame(width:geoWidth*0.15, alignment: .trailing)
@@ -191,6 +190,8 @@ struct MainView_checklist: View {
                             DatePicker(selection: $selectedDate,displayedComponents: [.date]) {}
                                 .labelsHidden()
                                 .foregroundStyle(topForegroundColor)
+
+
 //                                .border(.red)
 
                             if getStartOfDate(date: selectedDate) < getStartDateOfNow() {
@@ -209,30 +210,22 @@ struct MainView_checklist: View {
                             
                         }
                         .frame(width: geoWidth*0.7)
-                        
+                        .dynamicTypeSize( ...DynamicTypeSize.accessibility1)
+
                             
                         
-                        Group {
-                            if currentDailyRecord.mood == 0 {
-                                Image(systemName: "questionmark.circle")
-                                    .resizable()
-                                    .frame(width: facialExpressionSize, height: facialExpressionSize)
-                                
-                            }
-                            else {
-                                ZStack {
-                                    Circle()
-                                        .stroke(lineWidth: geoWidth*0.002)
-                                        .frame(width:facialExpressionSize, height: facialExpressionSize)
-                                    topForegroundColor
-                                        .frame(width:facialExpressionSize, height: facialExpressionSize)
-                                        .mask(
-                                            Image("facialExpression_\(currentDailyRecord.mood)")
-                                                .resizable()
-                                                .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
-                                        )
-                                }
-                            }
+
+                        ZStack {
+                            Circle()
+                                .stroke(lineWidth: geoWidth*0.002)
+                                .frame(width:facialExpressionSize, height: facialExpressionSize)
+                            topForegroundColor
+                                .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
+                                .mask(
+                                    Image("facialExpression_\(currentDailyRecord.mood)")
+                                        .resizable()
+                                        .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
+                                )
                         }
                         .padding(.trailing)
                         .frame(width:geoWidth*0.15,alignment: .trailing)
@@ -337,7 +330,7 @@ struct MainView_checklist: View {
 //                    .padding(.top,geoHeight*0.035)
                     .padding(.bottom, topBarBottomPadding)
                     .foregroundStyle(topForegroundColor) // 너무 튀는 것 같기도 하고..
-//                    .foregroundStyle(reversedColorSchemeColor.opacity(getStartOfDate(date: selectedDate) == getStartDateOfNow() ? 1.0 : 0.6))
+
                     
 
 
@@ -472,6 +465,7 @@ struct MainView_checklist: View {
                 )
                 .presentationCompactAdaptation(.fullScreenCover)
                 .ignoresSafeArea(.keyboard)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
 
             }
             
@@ -697,6 +691,7 @@ struct ChecklistView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
     @Query(sort:\Profile.createdTime) var profiles: [Profile]
     @Query(sort:\DailyQuest.createdTime) var dailyQuests: [DailyQuest]
@@ -886,13 +881,12 @@ struct ChecklistView: View {
 //                                    isEdit: $editDiary
                                 )
                                 .frame(width:checkListElementWidth, height: diaryHeight)
-                                //                            .background(.gray.adjust(brightness: 0.4).opacity(0.7))
-//                                .clipShape(.buttonBorder)
+                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+
                                 
                             }
                             
 
-//                            if diaryExists && (dailyQuestExists || todoExists) {
                             if diaryExists {
                                 Color.gray
                                     .opacity(0.4)
@@ -900,10 +894,6 @@ struct ChecklistView: View {
                                     .padding(.vertical, geoHeight*0.01)
                             }
                             
-//                            if currentDailyRecord.dailyQuestList!.count !=  0 {
-//                                Text("누적 퀘스트")
-//                                    .frame(width:checkListElementWidth,alignment: .leading)
-//                            }
 
                             VStack(spacing:5.0) {
                                 ForEach(dailyQuests_notHidden_sorted, id: \.self) { dailyQuest in
@@ -911,7 +901,7 @@ struct ChecklistView: View {
                                     
                                     HStack(spacing: 0) {
                                         
-                                        let height:CGFloat = dailyQuest.dataType != DataType.ox.rawValue ? 60.0 : 50.0
+                                        let height:CGFloat = qcbvHeight(dynamicTypeSize, dataType: dailyQuest.dataType)
 
                                         
                                         PurposeOfDailyQuestView(dailyQuest: dailyQuest, parentWidth: geoWidth, parentHeight: geoHeight)
@@ -944,7 +934,7 @@ struct ChecklistView: View {
 
                                 }
                             }
-                            
+//                            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                             
 //                            Spacer()
 //                                .frame(width:checkListElementWidth, height: dailyQuestExists ? geoHeight*0.08 : 0.0)
@@ -980,28 +970,23 @@ struct ChecklistView: View {
                                             Image(systemName: todo.done ? "checkmark.circle" : "circle")
                                                 .resizable()
                                                 .frame(width: questCheckBoxWidth*0.1*0.65, height: questCheckBoxWidth*0.1*0.65)
-//                                                .bold()
-//                                                .frame(width:checkBoxSize*0.8, height: checkBoxSize*0.8)
+
                                         }
                                         .frame(width: questCheckBoxWidth*0.1, alignment: .center)
                                         .buttonStyle(.plain)
-//                                        .border(.red)
 
-//                                        HStack(spacing:0.0) {
-//                                            Text("\(todo.idx)")
                                         Group {
-                                            textFieldView(currentDailyRecord: currentDailyRecord, todo: todo, text: todo.content, editingTodo:$editingTodo, idx: $editingIndex, doneButtonPressed: $doneButtonPressed)
+                                            TodoTextFieldView(currentDailyRecord: currentDailyRecord, todo: todo, text: todo.content, editingTodo:$editingTodo, idx: $editingIndex, doneButtonPressed: $doneButtonPressed)
                                                 .frame(width:editingIndex == todo.idx ? todo_textWidth*0.8 : todo_textWidth)
-//                                                .frame(width:todo_textWidth*0.8)
                                         }
                                         .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
-//                                        .border(.red)
                                         
                                         if editingIndex == todo.idx {
                                             Button("완료") {
                                                 doneButtonPressed.toggle()
                                             }
                                             .frame(width:questCheckBoxWidth*0.1)
+                                            .minimumScaleFactor(0.3)
                                         }
                                         
                                         if editingIndex == nil {
@@ -1076,7 +1061,9 @@ struct ChecklistView: View {
                                             }
                                             else if date == getStartDateOfNow() {
                                                 Text("클릭하여 당장 생각나는 할 일 적기")
+                                                    .lineLimit(2)
                                                     .frame(width:questCheckBoxWidth*0.8, alignment:.leading)
+
                                             }
                                             else {
                                                 Text("클릭하여 나중에 할 일 적기")
@@ -1091,7 +1078,7 @@ struct ChecklistView: View {
                                         Spacer()
                                             .frame(width:questCheckBoxWidth*0.1)
                                     }
-                                    .frame(width: checkListElementWidth, height:todo_height, alignment:.leading)
+                                    .frame(width: checkListElementWidth, /*height:todo_height,*/ alignment:.leading)
                                     .opacity(0.5)
                                     .onTapGesture {
 //                                        let firstTodo = Todo(dailyRecord: currentDailyRecord, index: 0)
@@ -1107,10 +1094,10 @@ struct ChecklistView: View {
                                     
                                 }
                             }
-                            
+                            .dynamicTypeSize( ...DynamicTypeSize.accessibility2)
+
                             
                             Spacer()
-//                                .frame(width: geometry.size.width, height: keyboardAppeared ? keyboardHeight*1.1 : geometry.size.height*0.2) // ~24.08.02
                                 .frame(width: geometry.size.width, height: keyboardAppeared ? ( editDiary ? keyboardHeight*1.1 : keyboardHeight + geoHeight * 0.3): geometry.size.height*0.4)
                             
 //                            TestNotificationView()
@@ -1250,7 +1237,7 @@ struct ChecklistView: View {
 }
 
 
-struct textFieldView: View {
+struct TodoTextFieldView: View {
     
     @Environment(\.modelContext) var modelContext
     
@@ -1402,7 +1389,7 @@ struct PurposeOfDailyQuestView: View {
                 
                 //                                    .popover(isPresented: $popUp_changePurpose) {
                 .popover(isPresented: $popUp_changePurpose) {
-                    ChoosePurposeView3(dailyQuest: dailyQuest)
+                    ChoosePurposeView_dailyQuest(dailyQuest: dailyQuest)
                         .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
                         .presentationCompactAdaptation(.popover)
                         .onDisappear() {
@@ -1465,7 +1452,7 @@ struct PurposeOfTodoView: View {
                 
                 //                                    .popover(isPresented: $popUp_changePurpose) {
                 .popover(isPresented: $popUp_changePurpose) {
-                    ChoosePurposeView4(todo: todo)
+                    ChoosePurposeView_todo(todo: todo)
                         .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
                         .presentationCompactAdaptation(.popover)
                         .onDisappear() {
@@ -1519,26 +1506,3 @@ struct CountdownView: View {
 
 
 
-
-//struct TestNotificationView: View {
-//    @State private var selectedDate = Date()
-//    
-//    var body: some View {
-//        VStack {
-//            DatePicker("Select time", selection: $selectedDate, displayedComponents: [.hourAndMinute])
-//                .datePickerStyle(WheelDatePickerStyle())
-//                .labelsHidden()
-//            
-//            Button(action: {
-//                scheduleNotification(at: selectedDate)
-//            }) {
-//                Text("Schedule Notification")
-//                    .padding()
-//                    .background(Color.blue)
-//                    .foregroundColor(.white)
-//                    .cornerRadius(8)
-//            }
-//        }
-//        .padding()
-//    }
-//}

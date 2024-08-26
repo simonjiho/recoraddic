@@ -92,8 +92,7 @@
 - canvas는 simulator에서 rendering을 이상하게 한다.
 - swiftUI 에 \.scenePhase를 enviroment variable로 추가하면 에러메시지 없이 app crash 일어날 때가 있다.
 - swift 5.9 기준: Image는 다른 view와 다르게 ZStack에서 onTapGesture, Button으로 사용 시 비작동 할 때가 있다. -> 해결 방법: 아주 옅은 color에 .overlay(Image())
-
-
+- text크기 컨트롤 안되는 View: Picker, TextField, TextEditor..?, DatePicker...?
 
 # WidgetKit
  - wigetKit에서는 timeLineProvider를 통해 주기적인 업데이트를 직접 설정해야한다. 일반적인 state variable로 컨트롤 되지 않는다.

@@ -310,10 +310,10 @@ struct EditCheckListView: View {
                         
                         ForEach(todos_tmp) { todo in
                             HStack(spacing:0.0) {
-                                Image(systemName: "circle")
-                                    .frame(width:elmWidth*0.1)
+//                                Image(systemName: "circle")
+//                                    .frame(width:elmWidth*0.1)
                                 Text(todo.content)
-                                    .frame(width:elmWidth*0.8, alignment:.leading)
+                                    .frame(width:elmWidth*0.9, alignment:.leading)
                                     .multilineTextAlignment(.leading)
                                 Button (action: {
                                     if let idx = todos_tmp.firstIndex(where: {$0 == todo}) {

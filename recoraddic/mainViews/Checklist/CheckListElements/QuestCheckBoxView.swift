@@ -57,6 +57,7 @@ func getNotificationTimeString(at alermTime: Date?, from date: Date) -> String {
 
 struct QuestCheckBoxView: View {
     @Environment(\.modelContext) var modelContext
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
     @Query var quests: [Quest]
     var dailyQuest: DailyQuest
     
@@ -86,7 +87,7 @@ struct QuestCheckBoxView: View {
     
     var body: some View {
         
-        let height:CGFloat = stopwatch.isRunning ? 75.0 : (dailyQuest.dataType != DataType.ox.rawValue ? 60.0 : 50.0)
+        let height:CGFloat = qcbvHeight(dynamicTypeSize, stopWatchIsRunnig: stopwatch.isRunning, dataType: dailyQuest.dataType)
         //            let geoHeight = geometry.size.height
         let menuSize:CGFloat = width * 0.2
         
@@ -100,6 +101,7 @@ struct QuestCheckBoxView: View {
             HStack(spacing:0.0) {
                 QuestCheckBoxContentView(
                     dailyQuest: dailyQuest,
+                    height: height,
                     value: $value,
                     dailyGoal: $dailyGoal,
                     stopwatch: stopwatch,
@@ -370,6 +372,7 @@ struct QuestCheckBoxView: View {
 struct QuestCheckBoxContentView: View {
     @Environment(\.modelContext) var modelContext
     var dailyQuest: DailyQuest
+    var height: CGFloat
     @Binding var value: Int
     @Binding var dailyGoal: Int?
     @ObservedObject var stopwatch: Stopwatch
@@ -382,7 +385,7 @@ struct QuestCheckBoxContentView: View {
         GeometryReader { geometry in
             
             let geoWidth = geometry.size.width
-            let height:CGFloat = stopwatch.isRunning ? 75.0 : (dailyQuest.dataType != DataType.ox.rawValue ? 60.0 : 50.0)
+//            let height:CGFloat = stopwatch.isRunning ? 75.0 : (dailyQuest.dataType != DataType.ox.rawValue ? 60.0 : 50.0)
 
             if dailyQuest.dataType == DataType.ox.rawValue {
                 QuestCheckBoxContent_OX(
@@ -463,6 +466,7 @@ struct QuestCheckBoxContent_OX:View {
 
 struct QuestCheckBoxContent_HOUR:View {
     @Environment(\.modelContext) var modelContext
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
 //    @EnvironmentObject var activityManager: ActivityManager
 
     var dailyQuest: DailyQuest
@@ -490,7 +494,6 @@ struct QuestCheckBoxContent_HOUR:View {
     let sheetHeight:CGFloat = 380.0
 
     
-    /// <#Description#>
     var body: some View {
         let isRecent: Bool = {
             if let date = dailyQuest.dailyRecord?.getLocalDate() {
@@ -512,7 +515,7 @@ struct QuestCheckBoxContent_HOUR:View {
         GeometryReader { geometry in
             
             let geoWidth = geometry.size.width
-            let height:CGFloat = stopwatch.isRunning ? 75.0 : 60.0
+            let height:CGFloat = qcbvHeight(dynamicTypeSize, stopWatchIsRunnig: stopwatch.isRunning)
 
             HStack(spacing:0.0) {
                 
@@ -520,6 +523,8 @@ struct QuestCheckBoxContent_HOUR:View {
                 if stopwatch.isRunning {
                     Button(action:stopStopWatch) {
                         Image(systemName: "pause")
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+
 //                            .resizable()
 //                            .scaledToFit()
 //                            .frame(width: geoWidth*1/9*0.75, height: geoWidth*1/9*0.75)
@@ -530,20 +535,20 @@ struct QuestCheckBoxContent_HOUR:View {
                     .opacity( isRecent ? 1.0 : 0.0)
 
                     
-                    let HeightOnTimer:CGFloat = 75.0
+//                    let heightOnTimer:CGFloat = qcbvHeight_large * qcbvMultiplier(dynamicTypeSize)
                     VStack {
                         Text("\(questName)")
                             .lineLimit(1)
-                            .font(.system(size: highlightValue2 == 0 ? HeightOnTimer*0.35 : HeightOnTimer*0.2))
+                            .font(.system(size: highlightValue2 == 0 ? height*0.35 : height*0.2))
 //                            .minimumScaleFactor(0.5)
                         
 //                            .font(.caption2)
                         Text(stopwatch.timeString)
-                            .font(.system(size: highlightValue2 == 1 ? HeightOnTimer*0.35 : HeightOnTimer*0.2))
+                            .font(.system(size: highlightValue2 == 1 ? height*0.35 : height*0.2))
 
                         if hasGoal {
                             Text_hours2(prefix: "목표: ",value: dailyQuest.dailyGoal ?? 0)
-                                .font(.system(size: highlightValue2 == 2 ? HeightOnTimer*0.35 : HeightOnTimer*0.2))
+                                .font(.system(size: highlightValue2 == 2 ? height*0.35 : height*0.2))
 //                                .font(.caption2)
                         }
 
@@ -570,9 +575,10 @@ struct QuestCheckBoxContent_HOUR:View {
 
                 }
                 else {
-                    let height:CGFloat = 60.0
+//                    let height:CGFloat = 60.0
                     Button(action:startStopWatch) {
                         Image(systemName: "play")
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
 //                            .resizable()
 //                            .scaledToFit()
 //                            .frame(width: geoWidth*1/9*0.75, height: geoWidth*1/9*0.75)
@@ -667,7 +673,7 @@ struct QuestCheckBoxContent_HOUR:View {
                 .presentationDetents([.height(sheetHeight)])
                 .presentationCompactAdaptation(.none)
                 .presentationBackground(getDarkTierColorOf(tier: tier))
-
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             }
             .onChange(of: hasGoal_toggle) {
 
@@ -947,13 +953,21 @@ struct QuestCheckBoxContent_CUSTOM:View {
                                                 .toggleStyle(.switch)
                                                 .frame(width:geoWidth*0.4)
                                                 .foregroundStyle(.blue)
+//                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                                             Button("완료") {
                                                 editDone()
                                             }
                                             .frame(width:geoWidth*0.6, alignment: .trailing)
                                             .foregroundStyle(.blue)
+//                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                                         }
+//                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+//                                        .environment(\.dynamicTypeSize, DynamicTypeSize.medium)
+
                                     }
+
+                                
+                                    
                                 }
                             if hasGoal  {
                                 Text(" / ")
@@ -996,6 +1010,8 @@ struct QuestCheckBoxContent_CUSTOM:View {
                     .font(.system(size: !highlightValue ? geoHeight*0.25 : geoHeight*0.4))
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
+//                    .environment(\.dynamicTypeSize, DynamicTypeSize.medium)
+
 
                 }
                 .padding(.horizontal,10)
@@ -1205,12 +1221,14 @@ struct DialForHours: View {
                         Toggle("목표설정",isOn:$hasGoal_toggle)
                             .frame(width:geoWidth/3)
                             .buttonBorderShape(.automatic)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
                     }
                     Button("완료") {
                         isEditing.toggle()
                     }
                     .padding(.trailing, 10)
-                    .frame(width: (geometry.size.width*0.95), alignment: .trailing)
+                    .frame(width: geometry.size.width*0.95, alignment: .trailing)
 //
 
                 }
@@ -1475,6 +1493,7 @@ struct NotificationButton: View {
                 } else {
                     Image(systemName: setAlready ? "bell" : "bell.slash")
                         .opacity(0.7)
+                        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                 }
                 
             }
@@ -1512,6 +1531,7 @@ struct NotificationButton: View {
                 .background(getDarkTierColorOf(tier: dailyQuest.currentTier)) // 크기 유지를 위해(없으면 자동 조정됨)
                 .presentationCompactAdaptation(.popover)
                 .presentationBackground(getDarkTierColorOf(tier: dailyQuest.currentTier))
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                .border(.red)
 
             }
@@ -1539,7 +1559,7 @@ struct NotificationButton: View {
                 .foregroundStyle(getBrightTierColorOf(tier: dailyQuest.currentTier))
                 .background(getDarkTierColorOf(tier: dailyQuest.currentTier))
                 .presentationDragIndicator(.visible)
-
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 //                .preferredColorScheme(.dark)
 
                 
@@ -1652,7 +1672,9 @@ struct EditNotificationTimeView: View {
                     .labelsHidden()
                     .contentShape(Rectangle())
                     .zIndex(-1)
+//                    .bold() // not work
                     .padding()
+                    .environment(\.dynamicTypeSize, .large)
                     
                 
                 //                Text("현재 이후의 시간으로만 알림설정이 가능합니다.")

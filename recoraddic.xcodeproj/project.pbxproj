@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B20429E42C7F52890022DB1A /* Text_scaleToFit.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20429E32C7F52890022DB1A /* Text_scaleToFit.swift */; };
 		B2102B142BA5CCCD0041C8FB /* QuestInDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2102B132BA5CCCD0041C8FB /* QuestInDetail.swift */; };
 		B220DA2E2B612EB60039160C /* colorFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA2D2B612EB60039160C /* colorFunc.swift */; };
 		B220DA3C2B6268260039160C /* RecordInDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA3B2B6268260039160C /* RecordInDetailView.swift */; };
@@ -54,6 +55,7 @@
 		B29C70322A35C5E40046873E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B29C70312A35C5E40046873E /* Assets.xcassets */; };
 		B29C70362A35C5E40046873E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B29C70352A35C5E40046873E /* Preview Assets.xcassets */; };
 		B2A8FA9B2B3BF6CC00B3C1C1 /* facialExpression.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2A8FA9A2B3BF6CC00B3C1C1 /* facialExpression.xcassets */; };
+		B2AA11642C818520003C9178 /* preview_questThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AA11632C818520003C9178 /* preview_questThumbnail.swift */; };
 		B2ABB25D2B10BBDE00870DE0 /* PopupViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2ABB25C2B10BBDE00870DE0 /* PopupViewLayout.swift */; };
 		B2ABC2652B4293680056C637 /* purposeTags.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2ABC2642B4293680056C637 /* purposeTags.swift */; };
 		B2ABC2672B42A2C50056C637 /* purposeImage.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2ABC2662B42A2C50056C637 /* purposeImage.xcassets */; };
@@ -70,6 +72,7 @@
 		B2BAEDD92AE65DD50099489B /* steppedForward_default.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2BAEDD82AE65DD50099489B /* steppedForward_default.xcassets */; };
 		B2C059F92C52A610001BEE77 /* StoneTower.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C059F82C52A610001BEE77 /* StoneTower.swift */; };
 		B2C3BAB12C770B9200A7F9A5 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3BAB02C770B9200A7F9A5 /* LoadingView.swift */; };
+		B2D612D32C7F51470083183F /* preview_facialExpressions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D612D22C7F51470083183F /* preview_facialExpressions.swift */; };
 		B2D7AD032B91C5440045C9EA /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7AD022B91C5440045C9EA /* SyncManager.swift */; };
 		B2D7AD052B92E29D0045C9EA /* logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7AD042B92E29D0045C9EA /* logger.swift */; };
 		B2D7AD082B9451920045C9EA /* StartNewRecordSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7AD072B9451920045C9EA /* StartNewRecordSet.swift */; };
@@ -77,7 +80,6 @@
 		B2D8F96B2B7533D700423AFC /* fires.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2D8F96A2B7533D700423AFC /* fires.xcassets */; };
 		B2D8F96D2B75ECB800423AFC /* FireView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D8F96C2B75ECB800423AFC /* FireView.swift */; };
 		B2D8F96F2B75F46A00423AFC /* dataFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D8F96E2B75F46A00423AFC /* dataFunctions.swift */; };
-		B2E1AB712B24D6E300EBF359 /* TextFieldForHour.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E1AB702B24D6E300EBF359 /* TextFieldForHour.swift */; };
 		B2E5522B2BC2989000ACA5A8 /* stoneTower_shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E5522A2BC2989000ACA5A8 /* stoneTower_shared.swift */; };
 		B2E6C6372C4674220082B000 /* EditCheckListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E6C6362C4674210082B000 /* EditCheckListView.swift */; };
 		B2E6C6392C47A8C20082B000 /* SolarCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E6C6382C47A8C20082B000 /* SolarCalculator.swift */; };
@@ -122,6 +124,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B20429E32C7F52890022DB1A /* Text_scaleToFit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Text_scaleToFit.swift; sourceTree = "<group>"; };
 		B2102B132BA5CCCD0041C8FB /* QuestInDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestInDetail.swift; sourceTree = "<group>"; };
 		B220DA2D2B612EB60039160C /* colorFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = colorFunc.swift; sourceTree = "<group>"; };
 		B220DA3B2B6268260039160C /* RecordInDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordInDetailView.swift; sourceTree = "<group>"; };
@@ -173,6 +176,7 @@
 		B29C70332A35C5E40046873E /* recoraddic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = recoraddic.entitlements; sourceTree = "<group>"; };
 		B29C70352A35C5E40046873E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B2A8FA9A2B3BF6CC00B3C1C1 /* facialExpression.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = facialExpression.xcassets; sourceTree = "<group>"; };
+		B2AA11632C818520003C9178 /* preview_questThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = preview_questThumbnail.swift; sourceTree = "<group>"; };
 		B2ABB25C2B10BBDE00870DE0 /* PopupViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupViewLayout.swift; sourceTree = "<group>"; };
 		B2ABC2642B4293680056C637 /* purposeTags.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = purposeTags.swift; sourceTree = "<group>"; };
 		B2ABC2662B42A2C50056C637 /* purposeImage.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = purposeImage.xcassets; sourceTree = "<group>"; };
@@ -189,6 +193,7 @@
 		B2BAEDD82AE65DD50099489B /* steppedForward_default.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = steppedForward_default.xcassets; sourceTree = "<group>"; };
 		B2C059F82C52A610001BEE77 /* StoneTower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower.swift; sourceTree = "<group>"; };
 		B2C3BAB02C770B9200A7F9A5 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		B2D612D22C7F51470083183F /* preview_facialExpressions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = preview_facialExpressions.swift; sourceTree = "<group>"; };
 		B2D7AD022B91C5440045C9EA /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
 		B2D7AD042B92E29D0045C9EA /* logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = logger.swift; sourceTree = "<group>"; };
 		B2D7AD072B9451920045C9EA /* StartNewRecordSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartNewRecordSet.swift; sourceTree = "<group>"; };
@@ -196,7 +201,6 @@
 		B2D8F96A2B7533D700423AFC /* fires.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = fires.xcassets; sourceTree = "<group>"; };
 		B2D8F96C2B75ECB800423AFC /* FireView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireView.swift; sourceTree = "<group>"; };
 		B2D8F96E2B75F46A00423AFC /* dataFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dataFunctions.swift; sourceTree = "<group>"; };
-		B2E1AB702B24D6E300EBF359 /* TextFieldForHour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldForHour.swift; sourceTree = "<group>"; };
 		B2E5522A2BC2989000ACA5A8 /* stoneTower_shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stoneTower_shared.swift; sourceTree = "<group>"; };
 		B2E6C6362C4674210082B000 /* EditCheckListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCheckListView.swift; sourceTree = "<group>"; };
 		B2E6C6382C47A8C20082B000 /* SolarCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolarCalculator.swift; sourceTree = "<group>"; };
@@ -369,13 +373,13 @@
 				B2ABB25C2B10BBDE00870DE0 /* PopupViewLayout.swift */,
 				B2FB21FF2B1367DC00AB17FA /* buttonsView.swift */,
 				B25BF9042B1C886E0039F1F9 /* ResizableText.swift */,
-				B2E1AB702B24D6E300EBF359 /* TextFieldForHour.swift */,
 				B2BA89062B32CA5600A3D50E /* textFieldMaxLength.swift */,
 				B2AECB882B5139F90020A937 /* DismissingKeyboard.swift */,
 				B2ABC2642B4293680056C637 /* purposeTags.swift */,
 				B220DA452B6524F50039160C /* themeNames.swift */,
 				B2D8F96C2B75ECB800423AFC /* FireView.swift */,
 				B2C3BAB02C770B9200A7F9A5 /* LoadingView.swift */,
+				B20429E32C7F52890022DB1A /* Text_scaleToFit.swift */,
 			);
 			path = shared;
 			sourceTree = "<group>";
@@ -408,6 +412,7 @@
 		B29C702C2A35C5E30046873E /* recoraddic */ = {
 			isa = PBXGroup;
 			children = (
+				B2FC0C462C7F511400813A42 /* previews */,
 				B241C0782C7B1CBF00873985 /* recoraddicRelease.entitlements */,
 				B2774E1A2C7721A200FCB297 /* Info.plist */,
 				B2D8F9682B73AA6A00423AFC /* Localizable.xcstrings */,
@@ -505,6 +510,15 @@
 				B2F017342C3D157600765EF6 /* recoraddicActivityAttributes.swift */,
 			);
 			path = shared;
+			sourceTree = "<group>";
+		};
+		B2FC0C462C7F511400813A42 /* previews */ = {
+			isa = PBXGroup;
+			children = (
+				B2D612D22C7F51470083183F /* preview_facialExpressions.swift */,
+				B2AA11632C818520003C9178 /* preview_questThumbnail.swift */,
+			);
+			path = previews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -679,7 +693,6 @@
 				B220DA2E2B612EB60039160C /* colorFunc.swift in Sources */,
 				B2E5522B2BC2989000ACA5A8 /* stoneTower_shared.swift in Sources */,
 				B2E6C6392C47A8C20082B000 /* SolarCalculator.swift in Sources */,
-				B2E1AB712B24D6E300EBF359 /* TextFieldForHour.swift in Sources */,
 				B283397D2AFB97E9009AEB2A /* calendarFunc.swift in Sources */,
 				B2ADCD012C4FC46900D9DE99 /* QuestCheckBoxView.swift in Sources */,
 				B2AFEE5F2C64B5FC003A5129 /* DiaryView_tmp.swift in Sources */,
@@ -690,11 +703,14 @@
 				B2D8F96F2B75F46A00423AFC /* dataFunctions.swift in Sources */,
 				B2D7AD032B91C5440045C9EA /* SyncManager.swift in Sources */,
 				B220DA462B6524F50039160C /* themeNames.swift in Sources */,
+				B20429E42C7F52890022DB1A /* Text_scaleToFit.swift in Sources */,
 				B29C70302A35C5E30046873E /* ContentView.swift in Sources */,
 				B2FB726F2A8762810012EBE1 /* customArrayFunc.swift in Sources */,
 				B2102B142BA5CCCD0041C8FB /* QuestInDetail.swift in Sources */,
+				B2AA11642C818520003C9178 /* preview_questThumbnail.swift in Sources */,
 				B260A3912A9B88AE00D73208 /* MainView_checklist.swift in Sources */,
 				B29C702E2A35C5E30046873E /* recoraddicApp.swift in Sources */,
+				B2D612D32C7F51470083183F /* preview_facialExpressions.swift in Sources */,
 				B2BA89102B36BDC600A3D50E /* SaveDailyRecordView.swift in Sources */,
 				B265D26C2B032D30002E51A8 /* randomColorFunc.swift in Sources */,
 				B260A3942A9B8B8F00D73208 /* MainView_QuestInventory.swift in Sources */,
@@ -1063,7 +1079,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1112,7 +1128,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -96,6 +96,7 @@ struct StartNewRecordSet:View {
                 .frame(width:geoWidth*0.9)
                 .padding(.vertical)
                 .border(.gray)
+                
 
                 Button("생성") {
                     if selectedDailyRecordThemeName == "StoneTower" {

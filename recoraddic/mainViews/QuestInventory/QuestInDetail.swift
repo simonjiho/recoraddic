@@ -633,7 +633,7 @@ struct QuestStatistics_inTerm: View {
                                 ) {
                                     VStack {
                                         Text(rawSelectedDate)
-                                        Text("\(DataType.string_fullRepresentableNotation(data: chartData[convertToDate(from: rawSelectedDate) ?? .now] ?? 0, dataType: dataTypeFrom(selectedQuest.dataType)))")
+                                        Text("\(DataType.string_fullRepresentableNotation(data: chartData[convertToDate(from: rawSelectedDate) ?? .now] ?? 0, dataType: dataTypeFrom(selectedQuest.dataType),customDataTypeNotation:selectedQuest.customDataTypeNotation))")
                                     }
                                     .padding(5)
                                     .foregroundStyle(tierColor_dark)

@@ -53,11 +53,11 @@ enum DataType:Int, CaseIterable, Identifiable {
             return "시간"
         }
         else if dataType == .ox {
-            return "OX (달성 유무 확인)"
+            return "OX"
         }
 
         else if dataType == .custom {
-            return "사용자 지정"
+            return "사용자화"
         }
         else {
             return "ERROR"

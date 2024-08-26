@@ -58,6 +58,7 @@ struct RecordInDetailView_new: View { // 해당 view의 심각한 문제점: ini
                     }
                     .buttonStyle(.plain)
                     .padding(.vertical,10)
+
                 }
             }
         }
@@ -83,6 +84,7 @@ struct RecordInDetailView_new: View { // 해당 view의 심각한 문제점: ini
 struct DailyRecordInShort: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) var modelContext
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
 
     @Query var quests: [Quest]
 
@@ -106,8 +108,8 @@ struct DailyRecordInShort: View {
 //            let imageOrStoneWidth = dailyRecord.diaryImage != nil ? geometry.size.width*0.8 : imageOrStoneHeight*1.5
             
             let questBoxWidth = geometry.size.width*0.9
-            let questBoxHeight = 40.0
-            let todoHeight = 30.0
+            let questBoxHeight = 40.0 * qcbvMultiplier(dynamicTypeSize)
+            let todoHeight = 30.0 * qcbvMultiplier(dynamicTypeSize)
             
             let confirmationPopUp_width = geoWidth*0.7
 //            let confirmationPopUp_height = confirmationPopUp_width*0.6
@@ -140,14 +142,14 @@ struct DailyRecordInShort: View {
 //                    .opacity(dailyRecord.mood == 0 ? 0.0 : 1.0)
                     
                 } else {
-                    Image(systemName: "questionmark.circle")
-                        .resizable()
+                    Circle()
+                        .stroke(lineWidth: geoWidth*0.003)
                         .frame(width:facialExpressionSize, height: facialExpressionSize)
                 }
 
-                    Text(kor_yyyymmddFormatOf(dailyRecord.date ?? Date()))
-                        .font(.title3)
-                        .bold()
+                Text(kor_yyyymmddFormatOf(dailyRecord.date ?? Date()))
+                    .font(.title3)
+                    .bold()
 
                 
                 
@@ -169,13 +171,14 @@ struct DailyRecordInShort: View {
                                 .padding(elementWidth*0.03)
                                 .frame(width:elementWidth)
                                 .background(.gray.opacity(0.1))
+                                .padding(.bottom, 20)
+
 //                                .padding(.bottom,geoHeight*0.05)
                         }
 
 
                         if dailyRecord.recordedAmount > 0 {
                             Text("달성한 퀘스트")
-                                .padding(.top, 20)
                                 .font(.headline)
                                 .frame(width: questBoxWidth, alignment: .leading)
                         }
@@ -236,6 +239,8 @@ struct DailyRecordInShort: View {
                     }//VStack
                     .frame(width: geometry.size.width, alignment: .top)
                     .padding(.vertical,10)
+                    
+                    Spacer().frame(height:geoHeight*0.2)
 
                 }//ScrollView
                 .frame(width: geometry.size.width, height: geometry.size.height*0.8)

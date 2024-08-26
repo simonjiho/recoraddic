@@ -8,12 +8,10 @@
 import Foundation
 import SwiftUI
 
-
 let defaultPurposes:[String] = [DefaultPurpose.atr, DefaultPurpose.hlt, DefaultPurpose.ftr, DefaultPurpose.ent, DefaultPurpose.rts, DefaultPurpose.inq, DefaultPurpose.ach, DefaultPurpose.lov, DefaultPurpose.fml, DefaultPurpose.cmn, DefaultPurpose.alt, DefaultPurpose.wrl]
 
 let defaultPurposes_per: [String] = [DefaultPurpose.atr, DefaultPurpose.hlt, DefaultPurpose.ftr, DefaultPurpose.ent, DefaultPurpose.rts, DefaultPurpose.inq, DefaultPurpose.ach]
 let defaultPurposes_notper: [String] = [DefaultPurpose.lov, DefaultPurpose.fml, DefaultPurpose.cmn, DefaultPurpose.alt, DefaultPurpose.wrl]
-
 
 //let defaultDataTypes:[DataType] = [.hour, DataType.REP, DataType.HOUR, DataType.CUSTOM]
 
@@ -46,66 +44,6 @@ let facialExpression_Middle:[Int] =
 //[1,2,3,7,8,9,10,11,13,14,15,20,21,23,24,25,26,27,34,37,39,42,43,44,47,48,50,54,56,58,59,72,79,82,85,86,87,88,89,96,99,100,101,102,105,106,111,112,116,118,122,123]
 [1,2,3,7,8,9,10,11,13,14,15,20,21,23,24,25,26,27,34,37,42,44,50,54,56,58,59,72,79,85,87,88,89,96,99,100,102,105,106,111,112,116,118,122,123]
 
-//#Preview {
-//    VStack {
-//        Text("\(facialExpression_tmp.count)/\(facialExpression_Middle.count)")
-//        LazyVGrid(columns: [GridItem(.adaptive(minimum: 40, maximum: 40))]) {
-//            ForEach(facialExpression_tmp, id:\.self) { idx in
-//                VStack(spacing:0.0) {
-//                    Text("\(idx)")
-//                        .font(.caption2)
-//                    Image("facialExpression_\(idx)")
-//                        .resizable()
-//                        .frame(width:30, height: 30)
-//                }
-//            }
-//            
-//        }
-//        .padding(.bottom)
-//        
-//        
-//        Text("\(facialExpression_Middle1.count)")
-//        LazyVGrid(columns: [GridItem(.adaptive(minimum: 40, maximum: 40))]) {
-//            ForEach(facialExpression_Middle1, id:\.self) { idx in
-//                VStack(spacing:0.0) {
-//                    Text("\(idx)")
-//                        .font(.caption2)
-//                    Image("facialExpression_\(idx)")
-//                        .resizable()
-//                        .frame(width:30, height: 30)
-//                }
-//            }
-//            
-//        }
-//        .padding(.bottom)
-//        
-//        Text("\(facialExpression_Middle2.count)")
-//        LazyVGrid(columns: [GridItem(.adaptive(minimum: 40, maximum: 40))]) {
-//            ForEach(facialExpression_Middle2, id:\.self) { idx in
-//                VStack(spacing:0.0) {
-//                    Text("\(idx)")
-//                        .font(.caption2)
-//                    Image("facialExpression_\(idx)")
-//                        .resizable()
-//                        .frame(width:30, height: 30)
-//                }
-//            }
-//            
-//        }
-//        .padding(.bottom)
-//        
-//        
-//        //        LazyVGrid(columns: [GridItem], content: <#T##() -> Content#>)
-//        
-//        Text("\(Set(facialExpression_tmp).intersection(Set(facialExpression_Middle1)))")
-//        Text("\(Set(facialExpression_tmp).intersection(Set(facialExpression_Middle2)))")
-//        Text("\(Set(facialExpression_Middle1).intersection(Set(facialExpression_Middle2)))")
-//        
-//        Text("\(Set(facialExpression_Middle) == Set(facialExpression_Middle1+facialExpression_Middle2+facialExpression_tmp))")
-//        Text("\(Set(facialExpression_Middle).subtracting((Set(facialExpression_tmp))))")
-//
-//    }
-//}
 
 
 func getStatusBarHeight() -> CGFloat {
@@ -156,3 +94,70 @@ func getmainHeight() -> CGFloat {
 
 let iphone15plusHeight: CGFloat = 932.0
 
+
+
+
+let qcbvHeight_large: CGFloat = 75.0
+let qcbvHeight_medium: CGFloat = 60.0
+let qcbvHeight_small: CGFloat = 50.0
+
+func qcbvHeight(_ dynamicTypeSize: DynamicTypeSize, stopWatchIsRunnig:Bool, dataType:Int) -> CGFloat {
+    let height:CGFloat = stopWatchIsRunnig ? qcbvHeight_large : (dataType != DataType.ox.rawValue ? qcbvHeight_medium : qcbvHeight_small)
+    let multiplier = qcbvMultiplier(dynamicTypeSize)
+
+    return height * multiplier
+}
+
+func qcbvHeight(_ dynamicTypeSize: DynamicTypeSize, dataType:Int) -> CGFloat {
+    let height:CGFloat = dataType != DataType.ox.rawValue ? qcbvHeight_medium : qcbvHeight_small
+    let multiplier = qcbvMultiplier(dynamicTypeSize)
+    return height * multiplier
+}
+
+func qcbvHeight(_ dynamicTypeSize: DynamicTypeSize, stopWatchIsRunnig:Bool) -> CGFloat {
+    let height:CGFloat = stopWatchIsRunnig ? qcbvHeight_large : qcbvHeight_medium
+    let multiplier = qcbvMultiplier(dynamicTypeSize)
+    return height * multiplier
+}
+
+func qcbvMultiplier(_ dynamicTypeSize: DynamicTypeSize) -> CGFloat {
+    switch dynamicTypeSize {
+    case ...DynamicTypeSize.xLarge: return 1.0
+    case .xxLarge: return 1.1
+    case .xxxLarge: return 1.2
+    case .accessibility1: return 1.3
+    case .accessibility2: return 1.4
+    case .accessibility3: return 1.5
+    case .accessibility4: return 1.6
+    default: return 1.8 // == case .accessibility5
+    }
+}
+
+func questThumbnailWidth(_ dynamicTypeSize: DynamicTypeSize, defaultWidth: CGFloat) -> CGFloat {
+    switch dynamicTypeSize {
+    case ...DynamicTypeSize.accessibility1: return defaultWidth
+    default: return defaultWidth*2
+    }
+}
+
+func stoneSizeMultiplier(_ dynamicTypeSize: DynamicTypeSize) -> CGFloat {
+    switch dynamicTypeSize {
+    case ...DynamicTypeSize.xLarge: return 1.00
+    case .xxLarge: return 1.05
+    case .xxxLarge: return 1.1
+    case .accessibility1: return 1.15
+    case .accessibility2: return 1.2
+    case .accessibility3: return 1.25
+    case .accessibility4: return 1.3
+//    case .
+    default: return 1.4
+    }
+}
+
+
+//func questThumbnailHeight(_ dynamicTypeSize: DynamicTypeSize, height: CGFloat) -> CGFloat {
+//    switch dynamicTypeSize {
+//    case ...DynamicTypeSize.xxxLarge: return height
+//    default: return height*2
+//    }
+//}

@@ -77,6 +77,7 @@ struct InShortView: View {
                         if keyBoard {
                             Text("\(inShortText.count)/50")
                                 .font(.footnote)
+                                .dynamicTypeSize(...DynamicTypeSize.xLarge)
                         }
                         
                     }
@@ -87,6 +88,7 @@ struct InShortView: View {
                             currentDailyRecord.dailyText = inShortText
                         })
                         .frame(width:geoWidth*0.1)
+                        .minimumScaleFactor(0.5)
                     }
                 }
                 .frame(width: geoWidth, height: geoHeight, alignment: .leading)
@@ -281,6 +283,13 @@ struct DiaryView: View {
                             .frame(width:textBoxWidth)
                             .lineLimit(1)
                             .position(textBoxPosition)
+                            .onTapGesture {
+                                if !isEdit {
+                                    withAnimation {
+                                        isEdit = true
+                                    }
+                                }
+                            }
                         //                                .border(.gray)
                     }
                     
@@ -319,6 +328,7 @@ struct DiaryView: View {
                         }
                     }
                     .position(iconPosition)
+                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     
 
                 }

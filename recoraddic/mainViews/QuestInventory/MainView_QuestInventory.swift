@@ -20,6 +20,7 @@ struct MainView_QuestInventory: View {
     
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
     @Query var quests:[Quest]
     
     @Binding var selectedView: MainViewName
@@ -70,7 +71,7 @@ struct MainView_QuestInventory: View {
             let gridHorizontalPadding = geoWidth*0.02
             let gridInnerPadding = geoWidth * 0.02
             let gridViewFrameWidth = geoWidth - gridHorizontalPadding*2 - gridInnerPadding*2
-            let gridWidth = (gridViewFrameWidth) / 2 * 0.97
+            let gridWidth = questThumbnailWidth(dynamicTypeSize, defaultWidth: (gridViewFrameWidth) / 2) * 0.97
             let gridHeight = gridWidth / 1.618
             let gridItemWidth = gridWidth * 0.85
             let gridItemHeight = gridHeight * 0.85
@@ -89,11 +90,11 @@ struct MainView_QuestInventory: View {
                         ZStack {
                             HStack(spacing:0.0) {
                                 //                            if !isEdit {
-                                Text("누적 퀘스트 목록")
+                                Text_scaleToFit("누적 퀘스트 목록")
                                     .bold()
                                     .fontDesign(.serif)
-//                                    .frame(height: geoHeight*0.07)
                                     .padding(.trailing, 10)
+                                
                                 Button("", systemImage: "flame.circle", action: {
                                     popUp_help.toggle()
                                 })
@@ -109,6 +110,8 @@ struct MainView_QuestInventory: View {
                         .frame(width: geoWidth*0.95, height: topBarSize)
                         .padding(.top,topBarTopPadding)
                         .padding(.bottom,topBarBottomPadding)
+                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+
                         
                         
                         ZStack {
@@ -205,7 +208,9 @@ struct MainView_QuestInventory: View {
                                     // TODO: plus button
                                     if !isEdit {
                                             
-                                        NavigationLink(destination: CreateNewQuest(popUp_createNewQuest: $popUp_addNewQuest)){
+                                        NavigationLink(destination: CreateNewQuest(popUp_createNewQuest: $popUp_addNewQuest) .ignoresSafeArea(.keyboard)
+
+                                        ){
                                            ZStack {
                                                 Image(systemName: "plus")
                                                     .resizable()
@@ -256,15 +261,17 @@ struct MainView_QuestInventory: View {
                             
                             if quests.filter({$0.isVisible()}).isEmpty {
                                 VStack {
-                                    Text("반복적으로 해야 할 일을 퀘스트로 생성하고 ")
+                                    Text_scaleToFit("반복적으로 해야 할 일을 퀘스트로 생성하고 ")
+                                        
                                     HStack {
                                         Image(systemName: "checklist.checked")
                                             .bold()
                                         Text("체크리스트")
-                                            .bold()
+                                            .bold() +
                                         Text("에 추가해보세요!")
-                                        
                                     }
+                                    .minimumScaleFactor(0.3)
+
                                 }
                                 .foregroundStyle(.opacity(0.5))
                             }
@@ -282,6 +289,7 @@ struct MainView_QuestInventory: View {
                             popUp_questStatisticsInDetail: $popUp_questStatisticsInDetail
                         )
                         .ignoresSafeArea(.keyboard)
+                        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
                     }
                 }
 
@@ -294,6 +302,7 @@ struct MainView_QuestInventory: View {
                         .popUpViewLayout(width: geoWidth*0.9, height: geoHeight*0.85, color: colorSchemeColor)
                         .position(CGPoint(x: geoWidth/2, y: geoHeight*0.85*0.6))
                         .shadow(color:shadowColor, radius: 3.0)
+                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 }
 
             }
@@ -351,7 +360,7 @@ struct MainView_QuestInventory: View {
                     .presentationCornerRadius(0.0)
                     .presentationBackgroundInteraction(.enabled(upThrough: .height(100)))
                     .presentationBackground(.thickMaterial)
-
+                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 
 //                }
             }
@@ -733,10 +742,12 @@ struct QuestThumbnailView: View {
 }
 
 
+
 struct CreateNewQuest: View {
     
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
 //    @Environment(\.isPresented) var isPresented
     @Environment(\.dismiss) var dismiss
     
@@ -759,6 +770,10 @@ struct CreateNewQuest: View {
     
     @FocusState var focusedTextField: Int?
     
+    let largeDynamicTypeSizes: [DynamicTypeSize] = [.accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5, .xxxLarge, .xxLarge]
+//    @State var recordOption: String = "ox"
+//    let recordOptions:[String] = ["ox", "recordTheQuantity"]
+    
     var body: some View {
         
         let questNames = quests.filter({!$0.inTrashCan}).map { $0.name }
@@ -778,91 +793,104 @@ struct CreateNewQuest: View {
             let contentHeight = geometry.size.height*0.9
             
             
-            ZStack {
+//            ZStack {
+            ScrollView {
                 VStack(alignment: .leading) {
-
                     
-                    HStack {
-//                        Text("이름:")
-//                            .frame(width:textBoxWidth,alignment: .trailing)
-//                            .font(.title3)
-                        TextField("퀘스트 이름", text:$questNameToAppend)
-                            .tag(0)
-                            .font(.title2)
-                            .maxLength(30, text: $questNameToAppend)
-                            .multilineTextAlignment(.center)
-                            .focused($focusedTextField, equals:0)
-                            .textFieldStyle(.roundedBorder)
-//                            .shadow(radius: 1)
-                        
-                    }
-                    .padding(.horizontal)
-                    .frame(width: geometry.size.width)
-                    //                                .frame(height: textBoxHeight)
                     
 
-                        
-                    if questNameToAppend == "" {
-                        Text("퀘스트 이름을 입력하세요")
-                            .frame(width: geometry.size.width)
-                            .foregroundStyle(.red)
-                            .font(.caption)
+                    TextField("퀘스트 이름", text:$questNameToAppend)
+                        .padding(.horizontal)
+                        .frame(width: geometry.size.width)
+                    
+                        .font(.title2)
+                        .maxLength(30, text: $questNameToAppend)
+                        .multilineTextAlignment(.center)
+                        .focused($focusedTextField, equals:0)
+                        .textFieldStyle(.roundedBorder)
+
+                    
+                    
+//                    HStack {
+                        if questNameToAppend == "" {
+                            Text_scaleToFit("퀘스트 이름을 입력하세요")
+                                .lineLimit(1)
+                                .padding(.horizontal)
+                                .frame(width: geometry.size.width)
+                                .font(.caption)
+                                .foregroundStyle(.red)
                             
                         }
-                    else if questNames.contains(questNameToAppend) {
-                        Text("퀘스트 이름이 이미 존재합니다.")
-                            .frame(width: geometry.size.width, height: 20)
-                            .foregroundStyle(.red)
-                            .font(.caption)
-                    }
-
+                        else if questNames.contains(questNameToAppend) {
+                            Text_scaleToFit("퀘스트 이름이 이미 존재합니다.")
+                                .lineLimit(1)
+                                .padding(.horizontal)
+                                .frame(width: geometry.size.width)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                        }
+                    
                     
                     HStack(spacing:0.0) {
-//                        Spacer()
-//                            .frame(width:checkBoxWidth, height:1)
-
-                        Text("단위")
-                            .padding(.leading, 3)
-                            .padding(.trailing,20)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
-                            .frame(width:textBoxWidth,alignment: .leading)
-                            .multilineTextAlignment(.leading)
-
-//                            .border(.blue)
-//                        .padding(.horizontal)
-                            
-                        Picker("", selection: $questDataTypeToAppend) {
-                            ForEach(DataType.allCases, id:\.self) {
-                                Text(DataType.kor_stringOf(dataType: $0))
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.5)
-                            }
+                        HStack {
+                            Text_scaleToFit("기록 유형")
+                                .lineLimit(1)
+                                .padding(.leading, 3)
+                                .font(.body)
+                                .padding(.trailing)
                         }
-                        .frame(width: textFieldWidth2)
+                        
+                        .frame(width:textBoxWidth,alignment:.leading)
 
+                        VStack(spacing:0.0) {
+                            Picker("", selection: $questDataTypeToAppend) {
+                                ForEach(DataType.allCases, id:\.self) {
+                                    
+                                    Text(DataType.kor_stringOf(dataType: $0))
+                                    
+                                }
+                            }
+                            .labelsHidden()
+                            
+                            
+                            if questDataTypeToAppend == .hour {
+                                Text_scaleToFit("소요된 시간을 기록합니다")
+                                    .frame(width:textFieldWidth)
+                                    .lineLimit(2)
+                                    .font(.caption)
+                            } else if questDataTypeToAppend == .custom {
+                                Text_scaleToFit("사용자 지정 단위를 기록합니다")
+                                    .frame(width:textFieldWidth)
+                                    .lineLimit(2)
+                                //                                .minimumScaleFactor(0.2)
+                                    .font(.caption)
+                            } else if questDataTypeToAppend == .ox {
+                                Text_scaleToFit("달성여부를 체크박스로 체크합니다.")
+                                    .frame(width:textFieldWidth)
+                                    .lineLimit(2)
+                                    .font(.caption)
+                            }
+                            
+                        }
+//                        .frame(width:textFieldWidth)
+
+                        
                     }
+                    .padding(.top,10)
                     .padding(.horizontal)
-//                    .border(.red)
-                    .padding(.top)
-                    // MARK: 계획수치 또는 달성수치
                     
-
+                    
+                    // MARK: 계획수치 또는 달성수치
                     if questDataTypeToAppend == DataType.custom {
                         HStack(spacing:0.0) {
-//                            Spacer()
-//                                .frame(width:checkBoxWidth)
-//                                .border(.yellow)
-
-                            Text("사용자 지정 단위")
+                            
+                            Text_scaleToFit("사용자 지정 단위")
                                 .padding(.leading, 3)
                                 .padding(.trailing,20)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
+                                .lineLimit(2)
                                 .frame(width:textBoxWidth,alignment: .leading)
                                 .multilineTextAlignment(.leading)
-//                                    .padding(.horizontal)
-
+                            
                             TextField("예시: 푸시업 -> n회",text: $customDataTypeNotation_textField)
                                 .frame(width: textFieldWidth2)
                                 .textFieldStyle(.roundedBorder)
@@ -872,15 +900,15 @@ struct CreateNewQuest: View {
                                 }
                         }
                         .padding(.horizontal)
-                        .frame(alignment: .leading)
-//                        .border(.red)
-
+//                        .frame(idealHeight:geoHeight*0.07, alignment: .leading)
+                        
+                        
                     }
                     
                     
                     HStack(spacing:0.0) {
                         HStack(spacing:0.0) {
-
+                            
                             Button(action:{
                                 addSubName.toggle()
                                 focusedTextField = 2
@@ -891,19 +919,16 @@ struct CreateNewQuest: View {
                             //                        .border(.yellow)
                             
                             
-                            Text("줄임말")
+                            Text_scaleToFit("줄임말")
                                 .padding(.leading, 3)
-                                .padding(.trailing,30)
+                                .padding(.trailing,20)
                                 .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                                .frame(width: textBoxWidth2, alignment: .leading)
-                                .multilineTextAlignment(.leading)
+
                                 .opacity(addSubName ? 1.0 : 0.5)
-                            //                            .border(.blue)
+                            
                         }
                         .frame(width: textBoxWidth, alignment: .leading)
-
-//                        .padding(.horizontal)
+                        
                         
                         TextField("퀘스트를 요약할 이름", text: $questSubnameToAppend)
                             .frame(width: textFieldWidth)
@@ -911,9 +936,9 @@ struct CreateNewQuest: View {
                             .autocorrectionDisabled()
                             .focused($focusedTextField, equals:2)
                             .disabled(!addSubName)
-                            .opacity(addSubName ? 1.0 : 0.2)
-
-
+                            .opacity(addSubName ? 1.0 : 0.5)
+                        
+                        
                         Button(action:{
                             showSubnameHelp.toggle()
                         }) {
@@ -921,76 +946,71 @@ struct CreateNewQuest: View {
                         }
                         .padding(.leading)
                         .popover(isPresented: $showSubnameHelp, content: {
-                            Text("줄임말 설정 시 퀘스트 상세 창을 제외한 모든 화면에서 줄임말로 표시됩니다.")
+                            Text_scaleToFit("줄임말 설정 시 퀘스트 상세 창을 제외한 모든 화면에서 줄임말로 표시됩니다.")
                                 .padding(.horizontal)
                                 .font(.caption)
                                 .foregroundStyle(.red)
                                 .presentationCompactAdaptation(.popover)
                         })
-
-
                         
-
+                        
+                        
+                        
                     }
                     .padding(.horizontal)
 
-//                    .border(.red)
 
-
-                        
                     HStack(spacing:0.0) {
-                        
+    
                         HStack(spacing:0.0) {
-                            
+    
                             Button(action:{
                                 addPastCumulative.toggle()
                                 focusedTextField = 3
-                                
+    
                             }) {
                                 Image(systemName: addPastCumulative ? "checkmark.square" : "square")
                             }
-                            //                        .border(.yellow)
-                            
-                            
-                            Text("과거 누적량")
+    
+    
+                            Text_scaleToFit("과거 누적량")
+                                .lineLimit(2)
                                 .padding(.leading, 3)
                                 .padding(.trailing,20)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                                .frame(width: textBoxWidth2, alignment: .leading)
                                 .multilineTextAlignment(.leading)
                                 .opacity(addPastCumulative ? 1.0 : 0.5)
                         }
                         .frame(width: textBoxWidth, alignment: .leading)
-//                        .padding(.horizontal)
-
+    
                         TextField("생성 이전의 누적량", text: $pastCumulative_str)
                             .frame(width: textFieldWidth)
                             .textFieldStyle(.roundedBorder)
                             .disabled(!addPastCumulative)
-                            .opacity(addPastCumulative ? 1.0 : 0.0)
+                            .opacity(addPastCumulative ? 1.0 : 0.5)
                             .focused($focusedTextField, equals:3)
                             .keyboardType(.numberPad)
-                        if addPastCumulative {
-                            Text(DataType.unitNotationOf(dataType: questDataTypeToAppend, customDataTypeNotation: customDataTypeNotation_textField))
-                                .opacity(addPastCumulative ? 1.0 : 0.2)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
+    //                        if addPastCumulative {
+                        HStack {
+                            Text_scaleToFit(DataType.unitNotationOf(dataType: questDataTypeToAppend, customDataTypeNotation: customDataTypeNotation_textField))
+                                .opacity(addPastCumulative ? 1.0 : 0.5)
+                                .lineLimit(2)
+                                .frame(width:geoWidth*0.1)
                                 .padding(.leading)
                         }
+                        .frame(idealHeight:geoHeight*0.08)
                     }
                     .padding(.horizontal)
-//                    .border(.red)
-                    .frame(width: geoWidth, alignment: .leading)
-//                    .border(.yellow)
-
-
                     
-                    
+
+    
+    
+    
+    
+    
                     Button(action: {
                         createNewQuest()
                         dismiss.callAsFunction()
-
+    
                     } ) {
                         Text("생성")
                     }
@@ -1000,28 +1020,29 @@ struct CreateNewQuest: View {
                         (
                             questNames.contains(questNameToAppend) || (questDataTypeToAppend == .custom && (customDataTypeNotation == "" || customDataTypeNotation == nil)) ||
                             questNameToAppend == "")
-                        
+    
                     )
                     .frame(width:geometry.size.width, alignment: .center)
                     
                     
                 } // Vstack
-                .padding()
-                .frame(width:geometry.size.width, height:contentHeight, alignment: .top)
-                
-                
-                
-
-                
-                
-            }// Zstack
-            .frame(width:geometry.size.width, height: contentHeight)
-            .navigationTitle("새로운 퀘스트")
+                .frame(width:geometry.size.width,alignment: .top)
+                Spacer().frame(height:geoHeight*0.7)
+            }
+            .navigationTitle("새로운 누적 퀘스트")
             .navigationBarTitleDisplayMode(.inline)
-
+            .scrollDisabled(!largeDynamicTypeSizes.contains(dynamicTypeSize))
             .onAppear() {
                 focusedTextField = 0
             }
+                
+                
+
+                
+                
+//            }// Zstack
+//            .frame(width:geometry.size.width, height: contentHeight)
+
 //            .onChange(of: customDataTypeNotation) { oldValue, newValue in
 //                if customDataTypeNotation == DataType.CUSTOM {
 //                    
@@ -1057,8 +1078,31 @@ struct CreateNewQuest: View {
 }
 
 
-
-
+//
+//struct PickerElement:View {
+//    var option: DataType
+//    let string: String
+//    
+//    init(option: DataType) {
+//        self.option = option
+//        self.string = {
+//            if option == .ox {
+//                return "달성여부를 체크박스로 체크합니다."
+//            } else if option == .hour {
+//                return "소요된 시간을 기록합니다"
+//            } else {
+//                return "사용자 지정 단위를 기록합니다"
+//            }
+//        }()
+//    }
+//    
+//    var body: some View {
+//        Text(DataType.kor_stringOf(dataType: option))
+//            .font(.callout) +
+//        Text("\n\(string)")
+//            .font(.system(size: 20.0))
+//    }
+//}
 
 
 
@@ -1181,8 +1225,11 @@ struct QuestHelpView: View {
                         
                         ScrollView(.vertical) {
                             VStack {
-                                Text("기본 불꽃 (최근 30일)")
+                                Text("기본 불꽃\n(최근 30일)")
                                     .font(.caption)
+                                    .opacity(0.7)
+                                    .multilineTextAlignment(.center)
+
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
                                         
@@ -1192,6 +1239,7 @@ struct QuestHelpView: View {
                                                     .frame(width:fireViewSize, height: fireViewSize)
                                                 Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
+                                                    .opacity(0.7)
                                             }
                                         }
                                     }
@@ -1204,8 +1252,11 @@ struct QuestHelpView: View {
                             .padding(.bottom,30)
                             
                             VStack {
-                                Text("꾸준함의 불꽃(20%)")
+                                Text("꾸준함의 불꽃 (20%)")
                                     .font(.caption)
+                                    .opacity(0.7)
+                                    .multilineTextAlignment(.center)
+                                
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
                                         ForEach(7...10, id:\.self) { momentumLevel in
@@ -1214,6 +1265,8 @@ struct QuestHelpView: View {
                                                     .frame(width:fireViewSize, height: fireViewSize)
                                                 Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
+                                                    .opacity(0.7)
+
                                             }
                                         }
                                     }
@@ -1228,8 +1281,10 @@ struct QuestHelpView: View {
                             
 
                             VStack {
-                                Text("꾸준함의 불꽃(30%)")
+                                Text("꾸준함의 불꽃 (30%)")
                                     .font(.caption)
+                                    .opacity(0.7)
+                                    .multilineTextAlignment(.center)
 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
@@ -1240,6 +1295,7 @@ struct QuestHelpView: View {
                                                     .frame(width:fireViewSize, height: fireViewSize)
                                                 Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
+                                                    .opacity(0.7)
                                             }
                                         }
                                     }
@@ -1253,8 +1309,11 @@ struct QuestHelpView: View {
                             .padding(.bottom,30)
                             
                             VStack {
-                                Text("꾸준함의 불꽃(50%)")
+                                Text("꾸준함의 불꽃 (50%)")
                                     .font(.caption)
+                                    .opacity(0.7)
+                                    .multilineTextAlignment(.center)
+
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
@@ -1265,6 +1324,7 @@ struct QuestHelpView: View {
                                                     .frame(width:fireViewSize, height: fireViewSize)
                                                 Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
+                                                    .opacity(0.7)
                                             }
                                         }
                                     }
@@ -1279,9 +1339,11 @@ struct QuestHelpView: View {
 
                             
                             VStack {
-                                Text("열정의 불꽃(70%)")
+                                Text("열정의 불꽃 (70%)")
                                     .font(.caption)
-                                
+                                    .opacity(0.7)
+                                    .multilineTextAlignment(.center)
+
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
                                         
@@ -1291,6 +1353,7 @@ struct QuestHelpView: View {
                                                     .frame(width:fireViewSize, height: fireViewSize)
                                                 Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
+                                                    .opacity(0.7)
                                             }
                                         }
                                     }
@@ -1304,8 +1367,11 @@ struct QuestHelpView: View {
                             
                             
                             VStack {
-                                Text("열정의 불꽃(85%)")
+                                Text("열정의 불꽃 (85%)")
                                     .font(.caption)
+                                    .opacity(0.7)
+                                    .multilineTextAlignment(.center)
+
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
@@ -1316,6 +1382,7 @@ struct QuestHelpView: View {
                                                     .frame(width:fireViewSize, height: fireViewSize)
                                                 Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
+                                                    .opacity(0.7)
                                             }
                                         }
                                     }
@@ -1330,8 +1397,11 @@ struct QuestHelpView: View {
                             
                             
                             VStack {
-                                Text("연속의 불꽃(100%)")
+                                Text("연속의 불꽃 (100%)")
                                     .font(.caption)
+                                    .opacity(0.7)
+                                    .multilineTextAlignment(.center)
+
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
@@ -1342,6 +1412,7 @@ struct QuestHelpView: View {
                                                     .frame(width:fireViewSize, height: fireViewSize)
                                                 Text("\(fireGuideLines[momentumLevel-1])")
                                                     .font(.caption2)
+                                                    .opacity(0.7)
                                             }
                                         }
                                     }
@@ -1399,142 +1470,6 @@ struct QuestHelpView: View {
 
 
 
-//let sampleQuest = {
-//    let workOut = Quest(name: "운동", dataType: DataType.HOUR)
-//    workOut.dailyData = [Date():1000]
-//    workOut.tier = 20
-//    workOut.momentumLevel = 10
-//    return workOut
-//}()
-//
-
-struct QuestThumbnailView_forPreview: View {
-    
-    var name: String
-    var tier: Int
-    var momentumLevel: Int
-    var cumulativeVal: String
-    var unitNotation: String
-
-    
-    var body: some View {
-        
-        GeometryReader { geometry in
-            let geoWidth = geometry.size.width
-            let geoHeight = geometry.size.height
-//            let gridItemWidth = geoWidth
-            
-            ZStack {
-                QuestTierView(tier: tier)
-                    .frame(width: geoWidth, height: geoHeight)
-                FireView(momentumLevel: momentumLevel)
-                //                                        Fire6()
-                    .frame(width: geoWidth/1.5, height: geoHeight/1.5)
-                    .position(x:geoWidth/2,y:geoHeight/2)
-                //                                            .opacity(0.7)
-                VStack {
-                    Text("\(name)")
-                        .foregroundStyle(.black)
-                        .bold()
-                        .minimumScaleFactor(0.3)
-                        .lineLimit(2)
-                        .padding(.bottom, geoHeight/10)
-                    
-                    //                                        Text(QuestRepresentingData.titleOf(representingData: quest.representingData))
-                    
-                    Text("\(cumulativeVal)\(unitNotation)")
-                        .foregroundStyle(.black)
-                        .bold()
-                        .minimumScaleFactor(0.3)
-                        .lineLimit(1)
-                    
-                }
-                .padding(10)
-                .frame(width:geoWidth ,height: geoHeight, alignment: .center)
-                .onAppear() {
-//                    print("\(name): tier \(tier)")
-                }
-                
-            }
-        }
-    }
-}
-//
-#Preview(body: {
-    HStack {
-        VStack {
-            QuestThumbnailView_forPreview(
-                name: "운동",
-                tier: 0,
-                momentumLevel: 7,
-                cumulativeVal: "1000.0",
-                unitNotation: "시간")
-            .frame(width: 100, height: 100)
-            QuestThumbnailView_forPreview(
-                name: "운동",
-                tier: 5,
-                momentumLevel: 7,
-                cumulativeVal: "1000.0",
-                unitNotation: "시간")
-            .frame(width: 100, height: 100)
-            QuestThumbnailView_forPreview(
-                name: "운동",
-                tier: 10,
-                momentumLevel: 7,
-                cumulativeVal: "1000.0",
-                unitNotation: "시간")
-            .frame(width: 100, height: 100)
-            QuestThumbnailView_forPreview(
-                name: "운동",
-                tier: 15,
-                momentumLevel: 7,
-                cumulativeVal: "1000.0",
-                unitNotation: "시간")
-            .frame(width: 100, height: 100)
-            QuestThumbnailView_forPreview(
-                name: "운동",
-                tier: 20,
-                momentumLevel: 7,
-                cumulativeVal: "1000.0",
-                unitNotation: "시간")
-            .frame(width: 100, height: 100)
-
-        }
-        VStack {
-            QuestThumbnailView_forPreview(
-                name: "운동",
-                tier: 25,
-                momentumLevel: 7,
-                cumulativeVal: "1000.0",
-                unitNotation: "시간")
-            .frame(width: 100, height: 100)
-            QuestThumbnailView_forPreview(
-                name: "운동",
-                tier: 30,
-                momentumLevel: 7,
-                cumulativeVal: "1000.0",
-                unitNotation: "시간")
-            .frame(width: 100, height: 100)
-            QuestThumbnailView_forPreview(
-                name: "운동",
-                tier: 35,
-                momentumLevel: 7,
-                cumulativeVal: "1000.0",
-                unitNotation: "시간")
-            .frame(width: 100, height: 100)
-            QuestThumbnailView_forPreview(
-                name: "운동",
-                tier: 40,
-                momentumLevel: 7,
-                cumulativeVal: "1000.0",
-                unitNotation: "시간")
-            .frame(width: 100, height: 100)
-
-        }
-        
-    }
-
-})
 
 
 struct RotatingGradient: View {

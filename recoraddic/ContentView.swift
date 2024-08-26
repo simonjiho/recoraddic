@@ -169,6 +169,7 @@ struct ContentView: View {
                      .tag(mainViews[2])
                      
                      MainView_Memo(profile:profile)
+//                         .fixedSize()
                          .tabItem {
                              Image(systemName: images[mainViews[3]]!)
                          }

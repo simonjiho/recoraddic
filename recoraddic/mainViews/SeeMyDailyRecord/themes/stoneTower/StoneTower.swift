@@ -19,6 +19,7 @@ struct StoneTower: View {
     
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
     
     @Query(sort:\DailyRecordSet.start) var dailyRecordSets: [DailyRecordSet]
     
@@ -95,7 +96,7 @@ struct StoneTower: View {
             let geoWidth:CGFloat = geometry.size.width
             let geoHeight:CGFloat = geometry.size.height
             
-            let stoneWidth:CGFloat = geoWidth*0.22
+            let stoneWidth:CGFloat = geoWidth*0.22 * stoneSizeMultiplier(dynamicTypeSize)
             let stoneHeight:CGFloat = stoneWidth*0.67
             let selectedStoneHeight:CGFloat = stoneHeight*1.4
             let selectedStoneWidth:CGFloat = stoneWidth*1.4
@@ -207,12 +208,20 @@ struct StoneTower: View {
                                                     }
                                                 }
                                                 
+                                                let xPosRatio:CGFloat = {
+                                                    switch dynamicTypeSize {
+                                                    case ...DynamicTypeSize.xxLarge : return 0.23
+                                                    case ...DynamicTypeSize.accessibility2 : return 0.20
+                                                    default: return 0.16
+                                                    }
+                                                }()
                                                 Text(yyyymmddFormatOf(record.getLocalDate()!))
                                                     .bold(isSelectedRecord)
                                                     .font(.caption)
                                                     .opacity(isOnCenter ? 1.0 : (isNearCenter ? 0.3 : 0.0))
-                                                    .position(x: misalignment <= 0 ? geoWidth*0.77 : geoWidth*0.23, y: height/2)
-                                                
+                                                    .position(x: misalignment <= 0 ? geoWidth*(1-xPosRatio) : geoWidth*xPosRatio, y: height/2)
+                                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+
                                                 VStack {
                                                     if record.dailyText != nil {
                                                         Image(systemName: "book.closed.fill")
@@ -227,6 +236,8 @@ struct StoneTower: View {
                                                 .opacity(isSelectedRecord ? 1.0 : 0.0)
 //                                                .opacity(isOnCenter ? (isSelectedRecord ? 1.0 : 0.5) : 0.0)
                                                 .position(x: geoWidth*0.5 + (misalignment <= 0 ? -1.0 : 1.0) * (selectedStoneWidth*0.5 + geoWidth*0.00 + detailTextBoxSize*0.5) + CGFloat(misalignment)*horizontalUnitWidth, y: height/2)
+                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+
 //                                                .position(x: misalignment <= 0 ? geoWidth*0.23 : geoWidth*0.77, y: height/2)
 
                                                 
@@ -271,6 +282,8 @@ struct StoneTower: View {
                                                 )
                                                 .labelsHidden()
                                                 .frame(width:geoWidth*0.25)
+                                                .dynamicTypeSize( ...DynamicTypeSize.xxLarge)
+
                                                 
                                                 Text("~")
                                                     .padding(.horizontal,5)
@@ -282,6 +295,8 @@ struct StoneTower: View {
                                                 )
                                                 .labelsHidden()
                                                 .frame(width:geoWidth*0.25)
+                                                .dynamicTypeSize( ...DynamicTypeSize.xxLarge)
+
                                             }
                                             else {
                                                 DatePicker(
@@ -292,7 +307,8 @@ struct StoneTower: View {
                                                 )
                                                 .labelsHidden()
                                                 .frame(width:geoWidth*0.25)
-                                                
+                                                .dynamicTypeSize( ...DynamicTypeSize.xxLarge)
+
                                                 Text("~")
                                                     .padding(.horizontal,5)
 
@@ -421,7 +437,7 @@ struct StoneTower: View {
 //                                            }
 //                                            isEditingTermGoals.toggle()
 //                                            editTermGoals = editText.count - 1
-//                                            
+//
 //                                        }) {
 //                                            let noTermGoals = dailyRecordSet.termGoals.count == 0
 //                                            Text("목표 \(noTermGoals ? "설정" : "편집")")
@@ -462,65 +478,11 @@ struct StoneTower: View {
 
                                 }
                                 .frame(width:geoWidth, height:groundHeight + keyboardHeight, alignment:.top)
+                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+
                             } // vstack
                                 
-                                
-                            
-//                            if numberOfStones == 0 {
-//                                VStack(spacing:0) {
-//
-//                                    StoneTower_stone(
-//                                        shapeNum: 3,
-//                                        brightness: 0,
-//                                        defaultColorIndex: defaultColorIndex,
-//                                        facialExpressionNum: 3,
-//                                        selected: false
-//                                    )
-//                                    .frame(width: stoneWidth, height: stoneHeight)
-//                                    .opacity(0.2)
-//                                    StoneTower_stone(
-//                                        shapeNum: 1,
-//                                        brightness: 2,
-//                                        defaultColorIndex: defaultColorIndex,
-//                                        facialExpressionNum: 2,
-//                                        selected: false
-//                                    )
-//                                    .frame(width: stoneWidth, height: stoneHeight)
-//                                    .opacity(0.3)
-//                                    StoneTower_stone(
-//                                        shapeNum: 2,
-//                                        brightness: 1,
-//                                        defaultColorIndex: defaultColorIndex,
-//                                        facialExpressionNum: 1,
-//                                        selected: false
-//                                    )
-//                                    .frame(width: stoneWidth, height: stoneHeight)
-//                                    .opacity(0.4)
-//                                }
-//                                .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
-//                                let noSavedDailyRecords_visible: Bool = dailyRecordSet.dailyRecords?.filter({$0.hasContent}).count == 0
-//                                
-//                                if noSavedDailyRecords_visible && selectedDrsIdx == dailyRecordSets.count - 1 && !isEditingTermGoals {
-//                                    Text("매일매일의 기록을 저장하세요!")
-//                                        .opacity(0.5)
-//                                        .position(x:geoWidth/2, y:aboveSkyHeight-stoneHeight*1.5)
-//                                }
-//                            }
-
-                            
-
-//                            let dailyQuestionStatisticsButtonPosition: CGPoint = CGPoint(x:questionMarkSize/2+geoWidth*0.05,y:totalSkyHeight-questionMarkSize/2-10)
-//                            Button(action:{
-//                                showDailyQuestionStatistics.toggle()
-//                            }) {
-//                                Image(systemName: "questionmark")
-//                                    .resizable()
-//                                    .frame(width:questionMarkSize, height:questionMarkSize)
-//                            }
-//                            .buttonStyle(.plain)
-//                            .position(x:questionMarkSize/2+geoWidth*0.05,y:totalSkyHeight-questionMarkSize/2-10)
-
-                            
+                        
 
 
 
@@ -887,13 +849,13 @@ struct StoneTower_stone: View {
 //struct RecordStoneShadowView: View {
 //    var adjustedThemeSet: ThemeSet
 //    var dailyRecordThemeNum: Int
-//    
-//    
+//
+//
 //    var body: some View {
-//        
+//
 //        GeometryReader { geometry in
 //            let shapeNum = dailyRecordThemeNum >= 0 ? dailyRecordThemeNum : 0
-//            
+//
 //            let shape: Path = {
 //                var returnShape: Path? = nil
 //                if shapeNum <= 2 {
@@ -911,30 +873,30 @@ struct StoneTower_stone: View {
 //                        )
 //                        path.closeSubpath()
 //                    }
-//                    
+//
 //                }
 //                else {
 //                    returnShape = Path(roundedRect: CGRect(x:0, y:0,width: geometry.size.width, height: geometry.size.height), cornerSize: CGSize(width: geometry.size.width*0.1, height:geometry.size.height*0.1))
-//                    
+//
 //                }
-//                
+//
 //                return returnShape!
-//                
-//                
+//
+//
 //            }()
-//            
-//            
-//            
-//            
+//
+//
+//
+//
 //            ZStack {
 //
-//                
+//
 //                Color.white
 //                    .clipShape(shape)
 //                    .shadow(radius: 7)
-//                
-//                
-//                
+//
+//
+//
 //            }   // zstack
 //            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
 //        }
@@ -1674,3 +1636,4 @@ struct MainButtonStyle3: ButtonStyle {
 
     }
 }
+

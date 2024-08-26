@@ -223,6 +223,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                         minDate: selectedDailyRecordSet.start.addingDays(1),
                         selectedDate:selectedDailyRecordSet.start.addingDays(1)
                     )
+                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .popUpViewLayout(width: geoWidth*0.9, height: (geoHeight-statusBarHeight)*0.6, color: backGroundColor)
                         .position(x:geoWidth/2,y: statusBarHeight + (geoHeight-statusBarHeight)/2 )
                 }
@@ -261,6 +262,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     .frame(width: geoWidth*0.95, height: geoHeight*0.7)
                     .background(.background)
                     .clipShape(.rect(cornerSize: CGSize(width: geoWidth*0.95*0.1, height: geoHeight*0.7*0.1)))
+                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+
                 }
                 
                 

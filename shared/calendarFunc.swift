@@ -27,11 +27,11 @@ let dueTime:Int = 10 // 10AM
 //        return calendar.startOfDay(for: yesterday)
 //    }
 //}
+
 func getStartDateOfNow() -> Date {
     let now = Date()
     var calendar = Calendar.current
     calendar.timeZone = TimeZone(identifier: "Asia/Seoul") ?? .current
-    
     return calendar.startOfDay(for: now)
 }
 
@@ -142,13 +142,10 @@ func convertToDate(from dateString: String) -> Date? {
 //}
 
 
-
 func getStartOfDate(date:Date) -> Date {
     let calendar = Calendar.current
     return calendar.startOfDay(for: date)
 }
-
-
 
 func calculateDaysBetweenTwoDates(from: Date, to: Date) -> Int {
     let currentCalendar = Calendar.current
@@ -157,18 +154,15 @@ func calculateDaysBetweenTwoDates(from: Date, to: Date) -> Int {
     return endDay - startDay
 }
 
-
-
 func getDateList(from startDate: Date, to endDate: Date) -> [Date] {
     var dates: [Date] = []
     let calendar = Calendar.current
     var currentDate = startDate
-
+    
     while currentDate <= endDate {
         dates.append(calendar.startOfDay(for: currentDate))
         currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate) ?? Date()
     }
-
     return dates
 }
 
@@ -178,7 +172,6 @@ func yymmFormatOf(_ date: Date) -> String {
     formatter.dateFormat = "YY/MM"
     return formatter.string(from: date)
 }
-
 
 func mmddFormatOf(_ date: Date) -> String {
     let formatter = DateFormatter()
@@ -313,13 +306,12 @@ func partitionByWeek(startDate: Date, endDate: Date) -> [[Date]] {
 }
 
 
-
-
 func containsFirstDateOfMonth(dates:[Date]) -> Bool {
     let startOfMonthIndex: Int? = dates.firstIndex(where: {$0.isStartOfMonth_local})
     if startOfMonthIndex != nil { return true }
     else { return false}
 }
+
 
 extension Date {
     var isStartOfMonth_local: Bool {

@@ -37,12 +37,15 @@ struct MainView_Memo:View {
                     }
                     else {
                         Image(systemName: "note.text")
+                        
                     }
                 }
                 .padding(isEditing ? .trailing : .horizontal)
                 .frame(width: UIScreen.main.bounds.width,height:topBarSize,alignment: isEditing ? .trailing : .center)
                 .padding(.top,topBarTopPadding)
                 .padding(.bottom,topBarBottomPadding)
+                .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
+
                 TextEditor(text: $profile.memo)
                     .padding()
                     .focused($isEditing)
@@ -52,6 +55,9 @@ struct MainView_Memo:View {
                         if profile.memo == "" {
                             Text("탭해서 간단히 메모해둘 내용을 적어보세요")
                                 .opacity(0.5)
+                                .onTapGesture {
+                                    isEditing = true
+                                }
                             //                            .containerRelativeFrame([.vertical,.horizontal], alignment: .topLeading)
                             //                            .frame(alignment:.topLeading)
                         }
