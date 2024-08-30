@@ -33,6 +33,7 @@ struct MainView_checklist: View {
 //    var currentRecordSet: DailyRecordSet
     
     @Binding var selectedView: MainViewName
+    @Binding var restrictedHeight:CGFloat
     
     @State var currentDailyRecord: DailyRecord = DailyRecord()
     
@@ -70,36 +71,28 @@ struct MainView_checklist: View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
         
-        let topForegroundColor: Color = {
-            if getStartOfDate(date: selectedDate) == getStartDateOfNow() {
-                return reversedColorSchemeColor
-            } else if getStartOfDate(date: selectedDate) > getStartDateOfNow() {
-                if colorScheme == .light {
-                    return Color.blue.adjust(saturation:-0.5, brightness: -0.4)
-                } else {
-                    return Color.blue.adjust(saturation:-0.35, brightness: 0.7)
-                }
-            } else {
-                if colorScheme == .light {
-                    return Color.green.adjust(saturation:-0.3, brightness: -0.4)
-                } else {
-                    return Color.green.adjust(saturation:-0.2, brightness: 0.7)
-                }
-            }
-        }()
+//        let topForegroundColor: Color = {
+//            if getStartOfDate(date: selectedDate) == getStartDateOfNow() {
+//                return reversedColorSchemeColor
+//            } else if getStartOfDate(date: selectedDate) > getStartDateOfNow() {
+//                if colorScheme == .light {
+//                    return Color.blue.adjust(saturation:-0.5, brightness: -0.4)
+//                } else {
+//                    return Color.blue.adjust(saturation:-0.35, brightness: 0.7)
+//                }
+//            } else {
+//                if colorScheme == .light {
+//                    return Color.green.adjust(saturation:-0.3, brightness: -0.4)
+//                } else {
+//                    return Color.green.adjust(saturation:-0.2, brightness: 0.7)
+//                }
+//            }
+//        }()
         
-//        let shadowColor:Color = getShadowColor(colorScheme)
 
-//        let middleColor:Color = colorScheme == .light ? Color.black.adjust(brightness: 0.2) : Color.white
-//        let linearGradient1: LinearGradient =
-//        LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .leading, endPoint: .trailing)
-//        let linearGradient2: LinearGradient =
-//        LinearGradient(gradient: Gradient(colors: [Color.red, Color.orange, middleColor, Color.orange, Color.red]), startPoint: .topLeading, endPoint: .bottomTrailing)
         
         let bgColor: Color = currentDailyRecord.dailyRecordSet?.getIntegratedDailyRecordColor(colorScheme: colorScheme) ?? Color.gray
-        
-        
-        // currentRecord == records.last => 기간이 지났어도 currentRecord임
+
         GeometryReader { geometry in
 
             
@@ -111,11 +104,6 @@ struct MainView_checklist: View {
             let buttonSize = geoWidth*0.06
 //            let buttonSize = geoWidth/13 // ~24.08.17
             
-//            let popUp_addQuest_height = geometry.size.height*(keyboardAppeared ? 0.6 : 0.8)
-//            let popUp_addQuest_yPos = keyboardAppeared ? 35 + popUp_addQuest_height/2 : geometry.size.height/2
-            
-//            let popOver_changeMood_width = geoWidth*0.6
-//            let popOver_changeMood_height = geoHeight*0.6
             
             let popUp_changeMood_width = geoWidth * 0.7
             let popUp_changeMood_height = geoHeight * 0.7
@@ -125,10 +113,7 @@ struct MainView_checklist: View {
             let facialExpressionSize = 35.0
             let topBarBottomPadding = geoHeight*0.005
             
-//            let textSize = topBarTopPadding * 0.8
-//            let topBarHeight = facialExpressionSize + topBarBottomPadding
-//            facialExpressionSize*0.7
-//            let isNotToday: Bool = getStartOfDate(date: selectedDate) != getStartDateOfNow()
+
             
             ZStack {
 
@@ -150,7 +135,7 @@ struct MainView_checklist: View {
                         Circle().frame(width:5,height:5).opacity((dateGap == 3) ? 1.0 : 0.0)
                     }
                     .frame(height:topBarTopPadding)
-                    .foregroundStyle(topForegroundColor)
+//                    .foregroundStyle(topForegroundColor)
 //                    .border(.red)
 
                     HStack(spacing:0.0) {
@@ -189,7 +174,7 @@ struct MainView_checklist: View {
                             }
                             DatePicker(selection: $selectedDate,displayedComponents: [.date]) {}
                                 .labelsHidden()
-                                .foregroundStyle(topForegroundColor)
+//                                .foregroundStyle(topForegroundColor)
 
 
 //                                .border(.red)
@@ -210,7 +195,7 @@ struct MainView_checklist: View {
                             
                         }
                         .frame(width: geoWidth*0.7)
-                        .dynamicTypeSize( ...DynamicTypeSize.accessibility1)
+                        .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
 
                             
                         
@@ -219,7 +204,7 @@ struct MainView_checklist: View {
                             Circle()
                                 .stroke(lineWidth: geoWidth*0.002)
                                 .frame(width:facialExpressionSize, height: facialExpressionSize)
-                            topForegroundColor
+                            reversedColorSchemeColor
                                 .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
                                 .mask(
                                     Image("facialExpression_\(currentDailyRecord.mood)")
@@ -292,7 +277,6 @@ struct MainView_checklist: View {
                                                 .background(bgColor.opacity(currentDailyRecord.mood == index ? 1.0 : 0.3))
                                             
                                                 .shadow(radius: 1)
-                                            //                                            .border(reversedColorSchemeColor, width: /* border width */ 1)
                                             
                                             
                                                 .onTapGesture {
@@ -329,7 +313,7 @@ struct MainView_checklist: View {
                     
 //                    .padding(.top,geoHeight*0.035)
                     .padding(.bottom, topBarBottomPadding)
-                    .foregroundStyle(topForegroundColor) // 너무 튀는 것 같기도 하고..
+//                    .foregroundStyle(topForegroundColor) // 너무 튀는 것 같기도 하고..
 
                     
 
@@ -349,12 +333,8 @@ struct MainView_checklist: View {
                         changeMood: $changeMood,
                         forceToChooseMood: $forceToChooseMood
                     )
-//                    .frame(height: isToday ? geoHeight*0.93 : geoHeight*0.88)
-//                    .frame(height:geoHeight*0.93)
-//                    .border(.red)
                 }
                 .frame(width:geometry.size.width, height: geometry.size.height, alignment: .top)
-//                .border(.blue)
 
                 HStack(spacing:0.0) {
                     
@@ -366,7 +346,7 @@ struct MainView_checklist: View {
                     }
                     .padding(.leading, 20)
                     .frame(width:geoWidth*0.35, alignment: .leading)
-                    .buttonStyle(CheckListButtonStyle3(color: topForegroundColor))
+                    .buttonStyle(CheckListButtonStyle3(color: reversedColorSchemeColor))
 
                     Button(action:{
                         popUp_addDailyQuest.toggle()
@@ -376,8 +356,7 @@ struct MainView_checklist: View {
                             .resizable()
                             .frame(width:buttonSize, height:buttonSize)
                     }
-                    .buttonStyle(CheckListButtonStyle3(color: topForegroundColor))
-//                    .frame(width:buttonSize, height:buttonSize)
+                    .buttonStyle(CheckListButtonStyle3(color: reversedColorSchemeColor))
                     .frame(width:geoWidth*0.3)
                     
                     Button(action:{selectedDate = selectedDate.addingDays(1)}) {
@@ -388,16 +367,12 @@ struct MainView_checklist: View {
                     }
                     .padding(.trailing, 20)
                     .frame(width:geoWidth*0.35, alignment: .trailing)
-                    .buttonStyle(CheckListButtonStyle3(color: topForegroundColor))
+                    .buttonStyle(CheckListButtonStyle3(color: reversedColorSchemeColor))
 
                 }
                 .position(x:geoWidth/2, y:geoHeight*0.95 - 10)
 
 
-                
-            
-                
-//                let nothingToSave: Bool = currentDailyRecord.dailyText == nil && currentDailyRecord.dailyQuestList!.count == 0 && currentDailyRecord.todoList!.count == 0
                 
 
 
@@ -405,16 +380,12 @@ struct MainView_checklist: View {
                 
             } // zstack
             .frame(width:geometry.size.width, height: geometry.size.height)
-//            .background(.quaternary)
             .onAppear {
                 
-//                updateExistency()
                 changeDailyRecord()
-//                updateDailyQuestAlerm()
                 startTimer()
                 setKeyboardAppearanceStateValue()
-                
-//                NotificationCenter.default.addObserver(forName: ., object: <#T##Any?#>, queue: <#T##OperationQueue?#>, using: <#T##(Notification) -> Void#>)
+                if restrictedHeight == 0 { restrictedHeight = geoHeight }
                 
             }
             .onDisappear {
@@ -438,9 +409,6 @@ struct MainView_checklist: View {
 
             }
             .onChange(of: selectedView) { oldValue, newValue in
-//                currentDailyRecord = dailyRecords.first ?? DailyRecord()
-//                updateExistency()
-//                updateDailyQuestAlerm()
                 
                 for dailyQuest in currentDailyRecord.dailyQuestList! {
                     dailyQuest.currentTier = quests.first(where: {$0.name == dailyQuest.questName && !$0.inTrashCan})?.tier ?? 0
@@ -452,10 +420,7 @@ struct MainView_checklist: View {
                     forceToChooseMood = false
                 }
             }
-//            .onReceive(notificationManager.$notificationData) { userInfo in
-//                
-////                updateDailyQuestAlerm()
-//            }
+
             .popover(isPresented: $popUp_addDailyQuest) {
                 EditCheckListView(
                     currentDailyRecord: currentDailyRecord,
@@ -509,21 +474,6 @@ struct MainView_checklist: View {
 
 
     
-//    private func updateDailyQuestAlerm() {
-//        // MARK: 앱을 끈 상태에서 들어가면 잘 nil처리 됨, 킨 상태이면 안됨
-//        // Your function to be executed when the app is opened via notification
-//        if let dailyQuests = currentDailyRecord.dailyQuestList {
-//            //            print("hallo~~~")
-//            for dailyQuest in dailyQuests {
-//                if let alermTime = dailyQuest.alermTime {
-//                    if alermTime.isExpired_local {
-//                        dailyQuest.alermTime = nil
-//                    }
-//                }
-//            }
-//        }
-//    }
-    
     
     func startTimer() { // 오늘의 자정에 timer 맞추기 ( 24/07/11 12:00 -> 24/07/12 00:00 에 작동하는 타이머 설정)
         // MARK: 과연 00:00 에 작동하는가? 23:59에 작동할 가능성은?
@@ -532,9 +482,6 @@ struct MainView_checklist: View {
         let tommorow = getTomorrowOf(date)
         let timeInterval = tommorow.timeIntervalSince(date)
 
-//        timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { _ in
-//            updateExistency()
-//        }
     }
     
     func setKeyboardAppearanceStateValue() -> Void {
@@ -1263,17 +1210,11 @@ struct TodoTextFieldView: View {
             .padding(.leading, 5)
             .frame(width:geoWidth, height: geoHeight)
 //            .lineLimit(2) // does not work
-            .minimumScaleFactor(0.7)
+            .minimumScaleFactor(0.85)
             .focused($isFocused)
             .onSubmit { // only when return button pressed.
                 
                 todo.content = text
-
-//                let todos = currentDailyRecord.todoList!.filter({$0.idx > todo.idx}).sorted(by: {$0.idx > $1.idx})
-//                for todo2 in todos {
-//                    todo2.idx += 1
-//                }
-//                try? modelContext.save()
 
                 let a = todo.idx
                 let date = currentDailyRecord.date
@@ -1297,10 +1238,7 @@ struct TodoTextFieldView: View {
                 
                 modelContext.insert(Todo(dailyRecord:currentDailyRecord, index: todo.idx + 1))
                 idx = todo.idx + 1
-                //                }
-                //                else {
-                //                    doneButtonPressed = false
-                //                }
+
             }
             .onChange(of: doneButtonPressed, {
                 //                if idx == todo.index {

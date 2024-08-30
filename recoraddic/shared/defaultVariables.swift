@@ -59,20 +59,23 @@ func getStatusBarHeight() -> CGFloat {
 }
 
 
-func getButtomSafeAreaHeight() -> CGFloat {
-    let window = UIApplication.shared.connectedScenes
-        .filter { $0.activationState == .foregroundActive }
-        .map { $0 as? UIWindowScene }
-        .compactMap { $0 }
-        .first?.windows
-        .filter { $0.isKeyWindow }
-        .first
-
-    let windowHeight = window?.windowScene?.windows.first?.screen.bounds.height ?? 0
-    let mainHeight = window?.windowScene?.windows.first?.frame.height ?? 0
-    let statusBarHeight = window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
-    return windowHeight - statusBarHeight - mainHeight // 전체 창 크기
-}
+//func getBottomSafeAreaHeight() -> CGFloat {
+//    let window = UIApplication.shared.connectedScenes
+//        .filter { $0.activationState == .foregroundActive }
+//        .map { $0 as? UIWindowScene }
+//        .compactMap { $0 }
+//        .first?.windows
+//        .filter { $0.isKeyWindow }
+//        .first
+//    let windowHeight = window?.windowScene?.windows.first?.screen.bounds.height ?? 0
+////    let mainHeight = window?.windowScene?.windows.first?.frame.height ?? 0
+//    let mainHeight = window?.windowScene?.
+//    let statusBarHeight = window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
+//    print(windowHeight)
+//    print(mainHeight)
+//    print(statusBarHeight)
+//    return windowHeight - statusBarHeight - mainHeight // 전체 창 크기
+//}
 //TODO: windowHeight 랑 mainHeight 값 확인
 func getmainHeight() -> CGFloat {
     let window = UIApplication.shared.connectedScenes

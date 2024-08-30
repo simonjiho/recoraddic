@@ -82,9 +82,9 @@ struct ContentView: View {
     
     @State var currentDailyRecord: DailyRecord?
     
-//    @State var todayRecordExists: Bool = false
-//    @State var yesterday
-    
+
+    @State var restrictedHeight:CGFloat = 0
+    @State var topEdgeIgnortedHeight:CGFloat = 0
     
     let images: [MainViewName:String] = [
         .checkList : "checklist.checked",
@@ -131,7 +131,8 @@ struct ContentView: View {
                  TabView(selection: $selectedView){
                      MainView_checklist(
 //                        currentRecordSet: currentDailyRecordSet,
-                        selectedView: $selectedView
+                        selectedView: $selectedView,
+                        restrictedHeight: $restrictedHeight
                         
                      )
                      .background(.quaternary)
@@ -149,14 +150,16 @@ struct ContentView: View {
                      .ignoresSafeArea(.keyboard)
                      .tag(mainViews[1])
 
-                     //
+                     
                      let currentDailyRecordSet: DailyRecordSet = dailyRecordSets.filter({$0.start <= getStandardDateOfNow()}).last ?? DailyRecordSet(start: getStandardDate(from: Date().addingDays(1000))) // MARK: signOutErrorPrevention(alternative DRS shouldn't be selected)
                      let index = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).count > 0 ? dailyRecordSets.filter({$0.start < .now}).count-1 : 0
                      MainView_SeeMyDailyRecord(
                         selectedDrsIdx: index,
                         selectedDailyRecordSet: currentDailyRecordSet,
                         isNewDailyRecordAdded: $isNewDailyRecordAdded,
-                        selectedView: $selectedView
+                        selectedView: $selectedView,
+                        restrictedHeight: $restrictedHeight,
+                        topEdgeIgnoredHeight: $topEdgeIgnortedHeight
 //                            navigationBarHeight: navigationBarHeight
                      )
                      .tabItem {
@@ -176,6 +179,7 @@ struct ContentView: View {
                          .background(.quaternary)
                          .ignoresSafeArea(.keyboard)
                          .tag(mainViews[3])
+
                      
                      MainView_ProfileAndSettings(profile: profile)
                      .tabItem {
@@ -196,6 +200,7 @@ struct ContentView: View {
                          }
                      }
 
+//                     _ = getBottomSafeAreaHeight()
 
                      
                  }

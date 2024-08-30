@@ -36,7 +36,6 @@ struct StoneTower: View {
     @Binding var drsDeleted: Bool
     @Binding var startDate: Date
     @Binding var endDate: Date
-
     
     let prevDRS_start: Date?
     let nextDRS_start: Date?
@@ -140,6 +139,7 @@ struct StoneTower: View {
                             .onTapGesture {
                                 selectedDailyRecord = nil
                             }
+                            .id(0)
 
                                 
                                 // stone
@@ -252,231 +252,108 @@ struct StoneTower: View {
                                         
                                         
                                     }
+                                    .disabled(isEditingTermGoals)
                                 }
                                 
                                 
-                                VStack(spacing:0.0) {
+                                VStack {
                                     
-                                    HStack {
-                                        Button(action:{
-                                            
-                                            selectedDrsIdx -= 1
-                                            isEditingTermGoals = false
-                                        }) {
-                                            Image(systemName: "chevron.left")
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .frame(width:geoWidth*0.12,height: groundHeight*0.1)
-                                        }
-                                        .buttonStyle(.plain)
-                                        .disabled(selectedDrsIdx == 0 || isEditingTermGoals)
-                                        
 
-                                        HStack {
-                                            if selectedDailyRecordSet.end != nil {
-                                                DatePicker(
-                                                    "",
-                                                    selection: $startDate,
-                                                    in: startRange,
-                                                    displayedComponents: [.date]
-                                                )
-                                                .labelsHidden()
-                                                .frame(width:geoWidth*0.25)
-                                                .dynamicTypeSize( ...DynamicTypeSize.xxLarge)
 
-                                                
-                                                Text("~")
-                                                    .padding(.horizontal,5)
-                                                DatePicker(
-                                                    "",
-                                                    selection: $endDate,
-                                                    in: endRange,
-                                                    displayedComponents: [.date]
-                                                )
-                                                .labelsHidden()
-                                                .frame(width:geoWidth*0.25)
-                                                .dynamicTypeSize( ...DynamicTypeSize.xxLarge)
 
+                                    if isEditingTermGoals {
+                                        if editText.count != 0 {
+                                            ForEach(0...editText.count - 1, id:\.self) { index in
+                                                HStack {
+                                                    Text("\(index+1). ")
+                                                    TextField("",text:$editText[index])
+                                                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                                                        .frame(width:geoWidth*0.7, alignment:.leading)
+                                                        .focused($editTermGoals, equals:index)
+                                                        .onSubmit {
+                                                            selectedDailyRecordSet.termGoals = editText.filter({$0 != ""})
+                                                            editTermGoals = nil
+                                                            isEditingTermGoals.toggle()
+                                                        }
+                                                    
+                                                    if index != 0 {
+                                                        Button(action: {
+                                                            if editTermGoals == index {
+                                                                if editTermGoals != 0 {
+                                                                    editTermGoals = index - 1
+                                                                }
+                                                            }
+                                                            DispatchQueue.main.asyncAfter(deadline: .now()+0.2) { // if done just right after, it will lead index out of range error.
+                                                                editText.remove(at: index)
+                                                            }
+                                                            
+                                                        }) {
+                                                            Image(systemName: "x.circle")
+                                                        }
+                                                        .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
+                                                        .buttonStyle(MainButtonStyle2(width: plusMinusButtonSize, height: plusMinusButtonSize))
+                                                    }
+                                                    else {
+                                                        Spacer()
+                                                        .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
+
+                                                    }
+                                                }
                                             }
-                                            else {
-                                                DatePicker(
-                                                    "",
-                                                    selection: $startDate,
-                                                    in: startRange,
-                                                    displayedComponents: [.date]
-                                                )
-                                                .labelsHidden()
-                                                .frame(width:geoWidth*0.25)
-                                                .dynamicTypeSize( ...DynamicTypeSize.xxLarge)
-
-                                                Text("~")
-                                                    .padding(.horizontal,5)
-
-                                            }
-
                                         }
-                                        .frame(width:geoWidth*0.7, height:groundHeight*0.15, alignment: .center)
-                                        Button(action:{
-                                            selectedDrsIdx += 1
-                                        }) {
-                                            Image(systemName: "chevron.right")
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .frame(width:geoWidth*0.12, height: groundHeight*0.1)
-                                        }
-                                        .buttonStyle(.plain)
-                                        .disabled(isLatestDailyRecordSet || isEditingTermGoals)
-
                                     }
-                                    .frame(width:geoWidth, height:groundHeight*0.23)
-                                    .padding(.bottom, groundHeight*0.07)
 
-
-                                    VStack {
-                                        if isEditingTermGoals {
-                                            if editText.count != 0 {
-                                                ForEach(0...editText.count - 1, id:\.self) { index in
+                                    else {
+                                        Group {
+                                            if selectedDailyRecordSet.termGoals.count != 0 {
+                                                ForEach(0...selectedDailyRecordSet.termGoals.count-1, id:\.self) { index in
                                                     HStack {
                                                         Text("\(index+1). ")
-                                                        TextField("",text:$editText[index])
-                                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                                        Text(selectedDailyRecordSet.termGoals[index])
                                                             .frame(width:geoWidth*0.7, alignment:.leading)
-                                                            .focused($editTermGoals, equals:index)
-                                                            .onSubmit {
-                                                                selectedDailyRecordSet.termGoals = editText.filter({$0 != ""})
-                                                                editTermGoals = nil
-                                                                isEditingTermGoals.toggle()
-                                                            }
-                                                        
-                                                        if index != 0 {
-                                                            Button(action: {
-                                                                if editTermGoals == index {
-                                                                    if editTermGoals != 0 {
-                                                                        editTermGoals = index - 1
-                                                                    }
-                                                                }
-                                                                DispatchQueue.main.asyncAfter(deadline: .now()+0.2) { // if done just right after, it will lead index out of range error.
-                                                                    editText.remove(at: index)
-                                                                }
-                                                                
-                                                            }) {
-                                                                Image(systemName: "x.circle")
-                                                            }
-                                                            .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
-                                                            .buttonStyle(MainButtonStyle2(width: plusMinusButtonSize, height: plusMinusButtonSize))
-                                                        }
-                                                        else {
-                                                            Spacer()
-                                                            .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
-
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        else {
-                                            Group {
-                                                if selectedDailyRecordSet.termGoals.count != 0 {
-                                                    ForEach(0...selectedDailyRecordSet.termGoals.count-1, id:\.self) { index in
-                                                        HStack {
-                                                            Text("\(index+1). ")
-                                                            Text(selectedDailyRecordSet.termGoals[index])
-                                                                .frame(width:geoWidth*0.7, alignment:.leading)
-                                                            
-                                                        }
-                                                        .opacity(0.8)
-                                                        .padding(.vertical,3)
-                                                        
                                                         
                                                     }
+                                                    .opacity(0.8)
+                                                    .padding(.vertical,3)
+                                                    
                                                     
                                                 }
-                                                else {
-                                                    Text("목표를 적어보세요")
-                                                        .opacity(0.3)
-                                                }
+                                                
                                             }
-                                            .onTapGesture {
-                                                editText = selectedDailyRecordSet.termGoals
-                                                if selectedDailyRecordSet.termGoals.count == 0 {
-                                                    editText.append("")
-                                                }
-                                                editTermGoals = editText.count - 1
-                                                isEditingTermGoals.toggle()
+                                            else {
+                                                Text("이번 기간의 목표를 적어보세요")
+                                                    .opacity(0.3)
                                             }
-                                        
                                         }
-                                        
-                                        
-                                        if isEditingTermGoals && editText.count <= 2 {
-                                            Button(action:{
+                                        .onTapGesture {
+                                            editText = selectedDailyRecordSet.termGoals
+                                            if selectedDailyRecordSet.termGoals.count == 0 {
                                                 editText.append("")
-                                                editTermGoals? += 1
-                                            }) {
-                                                Image(systemName: "plus.circle")
                                             }
-                                            .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
-                                            .buttonStyle(MainButtonStyle2(width: plusMinusButtonSize, height: plusMinusButtonSize))
+                                            editTermGoals = editText.count - 1
+                                            isEditingTermGoals.toggle()
                                         }
+                                    
                                     }
-                                    .frame(height:groundHeight*0.55, alignment: .top)
+                                    
+                                    
+                                    if isEditingTermGoals && editText.count <= 2 {
+                                        Button(action:{
+                                            editText.append("")
+                                            editTermGoals? += 1
+                                        }) {
+                                            Image(systemName: "plus.circle")
+                                        }
+                                        .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
+                                        .buttonStyle(MainButtonStyle2(width: plusMinusButtonSize, height: plusMinusButtonSize))
+                                    }
+
                                     
                                     // 나중에 얘 ZStack으로 옮겨서 SeeMyRecord로 옮기고, viewModifier로 넣기?
-                                
-//                                        HStack(spacing:0.0) {
-                                    Menu {
-                                        Button("스타일 변경") { // 나중에 theme, theme별 선택 가능 요소(색,배경 등등들 다 바꿀 수 있게 하기
-                                            popUp_changeStyle.toggle()
-                                        }
-                                        
-//                                        Button (action:{
-//                                            editText = dailyRecordSet.termGoals
-//                                            if editText.isEmpty {
-//                                                editText.append("")
-//                                            }
-//                                            isEditingTermGoals.toggle()
-//                                            editTermGoals = editText.count - 1
-//
-//                                        }) {
-//                                            let noTermGoals = dailyRecordSet.termGoals.count == 0
-//                                            Text("목표 \(noTermGoals ? "설정" : "편집")")
-//                                        }
-//                                        .disabled(isEditingTermGoals)
-                                        if selectedDrsIdx != 0 {
-                                            Button("직전 탑과 합치기") { // 나중에 theme, theme별 선택 가능 요소(색,배경 등등들 다 바꿀 수 있게 하기
-                                                drsDeleted.toggle()
-                                            }
-                                        }
-                                        // TODO: 분리하기
-                                        
-                                        if isLatestDailyRecordSet {
-                                            Button(action: {
-                                                popUp_startNewRecordSet.toggle()
-                                            }) {
-                                                Text("새로운 기록의 탑 생성")
-//                                                            .minimumScaleFactor(0.5)
-                                            }
-
-
-                                        }
-                                        
-                                    } label: {
-                                        Button(action:{}) {
-                                            Image(systemName:"line.3.horizontal")
-
-                                        }
-                                        .buttonStyle(MainButtonStyle2(width: buttonWidth2, height: buttonWidth2))
-                                        .shadow(color:shadowColor ,radius: 1.0)
-                                }
-                                    .padding(.bottom,10)
-                                    .padding(.trailing,10)
-                                    .frame(width: geoWidth, height:groundHeight*0.15, alignment:.bottomTrailing)
-
-//                                        .frame(width: geoWidth, height:groundHeight*0.15, alignment:.leading)
 
 
                                 }
+                                .padding(.top,20)
                                 .frame(width:geoWidth, height:groundHeight + keyboardHeight, alignment:.top)
                                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 
@@ -514,7 +391,7 @@ struct StoneTower: View {
                 }
 
                 .scrollDisabled(popUp_recordInDetail)
-                .defaultScrollAnchor(isLatestDailyRecordSet ? .top : .bottom)
+//                .defaultScrollAnchor(isLatestDailyRecordSet ? .top : .bottom) // 항상 .top이 나은듯
                 .onReceive(keyboardHeightPublisher) { value in
 
                     if keyboardAppeared {
@@ -537,7 +414,9 @@ struct StoneTower: View {
 
                 }
                 .scrollDisabled(keyboardAppeared)
-                
+//                .onChange(of: selectedView) {
+//                    scrollProxy.scrollTo(0, anchor: .top)
+//                }
 
 
             }
@@ -683,21 +562,24 @@ struct StoneTower_popUp_ChangeStyleView: View {
             let geoHeight = geometry.size.height
             let gridSize = geoWidth*0.2
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 60, maximum: 60))]) {
-                ForEach(0...5,id:\.self) { index in
-                    Circle()
-                        .fill(StoneTower.getIntegratedDailyRecordColor(index: index,colorScheme: colorScheme))
-                        .stroke(getReversedColorSchemeColor(colorScheme), style: StrokeStyle(lineWidth: index == defaultColorIndex_tmp ? 5.0 : 1.0))
-                        .padding(10)
-                        .frame(width:gridSize, height: gridSize)
-                        .onTapGesture {
-                            defaultColorIndex_tmp = index
-                            DispatchQueue.main.asyncAfter(deadline: .now()+0.05) {
-                                popUp_changeStyle.toggle()
+            VStack {
+                Text("돌멩이 색 변경")
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 60, maximum: 60))]) {
+                    ForEach(0...5,id:\.self) { index in
+                        Circle()
+                            .fill(StoneTower.getIntegratedDailyRecordColor(index: index,colorScheme: colorScheme))
+                            .stroke(getReversedColorSchemeColor(colorScheme), style: StrokeStyle(lineWidth: index == defaultColorIndex_tmp ? 5.0 : 1.0))
+                            .padding(10)
+                            .frame(width:gridSize, height: gridSize)
+                            .onTapGesture {
+                                defaultColorIndex_tmp = index
+                                DispatchQueue.main.asyncAfter(deadline: .now()+0.05) {
+                                    popUp_changeStyle.toggle()
+                                }
                             }
-                        }
+                    }
+                    
                 }
-
             }
             .padding(50)
 

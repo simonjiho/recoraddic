@@ -41,70 +41,58 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
     
     @Binding var isNewDailyRecordAdded: Bool
     @Binding var selectedView: MainViewName
+    @Binding var restrictedHeight: CGFloat
+    @Binding var topEdgeIgnoredHeight: CGFloat
     
     @State var popUp_startNewRecordSet: Bool = false
     @State var popUp_recordInDetail = false
     @State var popUp_changeStyle = false
-    
     @State var selectedRecord: DailyRecord? = nil
     @State var selectedDrDate: Date? = nil
-    
     @State var updateSelectedDailyRecordSet: Bool = false
-    
-//    @State var dailyRecordHiddenOrDeleted: Bool = false
-//    @State var alert_drsHidden: Bool = false
-//    @State var alert_drsInTrashCan: Bool = false
-//    @State var dailyRecordDeleted: Bool = false
-//    @State var dailyRecordUnhidden: Bool = false
-//    @State var hiddenOrDeletedIndex: Int = 0
     @State var recalculatingVisualValues_themeChanged: Bool = false // not used yet. Will be used to hide when calculation is on process
-    
     @State var dailyRecordSetHiddenOrDeleted: Bool = false
     @State var isEditingTermGoals: Bool = false
-    
     @State var newDailyRecordSetAdded: Bool = false
     @State var undoNewDRS: Bool = false
-    
     @State var startDate: Date = Date()
     @State var endDate: Date = Date()
-    
     @State var lastTapTime: Date = Date()
     @State var lastEditedTime: Date = Date()
-    
     @State var selectedDrIdx:Int? = nil
-
+    @State var alert_confirmDrsDeletion: Bool = false
     @State var drsDeleted: Bool = false
+    @State var buttonOpacity: CGFloat = 0.5
+    @State var lastDrSelectedTime: Date = Date()
     
     var body: some View {
         
         let showHiddenQuests = profiles.first?.showHiddenQuests ?? false
         let hiddenQuestNames: Set<String> = showHiddenQuests ? [] : Set(quests.filter({$0.isHidden}).map({$0.name}))
 
-        let dailyRecords_withContent:[DailyRecord] = {
-            if showHiddenQuests {
-                return selectedDailyRecordSet.dailyRecords!
-                    .filter({$0.hasContent})
-                    .sorted(by: {
-                        if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
-                        else { return false }
-                    })
-            } else {
-//                print("hiddenQuestNames:\(hiddenQuestNames)")
-//                print("dailyQuestList:\( Set(selectedRecord?.dailyQuestList!.map{$0.questName}) )")
-                return selectedDailyRecordSet.dailyRecords!
-                    .filter({
-                        $0.hasContent &&
-                        ($0.hasTodoOrDiary ||
-                         !Set($0.dailyQuestList!.filter({$0.data != 0}).map{$0.questName}).subtracting(hiddenQuestNames).isEmpty)
-                    })
-                    .sorted(by:{
-//                        print("\($0.dailyQuestList!.map{$0.questName})")
-                        if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
-                        else { return false }
-                    }
-                )
-            }
-        }()
+//        let dailyRecords_withContent:[DailyRecord] = {
+//            if showHiddenQuests {
+//                return selectedDailyRecordSet.dailyRecords!
+//                    .filter({$0.hasContent})
+//                    .sorted(by: {
+//                        if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
+//                        else { return false }
+//                    })
+//            } else {
+//                return selectedDailyRecordSet.dailyRecords!
+//                    .filter({
+//                        $0.hasContent &&
+//                        ($0.hasTodoOrDiary ||
+//                         !Set($0.dailyQuestList!.filter({$0.data != 0}).map{$0.questName}).subtracting(hiddenQuestNames).isEmpty)
+//                    })
+//                    .sorted(by:{
+//                        if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
+//                        else { return false }
+//                    }
+//                )
+//            }
+//        }()
+        let dailyRecords_withContent:[DailyRecord] = selectedDailyRecordSet.dailyRecordsWithContent(hiddenQuestNames: hiddenQuestNames, showHiddenQuests: showHiddenQuests)
         
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
@@ -112,7 +100,6 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         let statusBarHeight:CGFloat = getStatusBarHeight()
 
         let dailyRecordSetEmpty: Bool = selectedDailyRecordSet.dailyRecords!.filter({$0.hasContent}).count == 0
-//        let lastDailyRecord: Bo
         
         let nextDRS: DailyRecordSet? = selectedDrsIdx < dailyRecordSets.count - 1  ? dailyRecordSets[selectedDrsIdx+1] : nil
         
@@ -157,7 +144,8 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
             }
         }()
 
-        
+        let isLastDailyRecordSet: Bool = selectedDrsIdx == dailyRecordSets.count - 1
+
 
         
         GeometryReader { geometry in
@@ -213,15 +201,157 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     Text("변경하는 중..")
                 }
                 
+                HStack(spacing:0.0) {
+                    Button(action:{
+                        
+                        selectedDrsIdx -= 1
+                        isEditingTermGoals = false
+                    }) {
+                        Image(systemName: "arrowtriangle.backward")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width:geoWidth*0.08)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(selectedDrsIdx == 0 || isEditingTermGoals)
+                    .opacity((selectedDrsIdx == 0 || isEditingTermGoals) ? 0.0 : buttonOpacity)
+                    .padding(.leading,10)
+                    .frame(width:geoWidth/2, alignment:.leading)
+                    
+                    Button(action:{
+                        selectedDrsIdx += 1
+                    }) {
+                        Image(systemName: "arrowtriangle.forward")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width:geoWidth*0.08)
+                    }
+                    .buttonStyle(.plain)
+//                    .foregroundStyle(.ultraThinMaterial)
+                    .disabled(isLastDailyRecordSet || isEditingTermGoals)
+                    .opacity((isLastDailyRecordSet || isEditingTermGoals) ? 0.0 : buttonOpacity)
+
+                    .padding(.trailing,10)
+                    .frame(width:geoWidth/2, alignment:.trailing)
+
+                }
+//                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                
+                
+                // 790 849(790 + 59) 54 932(790 + 59 + ?)
+
+//                let restrictedScreenBoundsHeight:CGFloat = 10 /*UIScreen.main.bounds.height - geoHeight*/
+                HStack {
+                    if selectedDailyRecordSet.end != nil {
+                        DatePicker(
+                            "",
+                            selection: $startDate,
+                            in: startRange,
+                            displayedComponents: [.date]
+                        )
+                        .labelsHidden()
+//                        .frame(width:geoWidth*0.25)
+
+                        
+                        Text("~")
+                            .bold()
+                            .padding(.horizontal,3)
+                        DatePicker(
+                            "",
+                            selection: $endDate,
+                            in: endRange,
+                            displayedComponents: [.date]
+                        )
+                        .labelsHidden()
+//                        .frame(width:geoWidth*0.25)
+
+                    }
+                    else {
+                        DatePicker(
+                            "",
+                            selection: $startDate,
+                            in: startRange,
+                            displayedComponents: [.date]
+                        )
+                        .labelsHidden()
+
+                        Text("~")
+                            .bold()
+                            .padding(.horizontal,5)
+                            .minimumScaleFactor(0.5)
+                            .frame(width:30.0, alignment:.leading)
+
+                    }
+
+                }
+                .frame(width:geoWidth*0.95, height:restrictedHeight*0.05)
+                .position(x:geoWidth*0.5, y: (geoHeight - restrictedHeight) + restrictedHeight*0.035 + restrictedHeight*0.025 )
+                .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
+                .offset(x: selectedDailyRecordSet.end != nil ? 0.0 : 15.0)
+
+
+//                    .frame(width:geoWidth*0.7, height:groundHeight*0.15, alignment: .center)
+                
+                Menu { // menu의 요소들에는 dynamicTypeSize 안 통함
+                    
+                    Button("도움말") {
+                        
+                    }
+//                    .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
+
+                    
+                    Button("스타일 변경") { // 나중에 theme, theme별 선택 가능 요소(색,배경 등등들 다 바꿀 수 있게 하기
+                        popUp_changeStyle.toggle()
+                    }
+//                    .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
+
+                    if selectedDrsIdx != 0 {
+                        Button("현재 기록의 탑 삭제") {
+                            alert_confirmDrsDeletion.toggle()
+                        }
+                        
+                    }
+                    
+                    if isLastDailyRecordSet {
+                        Button(action: {
+                            popUp_startNewRecordSet.toggle()
+                        }) {
+                            Text("다음 기록의 탑 생성")
+                        }
+
+
+                    }
+                    
+                } label: {
+                    Image(systemName:"line.3.horizontal")
+                }
+                .frame(width:geoWidth*0.95, height:restrictedHeight*0.05, alignment: .trailing)
+                .position(x:geoWidth*0.5, y: (geoHeight - restrictedHeight) + restrictedHeight*0.035 + restrictedHeight*0.025 )
+                .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
+                .buttonStyle(.plain)
+                .alert("해당 기록의 탑을 삭제하시겠습니까?", isPresented: $alert_confirmDrsDeletion) {
+                    Button("삭제") {
+                        alert_confirmDrsDeletion.toggle()
+                        drsDeleted.toggle()
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.red)
+                    Button("아니오") {
+                        alert_confirmDrsDeletion.toggle()
+                    }
+                } message: {
+                    Text("모든 기록은 직전 기록의 탑과 병합됩니다.")
+                }
                 
                 
                 if popUp_startNewRecordSet {
                     Color.gray.opacity(0.5)
+                    let minDate = standardDateToLocalStartOfDay(std:selectedDailyRecordSet.start.addingDays(1))
                     StartNewRecordSet(
                         popUp_startNewRecordSet: $popUp_startNewRecordSet,
                         newDailyRecordSetAdded: $newDailyRecordSetAdded,
-                        minDate: selectedDailyRecordSet.start.addingDays(1),
-                        selectedDate:selectedDailyRecordSet.start.addingDays(1)
+                        minDate: minDate,
+                        selectedDate:max(minDate, getStartDateOfNow())
                     )
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                         .popUpViewLayout(width: geoWidth*0.9, height: (geoHeight-statusBarHeight)*0.6, color: backGroundColor)
@@ -241,6 +371,7 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                         .frame(width: geoWidth*0.8, height: geoHeight*0.7)
                         .background(.background)
                         .clipShape(.rect(cornerSize: CGSize(width: geoWidth*0.8*0.1, height: geoHeight*0.7*0.1)))
+                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     }
 
                 }
@@ -271,7 +402,11 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 
                 
             }
+            .frame(width:geoWidth,height:geoHeight)
             .scrollDisabled(dailyRecordSetEmpty)
+            .onAppear() {
+                if topEdgeIgnoredHeight == 0 {topEdgeIgnoredHeight = geoHeight}
+            }
         }
         .onChange(of: selectedDrsIdx) {
             updateSelectedDailyRecordSet = true
@@ -471,6 +606,20 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 
                 drsDeleted = false
                 
+            }
+        }
+        
+        .onChange(of: selectedDrDate) {
+            if selectedDrDate != nil {
+                buttonOpacity = 0.0
+                lastDrSelectedTime = Date()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                    if Date().timeIntervalSince(lastDrSelectedTime) > 2.5 {
+                        buttonOpacity = 0.5
+                    }
+                }
+            } else {
+                buttonOpacity = 0.5
             }
         }
 //        .onChange(of: popUp_recordInDetail) {

@@ -306,14 +306,13 @@ struct MainView_QuestInventory: View {
                 }
 
             }
-            
+            .onAppear() {print("main: \(geoHeight)")}
             .fullScreenCover(isPresented: $editQuestInfo, onDismiss: {selectedQuest=nil}) {
                 EditQuest2(
                     popUp_editQuest: $editQuestInfo,
                     selectedQuest: $selectedQuest
                 )
             }
-            
             .sheet(isPresented: $isEdit) {
 //                if popUp_confirmation {
 //
@@ -1246,7 +1245,6 @@ struct QuestHelpView: View {
                                 }
                             }
                             .padding(10)
-//                            .background(.gray.opacity(0.2))
                             .background(.red.opacity(0.3))
                             .clipShape(.buttonBorder)
                             .padding(.bottom,30)
@@ -1273,9 +1271,7 @@ struct QuestHelpView: View {
                                 }
                             }
                             .padding(10)
-//                            .background(.gray.opacity(0.2))
                             .background(Color.yellow.opacity(0.2).background(.green.opacity(0.2)))
-//                            .background(colorScheme == .light ? .green.opacity(0.3) : .yellow.opacity(0.3))
                             .clipShape(.buttonBorder)
                             .padding(.bottom,30)
                             

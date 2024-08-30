@@ -35,6 +35,8 @@ struct StartNewRecordSet:View {
     
     @State var steps: Int = 0
     
+    @State var alert_confirmNewDailyRecordSet = false
+    
     
     var body: some View {
         
@@ -99,10 +101,7 @@ struct StartNewRecordSet:View {
                 
 
                 Button("생성") {
-                    if selectedDailyRecordThemeName == "StoneTower" {
-                        createNewDailyRecordSet()
-                        popUp_startNewRecordSet.toggle()
-                    }
+                    alert_confirmNewDailyRecordSet.toggle()
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(selectedDailyRecordThemeName == nil)
@@ -112,6 +111,18 @@ struct StartNewRecordSet:View {
             }
             .frame(width: geoWidth,height: geoHeight,alignment: .top)
             .background(.background.opacity(0.3))
+            .alert("새로운 기록의 탑을 생성하시겠습니까?", isPresented: $alert_confirmNewDailyRecordSet) {
+                Button("생성") {
+                    alert_confirmNewDailyRecordSet.toggle()
+                    if selectedDailyRecordThemeName == "StoneTower" {
+                        createNewDailyRecordSet()
+                        popUp_startNewRecordSet.toggle()
+                    }
+                }
+                Button("취소") {
+                    alert_confirmNewDailyRecordSet.toggle()
+                }
+            }
 //            .dismissingKeyboard()
             
 

@@ -368,6 +368,29 @@ final class DailyRecordSet: Equatable {
         return self.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({$0.hasContent && ( ($0.getLocalDate() ?? getStartDateOfNow()) < .now )})
     }
 
+    func dailyRecordsWithContent(hiddenQuestNames:Set<String>, showHiddenQuests:Bool) -> [DailyRecord] {
+        if showHiddenQuests {
+            return self.dailyRecords!
+                .filter({$0.hasContent})
+                .sorted(by: {
+                    if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
+                    else { return false }
+                })
+        } else {
+            return self.dailyRecords!
+                .filter({
+                    $0.hasContent &&
+                    ($0.hasTodoOrDiary ||
+                     !Set($0.dailyQuestList!.filter({$0.data != 0}).map{$0.questName}).subtracting(hiddenQuestNames).isEmpty)
+                })
+                .sorted(by:{
+                    if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
+                    else { return false }
+                }
+            )
+        }
+    }
+    
     
 //    func increaseStreak(from date:Date) {
 //        if let dailyRecords = self.dailyRecords {

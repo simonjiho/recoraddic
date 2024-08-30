@@ -139,8 +139,6 @@ struct EditCheckListView: View {
                                         //                                    .background(getBrightTierColorOf(tier: quest.tier))
                                         .background(
                                             Rectangle()
-//                                                .fill (LinearGradient(colors: getGradientColorsOf(tier: quest.tier), startPoint: .topLeading, endPoint: .bottomTrailing)
-//                                                      )                                                
                                                 .fill(getTierColorOf(tier: quest.tier))
                                         )
                                         .clipShape(.buttonBorder)
@@ -271,11 +269,11 @@ struct EditCheckListView: View {
                                     .frame(width:elmWidth*0.9, height:questElmHeight)
                                     .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
                                     .bold()
+//                                    .background(getTierColorOf(tier: dailyQuest.currentTier))
                                     .background(
                                         Rectangle()
-                                            .fill (LinearGradient(colors: getGradientColorsOf(tier: dailyQuest.currentTier), startPoint: .topLeading, endPoint: .bottomTrailing)
-                                            )
-                                        )
+                                            .fill(getTierColorOf(tier: dailyQuest.currentTier))
+                                    )
                                     .clipShape(.buttonBorder)
                                 Button (action: {
                                     if let idx = dailyQuests_tmp.firstIndex(where: {$0 == dailyQuest}) {

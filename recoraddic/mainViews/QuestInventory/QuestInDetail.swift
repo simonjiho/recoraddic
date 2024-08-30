@@ -105,6 +105,7 @@ struct QuestInDetail: View {
                                     Button("확인") {
                                         alert_sameName.toggle()
                                     }
+                                    
                                 }
                                 
                                 

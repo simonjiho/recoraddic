@@ -214,7 +214,7 @@ struct DailyRecordInShort: View {
                             }
                         }
                         
-                        ForEach(dailyRecord.todoList!, id:\.self) { todo in
+                        ForEach(dailyRecord.todoList!.sorted(by: {$0.idx <= $1.idx}), id:\.self) { todo in
                             if todo.content != "" {
                                 let purposeCount2 = todo.purposes.count
                                 HStack {
