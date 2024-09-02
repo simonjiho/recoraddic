@@ -294,9 +294,9 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 
                 Menu { // menu의 요소들에는 dynamicTypeSize 안 통함
                     
-                    Button("도움말") {
-                        
-                    }
+//                    Button("도움말") {
+//                        
+//                    }
 //                    .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
 
                     
