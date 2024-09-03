@@ -290,7 +290,6 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 .offset(x: selectedDailyRecordSet.end != nil ? 0.0 : 15.0)
 
 
-//                    .frame(width:geoWidth*0.7, height:groundHeight*0.15, alignment: .center)
                 
                 Menu { // menu의 요소들에는 dynamicTypeSize 안 통함
                     

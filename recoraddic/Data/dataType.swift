@@ -53,7 +53,7 @@ enum DataType:Int, CaseIterable, Identifiable {
             return "시간"
         }
         else if dataType == .ox {
-            return "OX"
+            return "O/X"
         }
 
         else if dataType == .custom {

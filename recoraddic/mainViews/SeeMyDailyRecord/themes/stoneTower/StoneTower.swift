@@ -62,6 +62,8 @@ struct StoneTower: View {
     @State var showDailyQuestionStatistics: Bool = false
     @FocusState var editTermGoals: Int?
     
+    @State var pickerSelectedValue: Int = 0
+    
     
     var body: some View {
 
@@ -138,7 +140,13 @@ struct StoneTower: View {
                             .frame(height: totalSkyHeight + groundHeight + keyboardHeight)
                             .onTapGesture {
                                 selectedDailyRecord = nil
+                                if isEditingTermGoals {
+                                    selectedDailyRecordSet.termGoals = editText.filter({$0 != ""})
+                                    editTermGoals = nil
+                                    isEditingTermGoals = false
+                                }
                             }
+                            .dismissingKeyboard(isEditingTermGoals)
                             .id(0)
 
                                 
@@ -184,13 +192,32 @@ struct StoneTower: View {
                                             let heat:Int = heatNum(record.streak)
                                             
                                             ZStack {
-                                                StoneTower_stone(
-                                                    shapeNum: shapeNum,
-                                                    brightness: brightness,
-                                                    defaultColorIndex: defaultColorIndex,
-                                                    facialExpressionNum: record.mood,
-                                                    selected: isSelectedRecord
-                                                )
+                                                ZStack {
+                                                    StoneTower_stone(
+                                                        shapeNum: shapeNum,
+                                                        brightness: brightness,
+                                                        defaultColorIndex: defaultColorIndex,
+                                                        facialExpressionNum: record.mood,
+                                                        selected: isSelectedRecord
+                                                    )
+                                                    .frame(width: width, height: height)
+                                                    
+                                                    if record.dailyTextType == DailyTextType.inShort {
+                                                        Image(systemName:"book.closed")
+                                                            .font(.caption)
+                                                            .frame(width: width, height: height, alignment:.topLeading)
+                                                            .opacity(isSelectedRecord ? 0.0 :( isOnCenter ? 1.0 : (isNearCenter ? 0.3 : 0.0)))
+                                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+
+                                                    } else if record.dailyTextType == DailyTextType.diary {
+                                                        Image(systemName:"book.closed.fill")
+                                                            .font(.caption)
+                                                            .frame(width: width, height: height, alignment:.topLeading)
+                                                            .opacity(isSelectedRecord ? 0.0 :( isOnCenter ? 1.0 : (isNearCenter ? 0.3 : 0.0)))
+                                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                                    }
+                                                    
+                                                }
                                                 .frame(width: width, height: height)
                                                 .padding(.leading, geoWidth/2 - width/2 + CGFloat(misalignment)*horizontalUnitWidth)
                                                 .padding(.trailing, geoWidth/2 - width/2 - CGFloat(misalignment)*horizontalUnitWidth)
@@ -221,10 +248,14 @@ struct StoneTower: View {
                                                     .opacity(isOnCenter ? 1.0 : (isNearCenter ? 0.3 : 0.0))
                                                     .position(x: misalignment <= 0 ? geoWidth*(1-xPosRatio) : geoWidth*xPosRatio, y: height/2)
                                                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                                
+                                                
 
                                                 VStack {
-                                                    if record.dailyText != nil {
-                                                        Image(systemName: "book.closed.fill")
+                                                    if record.dailyTextType == DailyTextType.inShort {
+                                                        Image(systemName:"book.closed")
+                                                    } else if record.dailyTextType == DailyTextType.diary {
+                                                        Image(systemName:"book.closed.fill")
                                                     }
                                                     Text_hours(value: record.recordedMinutes)
                                                     Text("\(record.recordedAmount) 개의 기록")
@@ -255,12 +286,7 @@ struct StoneTower: View {
                                     .disabled(isEditingTermGoals)
                                 }
                                 
-                                
                                 VStack {
-                                    
-
-
-
                                     if isEditingTermGoals {
                                         if editText.count != 0 {
                                             ForEach(0...editText.count - 1, id:\.self) { index in
@@ -295,14 +321,14 @@ struct StoneTower: View {
                                                     }
                                                     else {
                                                         Spacer()
-                                                        .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
-
+                                                            .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
+                                                        
                                                     }
                                                 }
                                             }
                                         }
                                     }
-
+                                    
                                     else {
                                         Group {
                                             if selectedDailyRecordSet.termGoals.count != 0 {
@@ -311,6 +337,7 @@ struct StoneTower: View {
                                                         Text("\(index+1). ")
                                                         Text(selectedDailyRecordSet.termGoals[index])
                                                             .frame(width:geoWidth*0.7, alignment:.leading)
+                                                            .background(.gray.opacity(0.01))
                                                         
                                                     }
                                                     .opacity(0.8)
@@ -322,6 +349,7 @@ struct StoneTower: View {
                                             }
                                             else {
                                                 Text("이번 기간의 목표를 적어보세요")
+                                                    .frame(width:geoWidth*0.7)
                                                     .opacity(0.3)
                                             }
                                         }
@@ -333,7 +361,7 @@ struct StoneTower: View {
                                             editTermGoals = editText.count - 1
                                             isEditingTermGoals.toggle()
                                         }
-                                    
+                                        
                                     }
                                     
                                     
@@ -347,17 +375,162 @@ struct StoneTower: View {
                                         .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
                                         .buttonStyle(MainButtonStyle2(width: plusMinusButtonSize, height: plusMinusButtonSize))
                                     }
+//                                    Picker("",selection: $pickerSelectedValue) {
+//                                        ForEach(0...2, id:\.self) { value in
+//                                            if value == 0 {
+//                                                Image(systemName: "scope")
+//                                                
+//                                            }
+//                                            else if value == 1 {
+//                                                Image(systemName: "chart")
+//                                            }
+//                                            else if value == 2 {
+//                                                Image(systemName: "chart.bar")
+//                                            }
+//                                        }
+//                                    }
+//                                    .labelsHidden()
+//                                    .pickerStyle(.palette)
+//                                    
+//                                    if pickerSelectedValue == 0 {
+//                                        if isEditingTermGoals {
+//                                            if editText.count != 0 {
+//                                                ForEach(0...editText.count - 1, id:\.self) { index in
+//                                                    HStack {
+//                                                        Text("\(index+1). ")
+//                                                        TextField("",text:$editText[index])
+//                                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+//                                                            .frame(width:geoWidth*0.7, alignment:.leading)
+//                                                            .focused($editTermGoals, equals:index)
+//                                                            .onSubmit {
+//                                                                selectedDailyRecordSet.termGoals = editText.filter({$0 != ""})
+//                                                                editTermGoals = nil
+//                                                                isEditingTermGoals.toggle()
+//                                                            }
+//                                                        
+//                                                        if index != 0 {
+//                                                            Button(action: {
+//                                                                if editTermGoals == index {
+//                                                                    if editTermGoals != 0 {
+//                                                                        editTermGoals = index - 1
+//                                                                    }
+//                                                                }
+//                                                                DispatchQueue.main.asyncAfter(deadline: .now()+0.2) { // if done just right after, it will lead index out of range error.
+//                                                                    editText.remove(at: index)
+//                                                                }
+//                                                                
+//                                                            }) {
+//                                                                Image(systemName: "x.circle")
+//                                                            }
+//                                                            .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
+//                                                            .buttonStyle(MainButtonStyle2(width: plusMinusButtonSize, height: plusMinusButtonSize))
+//                                                        }
+//                                                        else {
+//                                                            Spacer()
+//                                                                .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
+//                                                            
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//                                        
+//                                        else {
+//                                            Group {
+//                                                if selectedDailyRecordSet.termGoals.count != 0 {
+//                                                    ForEach(0...selectedDailyRecordSet.termGoals.count-1, id:\.self) { index in
+//                                                        HStack {
+//                                                            Text("\(index+1). ")
+//                                                            Text(selectedDailyRecordSet.termGoals[index])
+//                                                                .frame(width:geoWidth*0.7, alignment:.leading)
+//                                                                .background(.gray.opacity(0.01))
+//                                                            
+//                                                        }
+//                                                        .opacity(0.8)
+//                                                        .padding(.vertical,3)
+//                                                        
+//                                                        
+//                                                    }
+//                                                    
+//                                                }
+//                                                else {
+//                                                    Text("이번 기간의 목표를 적어보세요")
+//                                                        .frame(width:geoWidth*0.7)
+//                                                        .opacity(0.3)
+//                                                }
+//                                            }
+//                                            .onTapGesture {
+//                                                editText = selectedDailyRecordSet.termGoals
+//                                                if selectedDailyRecordSet.termGoals.count == 0 {
+//                                                    editText.append("")
+//                                                }
+//                                                editTermGoals = editText.count - 1
+//                                                isEditingTermGoals.toggle()
+//                                            }
+//                                            
+//                                        }
+//                                        
+//                                        
+//                                        if isEditingTermGoals && editText.count <= 2 {
+//                                            Button(action:{
+//                                                editText.append("")
+//                                                editTermGoals? += 1
+//                                            }) {
+//                                                Image(systemName: "plus.circle")
+//                                            }
+//                                            .frame(width:plusMinusButtonSize, height:plusMinusButtonSize)
+//                                            .buttonStyle(MainButtonStyle2(width: plusMinusButtonSize, height: plusMinusButtonSize))
+//                                        }
+//                                        
+//                                        
+//                                        // 나중에 얘 ZStack으로 옮겨서 SeeMyRecord로 옮기고, viewModifier로 넣기?
+//                                        
+//                                        
+//                                    }
+//                                    else if pickerSelectedValue == 1 {
+//                                        
+////                                        let questCumulative:[String:Int] = {
+////                                            let returnList = [String:Int]()
+////                                            for dr in selectedDailyRecordSet.dailyRecords {
+////                                                for dq in dr.dailyQuestList! {
+////                                                    if let existingValue = returnList[dq.getName()] {
+////                                                        returnList[dq.getName()] = existingValue + dq.data
+////                                                    } else {
+////                                                        returnList[dq.getName()] = dq.data
+////                                                    }
+////                                                    
+////                                                }
+////                                            }
+////                                            return returnList
+////                                        }()
+////                                        let quest_recordedTimes:[String:Int] = {
+////                                            let returnList = [String:Int]()
+////                                            for dr in selectedDailyRecordSet.dailyRecords {
+////                                                for dq in dr.dailyQuestList! {
+////                                                    if let existingValue = returnList[dq.getName()] {
+////                                                        returnList[dq.getName()] = existingValue + dq.data
+////                                                    } else {
+////                                                        returnList[dq.getName()] = dq.data
+////                                                    }
+////                                                }
+////                                            }
+////                                            return returnList
+////                                        }()
+////                                        let questCumulative_sorted = questCumulative.sorted { (quest_recordedTimes[$0] ?? 1) > (quest_recordedTimes[$1] ?? 0)}
+////                                        ForEach(questCumulative_sorted) { (dqName, cumulatvie) in
+////                                            Text("\(dqName): \(cumulatvie)")
+////                                        }
+//                                    }
+                                }// vstack
+                                    .padding(.top,20)
+                                    .frame(width:geoWidth, height:groundHeight + keyboardHeight, alignment:.top)
+                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                                
 
-                                    
-                                    // 나중에 얘 ZStack으로 옮겨서 SeeMyRecord로 옮기고, viewModifier로 넣기?
 
 
-                                }
-                                .padding(.top,20)
-                                .frame(width:geoWidth, height:groundHeight + keyboardHeight, alignment:.top)
-                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 
-                            } // vstack
+                            }
                                 
                         
 
@@ -386,8 +559,7 @@ struct StoneTower: View {
                     let zStackViewFrameOriginY = zStackFrame.origin.y // 188 188
                     
                     scrollViewCenterY = scrollViewFrameOriginY - zStackViewFrameOriginY + scrollViewFrameCenterY
-                    //                print(scrollViewFrameOriginY)
-                    //                print(scrollViewCenterY)
+
                 }
 
                 .scrollDisabled(popUp_recordInDetail)
@@ -457,25 +629,25 @@ struct StoneTower: View {
 
     }
     
-    func shapeNum(_ input: Int) -> Int { // 기록 시간 -> 모양 (0~3시간 / 3시간~6시간 / 6시간 이상)
+    func shapeNum(_ input: Int) -> Int { // 기록 시간 -> 모양 (0~1시간 / 1시간~3시간 / 3~5시간 / 5시간 이상)
         
+        print(input)
         switch input {
-        case 0...179: return 1
-        case 180...359: return 2
-        case 360...: return 3
+        case 0...59: return 0
+        case 60...179: return 1
+        case 180...299: return 2
+        case 300...: return 3
         default: return 0
         }
     
     }
     
-    func brightness(_ input: Int) -> Int { // 기록 갯수(색) 1~2 / 3~5 / 6~10 / 10개 이상
+    func brightness(_ input: Int) -> Int { // 기록 갯수(색) 1~2 / 3~5 / 6~10 / 11개 이상
 
         switch input {
-        case 1...2: return 1
-        case 3...5: return 2
-        case 6...10: return 3
-        case 10...: return 4
-        default: return 0
+        case 0: return -3
+        case 1...7: return input - 4
+        default: return 3 // 8개 이상의 기록갯수
         }
         
     }
@@ -728,88 +900,27 @@ struct StoneTower_stone: View {
 }
 
 
-//struct RecordStoneShadowView: View {
-//    var adjustedThemeSet: ThemeSet
-//    var dailyRecordThemeNum: Int
-//
-//
-//    var body: some View {
-//
-//        GeometryReader { geometry in
-//            let shapeNum = dailyRecordThemeNum >= 0 ? dailyRecordThemeNum : 0
-//
-//            let shape: Path = {
-//                var returnShape: Path? = nil
-//                if shapeNum <= 2 {
-//                    returnShape = Path { path in
-//                        let width = geometry.size.width
-//                        let height = geometry.size.height
-//                        path.addLines(
-//                            {
-//                                var returnList:[CGPoint] = []
-//                                for ratio in adjustedThemeSet.shapes[shapeNum]!  {
-//                                    returnList.append(CGPoint(x: ratio.x * width, y: ratio.y * height))
-//                                }
-//                                return returnList
-//                            }()
-//                        )
-//                        path.closeSubpath()
-//                    }
-//
-//                }
-//                else {
-//                    returnShape = Path(roundedRect: CGRect(x:0, y:0,width: geometry.size.width, height: geometry.size.height), cornerSize: CGSize(width: geometry.size.width*0.1, height:geometry.size.height*0.1))
-//
-//                }
-//
-//                return returnShape!
-//
-//
-//            }()
-//
-//
-//
-//
-//            ZStack {
-//
-//
-//                Color.white
-//                    .clipShape(shape)
-//                    .shadow(radius: 7)
-//
-//
-//
-//            }   // zstack
-//            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
-//        }
-//
-//    }
-//}
-//
-
-
-
 
 
 struct StoneShape0: View {
     
     @Environment(\.colorScheme) var colorScheme
     
-    let point1:CGPoint = CGPoint(x: 0.30, y: 0.00)
-    let point2:CGPoint = CGPoint(x: 0.70, y: 0.00)
-    let point3:CGPoint = CGPoint(x: 0.90, y: 0.55)
-    let point4:CGPoint = CGPoint(x: 0.70, y: 1.00)
-    let point5:CGPoint = CGPoint(x: 0.30, y: 1.00)
-    let point6:CGPoint = CGPoint(x: 0.10, y: 0.55)
+    let point1:CGPoint = CGPoint(x: 0.27, y: 0.00)
+    let point2:CGPoint = CGPoint(x: 0.73, y: 0.00)
+    let point3:CGPoint = CGPoint(x: 0.93, y: 0.55)
+    let point4:CGPoint = CGPoint(x: 0.73, y: 1.00)
+    let point5:CGPoint = CGPoint(x: 0.27, y: 1.00)
+    let point6:CGPoint = CGPoint(x: 0.07, y: 0.55)
     // outer point (order: topLeft, clockwise)
 
     
-    let point7:CGPoint = CGPoint(x: 0.35, y: 0.15)
-    let point8:CGPoint = CGPoint(x: 0.65, y: 0.15)
-    let point9: CGPoint = CGPoint(x: 0.75, y: 0.60)
-    let point10:CGPoint = CGPoint(x: 0.65, y: 0.90)
-    let point11:CGPoint = CGPoint(x: 0.35, y: 0.90)
-    let point12:CGPoint = CGPoint(x: 0.25, y: 0.60)
+    let point7:CGPoint = CGPoint(x: 0.32, y: 0.15)
+    let point8:CGPoint = CGPoint(x: 0.68, y: 0.15)
+    let point9: CGPoint = CGPoint(x: 0.78, y: 0.60)
+    let point10:CGPoint = CGPoint(x: 0.68, y: 0.90)
+    let point11:CGPoint = CGPoint(x: 0.32, y: 0.90)
+    let point12:CGPoint = CGPoint(x: 0.22, y: 0.60)
 
     
     // inner point (order: topLeft, clockwise)

@@ -41,7 +41,7 @@
 		B260A39A2A9C759B00D73208 /* MainView_SeeMyDailyRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3992A9C759B00D73208 /* MainView_SeeMyDailyRecord.swift */; };
 		B262F2432A86460E00868F27 /* rawData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2422A86460E00868F27 /* rawData.swift */; };
 		B262F2452A86464700868F27 /* metaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B262F2442A86464700868F27 /* metaData.swift */; };
-		B265D26C2B032D30002E51A8 /* randomColorFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B265D26B2B032D30002E51A8 /* randomColorFunc.swift */; };
+		B265D26C2B032D30002E51A8 /* colorFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B265D26B2B032D30002E51A8 /* colorFunctions.swift */; };
 		B265D27D2B0497D0002E51A8 /* callTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B265D27C2B0497D0002E51A8 /* callTheme.swift */; };
 		B265D2812B049DF9002E51A8 /* dailyRecordStoneAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B265D2802B049DF9002E51A8 /* dailyRecordStoneAction.swift */; };
 		B265D2852B049FBA002E51A8 /* theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B265D2842B049FBA002E51A8 /* theme.swift */; };
@@ -159,7 +159,7 @@
 		B260A39D2A9C7FAA00D73208 /* note.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = note.md; sourceTree = "<group>"; };
 		B262F2422A86460E00868F27 /* rawData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rawData.swift; sourceTree = "<group>"; };
 		B262F2442A86464700868F27 /* metaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = metaData.swift; sourceTree = "<group>"; };
-		B265D26B2B032D30002E51A8 /* randomColorFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = randomColorFunc.swift; sourceTree = "<group>"; };
+		B265D26B2B032D30002E51A8 /* colorFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = colorFunctions.swift; sourceTree = "<group>"; };
 		B265D27C2B0497D0002E51A8 /* callTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = callTheme.swift; sourceTree = "<group>"; };
 		B265D2802B049DF9002E51A8 /* dailyRecordStoneAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dailyRecordStoneAction.swift; sourceTree = "<group>"; };
 		B265D2842B049FBA002E51A8 /* theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = theme.swift; sourceTree = "<group>"; };
@@ -288,7 +288,7 @@
 			children = (
 				B247D24A2A6D1DA100E457FB /* customMathFunc.swift */,
 				B2FB726E2A8762810012EBE1 /* customArrayFunc.swift */,
-				B265D26B2B032D30002E51A8 /* randomColorFunc.swift */,
+				B265D26B2B032D30002E51A8 /* colorFunctions.swift */,
 				B265D27C2B0497D0002E51A8 /* callTheme.swift */,
 				B27CBB582BA41E6C00CD6CD3 /* recalculateVisualValues_dr.swift */,
 				B2E6C6382C47A8C20082B000 /* SolarCalculator.swift */,
@@ -712,7 +712,7 @@
 				B29C702E2A35C5E30046873E /* recoraddicApp.swift in Sources */,
 				B2D612D32C7F51470083183F /* preview_facialExpressions.swift in Sources */,
 				B2BA89102B36BDC600A3D50E /* SaveDailyRecordView.swift in Sources */,
-				B265D26C2B032D30002E51A8 /* randomColorFunc.swift in Sources */,
+				B265D26C2B032D30002E51A8 /* colorFunctions.swift in Sources */,
 				B260A3942A9B8B8F00D73208 /* MainView_QuestInventory.swift in Sources */,
 				B2BA890A2B32E0EB00A3D50E /* DiaryView.swift in Sources */,
 				B27CBB592BA41E6C00CD6CD3 /* recalculateVisualValues_dr.swift in Sources */,

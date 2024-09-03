@@ -62,7 +62,7 @@ struct InShortView: View {
             HStack(spacing:0.0) {
 
                 HStack(spacing:0.0) {
-                    Image(systemName: "book.closed.fill")
+                    Image(systemName: "book.closed")
                         .frame(width:geoWidth*0.1)
                         .foregroundStyle(getReversedColorSchemeColor(colorScheme))
                     
@@ -243,8 +243,8 @@ struct DiaryView: View {
                     
                     
                     Color.gray.opacity(0.2)
-                        .frame(width: isEdit ? geoWidth : geoWidth*0.9, height: geoHeight)
-                        .position(CGPoint(x: isEdit ? geoWidth/2 : geoWidth*0.55, y: geoHeight/2))
+                        .frame(width: geoWidth, height: geoHeight)
+                        .position(CGPoint(x: geoWidth/2, y: geoHeight/2))
                         .onTapGesture {
                             if !isEdit {
                                 withAnimation {

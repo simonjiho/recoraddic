@@ -58,6 +58,7 @@ func getNotificationTimeString(at alermTime: Date?, from date: Date) -> String {
 struct QuestCheckBoxView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    @Environment(\.colorScheme) var colorScheme
     @Query var quests: [Quest]
     var dailyQuest: DailyQuest
     
@@ -93,6 +94,19 @@ struct QuestCheckBoxView: View {
         
         let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= width +  0.1) ? xOffset : width, height: height), transform: nil))
         let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
+        let invertForegroundStyleIntoBright: Bool = {
+            if colorScheme == .dark {
+                if dailyQuest.data == 0  { return true }
+                else if let dailyGoal = dailyQuest.dailyGoal {
+                    if CGFloat(dailyQuest.data) / CGFloat(dailyGoal) <= 0.5 { return true } else { return false }
+                }
+                else { return false }
+            }
+            else {
+                return false
+            }
+        }()
+//        let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0, isDark: colorScheme == .dark)
         
 //        let isRecent: Bool = getStartDateOfYesterday() <= dailyQuest.dailyRecord!.getLocalDate()!
         
@@ -108,7 +122,7 @@ struct QuestCheckBoxView: View {
                     isAnimating: $isAnimating
                 )
                 .frame(width:width*7/8, height: height)
-                .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
+//                .foregroundStyle(colorScheme == .dark && dailyQuest.data == 0 ? getBrightTierColorOf(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
                 .bold()
                 
                 NotificationButton(
@@ -117,20 +131,24 @@ struct QuestCheckBoxView: View {
                     popOverHeight: height
                 )
                 .frame(width: width*1/8, height: height)
-                .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
+//                .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
 //                .disabled(!isRecent)
 //                .opacity( isRecent ? 1.0 : 0.0)
 //                .border(.red)
             }
             .frame(width:width, height: height)
+//            .foregroundStyle(colorScheme == .dark ? getBrightTierColorOf2(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
+            .foregroundStyle( invertForegroundStyleIntoBright ? getBrightTierColorOf3(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
             .background(
                 ZStack {
+                    Color.white
                     Rectangle()
                         .fill(
                             LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
                         )
                         .frame(width:width, height:height)
                         .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * width, y:0)
+                        .opacity(colorScheme == .light ? 0.6 : 0.8)
 //                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
                     
                     Rectangle()
@@ -139,23 +157,22 @@ struct QuestCheckBoxView: View {
                         )
                         .frame(width:width, height:height)
                         .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * width, y:0)
+                        .opacity(colorScheme == .light ? 0.6 : 0.8)
 //                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
                 }
                     .frame(width:width, height:height)
                     .mask {
                         a
                     }
-//                    .background(getTierColorOf(tier: dailyQuest.currentTier))
-                    .background(getBrightTierColorOf3(tier: dailyQuest.currentTier))
-                    .blur(radius: 1)
-                    .opacity(0.9)
+
+                    .background(.gray.opacity(colorScheme == .light ? 0.3 : 0.3))
+                    .blur(radius: 0.5)
+
                 
             )
             .disabled(offset < -menuSize*0.5)
             .offset(x: offset, y:0)
-//            .onAppear() {
-//                isAnimating = true
-//            }
+
 
             
             HStack(spacing:0.0) {
@@ -165,7 +182,7 @@ struct QuestCheckBoxView: View {
                     .frame(width: menuSize*2, height:height)
             }
             .frame(width: menuSize*3, height:height)
-            .background(Color.red.blur(radius: 1))
+            .background(Color.red.blur(radius: 0.3))
             .offset(x: offset, y:0)
             .disabled(offset > -menuSize*0.5)
             .onTapGesture {
@@ -278,6 +295,11 @@ struct QuestCheckBoxView: View {
     //                }
                 }
             }
+            
+            if dailyQuest.dataType == DataType.hour.rawValue {
+                dailyQuest.dailyRecord?.updateRecordedMinutes()
+            }
+            
 
         }
         .onChange(of: stopwatch.isRunning) {
@@ -444,7 +466,7 @@ struct QuestCheckBoxContent_OX:View {
                 }
                 .frame(width: geoWidth*1/7, height: geoHeight)
 //                .border(.red)
-                .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
+//                .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
 
 
                 Text(dailyQuest.getName())
@@ -555,21 +577,21 @@ struct QuestCheckBoxContent_HOUR:View {
                     }
                     .padding(.horizontal,10)
                     .frame(width:geoWidth*6/7)
-                    .onTapGesture {
-                        lastTapTime = Date()
-                        if dailyQuest.dailyGoal == nil {
-                            highlightValue2 = (highlightValue2 + 1) % 2
-                        } else {
-                            highlightValue2 = (highlightValue2 + 1) % 3
-                        }
-                        if highlightValue2 != 1 {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-                                if Date().timeIntervalSince(lastTapTime) > 4.0 {
-                                    highlightValue2 = 1
-                                }
-                            }
-                        }
-                    }
+//                    .onTapGesture {
+//                        lastTapTime = Date()
+//                        if dailyQuest.dailyGoal == nil {
+//                            highlightValue2 = (highlightValue2 + 1) % 2
+//                        } else {
+//                            highlightValue2 = (highlightValue2 + 1) % 3
+//                        }
+//                        if highlightValue2 != 1 {
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+//                                if Date().timeIntervalSince(lastTapTime) > 4.0 {
+//                                    highlightValue2 = 1
+//                                }
+//                            }
+//                        }
+//                    }
 
 
 
@@ -631,24 +653,53 @@ struct QuestCheckBoxContent_HOUR:View {
                     }
                     .padding(.horizontal,10)
                     .frame(width:geoWidth*6/7)
-                    .onTapGesture {
-                        lastTapTime = Date()
-                        highlightValue.toggle()
-                        if highlightValue {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-                                if !isEditing_hours && (Date().timeIntervalSince(lastTapTime) > 4.0) {
-                                    highlightValue = false
-     
-                                }
-                            }
-                        }
-                    }
+//                    .onTapGesture {
+//                        lastTapTime = Date()
+//                        highlightValue.toggle()
+//                        if highlightValue {
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+//                                if !isEditing_hours && (Date().timeIntervalSince(lastTapTime) > 4.0) {
+//                                    highlightValue = false
+//     
+//                                }
+//                            }
+//                        }
+//                    }
 
                 }
             }
-
             .frame(width: geoWidth,height: height)
-            .foregroundStyle(getDarkTierColorOf(tier: tier))
+            .background(.white.opacity(0.01))
+            .onTapGesture {
+                
+                lastTapTime = Date()
+                if stopwatch.isRunning {
+                    if dailyQuest.dailyGoal == nil {
+                        highlightValue2 = (highlightValue2 + 1) % 2
+                    } else {
+                        highlightValue2 = (highlightValue2 + 1) % 3
+                    }
+                    if highlightValue2 != 1 {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                            if Date().timeIntervalSince(lastTapTime) > 4.0 {
+                                highlightValue2 = 1
+                            }
+                        }
+                    }
+                }
+                else {
+                    highlightValue.toggle()
+                    if highlightValue {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                            if !isEditing_hours && (Date().timeIntervalSince(lastTapTime) > 4.0) {
+                                highlightValue = false
+ 
+                            }
+                        }
+                    }
+                }
+            }
+//            .foregroundStyle(getDarkTierColorOf(tier: tier))
             .sheet(isPresented: $isEditing_hours) {
                 // code for on dismiss
             } content: {
@@ -692,9 +743,6 @@ struct QuestCheckBoxContent_HOUR:View {
                 if !isEditing_hours {
                     highlightValue = false
                 }
-            }
-            .onChange(of: value) {
-                dailyQuest.dailyRecord?.updateRecordedMinutes()
             }
         
             .onAppear() {
@@ -915,7 +963,7 @@ struct QuestCheckBoxContent_CUSTOM:View {
         let dataType = dailyQuest.dataType
         let tier: Int = dailyQuest.currentTier
         let customDataTypeNotation = dailyQuest.customDataTypeNotation
-        let tierColor_dark = getDarkTierColorOf(tier: tier)
+//        let tierColor_dark = getDarkTierColorOf(tier: tier)
         
         GeometryReader { geometry in
             
@@ -951,7 +999,7 @@ struct QuestCheckBoxContent_CUSTOM:View {
                                                 .lineLimit(1)
                                                 .minimumScaleFactor(0.7)
                                                 .toggleStyle(.switch)
-                                                .frame(width:geoWidth*0.4)
+                                                .frame(width:geoWidth*0.4, alignment: .leading)
                                                 .foregroundStyle(.blue)
 //                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                                             Button("완료") {
@@ -1016,23 +1064,37 @@ struct QuestCheckBoxContent_CUSTOM:View {
                 }
                 .padding(.horizontal,10)
                 .frame(width: geoWidth*6/7)
-                .onTapGesture {
-                    lastTapTime = Date()
-                    if !isEditing {
-                        highlightValue.toggle()
-                        if highlightValue {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-                                if !isEditing && (Date().timeIntervalSince(lastTapTime) > 4.0) {
-                                    highlightValue = false
-                                }
-                            }
-                        }
-                    }
-                }
+//                .onTapGesture {
+//                    lastTapTime = Date()
+//                    if !isEditing {
+//                        highlightValue.toggle()
+//                        if highlightValue {
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+//                                if !isEditing && (Date().timeIntervalSince(lastTapTime) > 4.0) {
+//                                    highlightValue = false
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
 
 
             }
             .frame(width: geoWidth,height: geoHeight)
+            .background(.white.opacity(0.01))
+            .onTapGesture {
+                lastTapTime = Date()
+                if !isEditing {
+                    highlightValue.toggle()
+                    if highlightValue {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                            if !isEditing && (Date().timeIntervalSince(lastTapTime) > 4.0) {
+                                highlightValue = false
+                            }
+                        }
+                    }
+                }
+            }
             .onChange(of: hasGoal_toggle) {
                 // 똑같을 때: hasGoal에 따라 hasGoal_toggle을 설정
                 if hasGoal_toggle != hasGoal {

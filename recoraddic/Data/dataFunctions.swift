@@ -15,9 +15,8 @@ extension Quest {
     func updateTier() -> Void {
         
 //        if self.tier == 40 { return }
-        
+        var cumulative = dataType == DataType.custom.rawValue ? self.dailyData.count : cumulative()
         if dataType == DataType.hour.rawValue {
-            var cumulative = cumulative()
             for i in 0...40 {
                 let minus: Int = {
                     switch i {
@@ -50,7 +49,6 @@ extension Quest {
             }
         }
         else {
-            var cumulative = self.dailyData.count
             for i in 0...40 {
                 let minus: Int = {
                     switch i {

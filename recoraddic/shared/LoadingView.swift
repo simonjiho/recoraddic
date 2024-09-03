@@ -33,7 +33,8 @@ struct LoadingView_initialization: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: UIScreen.main.bounds.width/5)
-            HStack(spacing:10.0) {Text("로딩 중")
+            HStack(spacing:10.0) {
+                Text("로딩 중")
                 ProgressView() // This is the loading circle
                     .progressViewStyle(CircularProgressViewStyle())
 //                    .scaleEffect(1.5) // Adjust the scale of the loading circle

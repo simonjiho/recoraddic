@@ -7,6 +7,323 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
+
+struct PurposeOfDailyQuestView_circle_checkMark: View {
+    
+    @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
+
+    
+    @State var popUp_changePurpose: Bool = false
+    var dailyQuest: DailyQuest
+    var parentWidth: CGFloat
+    var parentHeight: CGFloat
+    var tierColor: Color
+    
+    var body: some View {
+        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+        
+
+            Image(systemName:"checkmark")
+
+                    .background(PurposeInCircle(purposes:dailyQuest.purposes))
+                    .foregroundStyle(tierColor.opacity(dailyQuest.purposes.count == 0 ? 1.0 : 0.0))
+            .onTapGesture {
+                popUp_changePurpose.toggle()
+            }
+            
+            .popover(isPresented: $popUp_changePurpose) {
+                ChoosePurposeView_dailyQuest(dailyQuest: dailyQuest)
+                    .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
+                    .presentationCompactAdaptation(.popover)
+                
+            }
+                    
+    }
+}
+struct PurposeOfTodoView_circle_checkMark: View {
+    
+    @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
+    @Query var todos_preset: [Todo_preset]
+
+    
+    @State var popUp_changePurpose: Bool = false
+    var todo: Todo
+    var parentWidth: CGFloat
+    var parentHeight: CGFloat
+    
+    var body: some View {
+        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+        
+
+            Image(systemName:"checkmark")
+                .background(PurposeInCircle(purposes:todo.purposes))
+                .foregroundStyle(reversedColorSchemeColor.opacity(todo.purposes.count == 0 ? 1.0 : 0.0))
+            .onTapGesture {
+                popUp_changePurpose.toggle()
+            }
+            .popover(isPresented: $popUp_changePurpose) {
+                ChoosePurposeView_todo(todo: todo)
+                    .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
+                    .presentationCompactAdaptation(.popover)
+                    .onDisappear() {
+                        if let todo_preset = todos_preset.first(where:{$0.content == todo.content}) {
+                            todo_preset.purposes = todo.purposes
+                        }
+                    }
+                
+            }
+                    
+    }
+}
+
+struct PurposeOfDailyQuestView: View {
+    
+    @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
+
+    @Query var quests: [Quest]
+    
+    @State var popUp_changePurpose: Bool = false
+    var dailyQuest: DailyQuest
+    var parentWidth: CGFloat
+    var parentHeight: CGFloat
+    
+    var body: some View {
+        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+        
+        GeometryReader { geometry in
+            let geoWidth: CGFloat = geometry.size.width
+            let geoHeight: CGFloat = geometry.size.height
+            let tagSize = min(geoWidth*0.8,geoHeight*0.3)
+
+            
+//            Group {
+                Group {
+                    // purpose 0개일 때
+                    if dailyQuest.purposes.isEmpty {
+                        Color.white.opacity(0.01)
+                            .overlay(
+                                Image(systemName:"questionmark.square")
+                                    .resizable()
+                                    .frame(width:tagSize, height:tagSize)
+                                    .foregroundStyle(reversedColorSchemeColor)
+                            )
+                        // MARK: 이렇게 안 하면 외부의 zIndex가 작동 안 함.
+                    }
+                    else {
+                        PurposeTagsView_vertical(purposes:dailyQuest.purposes)
+                            .frame(width: geoWidth, height:geoHeight)
+                    }
+                    
+                }
+                .frame(width:geoWidth, height:geoHeight)
+                .onTapGesture {
+                    popUp_changePurpose.toggle()
+                }
+                
+                //                                    .popover(isPresented: $popUp_changePurpose) {
+                .popover(isPresented: $popUp_changePurpose) {
+                    ChoosePurposeView_dailyQuest(dailyQuest: dailyQuest)
+                        .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
+                        .presentationCompactAdaptation(.popover)
+                        .onDisappear() {
+                            if let quest = quests.first(where:{$0.name == dailyQuest.questName && !$0.inTrashCan}) {
+                                quest.recentPurpose = dailyQuest.purposes
+                            } else if let quest = quests.first(where:{$0.name == dailyQuest.questName}){
+                                quest.recentPurpose = dailyQuest.purposes
+                            }
+                        }
+                    
+                }
+//            }
+            
+            
+        }
+    }
+}
+
+struct PurposeOfQuestView: View {
+    
+    @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
+
+    @Query var quests: [Quest]
+    
+    @State var popUp_changePurpose: Bool = false
+    var quest: Quest
+    var parentWidth: CGFloat
+    var parentHeight: CGFloat
+    
+    var body: some View {
+        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+        
+        GeometryReader { geometry in
+            let geoWidth: CGFloat = geometry.size.width
+            let geoHeight: CGFloat = geometry.size.height
+
+            Button(action:{
+                popUp_changePurpose.toggle()
+            }) {
+                Group {
+                    if quest.recentPurpose.isEmpty {
+                        Color.white.opacity(0.01)
+                            .frame(width: geoWidth/2.5, height:geoHeight/2.5)
+                            .overlay(
+                                Image(systemName:"questionmark.circle")
+                                    .resizable()
+                                    .frame(width:geoWidth/2.5, height:geoHeight/2.5)
+                                    .foregroundStyle(reversedColorSchemeColor)
+                            )
+                        // MARK: buttonStyle(.plain) 이 조건문에서는 작동 안해서 이렇게 함
+                    }
+                    else {
+                        PurposeInCircle(purposes:quest.recentPurpose)
+                            .frame(width: geoWidth/2.5, height:geoHeight/2.5)
+                        
+                    }
+                }
+                .padding(.init(top: 7.5, leading: 7.5, bottom: 0, trailing: 0))
+                .frame(width:geoWidth, height:geoHeight, alignment: .topLeading)
+
+                
+                    
+            }
+            .frame(width:geoWidth, height:geoHeight)
+            .popover(isPresented: $popUp_changePurpose) {
+                ChoosePurposeView_Quest(quest: quest)
+                    .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
+                    .presentationCompactAdaptation(.popover)
+                
+            }
+            
+            
+            
+        }
+    }
+}
+
+
+
+struct PurposeOfTodoView: View {
+    
+    @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
+
+    @Query var todos_preset: [Todo_preset]
+    
+    @State var popUp_changePurpose: Bool = false
+    var todo: Todo
+    var parentWidth: CGFloat
+    var parentHeight: CGFloat
+    
+    var body: some View {
+//        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+        
+        GeometryReader { geometry in
+            let geoWidth: CGFloat = geometry.size.width
+            let geoHeight: CGFloat = geometry.size.height
+            let tagSize = min(geoWidth*0.8,geoHeight*0.3)
+
+            
+            Group {
+                Group {
+                    // purpose 0개일 때
+                    if todo.purposes.count == 0 {
+                        Image(systemName:"questionmark.square")
+                            .resizable()
+                            .frame(width:tagSize, height:tagSize)
+                            .foregroundStyle(reversedColorSchemeColor)
+                    }
+                    else {
+                        PurposeTagsView_vertical(purposes:todo.purposes)
+                            .frame(width: geoWidth, height:geoHeight)
+                    }
+                    
+                }
+                .frame(width:geoWidth, height:geoHeight)
+                .onTapGesture {
+                    popUp_changePurpose.toggle()
+                }
+                
+                //                                    .popover(isPresented: $popUp_changePurpose) {
+                .popover(isPresented: $popUp_changePurpose) {
+                    ChoosePurposeView_todo(todo: todo)
+                        .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
+                        .presentationCompactAdaptation(.popover)
+                        .onDisappear() {
+                            if let todo_preset = todos_preset.first(where:{$0.content == todo.content}) {
+                                todo_preset.purposes = todo.purposes
+                            }
+                        }
+                    
+                }
+            }
+            
+        }
+    }
+}
+
+struct ChoosePurposeView_Quest: View {
+    @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
+    
+    var quest: Quest
+    
+    var body: some View {
+        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+        
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            let gridSize = geoWidth/3
+            let tagSize = gridSize*0.8
+            
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: tagSize))],spacing: tagSize*0.2) {
+                
+                ForEach(recoraddic.defaultPurposes, id:\.self) { purpose in
+                    VStack(spacing:3.0) {
+                        
+                        PurposeTagView(purpose: purpose)
+                            .frame(width: tagSize*0.65, height: tagSize*0.65)
+                            .onTapGesture {
+                                if quest.recentPurpose.contains(purpose) { quest.recentPurpose.remove(purpose)}
+                                else if quest.recentPurpose.count < 3 {
+                                    quest.recentPurpose.insert(purpose)
+                                }
+                                
+                            }
+                        Text(DefaultPurpose.inKorean(purpose))
+                            .font(.caption)
+                            .padding(.horizontal,2)
+                        //                                .frame(width: geometry.size.width*0.3)
+                            .minimumScaleFactor(0.5)
+                            .foregroundStyle(quest.recentPurpose.contains(purpose) ? colorSchemeColor : reversedColorSchemeColor)
+                        
+                        
+                    } // Vstack
+                    .frame(width: tagSize, height: tagSize)
+                    .background(quest.recentPurpose.contains(purpose) ? reversedColorSchemeColor : .gray.opacity(0.2))
+                    .clipShape(.buttonBorder)
+                    
+                    
+                } // forEach
+                
+            } // scrollView
+            .padding(10)
+            .frame(width:geoWidth, height:geoHeight)
+        }
+    }
+}
 
 
 struct ChoosePurposeView_dailyQuest: View {
@@ -290,17 +607,64 @@ struct PurposeTagView: View {
     }
 }
 
-//struct ChoosePurposeView_Preview: View {
-//    @State var chosenPurposes: Set<String> = Set()
-//
-//    var body: some View {
-//        ChoosePurposeView(chosenPurposes: $chosenPurposes)
-//    }
-//}
 
 
-//#Preview(body: {
-////    ChoosePurposeView_Preview()
-//    ChoosePurposeView(chosenPurposes: .constant(Set<String>()))
-//        .frame(width:300, height:500)
-//})
+struct PurposeInCircle: View {
+    
+    var purposes: Set<String>
+    
+    var body: some View {
+        
+        let purposes_ordered: [String] = Array(purposes).sorted(by: { s1, s2 in
+            return recoraddic.defaultPurposes.firstIndex(of: s1)! > recoraddic.defaultPurposes.firstIndex(of: s2)!
+        })
+        GeometryReader { geometry in
+            ZStack {
+                
+                if purposes.count == 0 {
+                    Spacer()
+                }
+                else if purposes.count == 1 {
+                    Circle()
+                        .fill(purposeColor(purpose: purposes_ordered[0]))
+                }
+                else if purposes.count == 2 {
+                    Sector(startAngle: .degrees(0), endAngle: .degrees(180))
+                        .fill(purposeColor(purpose: purposes_ordered[0]))
+                    Sector(startAngle: .degrees(180), endAngle: .degrees(360))
+                        .fill(purposeColor(purpose: purposes_ordered[1]))
+                }
+                else {
+                    Sector(startAngle: .degrees(0), endAngle: .degrees(120))
+                        .fill(purposeColor(purpose: purposes_ordered[0]))
+                    
+                    Sector(startAngle: .degrees(120), endAngle: .degrees(240))
+                        .fill(purposeColor(purpose: purposes_ordered[1]))
+                    
+                    Sector(startAngle: .degrees(240), endAngle: .degrees(360))
+                        .fill(purposeColor(purpose: purposes_ordered[2]))
+                }
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+        }
+    }
+}
+
+struct Sector: Shape {
+    var startAngle: Angle
+    var endAngle: Angle
+
+    func path(in rect: CGRect) -> Path {
+        let center = CGPoint(x: rect.width / 2, y: rect.height / 2)
+        let radius = min(rect.width, rect.height) / 2
+        var path = Path()
+
+        path.move(to: center)
+        path.addArc(center: center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: false)
+        path.closeSubpath()
+
+        return path
+    }
+}
+
+

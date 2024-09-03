@@ -159,10 +159,13 @@ struct DailyRecordInShort: View {
                         if dailyRecord.dailyText != nil && dailyRecord.dailyText != "" {
 
                             Group {
-                                
-                                Image(systemName: "book.closed.fill")
-                                    .foregroundStyle(getReversedColorSchemeColor(colorScheme))
+                                if dailyRecord.dailyTextType == DailyTextType.diary {
+                                    Image(systemName: "book.closed.fill")
+                                } else {
+                                    Image(systemName: "book.closed")
+                                }
                             }
+                            .foregroundStyle(getReversedColorSchemeColor(colorScheme))
                             .frame(width:elementWidth,alignment: .leading)
                             
                             
@@ -185,18 +188,19 @@ struct DailyRecordInShort: View {
                         ForEach(dailyRecord.dailyQuestList!, id:\.self) { questdata in
                             
                             if (showHiddenQuests || !questNames_hidden.contains(questdata.questName)) && questdata.data != 0 {
-                                let text:String = dataTypeFrom(questdata.dataType) != DataType.ox ? "\(questdata.questName)  \(DataType.string_fullRepresentableNotation(data: questdata.data, dataType: dataTypeFrom(questdata.dataType), customDataTypeNotation: questdata.customDataTypeNotation))" : questdata.questName
+                                let text:String = dataTypeFrom(questdata.dataType) != DataType.ox ? "\(questdata.getName())  \(DataType.string_fullRepresentableNotation(data: questdata.data, dataType: dataTypeFrom(questdata.dataType), customDataTypeNotation: questdata.customDataTypeNotation))" : questdata.questName
                                 HStack {
-                                    if !questdata.purposes.isEmpty {
-                                        PurposeTagsView_vertical(purposes: questdata.purposes)
-                                            .frame(width:20, height:questBoxHeight*0.8)
-                                    } else {
-                                        Image(systemName: "checkmark.circle")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width:20, height:questBoxHeight*0.8)
-                                            .foregroundStyle(getDarkTierColorOf(tier: questdata.currentTier))
-                                    }
+                                    PurposeOfDailyQuestView_circle_checkMark(dailyQuest: questdata, parentWidth: UIScreen.main.bounds.width, parentHeight: UIScreen.main.bounds.height, tierColor: getDarkTierColorOf(tier: questdata.currentTier))
+//                                    if !questdata.purposes.isEmpty {
+//                                        PurposeTagsView_vertical(purposes: questdata.purposes)
+//                                            .frame(width:20, height:questBoxHeight*0.8)
+//                                    } else {
+//                                        Image(systemName: "checkmark.circle")
+//                                            .resizable()
+//                                            .scaledToFit()
+//                                            .frame(width:20, height:questBoxHeight*0.8)
+//                                            .foregroundStyle(getDarkTierColorOf(tier: questdata.currentTier))
+//                                    }
                                     Text(text)
                                         .minimumScaleFactor(0.5)
                                         .lineLimit(2)
@@ -214,23 +218,28 @@ struct DailyRecordInShort: View {
                             }
                         }
                         
+                        // 옅은 색의 라인 긋기
+                        
                         ForEach(dailyRecord.todoList!.sorted(by: {$0.idx <= $1.idx}), id:\.self) { todo in
                             if todo.content != "" {
                                 let purposeCount2 = todo.purposes.count
                                 HStack {
-                                    if todo.purposes.count != 0 {
-                                        PurposeTagsView_vertical(purposes: todo.purposes)
-                                            .frame(width:20, height:todoHeight*0.9)
-                                    } else {
-                                        Image(systemName: "checkmark.circle")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width:20, height:todoHeight*0.9)
-                                    }
+                                    PurposeOfTodoView_circle_checkMark(todo: todo,parentWidth: UIScreen.main.bounds.width, parentHeight: UIScreen.main.bounds.height)
+//                                    if todo.purposes.count != 0 {
+//                                        PurposeTagsView_vertical(purposes: todo.purposes)
+//                                            .frame(width:20, height:todoHeight*0.9)
+//                                    } else {
+//                                        Image(systemName: "checkmark.circle")
+//                                            .resizable()
+//                                            .scaledToFit()
+//                                            .frame(width:20, height:todoHeight*0.9)
+//                                    }
                                     Text("\(todo.content)")
                                         .lineLimit(3)
                                 }
-                                .frame(width:elementWidth,alignment: .leading)
+                                .padding(.leading,10)
+                                .frame(width:questBoxWidth,alignment: .leading)
+
                             }
                         }
                         

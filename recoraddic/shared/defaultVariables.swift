@@ -100,9 +100,9 @@ let iphone15plusHeight: CGFloat = 932.0
 
 
 
-let qcbvHeight_large: CGFloat = 75.0
-let qcbvHeight_medium: CGFloat = 60.0
-let qcbvHeight_small: CGFloat = 50.0
+let qcbvHeight_large: CGFloat = 70.0
+let qcbvHeight_medium: CGFloat = 55.0
+let qcbvHeight_small: CGFloat = 45.0
 
 func qcbvHeight(_ dynamicTypeSize: DynamicTypeSize, stopWatchIsRunnig:Bool, dataType:Int) -> CGFloat {
     let height:CGFloat = stopWatchIsRunnig ? qcbvHeight_large : (dataType != DataType.ox.rawValue ? qcbvHeight_medium : qcbvHeight_small)
@@ -125,7 +125,8 @@ func qcbvHeight(_ dynamicTypeSize: DynamicTypeSize, stopWatchIsRunnig:Bool) -> C
 
 func qcbvMultiplier(_ dynamicTypeSize: DynamicTypeSize) -> CGFloat {
     switch dynamicTypeSize {
-    case ...DynamicTypeSize.xLarge: return 1.0
+    case ...DynamicTypeSize.large: return 1.0
+    case .xLarge: return 1.05
     case .xxLarge: return 1.1
     case .xxxLarge: return 1.2
     case .accessibility1: return 1.3

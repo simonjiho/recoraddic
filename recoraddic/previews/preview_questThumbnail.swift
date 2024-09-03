@@ -25,7 +25,7 @@ struct QuestThumbnailView_forPreview: View {
 //            let gridItemWidth = geoWidth
             
             ZStack {
-                QuestTierView(tier: tier)
+                QuestTierView(tier: tier, notUsedYet: false)
                     .frame(width: geoWidth, height: geoHeight)
                 FireView(momentumLevel: momentumLevel)
                 //                                        Fire6()

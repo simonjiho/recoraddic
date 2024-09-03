@@ -206,29 +206,47 @@ func getBrightTierColorOf3(tier:Int) -> Color { // questCheckBox(dark)
 }
 
 
-func getGradientColorsOf(tier:Int, type:Int = 0) -> [Color] { // quest checkbox
+func getGradientColorsOf(tier:Int, type:Int = 0, isDark:Bool = false) -> [Color] { // quest checkbox
     
 
+    let tierColor_dark = getDarkTierColorOf(tier: tier)
     let tierColor:Color = getTierColorOf(tier: tier)
     let tierColor_bright:Color = getBrightTierColorOf(tier: tier)
     let tierColor_bright2:Color = getBrightTierColorOf2(tier: tier)
     let tierColor_bright3:Color = getBrightTierColorOf3(tier: tier)
 
-    
-    if type == 0 { //questCheckbox
-        return [tierColor_bright3,tierColor_bright3, tierColor_bright, tierColor_bright3, tierColor_bright3]
-    }
-    else if type == 1 { //questThumbnail
-        return [tierColor, tierColor_bright2, tierColor]
-    }
-    else if type == 2 { // 달력
-        return [tierColor_bright2, tierColor]
-    }
-    else if type == 3 {
-        return [tierColor, tierColor_bright2, tierColor, tierColor_bright2, tierColor]
-    }
-    else {
-        return [tierColor, tierColor_bright, tierColor]
+    if !isDark {
+        if type == 0 { //questCheckbox
+            return [tierColor_bright3,tierColor_bright3, tierColor_bright, tierColor_bright3, tierColor_bright3]
+        }
+        else if type == 1 { //questThumbnail
+            return [tierColor, tierColor_bright2, tierColor]
+        }
+        else if type == 2 { // 달력
+            return [tierColor_bright2, tierColor]
+        }
+        else if type == 3 {
+            return [tierColor, tierColor_bright2, tierColor, tierColor_bright2, tierColor]
+        }
+        else {
+            return [tierColor, tierColor_bright, tierColor]
+        }
+    } else {
+        if type == 0 { //questCheckbox
+            return [tierColor,tierColor, tierColor_bright3, tierColor, tierColor]
+        }
+        else if type == 1 { //questThumbnail
+            return [tierColor_bright2,tierColor, tierColor_bright2]
+        }
+        else if type == 2 { // 달력
+            return [tierColor_bright2, tierColor]
+        }
+        else if type == 3 {
+            return [tierColor_bright2, tierColor, tierColor_bright2, tierColor, tierColor_bright2]
+        }
+        else {
+            return [tierColor_bright, tierColor, tierColor_bright]
+        }
     }
     
 }

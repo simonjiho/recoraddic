@@ -47,6 +47,8 @@ struct MainView_QuestInventory: View {
     
     @State var editQuestInfo: Bool = false
     
+    @State var popOver_changePurpose: Bool = false
+    
     // @State enum -> 보관 / 숨기기 / 휴지통 하시겠습니까? -> enum에 따른 함수 구분해서 바꿔주기
     
     var body: some View {
@@ -73,10 +75,10 @@ struct MainView_QuestInventory: View {
             let gridViewFrameWidth = geoWidth - gridHorizontalPadding*2 - gridInnerPadding*2
             let gridWidth = questThumbnailWidth(dynamicTypeSize, defaultWidth: (gridViewFrameWidth) / 2) * 0.97
             let gridHeight = gridWidth / 1.618
-            let gridItemWidth = gridWidth * 0.85
-            let gridItemHeight = gridHeight * 0.85
+            let gridItemWidth = gridWidth * 0.92
+            let gridItemHeight = gridHeight * 0.92
 //            let gridItemSpacing = gridItemWidth*0.3
-            let gridVerticalSpacing = gridWidth*0.08
+            let gridVerticalSpacing = gridWidth*0.06
         
             let topBarTopPadding = geoHeight*0.035
             let topBarSize = geoHeight*0.05
@@ -122,76 +124,110 @@ struct MainView_QuestInventory: View {
                                     ForEach(quest_sorted_visible,id:\.createdTime) { quest in
                                         
                                         
-                                        Button(action:{
-                                            if !isEdit {
-                                                selectedQuest = quest
-                                                popUp_questStatisticsInDetail.toggle()
-                                            }
-                                            else {
-                                                if selectedQuestNames.contains(quest.name) {
-                                                    selectedQuestNames.remove(quest.name)
+
+                                        ZStack {
+                                            Button(action:{
+                                                if !isEdit {
+                                                    selectedQuest = quest
+                                                    popUp_questStatisticsInDetail.toggle()
                                                 }
                                                 else {
-                                                    selectedQuestNames.insert(quest.name)
-                                                }
-                                            }
-                                            
-                                        }) {
-                                            ZStack {
-                                                ZStack {
-                                                    QuestThumbnailView(quest: quest)
-                                                        .frame(width: gridItemWidth, height: gridItemHeight)
-                                                    if isEdit {
-                                                        Button(action:{
-                                                            if selectedQuestNames.contains(quest.name) {
-                                                                selectedQuestNames.remove(quest.name)
-                                                            }
-                                                            else {
-                                                                selectedQuestNames.insert(quest.name)
-                                                            }
-                                                        }) {
-                                                            ZStack {
-                                                                let path: Path = Path(roundedRect: CGRect(x: 0, y: 0, width: gridItemWidth, height: gridItemHeight), cornerSize: CGSize(width: gridItemWidth/20, height: gridItemWidth/20))
-                                                                path
-                                                                    .stroke(lineWidth: gridItemHeight/15)
-                                                                if selectedQuestNames.contains(quest.name) {
-                                                                    Image(systemName:"checkmark")
-                                                                        .resizable()
-                                                                        .scaledToFit()
-                                                                        .frame(width:gridItemWidth*0.6, height: gridItemHeight*0.6)
-                                                                }
-                                                                
-                                                            }
-                                                            .frame(width:gridItemWidth, height: gridItemHeight)
-                                                            .foregroundStyle(.blue)
-                                                            
-                                                        }
+                                                    if selectedQuestNames.contains(quest.name) {
+                                                        selectedQuestNames.remove(quest.name)
+                                                    }
+                                                    else {
+                                                        selectedQuestNames.insert(quest.name)
                                                     }
                                                 }
-                                                .frame(width: gridItemWidth, height: gridItemHeight)
+                                            }) {
+                                                QuestThumbnailView(quest: quest)
+                                                    .frame(width: gridItemWidth, height: gridItemHeight)
                                             }
-                                            .frame(width:gridWidth, height: gridHeight)
-                                            
-                                        }
-                                        .contextMenu(ContextMenu(menuItems: {
-                                            
-                                            Button("정보 수정") {
-                                                selectedQuest = quest
-                                                editQuestInfo.toggle()
-//                                                toggleEditQuestInfo()
-                                            }
-                                            Button("보관") {
-                                                quest.isArchived = true
-                                            }
-                                            Button("숨기기") {
-                                                quest.isHidden = true
-                                            }
+                                            .contextMenu(ContextMenu(menuItems: {
+                                                
+                                                Button("정보 수정") {
+                                                    selectedQuest = quest
+                                                    editQuestInfo.toggle()
+    //                                                toggleEditQuestInfo()
+                                                }
+                                                Button("보관") {
+                                                    quest.isArchived = true
+                                                }
+                                                Button("숨기기") {
+                                                    quest.isHidden = true
+                                                }
 
-                                            Button("휴지통으로 이동", systemImage:"trash") {
-                                                quest.inTrashCan = true
+                                                Button("휴지통으로 이동", systemImage:"trash") {
+                                                    quest.inTrashCan = true
+                                                }
+                                                .foregroundStyle(.red)
+                                            }))
+
+//                                            PurposeOfQuestView(quest:quest, parentWidth:geoWidth, parentHeight:geoHeight)
+//                                                .frame(width:gridItemWidth/10, height:gridItemWidth/10)
+//                                                .position(CGPoint(x: 10.0 + gridItemWidth/20, y: 10.0 + gridItemWidth/20))
+//                                                .opacity(0.8)
+//                                                .zIndex(5)
+                                            
+                                            
+//                                            Button(action:{
+//                                                popOver_changePurpose.toggle()
+//                                            }) {
+//                                                PurposeInCircle(purposes: quest.recentPurpose)
+//                                                    .frame(width:gridItemWidth/10, height:gridItemWidth/10)
+//                                                    .position(CGPoint(x: 10.0 + gridItemWidth/20, y: 10.0 + gridItemWidth/20))
+//                                                    .opacity(0.8)
+//                                            }
+//                                            .popover(isPresented: $popOver_changePurpose) {
+//                                                ChoosePurposeView_Quest(quest: quest)
+//                                                    .frame(width:geoWidth*0.6, height: geoWidth*0.8) // 12개 3*4 grid
+//                                                    .presentationCompactAdaptation(.popover)
+////                                                    .onDisappear() {
+////                                                        
+////                                                        let predicate = #Predicate<DailyQuest> { dailyQuest in
+////                                                            dailyQuest.questName == quest.name
+////                                                        }
+////                                                        let descriptor = FetchDescriptor(predicate: predicate)
+////                                                        try! modelContext.enumerate(
+////                                                            descriptor,
+////                                                            batchSize: 5000,
+////                                                            allowEscapingMutations: false
+////                                                        ) { dailyQuest in
+////                                                            dailyQuest.purposes = quest.recentPurpose
+////                                                        }
+////                        
+////                                                    }
+//                                                
+//                                            }
+
+                                            if isEdit {
+                                                Button(action:{
+                                                    if selectedQuestNames.contains(quest.name) {
+                                                        selectedQuestNames.remove(quest.name)
+                                                    }
+                                                    else {
+                                                        selectedQuestNames.insert(quest.name)
+                                                    }
+                                                }) {
+                                                    ZStack {
+                                                        let path: Path = Path(roundedRect: CGRect(x: 0, y: 0, width: gridItemWidth, height: gridItemHeight), cornerSize: CGSize(width: gridItemWidth/11, height: gridItemWidth/11))
+                                                        path
+                                                            .stroke(lineWidth: gridItemHeight/15)
+                                                        if selectedQuestNames.contains(quest.name) {
+                                                            Image(systemName:"checkmark")
+                                                                .resizable()
+                                                                .scaledToFit()
+                                                                .frame(width:gridItemWidth*0.6, height: gridItemHeight*0.6)
+                                                        }
+                                                        
+                                                    }
+                                                    .frame(width:gridItemWidth, height: gridItemHeight)
+                                                    .foregroundStyle(.blue)
+                                                    
+                                                }
                                             }
-                                            .foregroundStyle(.red)
-                                        }))
+                                        }
+                                        .frame(width: gridItemWidth, height: gridItemHeight)
                                         .onAppear() {
                                             quest.updateMomentumLevel()
                                         }
@@ -218,7 +254,7 @@ struct MainView_QuestInventory: View {
                                             }
                                             .frame(width: gridItemWidth, height: gridItemHeight)
                                             .background(.gray.opacity(0.3))
-                                            .clipShape(.rect(cornerSize: CGSize(width: gridItemWidth/20, height: gridItemHeight/20)))
+                                            .clipShape(.rect(cornerSize: CGSize(width: gridItemWidth/11, height: gridItemHeight/11)))
 
                                                 
                                         }
@@ -244,7 +280,7 @@ struct MainView_QuestInventory: View {
                                 .frame(width:gridViewFrameWidth)
                                 .padding(gridInnerPadding)
 //                                .background(.quaternary)
-                                .clipShape(.rect(cornerRadius: gridItemWidth/20))
+//                                .clipShape(.rect(cornerRadius: gridItemWidth/11))
 //                                .padding(.top, gridItemSpacing)
                                 .padding(.horizontal, gridHorizontalPadding)
                                     
@@ -606,6 +642,7 @@ struct QuestTierView: View {
     
 //    @Binding var tier: Int
     var tier: Int
+    var notUsedYet: Bool
 
     
     var body: some View {
@@ -646,37 +683,106 @@ struct QuestTierView: View {
                 case 1:
                     return geoHeight*0.04
                 case 2:
-                    return geoHeight*0.06
+                    return geoHeight*0.07
                 case 3:
-                    return geoHeight*0.09
+                    return geoHeight*0.10
                 case 4:
-                    return geoHeight*0.09
+                    return geoHeight*0.12
                 default:
                     return 0.0
                 }
             }()
             
-            let tierViewFrame: Path = Path(CGPath(roundedRect: CGRect(x: 0, y: 0, width: geoWidth, height: geoHeight), cornerWidth: geoWidth/20, cornerHeight: geoHeight/20, transform: nil))
+            let tierViewFrame: Path = Path(CGPath(roundedRect: CGRect(x: 0, y: 0, width: geoWidth, height: geoHeight), cornerWidth: geoWidth/11, cornerHeight: geoWidth/11, transform: nil))
 //            let strokeLineWidth:CGFloat = geoWidth*0.04*(0.5 * CGFloat(tier%5))
 
             
+            
             ZStack {
                 tierViewFrame
-                    .fill(LinearGradient(colors: getGradientColorsOf(tier: tier, type:1), startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .fill(.white)
+                    .opacity(notUsedYet ? 0.0 : 1.0 )
                 
+//                RoundedRectangle(cornerSize: CGSize(width: geoWidth/11, height: geoWidth/11))
+//                tierViewFrame
+//                    .stroke(lineWidth: strokeWidth)
+//                    .fill(.white)
+//                    .frame(width:geoWidth+strokeWidth/2, height: geoHeight+strokeWidth/2)
+//                    .opacity(colorScheme == .light ? 0.5 : 0.6)
+                
+                if notUsedYet {
+                    tierViewFrame
+                        .fill(Color.gray.opacity(0.7))
+                } else {
+                    tierViewFrame
+//                    Rectangle()
+                        .fill(LinearGradient(colors: getGradientColorsOf(tier: tier, type:1), startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .opacity(colorScheme == .light ? 0.6 : 0.8)
+
+                }
+                
+                
+                if tier % 5 == 4 {
+                    let width1:CGFloat = geoWidth+strokeWidth/3
+                    let height1: CGFloat = geoHeight+strokeWidth/3
+                    RoundedRectangle(cornerSize: CGSize(width: width1/11, height: width1/11))
+                        .stroke(.white.opacity(0.7), lineWidth: strokeWidth/3)
+    //                    .stroke(lineWidth: strokeWidth)
+                        .frame(width:geoWidth, height: geoHeight)
+                        .position(x:geoWidth/2, y:geoHeight/2)
+                        .rotationEffect(.radians(.pi/36*0.6))
+//                        .position(x:width1/2, y:height1/2)
+
+                    RoundedRectangle(cornerSize: CGSize(width: width1/11, height: width1/11))
+                        .stroke(.white.opacity(0.7), lineWidth: strokeWidth/3)
+    //                    .stroke(lineWidth: strokeWidth)
+                        .frame(width:geoWidth, height: geoHeight)
+                        .position(x:geoWidth/2, y:geoHeight/2)
+                        .rotationEffect(.radians(-(.pi/36*0.6)))
+//                        .position(x:width1/2-strokeWidth/3, y:height1/2-strokeWidth/3)
+
+                }
+                if tier % 5 == 3 {
+                    let width1:CGFloat = geoWidth+strokeWidth/3
+                    let height1: CGFloat = geoHeight+strokeWidth/3
+                    RoundedRectangle(cornerSize: CGSize(width: width1/11, height: width1/11))
+                        .stroke(.white, lineWidth: strokeWidth/3)
+    //                    .stroke(lineWidth: strokeWidth)
+                        .frame(width:geoWidth, height: geoHeight)
+                        .position(x:geoWidth/2, y:geoHeight/2)
+                }
+//                else if tier % 5 == 4 {
+//                    let width1:CGFloat = geoWidth+strokeWidth/3
+//                    let height1: CGFloat = geoHeight+strokeWidth/3
+//                    RoundedRectangle(cornerSize: CGSize(width: width1/11, height: width1/11))
+//                        .stroke(.white.opacity(0.4), lineWidth: strokeWidth/3)
+//    //                    .stroke(lineWidth: strokeWidth)
+//                        .frame(width:geoWidth, height: geoHeight)
+//                        .position(x:geoWidth/2, y:geoHeight/2)
+//                }
+                
+
+
+                let width2:CGFloat = geoWidth+strokeWidth
+                let height2: CGFloat = geoHeight+strokeWidth
                 RotatingGradient(level: tier%5, colors: rotationGradientColors)
                     .frame(width:(geoWidth+strokeWidth*2)*1.5, height: (geoWidth+strokeWidth*2)*1.5)
                     .position(x:geoWidth/2, y:geoHeight/2)
                     .mask {
-                        RoundedRectangle(cornerSize: CGSize(width: geoWidth/20, height: geoHeight/20))
+                        RoundedRectangle(cornerSize: CGSize(width: width2/11, height: width2/11))
                             .stroke(lineWidth: strokeWidth)
-                            .frame(width:geoWidth+strokeWidth/2, height: geoHeight+strokeWidth/2)
+                            .frame(width:geoWidth, height: geoHeight)
                     }
+//                    .opacity()
+                    .opacity(tier % 5 <= 1 ? 1.0 : (colorScheme == .light ? 0.4 : 0.7))
+
+//                    .opacity(colorScheme == .light ? 0.5 : 0.6)
 
                 
                 
             }
             .frame(width: geoWidth, height: geoHeight)
+//            .clipShape(.buttonBorder)
 
 
 
@@ -692,6 +798,7 @@ struct QuestTierView: View {
 struct QuestThumbnailView: View {
     
     @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
 
     @State var quest: Quest
 
@@ -704,9 +811,12 @@ struct QuestThumbnailView: View {
 //            let gridItemWidth = geoWidth
             
             ZStack {
-                QuestTierView(tier: quest.tier)
+                QuestTierView(tier: quest.tier, notUsedYet: quest.cumulative() == 0)
                     .frame(width: geoWidth, height: geoHeight)
-                    .opacity(0.85)
+                PurposeOfQuestView(quest:quest, parentWidth:UIScreen.main.bounds.width, parentHeight:UIScreen.main.bounds.height)
+                    .frame(width:geoWidth/4, height:geoWidth/4)
+                    .position(CGPoint(x: geoWidth/8, y: geoWidth/8))
+                    .opacity(0.8)
                 FireView(momentumLevel: quest.momentumLevel)
                     .frame(width: geoWidth/1.5, height: geoHeight/1.5)
                     .position(x:geoWidth/2,y:geoHeight/2)
@@ -731,9 +841,9 @@ struct QuestThumbnailView: View {
                 }
                 .padding(10)
                 .frame(width:geoWidth ,height: geoHeight, alignment: .center)
-                .onAppear() {
-                    print("\(quest.name): tier \(quest.tier)")
-                }
+//                .onAppear() {
+//                    print("\(quest.name): tier \(quest.tier)")
+//                }
                 
             }
         }
@@ -756,7 +866,7 @@ struct CreateNewQuest: View {
     // isPlan, popUp
     
     @State var questNameToAppend = ""
-    @State var questDataTypeToAppend: DataType = .ox
+    @State var questDataTypeToAppend: DataType = .hour
     @State var customDataTypeNotation: String?
     @State var customDataTypeNotation_textField: String = ""
     @State var additionalInfo: Bool = false
@@ -791,8 +901,6 @@ struct CreateNewQuest: View {
             
             let contentHeight = geometry.size.height*0.9
             
-            
-//            ZStack {
             ScrollView {
                 VStack(alignment: .leading) {
                     
@@ -843,7 +951,8 @@ struct CreateNewQuest: View {
 
                         VStack(spacing:0.0) {
                             Picker("", selection: $questDataTypeToAppend) {
-                                ForEach(DataType.allCases, id:\.self) {
+                                
+                                ForEach([DataType.hour, DataType.ox, DataType.custom], id:\.self) {
                                     
                                     Text(DataType.kor_stringOf(dataType: $0))
                                     
@@ -1194,7 +1303,7 @@ struct QuestHelpView: View {
                         ScrollView {
                             ForEach(0...8, id:\.self) { tier in
                                 VStack {
-                                    QuestTierView(tier: tier*5)
+                                    QuestTierView(tier: tier*5, notUsedYet: false)
                                         .frame(width:tierViewSize, height: tierViewSize)
 //                                    Text(selectedOption == "시간x" ?  notHourTierGuideLines[tier]: hourTierGuideLines[tier])
 //                                        .font(.caption)

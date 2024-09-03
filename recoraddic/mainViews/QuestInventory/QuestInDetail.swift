@@ -139,37 +139,22 @@ struct QuestInDetail: View {
                         } // 휴지통에 있을 때의 메뉴
                         else if !keyBoardAppeared {
                             let current: Int = {
-                                if quest.dataType == DataType.hour.rawValue {
-                                    return DataType.cumulative_integratedValueNotation(data: (quest.cumulative()), dataType: dataTypeFrom(quest.dataType))
+                                if quest.dataType == DataType.custom.rawValue {
+                                    return quest.dailyData.count
                                 }
                                 else {
-                                    return quest.dailyData.count
+                                    return DataType.cumulative_integratedValueNotation(data: (quest.cumulative()), dataType: dataTypeFrom(quest.dataType))
                                 }
                             }()
                             let next: Int = DataType.cumulative_integratedValueNotation(data: (quest.getNextTierCondition()), dataType: dataTypeFrom(quest.dataType))
                             HStack(spacing:0.0) {
-                                Text("다음 단계")
-                                    .font(.title3)
-                                
-                                //                                QuestTierView(tier: (questTier/5 + 1)*5)
-                                //                                    .frame(width: geoHeight*0.035, height: geoHeight*0.035)
-                                
-                                
-                                Text(" : \(current)/\(next)")
-                                    .font(.title3)
-                                
-                                
                                 if quest.dataType == DataType.hour.rawValue {
-                                    Text("시간")
+                                    Text("누적 시간: \(current)hr")
+                                } else if quest.dataType == DataType.ox.rawValue {
+                                    Text("누적 달성: \(current)회")
+                                } else {
+                                    Text("기록 횟수: \(current)회")
                                 }
-                                else {
-                                    Text("회 기록")
-                                        .font(.title3)
-                                    
-                                }
-                                //                                .background(
-                                //                                    QuestTierView(tier: nextTier)
-                                //                                )
                             }
                             .frame(width:contentWidth1, height: titleHeight*0.2)
                             .foregroundStyle(getDarkTierColorOf(tier: questTier))
@@ -417,6 +402,7 @@ struct QuestInDetail: View {
                 .background(LinearGradient(colors: getGradientColorsOf(tier: quest.tier, type: 1), startPoint: .topLeading, endPoint: .bottomTrailing))
                 .fullScreenCover(isPresented: $popUp_editQuest) {
 //                    if let quest = selectedQuest {
+                    let pastCumulative = quest.dataType == DataType.hour.rawValue ? quest.pastCumulatve/60 : quest.pastCumulatve
                     EditQuest(
                         popUp_editQuest: $popUp_editQuest,
                         quest: quest,
@@ -427,35 +413,12 @@ struct QuestInDetail: View {
                         addSubName: quest.subName != nil,
                         questSubname: quest.subName ?? "",
                         addPastCumulative: quest.pastCumulatve != 0,
-                        pastCumulative: quest.pastCumulatve/60,
-                        pastCumulative_str: String(quest.pastCumulatve/60)
+                        pastCumulative: pastCumulative,
+                        pastCumulative_str: String(pastCumulative)
                     )
 //                    }
                 }
                 .overlay {
-//                        if let quest = selectedQuest {
-//                            NavigationLink(destination: EditQuest(
-//                                popUp_editQuest: $popUp_editQuest,
-//                                quest: quest,
-//                                questName: quest.name,
-//                                questDataType: DataType(rawValue: quest.dataType) ?? .hour ,
-//                                customDataTypeNotation:quest.customDataTypeNotation,
-//                                customDataTypeNotation_textField: quest.customDataTypeNotation ?? "",
-//                                addSubName: quest.subName != nil,
-//                                questSubname: quest.subName ?? "",
-//                                addPastCumulative: quest.pastCumulatve != 0,
-//                                pastCumulative: quest.pastCumulatve,
-//                                pastCumulative_str: String(quest.pastCumulatve)
-//                            )
-//                                .
-//                            ) {
-//                                Image(systemName: "square.and.pencil")
-//                            }
-//                            .padding(10)
-//                            .frame(width: geoWidth,height: geoHeight, alignment: .topTrailing)
-//                            .zIndex(3)
-//                            .buttonStyle(.plain)
-//                        }
                     if let quest = selectedQuest {
                         
                         if !quest.inTrashCan {
@@ -1348,6 +1311,7 @@ struct EditQuest: View {
 
         }
         
+        
 
         
         
@@ -1364,6 +1328,8 @@ struct EditQuest: View {
                     quest.pastCumulatve = pastCumulatve
                 }
             }
+        } else {
+            quest.pastCumulatve = 0
         }
         quest.updateTier()
         

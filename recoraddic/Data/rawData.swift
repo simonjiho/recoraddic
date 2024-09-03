@@ -66,7 +66,7 @@ final class DefaultPurpose {
             return "탐구심"
         }
         else if input == DefaultPurpose.ent {
-            return "행복/즐거움"
+            return "즐거움"
         }
         else if input == DefaultPurpose.hlt {
             return "건강"

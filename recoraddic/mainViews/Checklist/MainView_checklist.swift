@@ -119,36 +119,63 @@ struct MainView_checklist: View {
 
                 VStack(spacing:0.0) {
                     let dateGap: Int = calculateDaysBetweenTwoDates(from: getStartDateOfNow(), to: selectedDate)
-                    HStack {
-                        Circle().frame(width:5,height:5).opacity((dateGap == -3) ? 1.0 : 0.0)
-                        Circle().frame(width:5,height:5).opacity((dateGap == -2 || dateGap == -3) ? 1.0 : 0.0)
-                        Circle().frame(width:5,height:5).opacity((dateGap <= -1 && dateGap >= -3) ? 1.0 : 0.0)
-                        if dateGap <= 3 && dateGap >= -3 {
-                            Rectangle().frame(width:1,height:topBarTopPadding*0.7).opacity(dateGap == 0 ? 0.0 : 1.0)
-                        } else {
-                            Text("\(dateGap > 0 ? "+" : "")\(dateGap)")
-                                .font(.system(size: topBarTopPadding*0.7))
-                                .bold()
+                    HStack(spacing:0.0) {
+                        HStack {
+                            Text("일기")
+                                .frame(width:facialExpressionSize)
+                                .font(.caption2)
+                                .opacity(currentDailyRecord.dailyText == nil ? 1.0 : 0.0)
+
                         }
-                        Circle().frame(width:5,height:5).opacity((dateGap >= 1 && dateGap <= 3) ? 1.0 : 0.0)
-                        Circle().frame(width:5,height:5).opacity((dateGap == 2 || dateGap == 3) ? 1.0 : 0.0)
-                        Circle().frame(width:5,height:5).opacity((dateGap == 3) ? 1.0 : 0.0)
+                        .padding(.leading)
+                        .frame(width:geoWidth*0.15, alignment: .leading)
+                    
+                        HStack {
+                            Circle().frame(width:5,height:5).opacity((dateGap == -3) ? 1.0 : 0.0)
+                            Circle().frame(width:5,height:5).opacity((dateGap == -2 || dateGap == -3) ? 1.0 : 0.0)
+                            Circle().frame(width:5,height:5).opacity((dateGap <= -1 && dateGap >= -3) ? 1.0 : 0.0)
+                            if dateGap <= 3 && dateGap >= -3 {
+                                Rectangle().frame(width:1,height:topBarTopPadding*0.7).opacity(dateGap == 0 ? 0.0 : 1.0)
+                            } else {
+                                Text("\(dateGap > 0 ? "+" : "")\(dateGap)")
+                                    .font(.system(size: topBarTopPadding*0.7))
+                                    .bold()
+                            }
+                            Circle().frame(width:5,height:5).opacity((dateGap >= 1 && dateGap <= 3) ? 1.0 : 0.0)
+                            Circle().frame(width:5,height:5).opacity((dateGap == 2 || dateGap == 3) ? 1.0 : 0.0)
+                            Circle().frame(width:5,height:5).opacity((dateGap == 3) ? 1.0 : 0.0)
+                        }
+                        .frame(width: geoWidth*0.7, height:topBarTopPadding)
+                        HStack {
+                            Text("표정")
+                                .frame(width:facialExpressionSize)
+                                .font(.caption2)
+
+                        }
+                        .padding(.trailing)
+                        .frame(width:geoWidth*0.15, alignment: .trailing)
+
                     }
-                    .frame(height:topBarTopPadding)
+                    .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
+
 //                    .foregroundStyle(topForegroundColor)
 //                    .border(.red)
 
                     HStack(spacing:0.0) {
                         if currentDailyRecord.dailyText == nil {
+                            
                             Button(action:{selectDiaryOption = true}) {
                                 Image(systemName:"book.closed.fill")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: facialExpressionSize*0.7, height: facialExpressionSize*0.7)
+                                    .padding(facialExpressionSize*0.1)
+                                    .frame(width: facialExpressionSize, height: facialExpressionSize)
+
                             }
-                            .padding(.trailing)
-                            .frame(width:geoWidth*0.15, alignment: .trailing)
+                            .padding(.leading)
+                            .frame(width:geoWidth*0.15, alignment: .leading)
                             .buttonStyle(.plain)
+                            
 //                            .border(.red)
                         } else {
                             Spacer()
@@ -198,13 +225,18 @@ struct MainView_checklist: View {
                         .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
 
                             
-                        
-
                         ZStack {
-                            Circle()
-                                .stroke(lineWidth: geoWidth*0.002)
-                                .frame(width:facialExpressionSize, height: facialExpressionSize)
-                            reversedColorSchemeColor
+                            if colorScheme == .light {
+                                Circle()
+                                    .stroke(lineWidth: geoWidth*0.002)
+                                    .frame(width:facialExpressionSize, height: facialExpressionSize)
+                            } else {
+                                Circle()
+                                    .fill(.white)
+                                    .frame(width:facialExpressionSize, height: facialExpressionSize)
+                            }
+
+                            Color.black
                                 .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
                                 .mask(
                                     Image("facialExpression_\(currentDailyRecord.mood)")
@@ -212,6 +244,7 @@ struct MainView_checklist: View {
                                         .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
                                 )
                         }
+
                         .padding(.trailing)
                         .frame(width:geoWidth*0.15,alignment: .trailing)
                         .onTapGesture {
@@ -310,6 +343,7 @@ struct MainView_checklist: View {
                         // use "in:" to add date range
                     }
                     .frame(height: topBarSize)
+                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     
 //                    .padding(.top,geoHeight*0.035)
                     .padding(.bottom, topBarBottomPadding)
@@ -844,39 +878,57 @@ struct ChecklistView: View {
 
                             VStack(spacing:5.0) {
                                 ForEach(dailyQuests_notHidden_sorted, id: \.self) { dailyQuest in
-//                                ForEach(currentDailyRecord.dailyQuestList!, id: \.self) { dailyQuest in
-                                    
-                                    HStack(spacing: 0) {
-                                        
-                                        let height:CGFloat = qcbvHeight(dynamicTypeSize, dataType: dailyQuest.dataType)
 
+                                    let data = dailyQuest.data
+                                    let xOffset:CGFloat = data == 0 ? 0.1 : CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal ?? dailyQuest.data), to: 0...checkListElementWidth)
                                         
-                                        PurposeOfDailyQuestView(dailyQuest: dailyQuest, parentWidth: geoWidth, parentHeight: geoHeight)
-                                            .frame(width:questCheckBox_purposeTagsWidth, height: height, alignment: .leading)
-                                            .opacity(0.9)
-                                            .zIndex(3)
+                                    QuestCheckBoxView(
+                                        dailyQuest: dailyQuest,
+                                        targetDailyQuest: $dailyQuestToDelete,
+                                        deleteTarget: $applyDailyQuestRemoval,
+                                        value: data,
+                                        dailyGoal: dailyQuest.dailyGoal,
+                                        xOffset: xOffset,
+                                        width: checkListElementWidth
+                                    )
+//                                    .opacity(0.85)
 
+//                                    .frame(width: checkListElementWidth, alignment:.leading)
 
-                                        let data = dailyQuest.data
-                                        
-                                        let xOffset:CGFloat = data == 0 ? 0.1 : CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal ?? dailyQuest.data), to: 0...questCheckBoxWidth)
-                                        
-                                        
-                                        QuestCheckBoxView(
-                                            dailyQuest: dailyQuest,
-                                            targetDailyQuest: $dailyQuestToDelete,
-                                            deleteTarget: $applyDailyQuestRemoval,
-                                            value: data,
-                                            dailyGoal: dailyQuest.dailyGoal,
-                                            xOffset: xOffset,
-                                            width: questCheckBoxWidth
-                                        )
-                                        .opacity(0.85)
 
 //
                                         
-                                    }
-                                    .frame(width: checkListElementWidth, alignment:.leading)
+//                                    HStack(spacing: 0) {
+//                                        
+//                                        let height:CGFloat = qcbvHeight(dynamicTypeSize, dataType: dailyQuest.dataType)
+//
+//                                        
+//                                        PurposeOfDailyQuestView(dailyQuest: dailyQuest, parentWidth: geoWidth, parentHeight: geoHeight)
+//                                            .frame(width:questCheckBox_purposeTagsWidth, height: height, alignment: .leading)
+//                                            .opacity(0.9)
+//                                            .zIndex(3)
+//
+//
+//                                        let data = dailyQuest.data
+//                                        
+//                                        let xOffset:CGFloat = data == 0 ? 0.1 : CGFloat(data).map(from:0.0...CGFloat(dailyQuest.dailyGoal ?? dailyQuest.data), to: 0...questCheckBoxWidth)
+//                                        
+//                                        
+//                                        QuestCheckBoxView(
+//                                            dailyQuest: dailyQuest,
+//                                            targetDailyQuest: $dailyQuestToDelete,
+//                                            deleteTarget: $applyDailyQuestRemoval,
+//                                            value: data,
+//                                            dailyGoal: dailyQuest.dailyGoal,
+//                                            xOffset: xOffset,
+//                                            width: questCheckBoxWidth
+//                                        )
+//                                        .opacity(0.85)
+//
+////
+//                                        
+//                                    }
+//                                    .frame(width: checkListElementWidth, alignment:.leading)
                                     
 
                                 }
@@ -1279,132 +1331,6 @@ struct TodoTextFieldView: View {
     }
 }
 
-struct PurposeOfDailyQuestView: View {
-    
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.colorScheme) var colorScheme
-
-    @Query var quests: [Quest]
-    
-    @State var popUp_changePurpose: Bool = false
-    var dailyQuest: DailyQuest
-    var parentWidth: CGFloat
-    var parentHeight: CGFloat
-    
-    var body: some View {
-        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
-        
-        GeometryReader { geometry in
-            let geoWidth: CGFloat = geometry.size.width
-            let geoHeight: CGFloat = geometry.size.height
-            let tagSize = min(geoWidth*0.8,geoHeight*0.3)
-
-            
-//            Group {
-                Group {
-                    // purpose 0개일 때
-                    if dailyQuest.purposes.isEmpty {
-                        Color.white.opacity(0.01)
-                            .overlay(
-                                Image(systemName:"questionmark.square")
-                                    .resizable()
-                                    .frame(width:tagSize, height:tagSize)
-                                    .foregroundStyle(reversedColorSchemeColor)
-                            )
-                        // MARK: 이렇게 안 하면 외부의 zIndex가 작동 안 함.
-                    }
-                    else {
-                        PurposeTagsView_vertical(purposes:dailyQuest.purposes)
-                            .frame(width: geoWidth, height:geoHeight)
-                    }
-                    
-                }
-                .frame(width:geoWidth, height:geoHeight)
-                .onTapGesture {
-                    popUp_changePurpose.toggle()
-                }
-                
-                //                                    .popover(isPresented: $popUp_changePurpose) {
-                .popover(isPresented: $popUp_changePurpose) {
-                    ChoosePurposeView_dailyQuest(dailyQuest: dailyQuest)
-                        .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
-                        .presentationCompactAdaptation(.popover)
-                        .onDisappear() {
-                            if let quest = quests.first(where:{$0.name == dailyQuest.questName && !$0.inTrashCan}) {
-                                quest.recentPurpose = dailyQuest.purposes
-                            } else if let quest = quests.first(where:{$0.name == dailyQuest.questName}){
-                                quest.recentPurpose = dailyQuest.purposes
-                            }
-                        }
-                    
-                }
-//            }
-            
-            
-        }
-    }
-}
-
-struct PurposeOfTodoView: View {
-    
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.colorScheme) var colorScheme
-
-    @Query var todos_preset: [Todo_preset]
-    
-    @State var popUp_changePurpose: Bool = false
-    var todo: Todo
-    var parentWidth: CGFloat
-    var parentHeight: CGFloat
-    
-    var body: some View {
-//        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
-        
-        GeometryReader { geometry in
-            let geoWidth: CGFloat = geometry.size.width
-            let geoHeight: CGFloat = geometry.size.height
-            let tagSize = min(geoWidth*0.8,geoHeight*0.3)
-
-            
-            Group {
-                Group {
-                    // purpose 0개일 때
-                    if todo.purposes.count == 0 {
-                        Image(systemName:"questionmark.square")
-                            .resizable()
-                            .frame(width:tagSize, height:tagSize)
-                            .foregroundStyle(reversedColorSchemeColor)
-                    }
-                    else {
-                        PurposeTagsView_vertical(purposes:todo.purposes)
-                            .frame(width: geoWidth, height:geoHeight)
-                    }
-                    
-                }
-                .frame(width:geoWidth, height:geoHeight)
-                .onTapGesture {
-                    popUp_changePurpose.toggle()
-                }
-                
-                //                                    .popover(isPresented: $popUp_changePurpose) {
-                .popover(isPresented: $popUp_changePurpose) {
-                    ChoosePurposeView_todo(todo: todo)
-                        .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
-                        .presentationCompactAdaptation(.popover)
-                        .onDisappear() {
-                            if let todo_preset = todos_preset.first(where:{$0.content == todo.content}) {
-                                todo_preset.purposes = todo.purposes
-                            }
-                        }
-                    
-                }
-            }
-            
-        }
-    }
-}
 
 
 
