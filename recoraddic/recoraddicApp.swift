@@ -84,10 +84,6 @@ struct recoraddicApp: App {
     }
 }
 
-//extension Notification.Name {
-//    static let scenePhaseChanged = Notification.Name("scenePhaseChanged")
-//}
-
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
@@ -131,6 +127,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 //        NotificationCenter.default.post(name: Notification.Name(""), object: nil, userInfo: userInfo)
 //    }
 
+    
     private func setupNotificationCategories() {
         let customCategory = UNNotificationCategory(
             identifier: "dailyQuestNotification",

@@ -70,28 +70,6 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
         let showHiddenQuests = profiles.first?.showHiddenQuests ?? false
         let hiddenQuestNames: Set<String> = showHiddenQuests ? [] : Set(quests.filter({$0.isHidden}).map({$0.name}))
 
-//        let dailyRecords_withContent:[DailyRecord] = {
-//            if showHiddenQuests {
-//                return selectedDailyRecordSet.dailyRecords!
-//                    .filter({$0.hasContent})
-//                    .sorted(by: {
-//                        if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
-//                        else { return false }
-//                    })
-//            } else {
-//                return selectedDailyRecordSet.dailyRecords!
-//                    .filter({
-//                        $0.hasContent &&
-//                        ($0.hasTodoOrDiary ||
-//                         !Set($0.dailyQuestList!.filter({$0.data != 0}).map{$0.questName}).subtracting(hiddenQuestNames).isEmpty)
-//                    })
-//                    .sorted(by:{
-//                        if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
-//                        else { return false }
-//                    }
-//                )
-//            }
-//        }()
         let dailyRecords_withContent:[DailyRecord] = selectedDailyRecordSet.dailyRecordsWithContent(hiddenQuestNames: hiddenQuestNames, showHiddenQuests: showHiddenQuests)
         
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
@@ -202,34 +180,52 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 }
                 
                 HStack(spacing:0.0) {
-                    Button(action:{
+                    Group {
                         
-                        selectedDrsIdx -= 1
-                        isEditingTermGoals = false
-                    }) {
-                        Image(systemName: "arrowtriangle.backward")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width:geoWidth*0.08)
+                        if selectedDrsIdx == 0 || isEditingTermGoals {
+                            Spacer()
+                        }
+                        else {
+                            Button(action:{
+                                
+                                selectedDrsIdx -= 1
+                                isEditingTermGoals = false
+                            }) {
+                                Image(systemName: "arrowtriangle.backward")
+                                //                        Image(systemName: "line.3.horizontal.circle")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width:geoWidth*0.08)
+                                    .opacity(buttonOpacity)
+                                
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(selectedDrsIdx == 0 || isEditingTermGoals)
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .disabled(selectedDrsIdx == 0 || isEditingTermGoals)
-                    .opacity((selectedDrsIdx == 0 || isEditingTermGoals) ? 0.0 : buttonOpacity)
                     .padding(.leading,10)
                     .frame(width:geoWidth/2, alignment:.leading)
                     
-                    Button(action:{
-                        selectedDrsIdx += 1
-                    }) {
-                        Image(systemName: "arrowtriangle.forward")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width:geoWidth*0.08)
+                    
+                    Group {
+                        
+                        if isLastDailyRecordSet || isEditingTermGoals {
+                            Spacer()
+                        }
+                        else {
+                            Button(action:{
+                                selectedDrsIdx += 1
+                            }) {
+                                Image(systemName: "arrowtriangle.forward")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width:geoWidth*0.08)
+                                    .opacity(buttonOpacity)
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(isLastDailyRecordSet || isEditingTermGoals)
+                        }
                     }
-                    .buttonStyle(.plain)
-//                    .foregroundStyle(.ultraThinMaterial)
-                    .disabled(isLastDailyRecordSet || isEditingTermGoals)
-                    .opacity((isLastDailyRecordSet || isEditingTermGoals) ? 0.0 : buttonOpacity)
 
                     .padding(.trailing,10)
                     .frame(width:geoWidth/2, alignment:.trailing)
@@ -238,7 +234,6 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
 //                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 
                 
-                // 790 849(790 + 59) 54 932(790 + 59 + ?)
 
 //                let restrictedScreenBoundsHeight:CGFloat = 10 /*UIScreen.main.bounds.height - geoHeight*/
                 HStack {
@@ -289,8 +284,6 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                 .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
                 .offset(x: selectedDailyRecordSet.end != nil ? 0.0 : 15.0)
 
-
-                
                 Menu { // menu의 요소들에는 dynamicTypeSize 안 통함
                     
 //                    Button("도움말") {
@@ -322,7 +315,12 @@ struct MainView_SeeMyDailyRecord: View { //MARK: selectedDailyRecordSet은 selec
                     }
                     
                 } label: {
-                    Image(systemName:"line.3.horizontal")
+                    
+                    Image(systemName:"line.3.horizontal.circle")
+//                    Image(systemName:"line.3.horizontal") // 24.09.28 os issue: ios 18.0 에서 line.3.horizontal 작동 안함
+//                    Image(systemName: "circle")
+
+                    
                 }
                 .frame(width:geoWidth*0.95, height:restrictedHeight*0.05, alignment: .trailing)
                 .position(x:geoWidth*0.5, y: (geoHeight - restrictedHeight) + restrictedHeight*0.035 + restrictedHeight*0.025 )

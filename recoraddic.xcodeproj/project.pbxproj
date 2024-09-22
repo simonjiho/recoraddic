@@ -32,9 +32,11 @@
 		B241C0742C7AF94700873985 /* calendarFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B283397C2AFB97E9009AEB2A /* calendarFunc.swift */; };
 		B241C0752C7AF94A00873985 /* colorFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B220DA2D2B612EB60039160C /* colorFunc.swift */; };
 		B241C0772C7AFAF600873985 /* recoraddicActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F017342C3D157600765EF6 /* recoraddicActivityAttributes.swift */; };
+		B246AB4F2CA8282600CF44F3 /* simplePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B246AB4E2CA8282000CF44F3 /* simplePreview.swift */; };
 		B247D24B2A6D1DA100E457FB /* customMathFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B247D24A2A6D1DA100E457FB /* customMathFunc.swift */; };
 		B24C298E2C283331000F3EEE /* dailyQuestionsGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */; };
 		B24C29922C329B7B000F3EEE /* test.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24C29912C329B7B000F3EEE /* test.swift */; };
+		B24DFC702CA7E70600572776 /* StoneTower_tmp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B24DFC6F2CA7E6FF00572776 /* StoneTower_tmp.swift */; };
 		B25BF9052B1C886E0039F1F9 /* ResizableText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B25BF9042B1C886E0039F1F9 /* ResizableText.swift */; };
 		B260A3912A9B88AE00D73208 /* MainView_checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3902A9B88AE00D73208 /* MainView_checklist.swift */; };
 		B260A3942A9B8B8F00D73208 /* MainView_QuestInventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B260A3932A9B8B8F00D73208 /* MainView_QuestInventory.swift */; };
@@ -148,9 +150,11 @@
 		B241C06B2C7AF84C00873985 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B241C06D2C7AF84C00873985 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B241C0782C7B1CBF00873985 /* recoraddicRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = recoraddicRelease.entitlements; sourceTree = "<group>"; };
+		B246AB4E2CA8282000CF44F3 /* simplePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = simplePreview.swift; sourceTree = "<group>"; };
 		B247D24A2A6D1DA100E457FB /* customMathFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customMathFunc.swift; sourceTree = "<group>"; };
 		B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dailyQuestionsGraph.swift; sourceTree = "<group>"; };
 		B24C29912C329B7B000F3EEE /* test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test.swift; sourceTree = "<group>"; };
+		B24DFC6F2CA7E6FF00572776 /* StoneTower_tmp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower_tmp.swift; sourceTree = "<group>"; };
 		B25BF9042B1C886E0039F1F9 /* ResizableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizableText.swift; sourceTree = "<group>"; };
 		B2600B062A35E1FF00E00D91 /* what_I_learned.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = what_I_learned.md; sourceTree = "<group>"; };
 		B260A3902A9B88AE00D73208 /* MainView_checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_checklist.swift; sourceTree = "<group>"; };
@@ -487,6 +491,7 @@
 				B220DA432B6519C20039160C /* stoneTower_backgroundThemes.swift */,
 				B2E5522A2BC2989000ACA5A8 /* stoneTower_shared.swift */,
 				B2C059F82C52A610001BEE77 /* StoneTower.swift */,
+				B24DFC6F2CA7E6FF00572776 /* StoneTower_tmp.swift */,
 			);
 			path = stoneTower;
 			sourceTree = "<group>";
@@ -515,6 +520,7 @@
 		B2FC0C462C7F511400813A42 /* previews */ = {
 			isa = PBXGroup;
 			children = (
+				B246AB4E2CA8282000CF44F3 /* simplePreview.swift */,
 				B2D612D22C7F51470083183F /* preview_facialExpressions.swift */,
 				B2AA11632C818520003C9178 /* preview_questThumbnail.swift */,
 			);
@@ -703,8 +709,10 @@
 				B2D8F96F2B75F46A00423AFC /* dataFunctions.swift in Sources */,
 				B2D7AD032B91C5440045C9EA /* SyncManager.swift in Sources */,
 				B220DA462B6524F50039160C /* themeNames.swift in Sources */,
+				B246AB4F2CA8282600CF44F3 /* simplePreview.swift in Sources */,
 				B20429E42C7F52890022DB1A /* Text_scaleToFit.swift in Sources */,
 				B29C70302A35C5E30046873E /* ContentView.swift in Sources */,
+				B24DFC702CA7E70600572776 /* StoneTower_tmp.swift in Sources */,
 				B2FB726F2A8762810012EBE1 /* customArrayFunc.swift in Sources */,
 				B2102B142BA5CCCD0041C8FB /* QuestInDetail.swift in Sources */,
 				B2AA11642C818520003C9178 /* preview_questThumbnail.swift in Sources */,
@@ -789,7 +797,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic.recoraddicNotification;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -825,7 +833,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic.recoraddicNotification;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -863,7 +871,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic.recoraddicWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -901,7 +909,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic.recoraddicWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1052,7 +1060,7 @@
 				CODE_SIGN_ENTITLEMENTS = recoraddic/recoraddic.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 76;
+				CURRENT_PROJECT_VERSION = 77;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"recoraddic/Preview Content\"";
 				DEVELOPMENT_TEAM = K5V8U9HR59;
@@ -1079,7 +1087,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1101,7 +1109,7 @@
 				CODE_SIGN_ENTITLEMENTS = recoraddic/recoraddicRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 76;
+				CURRENT_PROJECT_VERSION = 77;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"recoraddic/Preview Content\"";
 				DEVELOPMENT_TEAM = K5V8U9HR59;
@@ -1128,7 +1136,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = BranchCorp.recoraddic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

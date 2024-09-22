@@ -19,7 +19,6 @@ extension Color { // hue: 색조 , saturation: 채도
         if uiColor.getHue(&currentHue, saturation: &currentSaturation, brightness: &currentBrightness, alpha: &currentOpacity) {
             return Color(hue: currentHue + hue, saturation: currentSaturation + saturation, brightness: currentBrightness + brightness, opacity: currentOpacity + opacity)
         }
-//        print("oh....")
         return self
     }
     func getRGBA() -> (CGFloat, CGFloat, CGFloat, CGFloat) {
@@ -42,8 +41,6 @@ extension Color { // hue: 색조 , saturation: 채도
         let rgba: (CGFloat,CGFloat,CGFloat,CGFloat) = self.getRGBA()
         return Color(red: rgba.0, green: rgba.1, blue: rgba.2)
     }
-
-    
 }
 
 func getTierColorOf(tier:Int) -> Color {

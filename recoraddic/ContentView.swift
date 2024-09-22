@@ -165,7 +165,9 @@ struct ContentView: View {
                      .tabItem {
                          Image(systemName: images[mainViews[2]]!)
                      }
+                     #if os(iOS)
                      .ignoresSafeArea(edges:.top)
+                     #endif
                      .ignoresSafeArea(.keyboard)
 
 

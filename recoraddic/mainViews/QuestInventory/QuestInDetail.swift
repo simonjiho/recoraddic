@@ -229,31 +229,32 @@ struct QuestInDetail: View {
                                 //                        .padding(.bottom,geoHeight*0.005)
                                 
                                 ZStack { // for scroll
+                                    let elementSize:CGFloat = contentWidth2/7
+                                    let (startDate,endDate): (Date,Date) = {
+                                        let sorted_dates: [Date] = quest.dailyData.keys.sorted()
+                                        
+                                        if sorted_dates.isEmpty {
+                                            return (.now, .now)
+                                        }
+                                        else {
+                                            return (sorted_dates.first!, sorted_dates.last!)
+                                        }
+                                        
+                                    }()
+                                    let numberOfRows:Int = (calculateDaysBetweenTwoDates(from: startDate, to: endDate) + 8) / 7 + 1
+                                    
+                                    let scrollViewHeight:CGFloat = elementSize * CGFloat(numberOfRows)
                                     ScrollView {
-                                        
-                                        let elementSize:CGFloat = contentWidth2/7
-                                        let (startDate,endDate): (Date,Date) = {
-                                            let sorted_dates: [Date] = quest.dailyData.keys.sorted()
-                                            
-                                            if sorted_dates.isEmpty {
-                                                return (.now, .now)
-                                            }
-                                            else {
-                                                return (sorted_dates.first!, sorted_dates.last!)
-                                            }
-                                            
-                                        }()
-                                        let numberOfRows:Int = (calculateDaysBetweenTwoDates(from: startDate, to: endDate) + 8) / 7 + 1
-                                        
-                                        let scrollViewHeight:CGFloat = elementSize * CGFloat(numberOfRows)
                                         
                                         SerialVisualization(data: quest.dailyData, tier: questTier)
                                             .frame(width: contentWidth2, height: scrollViewHeight, alignment: .center)
+//                                            .border(.red)
                                             .padding(.horizontal, (contentWidth1-contentWidth2)/2)
                                         
                                     }
                                     .frame(width:contentWidth1)
-                                    .defaultScrollAnchor(.bottom)
+//                                    .border(.yellow)
+                                    .defaultScrollAnchor(scrollViewHeight > contentHeight ? .bottom : .top)
                                 }
                                 
                             } // 달력

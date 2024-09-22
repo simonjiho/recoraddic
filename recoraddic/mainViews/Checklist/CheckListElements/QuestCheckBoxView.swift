@@ -94,18 +94,20 @@ struct QuestCheckBoxView: View {
         
         let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= width +  0.1) ? xOffset : width, height: height), transform: nil))
         let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
-        let invertForegroundStyleIntoBright: Bool = {
-            if colorScheme == .dark {
-                if dailyQuest.data == 0  { return true }
-                else if let dailyGoal = dailyQuest.dailyGoal {
-                    if CGFloat(dailyQuest.data) / CGFloat(dailyGoal) <= 0.5 { return true } else { return false }
-                }
-                else { return false }
-            }
-            else {
-                return false
-            }
-        }()
+//        let invertForegroundStyleIntoBright: Bool = {
+//            if colorScheme == .dark {
+//                if dailyQuest.data == 0  { return true }
+//                else if let dailyGoal = dailyQuest.dailyGoal {
+//                    if CGFloat(dailyQuest.data) / CGFloat(dailyGoal) <= 0.5 { return true } else { return false }
+//                }
+//                else { return false }
+//            }
+//            else {
+//                return false
+//            }
+//        }()
+        let invertForegroundStyleIntoBright: Bool =  colorScheme == .dark && dailyQuest.data == 0
+
 //        let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0, isDark: colorScheme == .dark)
         
 //        let isRecent: Bool = getStartDateOfYesterday() <= dailyQuest.dailyRecord!.getLocalDate()!
@@ -138,7 +140,7 @@ struct QuestCheckBoxView: View {
             }
             .frame(width:width, height: height)
 //            .foregroundStyle(colorScheme == .dark ? getBrightTierColorOf2(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
-            .foregroundStyle( invertForegroundStyleIntoBright ? getBrightTierColorOf3(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
+            .foregroundStyle( invertForegroundStyleIntoBright ? getBrightTierColorOf(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
             .background(
                 ZStack {
                     Color.white
@@ -165,7 +167,8 @@ struct QuestCheckBoxView: View {
                         a
                     }
 
-                    .background(.gray.opacity(colorScheme == .light ? 0.3 : 0.3))
+//                    .background(.gray.opacity(colorScheme == .light ? 0.3 : 0.3))
+                    .background(invertForegroundStyleIntoBright ? .gray.opacity(0.3) : getTierColorOf(tier: dailyQuest.currentTier))
                     .blur(radius: 0.5)
 
                 
@@ -193,7 +196,7 @@ struct QuestCheckBoxView: View {
         }
         .frame(width:width, height: height, alignment: .leading)
         .clipShape(.buttonBorder)
-        .gesture(
+        .simultaneousGesture(
             DragGesture()
                 .onChanged { value in
                     
@@ -513,7 +516,7 @@ struct QuestCheckBoxContent_HOUR:View {
     
     @State var lastTapTime: Date = Date()
     
-    let sheetHeight:CGFloat = 380.0
+    let sheetHeight:CGFloat = 450.0
 
     
     var body: some View {
@@ -936,6 +939,7 @@ struct Text_hours2: View {
 
 struct QuestCheckBoxContent_CUSTOM:View {
     @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
     var dailyQuest: DailyQuest
     
     @Binding var value: Int
@@ -987,6 +991,7 @@ struct QuestCheckBoxContent_CUSTOM:View {
                         if isEditing {
                             TextField("", text:$valueInText)
                                 .keyboardType(.numberPad)
+                                .foregroundStyle(getReversedColorSchemeColor(colorScheme))
                                 .frame(width: geoWidth*((focusedField == .value || focusedField == nil) ? 3.0 : 0.5)/7, height: geoHeight*0.4)
                                 .textFieldStyle(.roundedBorder)
                                 .clipShape(.buttonBorder)
@@ -1021,6 +1026,7 @@ struct QuestCheckBoxContent_CUSTOM:View {
                                 Text(" / ")
                                 TextField("", text:$goalValueInText)
                                     .keyboardType(.numberPad)
+                                    .foregroundStyle(getReversedColorSchemeColor(colorScheme))
                                     .frame(width:geoWidth*(focusedField == .goal ? 3.0 : 0.5)/7, height: geoHeight*0.4)
                                     .textFieldStyle(.roundedBorder)
                                     .clipShape(.buttonBorder)
@@ -1296,86 +1302,88 @@ struct DialForHours: View {
                 }
                 .frame(width: geometry.size.width)
                 .padding(.top, 10)
-                .padding(.bottom, geoHeight*0.06)
+//                .padding(.bottom, geoHeight*0.06)
+//                .padding(.bottom)
 
-                HStack(spacing:0.0) {
+                
+                ZStack {
                     
-                    
-//                    Picker(selection: $hour, label: Text("First Value")) {
-//                        ForEach(0..<25) { i in
-//                            Text("\(i)").tag(i)
-//                        }
-//                    }
-//                    .frame(width: 50)
-//                    .clipped()
-//                    .pickerStyle(.wheel)
-                    VStack {
-                        Text("달성")
-                            .bold()
-                        Picker(selection: $value, label: Text("Second Value")) {
-//                            ForEach(0..<60*24) { i in
-                            ForEach(dialMinutes, id:\.self) { i in
-                                Text("\(DataType.string_fullRepresentableNotation(data: i, dataType: DataType.hour))")
-                                    .foregroundStyle(getDarkTierColorOf(tier: tier))
+                    Color.white.opacity(0.005).disabled(true)
+//                        .interactiveDismissDisabled(true)
+                        .gesture(DragGesture().onChanged({_ in})) // disable dragGesture
 
-                            }
-                        }
+                    HStack(spacing:0.0) {
                         
-                        .frame(width: hasGoal_toggle ? geoWidth/3 : geoWidth*0.5)
-                        .clipped()
-                        .pickerStyle(.wheel)
-                        .background(getBrightTierColorOf(tier: tier))
-                        .clipShape(.buttonBorder)
-                    }
-                    .frame(width: geoWidth/2)
-
-
-                    
-                    
-                    
-                    if hasGoal_toggle {
                         VStack {
-                            Text("목표")
+                            Text("달성")
                                 .bold()
-                            Picker(selection: $dailyGoal_nonNil, label: Text("Second Value")) {
-                                ForEach(0..<60*24/5) { i in
-                                    Text("\(DataType.string_fullRepresentableNotation(data: (i+1)*5, dataType: DataType.hour))")
-                                        .tag((i+1)*5)
+                            Picker(selection: $value, label: Text("Second Value")) {
+                                //                            ForEach(0..<60*24) { i in
+                                ForEach(dialMinutes, id:\.self) { i in
+                                    Text("\(DataType.string_fullRepresentableNotation(data: i, dataType: DataType.hour))")
                                         .foregroundStyle(getDarkTierColorOf(tier: tier))
+                                    
                                 }
                             }
-                            .frame(width: geoWidth/3)
+                            
+                            .frame(width: hasGoal_toggle ? geoWidth/3 : geoWidth*0.5)
                             .clipped()
                             .pickerStyle(.wheel)
                             .background(getBrightTierColorOf(tier: tier))
                             .clipShape(.buttonBorder)
-                            
                         }
                         .frame(width: geoWidth/2)
-
-
-//                        Picker(selection: $hour_goal, label: Text("First Value")) {
-//                            ForEach(0..<25) { i in
-//                                Text("\(i)").tag(i)
-//                            }
-//                        }
-//                        .frame(width: 50)
-//                        .clipped()
-//                        .pickerStyle(.wheel)
-//                        Text("시간  ")
-//                        Picker(selection: $minute_goal, label: Text("Second Value")) {
-//                            ForEach(0..<60) { i in
-//                                Text("\(i)").tag(i)
-//                            }
-//                        }
-//                        .frame(width: 50)
-//                        .clipped()
-//                        .pickerStyle(.wheel)
-//                        Text("분")
+                        
+                        
+                        
+                        
+                        
+                        if hasGoal_toggle {
+                            VStack {
+                                Text("목표")
+                                    .bold()
+                                Picker(selection: $dailyGoal_nonNil, label: Text("Second Value")) {
+                                    ForEach(0..<60*24/5) { i in
+                                        Text("\(DataType.string_fullRepresentableNotation(data: (i+1)*5, dataType: DataType.hour))")
+                                            .tag((i+1)*5)
+                                            .foregroundStyle(getDarkTierColorOf(tier: tier))
+                                    }
+                                }
+                                .frame(width: geoWidth/3)
+                                .clipped()
+                                .pickerStyle(.wheel)
+                                .background(getBrightTierColorOf(tier: tier))
+                                .clipShape(.buttonBorder)
+                                
+                            }
+                            .frame(width: geoWidth/2)
+                            
+                            
+                            //                        Picker(selection: $hour_goal, label: Text("First Value")) {
+                            //                            ForEach(0..<25) { i in
+                            //                                Text("\(i)").tag(i)
+                            //                            }
+                            //                        }
+                            //                        .frame(width: 50)
+                            //                        .clipped()
+                            //                        .pickerStyle(.wheel)
+                            //                        Text("시간  ")
+                            //                        Picker(selection: $minute_goal, label: Text("Second Value")) {
+                            //                            ForEach(0..<60) { i in
+                            //                                Text("\(i)").tag(i)
+                            //                            }
+                            //                        }
+                            //                        .frame(width: 50)
+                            //                        .clipped()
+                            //                        .pickerStyle(.wheel)
+                            //                        Text("분")
+                        }
+                        
+                        
                     }
-                    
-                    
                 }
+                .frame(width:geoWidth)
+                .padding(.vertical)
             }
             .foregroundStyle(getBrightTierColorOf(tier: tier))
 

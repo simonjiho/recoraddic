@@ -119,12 +119,9 @@ struct MainView_QuestInventory: View {
                         ZStack {
                             ScrollView {
                                 
-                                    
+                                
                                 LazyVGrid(columns: [GridItem(.adaptive(minimum: gridWidth, maximum: gridWidth))], spacing: gridVerticalSpacing) {
                                     ForEach(quest_sorted_visible,id:\.createdTime) { quest in
-                                        
-                                        
-
                                         ZStack {
                                             Button(action:{
                                                 if !isEdit {
@@ -148,7 +145,7 @@ struct MainView_QuestInventory: View {
                                                 Button("정보 수정") {
                                                     selectedQuest = quest
                                                     editQuestInfo.toggle()
-    //                                                toggleEditQuestInfo()
+                                                    //                                                toggleEditQuestInfo()
                                                 }
                                                 Button("보관") {
                                                     quest.isArchived = true
@@ -156,50 +153,14 @@ struct MainView_QuestInventory: View {
                                                 Button("숨기기") {
                                                     quest.isHidden = true
                                                 }
-
+                                                
                                                 Button("휴지통으로 이동", systemImage:"trash") {
                                                     quest.inTrashCan = true
                                                 }
                                                 .foregroundStyle(.red)
                                             }))
 
-//                                            PurposeOfQuestView(quest:quest, parentWidth:geoWidth, parentHeight:geoHeight)
-//                                                .frame(width:gridItemWidth/10, height:gridItemWidth/10)
-//                                                .position(CGPoint(x: 10.0 + gridItemWidth/20, y: 10.0 + gridItemWidth/20))
-//                                                .opacity(0.8)
-//                                                .zIndex(5)
                                             
-                                            
-//                                            Button(action:{
-//                                                popOver_changePurpose.toggle()
-//                                            }) {
-//                                                PurposeInCircle(purposes: quest.recentPurpose)
-//                                                    .frame(width:gridItemWidth/10, height:gridItemWidth/10)
-//                                                    .position(CGPoint(x: 10.0 + gridItemWidth/20, y: 10.0 + gridItemWidth/20))
-//                                                    .opacity(0.8)
-//                                            }
-//                                            .popover(isPresented: $popOver_changePurpose) {
-//                                                ChoosePurposeView_Quest(quest: quest)
-//                                                    .frame(width:geoWidth*0.6, height: geoWidth*0.8) // 12개 3*4 grid
-//                                                    .presentationCompactAdaptation(.popover)
-////                                                    .onDisappear() {
-////                                                        
-////                                                        let predicate = #Predicate<DailyQuest> { dailyQuest in
-////                                                            dailyQuest.questName == quest.name
-////                                                        }
-////                                                        let descriptor = FetchDescriptor(predicate: predicate)
-////                                                        try! modelContext.enumerate(
-////                                                            descriptor,
-////                                                            batchSize: 5000,
-////                                                            allowEscapingMutations: false
-////                                                        ) { dailyQuest in
-////                                                            dailyQuest.purposes = quest.recentPurpose
-////                                                        }
-////                        
-////                                                    }
-//                                                
-//                                            }
-
                                             if isEdit {
                                                 Button(action:{
                                                     if selectedQuestNames.contains(quest.name) {
@@ -243,11 +204,11 @@ struct MainView_QuestInventory: View {
                                     
                                     // TODO: plus button
                                     if !isEdit {
-                                            
+                                        
                                         NavigationLink(destination: CreateNewQuest(popUp_createNewQuest: $popUp_addNewQuest) .ignoresSafeArea(.keyboard)
-
+                                                       
                                         ){
-                                           ZStack {
+                                            ZStack {
                                                 Image(systemName: "plus")
                                                     .resizable()
                                                     .frame(width: gridItemWidth*0.2, height: gridItemWidth*0.2)
@@ -255,23 +216,14 @@ struct MainView_QuestInventory: View {
                                             .frame(width: gridItemWidth, height: gridItemHeight)
                                             .background(.gray.opacity(0.3))
                                             .clipShape(.rect(cornerSize: CGSize(width: gridItemWidth/11, height: gridItemHeight/11)))
-
-                                                
+                                            
+                                            
                                         }
                                         .buttonStyle(.plain)
-                                            
-                                            
-                                            
-                                            //                                            Button(action: {
-                                            //                                                popUp_addNewQuest.toggle()
-                                            //                                            }) {
-                                            //                                                Image(systemName: "plus.square")
-                                            //                                                    .resizable()
-                                            //                                                    .frame(width: gridItemWidth*0.4, height: gridItemWidth*0.4)
-                                            //                                            }
-                                            //                                            .buttonStyle(.plain)
                                         
-
+                                        
+                                        
+                                        
                                     }
                                     
                                     
@@ -279,21 +231,18 @@ struct MainView_QuestInventory: View {
                                 } // lazyVGrid
                                 .frame(width:gridViewFrameWidth)
                                 .padding(gridInnerPadding)
-//                                .background(.quaternary)
-//                                .clipShape(.rect(cornerRadius: gridItemWidth/11))
-//                                .padding(.top, gridItemSpacing)
                                 .padding(.horizontal, gridHorizontalPadding)
-                                    
-
                                 
- 
+                                
+                                
+                                Spacer()
+                                    .frame(height:gridItemHeight*(quest_sorted_visible.count%2 == 0 ? 1 : 2))
+                                
                                 
                                 
                                 
                             } // ScrollView
                             .frame(width:geometry.size.width, height: geometry.size.height*0.9)
-//                            .border(.red)
-                            
                             
                             if quests.filter({$0.isVisible()}).isEmpty {
                                 VStack {
@@ -312,13 +261,12 @@ struct MainView_QuestInventory: View {
                                 .foregroundStyle(.opacity(0.5))
                             }
                         }
-                        .frame(width:geometry.size.width, height: geometry.size.height*0.9)
+                        .frame(width:geometry.size.width, height: geoHeight*0.9)
                         
                         
                     } // VStack
                     .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
                     .background(.quaternary)
-
                     .sheet(isPresented: $popUp_questStatisticsInDetail, onDismiss: {selectedQuest = nil}) {
                         QuestInDetail(
                             selectedQuest: $selectedQuest,

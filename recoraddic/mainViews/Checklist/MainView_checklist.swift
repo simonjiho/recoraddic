@@ -580,7 +580,8 @@ struct MainView_checklist: View {
         }
         
         for todo in currentDailyRecord.todoList! {
-            if todo.content == "" || !todo.done {
+//            if todo.content == "" || !todo.done {
+            if todo.content == "" {
                 modelContext.delete(todo)
             }
         }

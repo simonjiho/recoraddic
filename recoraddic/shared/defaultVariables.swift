@@ -153,7 +153,6 @@ func stoneSizeMultiplier(_ dynamicTypeSize: DynamicTypeSize) -> CGFloat {
     case .accessibility2: return 1.2
     case .accessibility3: return 1.25
     case .accessibility4: return 1.3
-//    case .
     default: return 1.4
     }
 }

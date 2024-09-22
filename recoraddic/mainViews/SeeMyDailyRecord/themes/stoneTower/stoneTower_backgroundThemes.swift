@@ -60,10 +60,20 @@ struct StoneTowerBackground_1:View {
         
         let skyGradient: LinearGradient = {
             if colorScheme == .light {
-                return LinearGradient(colors: [.blue.adjust(saturation: -0.4, brightness: 0.3),.blue.adjust(saturation: -0.45, brightness: 0.4),.blue.adjust(saturation: -0.5, brightness: 0.43),.blue.adjust(saturation: -0.52, brightness: 0.47)], startPoint: .top, endPoint: .bottom)
+//                return LinearGradient(colors: [.blue.adjust(saturation: -0.4, brightness: 0.3),.blue.adjust(saturation: -0.45, brightness: 0.4),.blue.adjust(saturation: -0.5, brightness: 0.43),.blue.adjust(saturation: -0.52, brightness: 0.47)], startPoint: .top, endPoint: .bottom)
+                return LinearGradient(colors: [
+                    Color(red:100.0/255.0, green:250.0/255.0, blue: 251.0/255.0),
+                    Color(red:140.0/255.0, green:255.0/255.0, blue: 255.0/255.0),
+                    Color(red:240.0/255.0, green:255.0/255.0, blue: 255.0/255.0)
+                ], startPoint: .top, endPoint: .bottom
+                )
             }
             else {
-                return LinearGradient(colors: [.blue.adjust(saturation: 0.5, brightness: -0.5),.blue.adjust(saturation: 0.7, brightness: -0.9)], startPoint: .top, endPoint: .bottom)
+                return LinearGradient(colors: [
+                    Color(red:0.0/255.0, green:0.0/255.0, blue: 125.0/255.0),
+                    Color(red:2.0/255.0, green:0.0/255.0, blue: 75.0/255.0),
+                    Color(red:0.0/255.0, green:0.0/255.0, blue: 25.0/255.0)
+                ], startPoint: .top, endPoint: .bottom)
             }
                 
             }()
@@ -117,11 +127,13 @@ struct StoneTowerBackground_1:View {
                         VStack(spacing:0.0) {
                             
                             if colorScheme == .light {
-                                Color.blue.adjust(saturation: -0.4, brightness: 0.3)
+                                Color(red:100.0/255.0, green:250.0/255.0, blue: 251.0/255.0)
+//                                Color.blue.adjust(saturation: -0.4, brightness: 0.3)
                                     .frame(width:geoWidth, height: totalSkyHeight - skyGradientHeight)
                             }
                             else {
-                                Color.blue.adjust(saturation: 0.5, brightness: -0.5)                                .frame(width:geoWidth, height: totalSkyHeight - skyGradientHeight)
+                                Color(red:0.0/255.0, green:0.0/255.0, blue: 125.0/255.0)
+                                    .frame(width:geoWidth, height: totalSkyHeight - skyGradientHeight)
                             }
                             
                             skyGradient

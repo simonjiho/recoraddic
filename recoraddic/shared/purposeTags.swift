@@ -159,48 +159,56 @@ struct PurposeOfQuestView: View {
     var quest: Quest
     var parentWidth: CGFloat
     var parentHeight: CGFloat
+//    var isAlmostLast: Bool = false
     
     var body: some View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
         
-        GeometryReader { geometry in
-            let geoWidth: CGFloat = geometry.size.width
-            let geoHeight: CGFloat = geometry.size.height
-
-            Button(action:{
-                popUp_changePurpose.toggle()
-            }) {
-                Group {
-                    if quest.recentPurpose.isEmpty {
-                        Color.white.opacity(0.01)
-                            .frame(width: geoWidth/2.5, height:geoHeight/2.5)
-                            .overlay(
-                                Image(systemName:"questionmark.circle")
-                                    .resizable()
-                                    .frame(width:geoWidth/2.5, height:geoHeight/2.5)
-                                    .foregroundStyle(reversedColorSchemeColor)
-                            )
-                        // MARK: buttonStyle(.plain) 이 조건문에서는 작동 안해서 이렇게 함
-                    }
-                    else {
-                        PurposeInCircle(purposes:quest.recentPurpose)
-                            .frame(width: geoWidth/2.5, height:geoHeight/2.5)
-                        
-                    }
-                }
-                .padding(.init(top: 7.5, leading: 7.5, bottom: 0, trailing: 0))
-                .frame(width:geoWidth, height:geoHeight, alignment: .topLeading)
-
+        ScrollViewReader { scrollProxy in
+            GeometryReader { geometry in
+                let geoWidth: CGFloat = geometry.size.width
+                let geoHeight: CGFloat = geometry.size.height
                 
+                Button(action:{
+                    if geometry.frame(in: .global).minY > UIScreen.main.bounds.height*0.5 {
+                        scrollProxy.scrollTo(quest.name, anchor: .center)
+                    }
+//                    scrollProxy.scrollTo(quest.name, anchor: isAlmostLast ? .top : .center)
+                    popUp_changePurpose.toggle()
+                }) {
+                    Group {
+                        if quest.recentPurpose.isEmpty {
+                            Color.white.opacity(0.01)
+                                .frame(width: geoWidth/2.5, height:geoHeight/2.5)
+                                .overlay(
+                                    Image(systemName:"questionmark.circle")
+                                        .resizable()
+                                        .frame(width:geoWidth/2.5, height:geoHeight/2.5)
+                                        .foregroundStyle(reversedColorSchemeColor)
+                                )
+                            // MARK: buttonStyle(.plain) 이 조건문에서는 작동 안해서 이렇게 함
+                        }
+                        else {
+                            PurposeInCircle(purposes:quest.recentPurpose)
+                                .frame(width: geoWidth/2.5, height:geoHeight/2.5)
+                            
+                        }
+                    }
+                    .padding(.init(top: 7.5, leading: 7.5, bottom: 0, trailing: 0))
+                    .frame(width:geoWidth, height:geoHeight, alignment: .topLeading)
                     
-            }
-            .frame(width:geoWidth, height:geoHeight)
-            .popover(isPresented: $popUp_changePurpose) {
-                ChoosePurposeView_Quest(quest: quest)
-                    .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
-                    .presentationCompactAdaptation(.popover)
-                
+                    
+                    
+                }
+                .frame(width:geoWidth, height:geoHeight)
+                .popover(isPresented: $popUp_changePurpose) {
+                    ChoosePurposeView_Quest(quest: quest)
+                        .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
+                        .presentationCompactAdaptation(.popover)
+                    
+                }
+                .id(quest.name)
             }
             
             
