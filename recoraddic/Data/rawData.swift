@@ -569,10 +569,8 @@ class Quest: Equatable, Identifiable, Hashable {
     var inTrashCan: Bool = false
     
     var tier: Int = 0 // 0~40
-    //MARK: 0~9: 1시간(회) 10~19: 10시간(회) 10
     var momentumLevel: Int = 0
-    // normal momentum: 0~10
-    // special momentum: 11~31
+
     
      
 //    @Relationship(deleteRule:.cascade)

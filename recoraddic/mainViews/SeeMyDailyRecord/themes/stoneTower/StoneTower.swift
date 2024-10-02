@@ -98,7 +98,7 @@ struct StoneTower: View {
             let geoHeight:CGFloat = geometry.size.height
             
             let stoneWidth:CGFloat = geoWidth*0.22 * stoneSizeMultiplier(dynamicTypeSize)
-            let stoneHeight:CGFloat = stoneWidth*0.67
+            let stoneHeight:CGFloat = stoneWidth*0.5
             let selectedStoneHeight:CGFloat = stoneHeight*1.4
             let selectedStoneWidth:CGFloat = stoneWidth*1.4
             let heightGap:CGFloat = haveSelectedRecord ? stoneHeightMultiplier(selectedDailyRecord?.recordedMinutes ?? 0)*(selectedStoneHeight - stoneHeight) : 0.0
@@ -601,16 +601,18 @@ struct StoneTower: View {
     }
     
     func stoneHeightMultiplier(_ input: Int) -> CGFloat {
-        return 1.0 + min(640.0, max(CGFloat(input)-180.0,0.0))/480.0 * 2.0
+        return 1.0 + min(1.0, CGFloat(input)/900.0) * 5
     }
     
     func shapeNum(_ input: Int) -> Int { // 기록 시간 -> 모양 (0~1시간 / 1시간~3시간 / 3~5시간 / 5시간 이상)
         switch input {
-        case 0...59: return 0
-        case 60...119: return 1
-        case 120...179: return 2
-        case 180...: return 3
-        default: return 0
+        case 0: return 2
+        default: return 3
+//        case 0...59: return 0
+//        case 60...119: return 1
+//        case 120...179: return 2
+//        case 180...: return 3
+//        default: return 0
         }
         
     }
@@ -829,10 +831,7 @@ struct StoneTower_stone: View {
                 default:
                     Text("ERROR")
                 }
-                //                if shapeNum == 0 {
-                //                    StoneShape0(mainColor: stoneColor)
-                //                }
-                
+
                 
                 if facialExpressionNum != 0 {
                     
@@ -844,7 +843,7 @@ struct StoneTower_stone: View {
                                 .aspectRatio(contentMode: .fit)
                             //                        .frame(height: geometry.size.height*0.8)
                             //                                .frame(width:geometry.size.width*0.8)
-                                .frame(width:geometry.size.width*0.8, height: geometry.size.height*0.6)
+                                .frame(width:geometry.size.width*0.65, height:geometry.size.height*0.85)
                         }
                         .opacity(selected ? 0.7 : 0.3)
                     

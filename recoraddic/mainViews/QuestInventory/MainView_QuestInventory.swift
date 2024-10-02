@@ -137,7 +137,7 @@ struct MainView_QuestInventory: View {
                                                     }
                                                 }
                                             }) {
-                                                QuestThumbnailView(quest: quest)
+                                                QuestThumbnailView_redesigned(quest: quest)
                                                     .frame(width: gridItemWidth, height: gridItemHeight)
                                             }
                                             .contextMenu(ContextMenu(menuItems: {
@@ -236,7 +236,7 @@ struct MainView_QuestInventory: View {
                                 
                                 
                                 Spacer()
-                                    .frame(height:gridItemHeight*(quest_sorted_visible.count%2 == 0 ? 1 : 2))
+                                    .frame(height:gridItemHeight*(quest_sorted_visible.count%2 == 0 ? 2 : 3))
                                 
                                 
                                 
@@ -737,6 +737,70 @@ struct QuestTierView: View {
 
         }
         
+    }
+}
+struct QuestThumbnailView_redesigned: View {
+    
+    @Environment(\.modelContext) var modelContext
+    @Environment(\.colorScheme) var colorScheme
+
+    @State var quest: Quest
+    @State var showMomentumLvDetail:Bool = false
+    
+    var body: some View {
+        
+        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+//            let gridItemWidth = geoWidth
+            let badgeSize:CGFloat = geoHeight*0.45
+            let textWidth:CGFloat = (geoWidth - badgeSize)*0.9
+            
+            ZStack {
+                QuestTierView(tier: quest.tier, notUsedYet: quest.cumulative() == 0)
+                    .frame(width: geoWidth, height: geoHeight)
+                HStack(spacing: 0.0) {
+                    VStack(spacing:0.0) {
+                        FireView(momentumLevel: quest.momentumLevel)
+                            .frame(width: badgeSize, height: badgeSize, alignment: .trailing)
+                            .onTapGesture{showMomentumLvDetail.toggle()}
+                            .popover(isPresented:$showMomentumLvDetail) {
+                                Text(quest.textForMomentumLevel())
+//                                    .buttonStyle(.plain)
+                                    .padding()
+                                    .presentationCompactAdaptation(.popover)
+                            }
+                        PurposeOfQuestView_redesigned(quest:quest)
+                        .frame(width:badgeSize, height:badgeSize)
+                        
+                    }
+                    .frame(width:badgeSize,height:geoHeight*0.9)
+                    VStack(spacing:5.0) {
+                        Text(quest.getName())
+                            .foregroundStyle(getDarkTierColorOf(tier:quest.tier))
+                            .bold()
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(1)
+
+                        Text(quest.representingDataToString())
+                            .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
+                            .font(.caption)
+                            .minimumScaleFactor(0.3)
+                            .lineLimit(1)
+                        
+                        
+                    }
+                    .frame(width:textWidth,alignment: .center)
+
+
+                }
+                .frame(width:geoWidth,height:geoHeight)
+
+                
+            }
+        }
+       
     }
 }
 
@@ -1620,3 +1684,4 @@ struct EditQuest2: View {
     
     
 }
+

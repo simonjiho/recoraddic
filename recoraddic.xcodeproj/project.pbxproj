@@ -78,6 +78,7 @@
 		B2D7AD032B91C5440045C9EA /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7AD022B91C5440045C9EA /* SyncManager.swift */; };
 		B2D7AD052B92E29D0045C9EA /* logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7AD042B92E29D0045C9EA /* logger.swift */; };
 		B2D7AD082B9451920045C9EA /* StartNewRecordSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7AD072B9451920045C9EA /* StartNewRecordSet.swift */; };
+		B2D7D74C2CB51B5800559D43 /* QuestThumbnail_reDesignTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7D74B2CB51B4500559D43 /* QuestThumbnail_reDesignTest.swift */; };
 		B2D8F9692B73AA6A00423AFC /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B2D8F9682B73AA6A00423AFC /* Localizable.xcstrings */; };
 		B2D8F96B2B7533D700423AFC /* fires.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2D8F96A2B7533D700423AFC /* fires.xcassets */; };
 		B2D8F96D2B75ECB800423AFC /* FireView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D8F96C2B75ECB800423AFC /* FireView.swift */; };
@@ -201,6 +202,7 @@
 		B2D7AD022B91C5440045C9EA /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
 		B2D7AD042B92E29D0045C9EA /* logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = logger.swift; sourceTree = "<group>"; };
 		B2D7AD072B9451920045C9EA /* StartNewRecordSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartNewRecordSet.swift; sourceTree = "<group>"; };
+		B2D7D74B2CB51B4500559D43 /* QuestThumbnail_reDesignTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestThumbnail_reDesignTest.swift; sourceTree = "<group>"; };
 		B2D8F9682B73AA6A00423AFC /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B2D8F96A2B7533D700423AFC /* fires.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = fires.xcassets; sourceTree = "<group>"; };
 		B2D8F96C2B75ECB800423AFC /* FireView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireView.swift; sourceTree = "<group>"; };
@@ -338,6 +340,7 @@
 		B260A3922A9B8B7600D73208 /* QuestInventory */ = {
 			isa = PBXGroup;
 			children = (
+				B2D7D74B2CB51B4500559D43 /* QuestThumbnail_reDesignTest.swift */,
 				B260A3932A9B8B8F00D73208 /* MainView_QuestInventory.swift */,
 				B2102B132BA5CCCD0041C8FB /* QuestInDetail.swift */,
 			);
@@ -724,6 +727,7 @@
 				B260A3942A9B8B8F00D73208 /* MainView_QuestInventory.swift in Sources */,
 				B2BA890A2B32E0EB00A3D50E /* DiaryView.swift in Sources */,
 				B27CBB592BA41E6C00CD6CD3 /* recalculateVisualValues_dr.swift in Sources */,
+				B2D7D74C2CB51B5800559D43 /* QuestThumbnail_reDesignTest.swift in Sources */,
 				B262F2432A86460E00868F27 /* rawData.swift in Sources */,
 				B247D24B2A6D1DA100E457FB /* customMathFunc.swift in Sources */,
 				B25BF9052B1C886E0039F1F9 /* ResizableText.swift in Sources */,
