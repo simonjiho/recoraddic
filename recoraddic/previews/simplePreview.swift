@@ -6,23 +6,55 @@
 //
 import SwiftUI
 
+let groundColor1 = Color(red:0.0/255.0, green:65.0/255.0, blue: 0.0/255.0)
+let groundColor2 = Color(red:0.0/255.0, green:25.0/255.0, blue: 0.0/255.0)
+let groundColor3 = Color(red:210.0/255.0, green:255.0/255.0, blue: 150.0/255.0)
+let groundColor4 = Color(red:245.0/255.0, green:255.0/255.0, blue: 220.0/255.0)
 #Preview(body: {
-    VStack(spacing:0.0) {
-//        Color(uiColor: UIColor(Color.blue.adjust(saturation: -0.4, brightness: 0.3)))
-        Color(red:2.0/255.0, green:0.0/255.0, blue: 125.0/255.0)
+    VStack {
+        HStack {
+            LinearGradient(colors: [
+                Color(red:0.0/255.0, green:255.0/255.0, blue: 255.0/255.0),
+                Color(red:155.0/255.0, green:255.0/255.0, blue: 255.0/255.0)
+            ], startPoint: .top, endPoint: .bottom
+            )
+            .overlay(content: {Text("hello").opacity(0.5)})
 
-        HStack(spacing:0.0) {
+            VStack(spacing:0.0) {
+                LinearGradient(colors: [
+                    Color(red:100.0/255.0, green:255.0/255.0, blue: 255.0/255.0),
+                    Color(red:255.0/255.0, green:255.0/255.0, blue: 255.0/255.0)
+                ], startPoint: .top, endPoint: .bottom
+                )            .overlay(content: {Text("hello").opacity(0.5)})
+                LinearGradient(colors: [
+                    groundColor4,
+                    groundColor3
+                ], startPoint: .top, endPoint: .bottom
+               )
+            }
+
+        }
+        
+        HStack {
             LinearGradient(colors: [
-                .blue.adjust(saturation: 0.5, brightness: -0.5),.blue.adjust(saturation: 0.7, brightness: -0.9)
-            ],startPoint: .top,endPoint: .bottom)
-            LinearGradient(colors: [
-                Color(red:0.0/255.0, green:0.0/255.0, blue: 125.0/255.0),
-                Color(red:2.0/255.0, green:0.0/255.0, blue: 75.0/255.0),
-                Color(red:0.0/255.0, green:0.0/255.0, blue: 25.0/255.0)
-,
-                
-            ],startPoint: .top,endPoint: .bottom)
-            
+                Color(red:0.0/255.0, green:0.0/255.0, blue: 200.0/255.0),
+                Color(red:0.0/255.0, green:0.0/255.0, blue: 100.0/255.0)
+            ], startPoint: .top, endPoint: .bottom
+            )            .overlay(content: {Text("hello").opacity(0.8)})
+
+            VStack(spacing:0.0) {
+                LinearGradient(colors: [
+                    Color(red:0.0/255.0, green:0.0/255.0, blue: 100.0/255.0),
+                    Color(red:0.0/255.0, green:0.0/255.0, blue: 0.0/255.0)
+                ], startPoint: .top, endPoint: .bottom
+                )            .overlay(content: {Text("hello").opacity(0.8)})
+                LinearGradient(colors: [
+                    groundColor2,
+                    groundColor1
+                ], startPoint: .top, endPoint: .bottom
+               )
+            }
+
         }
     }
 })

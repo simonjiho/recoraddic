@@ -475,7 +475,7 @@ struct MainView_checklist: View {
                 
                 
                 if oldValue < getStandardDateOfYesterday() {
-                    removeEmptyDailyQuests()
+                    removeUselessData()
                 }
                 changeDailyRecord()
             }
@@ -570,14 +570,14 @@ struct MainView_checklist: View {
 //        }
     }
     
-    func removeEmptyDailyQuests() -> Void {
+    func removeUselessData() -> Void {
             
-        for dailyQuest in currentDailyRecord.dailyQuestList! {
-            if dailyQuest.data == 0 {
-                modelContext.delete(dailyQuest)
-
-            }
-        }
+//        for dailyQuest in currentDailyRecord.dailyQuestList! {
+//            if dailyQuest.data == 0 {
+//                modelContext.delete(dailyQuest)
+//
+//            }
+//        }
         
         for todo in currentDailyRecord.todoList! {
 //            if todo.content == "" || !todo.done {
@@ -892,7 +892,7 @@ struct ChecklistView: View {
                                         xOffset: xOffset,
                                         width: checkListElementWidth
                                     )
-//                                    .opacity(0.85)
+//                                    .opacity(colorScheme == .light ? 1.0 : 0.85)
 
 //                                    .frame(width: checkListElementWidth, alignment:.leading)
 

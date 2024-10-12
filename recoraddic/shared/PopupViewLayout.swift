@@ -108,6 +108,23 @@ struct PopupViewLayout: ViewModifier {
     }
 }
 
+struct PopupViewLayout_noSize: ViewModifier {
+//    var color: Color
+    
+    func body(content:Content) -> some View {
+
+        content
+            .padding(10)
+            .background()
+//            .background(color)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(radius: 1)
+            .shadow(radius: 1)
+
+            
+    }
+}
+
 
 
 
@@ -148,5 +165,12 @@ extension View {
         color: Color
         ) -> some View {
             self.modifier(recoraddic.PopupViewLayout(width: width, height: height, color: color))
+    }
+    
+    func popUpViewLayout(
+//        color: Color
+        ) -> some View {
+            self.modifier(recoraddic.PopupViewLayout_noSize())
+//            self.modifier(recoraddic.PopupViewLayout_noSize(color: color))
     }
 }

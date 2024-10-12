@@ -135,7 +135,10 @@ struct ContentView: View {
                         restrictedHeight: $restrictedHeight
                         
                      )
-                     .background(.quaternary)
+//                     .background(.quaternary)
+                     .background(.quinary)
+//                     .background(colorScheme == .dark ? .quaternary : .quinary)
+
                      .tabItem {
                          Image(systemName: images[mainViews[0]]!)
                      }
@@ -146,14 +149,14 @@ struct ContentView: View {
                      .tabItem {
                          Image(systemName: images[mainViews[1]]!)
                      }
-                     .background(.quaternary)
+                     .background(.quinary)
                      .ignoresSafeArea(.keyboard)
                      .tag(mainViews[1])
 
                      
                      let currentDailyRecordSet: DailyRecordSet = dailyRecordSets.filter({$0.start <= getStandardDateOfNow()}).last ?? DailyRecordSet(start: getStandardDate(from: Date().addingDays(1000))) // MARK: signOutErrorPrevention(alternative DRS shouldn't be selected)
                      let index = dailyRecordSets.filter({$0.start < getStandardDateOfNow()}).count > 0 ? dailyRecordSets.filter({$0.start < .now}).count-1 : 0
-                     MainView_SeeMyDailyRecord(
+                     MainView_TermSummation(
                         selectedDrsIdx: index,
                         selectedDailyRecordSet: currentDailyRecordSet,
                         isNewDailyRecordAdded: $isNewDailyRecordAdded,
@@ -178,8 +181,8 @@ struct ContentView: View {
                          .tabItem {
                              Image(systemName: images[mainViews[3]]!)
                          }
-                         .background(.quaternary)
-                         .ignoresSafeArea(.keyboard)
+                         .background(.quinary)
+//                         .ignoresSafeArea(.keyboard)
                          .tag(mainViews[3])
 
                      
@@ -187,7 +190,7 @@ struct ContentView: View {
                      .tabItem {
                          Image(systemName: images[mainViews[4]]!)
                      }
-                     .background(.quaternary)
+                     .background(.quinary)
                      .ignoresSafeArea(.keyboard)
                      .tag(mainViews[4])
                  }

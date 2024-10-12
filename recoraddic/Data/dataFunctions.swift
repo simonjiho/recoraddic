@@ -216,6 +216,21 @@ extension Quest {
         
         let unactivatedPeriod: Int = calculateDaysBetweenTwoDates(from:latestRecordDate, to: today)
         
+//        if self.name == "시간퀘스트" {
+//            print(unactivatedPeriod)
+//            print(self.dailyData)
+//            let baseDate = Calendar.current.date(byAdding: .day, value: -3, to: todayOrYesterday)!
+//            print(baseDate)
+//            for key in self.dailyData.keys {
+//                print(calculateDaysBetweenTwoDates(from: baseDate, to: key) > 0)
+//            }
+//            let numberOfRecordedDates:Int = self.dailyData.filter({ element in
+//                calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0
+//            }).count
+//            print(numberOfRecordedDates)
+//            print(checkMomentumLevel(ratio: 0.33, termLength: 3, today: todayOrYesterday))
+//        }
+        
         if unactivatedPeriod <= 1 { // try finding if there's special(extreme high) momentumLevel
             if checkMomentumLevel(ratio: 1.0, termLength: 60, today: todayOrYesterday) {
                 return 24
@@ -236,7 +251,7 @@ extension Quest {
                 return 19
             }
         }
-        else if unactivatedPeriod <= 5 {
+        if unactivatedPeriod <= 5 {
             if checkMomentumLevel(ratio: 0.66, termLength: 60, today: todayOrYesterday) {
                 return 18
             }
@@ -273,8 +288,9 @@ extension Quest {
             else if checkMomentumLevel(ratio: 0.33, termLength: 3, today: todayOrYesterday) {
                 return 7
             }
+            
         }
-        else if unactivatedPeriod <= 10 {  // try finding if there's special(middle) momentumLevel
+        if unactivatedPeriod <= 10 {  // try finding if there's special(middle) momentumLevel
             if checkMomentumLevel(ratio: 0.1, termLength: 60, today: todayOrYesterday) {
                 return 6
             }
@@ -300,11 +316,11 @@ extension Quest {
     }
     
     func checkMomentumLevel(ratio:CGFloat,termLength:Int, today: Date) -> Bool {
-        
+
         // 기준이 되는 날짜: 오늘 것을 기록했을 때는 오늘, 아직 기록 안했으면 어제 것 기준으로 계산
         
         
-        let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: today) ?? Date()
+        let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: today) ?? today
         
         let numberOfRecordedDates:Int = self.dailyData.filter({ element in
             calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0
@@ -326,7 +342,7 @@ extension Quest {
         }.last!.key
 //        let today: Date = getStandardDateOfNow()
 //        let todayOrYesterday = latestRecordDate == today ? today : getStandardDateOfYesterday()
-        let datesRecorded:[Date] = self.dailyData.keys.filter({self.dailyData[$0] ?? 0 > 0})
+        let datesRecorded:[Date] = self.dailyData.keys.filter({(self.dailyData[$0] ?? 0) > 0})
         let boolArray60days:[Bool] = generateBoolArray(from:datesRecorded)
 //        let (days, percentage) = getRecentPercentage(from:boolArray60days)
         if momentumLevel >= 19 {
@@ -349,7 +365,7 @@ extension Quest {
                 default: return 1
                 }
             }()
-            return "최근 \(days)일 \(boolArray60days[...days].filter({$0}).count)회 기록"
+            return "최근 \(days)일 \(boolArray60days[..<days].filter({$0}).count)회 기록"
         } else {
             if boolArray60days.filter({$0}).count == 0 { return "마지막 기록: \(kor_yyyymmddFormatOf(standardDateToLocalStartOfDay(std:latestRecordDate)))"}
             else { return "마지막 기록: \((boolArray60days.firstIndex(where:{$0}) ?? -99999) + 1)일 전" }

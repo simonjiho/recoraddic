@@ -74,6 +74,9 @@
 		B2BAEDD92AE65DD50099489B /* steppedForward_default.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2BAEDD82AE65DD50099489B /* steppedForward_default.xcassets */; };
 		B2C059F92C52A610001BEE77 /* StoneTower.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C059F82C52A610001BEE77 /* StoneTower.swift */; };
 		B2C3BAB12C770B9200A7F9A5 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3BAB02C770B9200A7F9A5 /* LoadingView.swift */; };
+		B2C447E22CCCC73F003C8FAA /* QuestHelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C447E12CCCC737003C8FAA /* QuestHelpView.swift */; };
+		B2C447E42CCCDD03003C8FAA /* StoneTower 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C447E32CCCDD03003C8FAA /* StoneTower 2.swift */; };
+		B2C447E62CCCFE8E003C8FAA /* MainView_SeeMyDailyRecord 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C447E52CCCFE8E003C8FAA /* MainView_SeeMyDailyRecord 2.swift */; };
 		B2D612D32C7F51470083183F /* preview_facialExpressions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D612D22C7F51470083183F /* preview_facialExpressions.swift */; };
 		B2D7AD032B91C5440045C9EA /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7AD022B91C5440045C9EA /* SyncManager.swift */; };
 		B2D7AD052B92E29D0045C9EA /* logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D7AD042B92E29D0045C9EA /* logger.swift */; };
@@ -90,7 +93,6 @@
 		B2E6C6472C4A80C90082B000 /* fire_background.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2E6C6462C4A80C90082B000 /* fire_background.xcassets */; };
 		B2EC07CC2C69F0D200BD6AC5 /* RecordInDetailView_tmp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2EC07CB2C69F0D200BD6AC5 /* RecordInDetailView_tmp.swift */; };
 		B2F017352C3D157600765EF6 /* recoraddicActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F017342C3D157600765EF6 /* recoraddicActivityAttributes.swift */; };
-		B2FB22002B1367DC00AB17FA /* buttonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2FB21FF2B1367DC00AB17FA /* buttonsView.swift */; };
 		B2FB726F2A8762810012EBE1 /* customArrayFunc.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2FB726E2A8762810012EBE1 /* customArrayFunc.swift */; };
 /* End PBXBuildFile section */
 
@@ -198,6 +200,9 @@
 		B2BAEDD82AE65DD50099489B /* steppedForward_default.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = steppedForward_default.xcassets; sourceTree = "<group>"; };
 		B2C059F82C52A610001BEE77 /* StoneTower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoneTower.swift; sourceTree = "<group>"; };
 		B2C3BAB02C770B9200A7F9A5 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		B2C447E12CCCC737003C8FAA /* QuestHelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestHelpView.swift; sourceTree = "<group>"; };
+		B2C447E32CCCDD03003C8FAA /* StoneTower 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StoneTower 2.swift"; sourceTree = "<group>"; };
+		B2C447E52CCCFE8E003C8FAA /* MainView_SeeMyDailyRecord 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainView_SeeMyDailyRecord 2.swift"; sourceTree = "<group>"; };
 		B2D612D22C7F51470083183F /* preview_facialExpressions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = preview_facialExpressions.swift; sourceTree = "<group>"; };
 		B2D7AD022B91C5440045C9EA /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
 		B2D7AD042B92E29D0045C9EA /* logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = logger.swift; sourceTree = "<group>"; };
@@ -216,7 +221,6 @@
 		B2F0171C2C3D155400765EF6 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		B2F0171E2C3D155400765EF6 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		B2F017342C3D157600765EF6 /* recoraddicActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recoraddicActivityAttributes.swift; sourceTree = "<group>"; };
-		B2FB21FF2B1367DC00AB17FA /* buttonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = buttonsView.swift; sourceTree = "<group>"; };
 		B2FB726E2A8762810012EBE1 /* customArrayFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customArrayFunc.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -340,6 +344,7 @@
 		B260A3922A9B8B7600D73208 /* QuestInventory */ = {
 			isa = PBXGroup;
 			children = (
+				B2C447E12CCCC737003C8FAA /* QuestHelpView.swift */,
 				B2D7D74B2CB51B4500559D43 /* QuestThumbnail_reDesignTest.swift */,
 				B260A3932A9B8B8F00D73208 /* MainView_QuestInventory.swift */,
 				B2102B132BA5CCCD0041C8FB /* QuestInDetail.swift */,
@@ -353,6 +358,7 @@
 				B2D7AD062B94512F0045C9EA /* PopUpViews */,
 				B220DA3D2B63AE990039160C /* themes */,
 				B260A3992A9C759B00D73208 /* MainView_SeeMyDailyRecord.swift */,
+				B2C447E52CCCFE8E003C8FAA /* MainView_SeeMyDailyRecord 2.swift */,
 			);
 			path = SeeMyDailyRecord;
 			sourceTree = "<group>";
@@ -378,14 +384,12 @@
 				B2BA88F92B2B0D4500A3D50E /* defaultVariables.swift */,
 				B265D2802B049DF9002E51A8 /* dailyRecordStoneAction.swift */,
 				B2ABB25C2B10BBDE00870DE0 /* PopupViewLayout.swift */,
-				B2FB21FF2B1367DC00AB17FA /* buttonsView.swift */,
 				B25BF9042B1C886E0039F1F9 /* ResizableText.swift */,
 				B2BA89062B32CA5600A3D50E /* textFieldMaxLength.swift */,
 				B2AECB882B5139F90020A937 /* DismissingKeyboard.swift */,
 				B2ABC2642B4293680056C637 /* purposeTags.swift */,
 				B220DA452B6524F50039160C /* themeNames.swift */,
 				B2D8F96C2B75ECB800423AFC /* FireView.swift */,
-				B2C3BAB02C770B9200A7F9A5 /* LoadingView.swift */,
 				B20429E32C7F52890022DB1A /* Text_scaleToFit.swift */,
 			);
 			path = shared;
@@ -431,6 +435,7 @@
 				B29C702D2A35C5E30046873E /* recoraddicApp.swift */,
 				B2D7AD022B91C5440045C9EA /* SyncManager.swift */,
 				B29C702F2A35C5E30046873E /* ContentView.swift */,
+				B2C3BAB02C770B9200A7F9A5 /* LoadingView.swift */,
 				B2AECB862B4EDA4F0020A937 /* ExampleData.swift */,
 				B2D7AD042B92E29D0045C9EA /* logger.swift */,
 				B229F0252C3E8AF400198445 /* notification.swift */,
@@ -494,6 +499,7 @@
 				B220DA432B6519C20039160C /* stoneTower_backgroundThemes.swift */,
 				B2E5522A2BC2989000ACA5A8 /* stoneTower_shared.swift */,
 				B2C059F82C52A610001BEE77 /* StoneTower.swift */,
+				B2C447E32CCCDD03003C8FAA /* StoneTower 2.swift */,
 				B24DFC6F2CA7E6FF00572776 /* StoneTower_tmp.swift */,
 			);
 			path = stoneTower;
@@ -734,19 +740,21 @@
 				B265D27D2B0497D0002E51A8 /* callTheme.swift in Sources */,
 				B220DA3C2B6268260039160C /* RecordInDetailView.swift in Sources */,
 				B2BA88FA2B2B0D4500A3D50E /* defaultVariables.swift in Sources */,
+				B2C447E62CCCFE8E003C8FAA /* MainView_SeeMyDailyRecord 2.swift in Sources */,
 				B265D2812B049DF9002E51A8 /* dailyRecordStoneAction.swift in Sources */,
 				B2B28DBD2AC5D69D0071531B /* MainView_ProfileAndSettings.swift in Sources */,
 				B2C3BAB12C770B9200A7F9A5 /* LoadingView.swift in Sources */,
 				B2E6C63B2C47AA1B0082B000 /* SunriseSunsetViewModel.swift in Sources */,
-				B2FB22002B1367DC00AB17FA /* buttonsView.swift in Sources */,
 				B220DA442B6519C20039160C /* stoneTower_backgroundThemes.swift in Sources */,
 				B282D1222C70826E008F6F7A /* MainView_Memo.swift in Sources */,
 				B2E6C6372C4674220082B000 /* EditCheckListView.swift in Sources */,
 				B2F017352C3D157600765EF6 /* recoraddicActivityAttributes.swift in Sources */,
 				B2C059F92C52A610001BEE77 /* StoneTower.swift in Sources */,
+				B2C447E22CCCC73F003C8FAA /* QuestHelpView.swift in Sources */,
 				B2D7AD052B92E29D0045C9EA /* logger.swift in Sources */,
 				B2ABB25D2B10BBDE00870DE0 /* PopupViewLayout.swift in Sources */,
 				B24C298E2C283331000F3EEE /* dailyQuestionsGraph.swift in Sources */,
+				B2C447E42CCCDD03003C8FAA /* StoneTower 2.swift in Sources */,
 				B2D8F96D2B75ECB800423AFC /* FireView.swift in Sources */,
 				B24C29922C329B7B000F3EEE /* test.swift in Sources */,
 				B2ABC2652B4293680056C637 /* purposeTags.swift in Sources */,

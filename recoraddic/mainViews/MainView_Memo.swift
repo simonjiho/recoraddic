@@ -64,7 +64,7 @@ struct MainView_Memo:View {
                     }
             }
             //        .padding(.horizontal,10)
-            .frame(width: UIScreen.main.bounds.width, height: geoHeight)
+            .frame(width: UIScreen.main.bounds.width, height: geoHeight,alignment: .top)
             //        .background(.quaternary)
             //        .border(.red)
             

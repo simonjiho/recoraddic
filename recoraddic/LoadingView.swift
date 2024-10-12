@@ -19,7 +19,7 @@ struct LoadingView: View {
                 .frame(width: UIScreen.main.bounds.width/5)
         }
         .containerRelativeFrame([.horizontal,.vertical])
-        .background(.quaternary)
+        .background(.quinary)
 
     }
 }
@@ -43,7 +43,7 @@ struct LoadingView_initialization: View {
 
         }
         .containerRelativeFrame([.horizontal,.vertical])
-        .background(.quaternary)
+        .background(.quinary)
     }
 }
 

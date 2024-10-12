@@ -64,32 +64,40 @@
 //    default: return 60.0
 //    }
 //}
+//
+//
+//let fireSize:[Int:Int] = [
+//    1:1,2:1,3:2,4:2,5:3,6:3,
+//    7:3,8:4,9:5,10:6,
+//    11:3,12:4,13:5,14:6,
+//    15:3,16:4,17:5,18:6,
+//    19:2,20:3,21:4,22:5,23:6,
+//    24:2,25:3,26:4,27:5,28:6,
+//    29:1,30:2,31:3,32:4,33:5,34:6
+//
 
-
-
-let fireSize:[Int:Int] = [
-    1:1,2:1,3:2,4:2,5:3,6:3,
-    7:3,8:4,9:5,10:6,
-    11:3,12:4,13:5,14:6,
-    15:3,16:4,17:5,18:6,
-    19:2,20:3,21:4,22:5,23:6,
-    24:2,25:3,26:4,27:5,28:6,
-    29:1,30:2,31:3,32:4,33:5,34:6
-]
-
+func frameCount(momentumLevel:Int) -> Int {
+    switch (momentumLevel+5)/6 {
+    case 1: return 6
+    case 2: return 6
+    case 3: return 6
+    case 4: return 6
+    default: return 6
+    }
+}
 
 func fireSizeRatio(momentumLevel:Int) -> CGFloat {
     
-    if momentumLevel == 0 { return 0.7}
+    if momentumLevel == 0 { return 0.6}
     
     switch momentumLevel%6 {
-    case 1: return 0.7
-    case 2: return 0.74
-    case 3: return 0.79
-    case 4: return 0.85
-    case 5: return 0.91
-    case 0: return 1.0
-    default: return 0.7
+    case 1: return 0.6
+    case 2: return 0.7
+    case 3: return 0.8
+    case 4: return 0.9
+    case 5: return 1.0
+    case 0: return 1.1
+    default: return 0.6
     }
 }
 
@@ -126,6 +134,7 @@ struct FireView: View {
 
     
     var body: some View {
+        let frameCnt = frameCount(momentumLevel:momentumLevel)
 
         GeometryReader { geometry in
 //            if momentumLevel == 0 {
@@ -138,7 +147,6 @@ struct FireView: View {
 
 //            } else {
                 let fps = fps(momentumLevel: momentumLevel)
-                let frameCount = 6
                 let sizeRatio = fireSizeRatio(momentumLevel: momentumLevel)
                 
                 Image("fire\((momentumLevel+5)/6)_frame\(frameIndex+1)")
@@ -151,7 +159,7 @@ struct FireView: View {
 
                     .onAppear() {
                         timer = Timer.scheduledTimer(withTimeInterval: 1.0 / fps, repeats: true) { _ in
-                            frameIndex = (frameIndex + 1) % frameCount
+                            frameIndex = (frameIndex + 1) % frameCnt
                         }
                         RunLoop.current.add(timer!, forMode: .common)
                         

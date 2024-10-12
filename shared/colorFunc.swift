@@ -118,6 +118,76 @@ func getDarkTierColorOf(tier:Int) -> Color {
     }
 }
 
+func getDarkTierColorOf2(tier:Int) -> Color {
+    
+    let tierColor: Color = getTierColorOf(tier: tier)
+    
+    switch tier/5 {
+    case 0:
+        return tierColor.adjust(brightness: -0.1)
+    case 1:
+        return tierColor.adjust(brightness: -0.15)
+    case 2:
+        return tierColor.adjust(brightness: -0.1)
+    case 3:
+        return tierColor.adjust(brightness: -0.2)
+    case 4:
+        return tierColor.adjust(brightness: -0.2)
+    case 5:
+        return tierColor.adjust(saturation:0.2
+                                ,brightness: -0.15)
+    case 6:
+        return tierColor.adjust(brightness: -0.2)
+    case 7:
+//        return tierColor.adjust(brightness: -0.2)
+//        return tierColor.adjust(brightness: 0.1)
+//        return Color.purple.adjust(brightness: 0.8)
+        return tierColor.adjust(brightness: -0.2)
+
+
+    case 8:
+        return tierColor.adjust(brightness: -0.2)
+
+    default:
+        return tierColor.adjust(brightness: -0.25)
+    }
+}
+func getDarkTierColorOf3(tier:Int) -> Color {
+    
+    let tierColor: Color = getTierColorOf(tier: tier)
+    
+    switch tier/5 {
+    case 0:
+        return tierColor.adjust(brightness: -0.15)
+    case 1:
+        return tierColor.adjust(brightness: -0.25)
+    case 2:
+        return tierColor.adjust(brightness: -0.2)
+    case 3:
+        return tierColor.adjust(brightness: -0.3)
+    case 4:
+        return tierColor.adjust(brightness: -0.35)
+    case 5:
+        return tierColor.adjust(saturation:0.2
+                                ,brightness: -0.3)
+    case 6:
+        return tierColor.adjust(brightness: -0.35)
+    case 7:
+//        return tierColor.adjust(brightness: -0.2)
+//        return tierColor.adjust(brightness: 0.1)
+//        return Color.purple.adjust(brightness: 0.8)
+        return tierColor.adjust(brightness: -0.3)
+
+
+    case 8:
+        return tierColor.adjust(brightness: -0.35)
+
+    default:
+        return tierColor.adjust(brightness: -0.4)
+    }
+
+}
+
 
 func getBrightTierColorOf(tier:Int) -> Color { // questCheckBox(bright)
     
@@ -127,7 +197,7 @@ func getBrightTierColorOf(tier:Int) -> Color { // questCheckBox(bright)
     case 0...2:
         return tierColor.adjust(brightness: 0.15)
     case 3:
-        return tierColor.adjust(brightness: 0.14)
+        return tierColor.adjust(brightness: 0.20)
     case 4:
         return tierColor.adjust(brightness: 0.17)
     case 5:
@@ -206,11 +276,13 @@ func getBrightTierColorOf3(tier:Int) -> Color { // questCheckBox(dark)
 func getGradientColorsOf(tier:Int, type:Int = 0, isDark:Bool = false) -> [Color] { // quest checkbox
     
 
-    let tierColor_dark = getDarkTierColorOf(tier: tier)
-    let tierColor:Color = getTierColorOf(tier: tier)
-    let tierColor_bright:Color = getBrightTierColorOf(tier: tier)
-    let tierColor_bright2:Color = getBrightTierColorOf2(tier: tier)
-    let tierColor_bright3:Color = getBrightTierColorOf3(tier: tier)
+    let tierColor_dark = getDarkTierColorOf(tier: tier).colorExpressionIntegration()
+    let tierColor_dark2 = getDarkTierColorOf2(tier: tier).colorExpressionIntegration()
+    let tierColor_dark3 = getDarkTierColorOf3(tier: tier).colorExpressionIntegration()
+    let tierColor:Color = getTierColorOf(tier: tier).colorExpressionIntegration()
+    let tierColor_bright:Color = getBrightTierColorOf(tier: tier).colorExpressionIntegration()
+    let tierColor_bright2:Color = getBrightTierColorOf2(tier: tier).colorExpressionIntegration()
+    let tierColor_bright3:Color = getBrightTierColorOf3(tier: tier).colorExpressionIntegration()
 
     if !isDark {
         if type == 0 { //questCheckbox
@@ -230,7 +302,8 @@ func getGradientColorsOf(tier:Int, type:Int = 0, isDark:Bool = false) -> [Color]
         }
     } else {
         if type == 0 { //questCheckbox
-            return [tierColor,tierColor, tierColor_bright3, tierColor, tierColor]
+//            return [tierColor,tierColor, tierColor_bright3, tierColor, tierColor]
+            return [tierColor_dark2,tierColor_dark2, tierColor_dark2, tierColor_dark2, tierColor_dark2]
         }
         else if type == 1 { //questThumbnail
             return [tierColor_bright2,tierColor, tierColor_bright2]
@@ -278,6 +351,28 @@ func getReversedColorSchemeColor(_ colorScheme:ColorScheme) -> Color {
             getDarkTierColorOf(tier: 35)
             getDarkTierColorOf(tier: 40)
         } // dark
+        VStack {
+            getDarkTierColorOf3(tier: 0)
+            getDarkTierColorOf3(tier: 5)
+            getDarkTierColorOf3(tier: 10)
+            getDarkTierColorOf3(tier: 15)
+            getDarkTierColorOf3(tier: 20)
+            getDarkTierColorOf3(tier: 25)
+            getDarkTierColorOf3(tier: 30)
+            getDarkTierColorOf3(tier: 35)
+            getDarkTierColorOf3(tier: 40)
+        } // dark3
+        VStack {
+            getDarkTierColorOf2(tier: 0)
+            getDarkTierColorOf2(tier: 5)
+            getDarkTierColorOf2(tier: 10)
+            getDarkTierColorOf2(tier: 15)
+            getDarkTierColorOf2(tier: 20)
+            getDarkTierColorOf2(tier: 25)
+            getDarkTierColorOf2(tier: 30)
+            getDarkTierColorOf2(tier: 35)
+            getDarkTierColorOf2(tier: 40)
+        } // dark2
         VStack {
             getTierColorOf(tier: 0)
             getTierColorOf(tier: 5)

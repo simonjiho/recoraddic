@@ -166,7 +166,7 @@ struct DRSThemeThumbnailView: View {
             if dailyRecordThemeName == "StoneTower" {
                 VStack(spacing:0.0) {
                     StoneTower_stone(
-                        shapeNum: 3, brightness: 3, defaultColorIndex: 0, facialExpressionNum: 0, selected: false
+                        shapeNum: 3, brightness: 3, defaultColorIndex: 0, facialExpressionNum: 0
                     )
                     .frame(width:geoWidth*0.75, height: geoHeight*0.5)
                     Text("기본")

@@ -93,7 +93,8 @@ struct QuestCheckBoxView: View {
         let menuSize:CGFloat = width * 0.2
         
         let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= width +  0.1) ? xOffset : width, height: height), transform: nil))
-        let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
+//        let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
+        let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0, isDark: colorScheme == .dark)
 //        let invertForegroundStyleIntoBright: Bool = {
 //            if colorScheme == .dark {
 //                if dailyQuest.data == 0  { return true }
@@ -106,7 +107,10 @@ struct QuestCheckBoxView: View {
 //                return false
 //            }
 //        }()
-        let invertForegroundStyleIntoBright: Bool =  colorScheme == .dark && dailyQuest.data == 0
+//        let invertForegroundStyleIntoBright: Bool =  colorScheme == .dark && dailyQuest.data == 0
+        let invertForegroundStyleIntoBright: Bool =  colorScheme == .dark
+//        let letBackgroundStyleGray: Bool = invertForegroundStyleIntoBright || colorScheme == .light
+//        let letBackgroundStyleGray: Bool = invertForegroundStyleIntoBright || colorScheme == .light
 
 //        let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0, isDark: colorScheme == .dark)
         
@@ -140,7 +144,8 @@ struct QuestCheckBoxView: View {
             }
             .frame(width:width, height: height)
 //            .foregroundStyle(colorScheme == .dark ? getBrightTierColorOf2(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
-            .foregroundStyle( invertForegroundStyleIntoBright ? getBrightTierColorOf(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
+            .foregroundStyle( invertForegroundStyleIntoBright ? getBrightTierColorOf2(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
+//            .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
             .background(
                 ZStack {
                     Color.white
@@ -150,7 +155,10 @@ struct QuestCheckBoxView: View {
                         )
                         .frame(width:width, height:height)
                         .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * width, y:0)
-                        .opacity(colorScheme == .light ? 0.6 : 0.8)
+//                        .opacity(colorScheme == .light ? 0.6 : 0.75)
+                        .opacity(colorScheme == .light ? 0.6 : 0.9)
+
+//                        .opacity(0.6)
 //                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
                     
                     Rectangle()
@@ -159,7 +167,9 @@ struct QuestCheckBoxView: View {
                         )
                         .frame(width:width, height:height)
                         .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * width, y:0)
-                        .opacity(colorScheme == .light ? 0.6 : 0.8)
+//                        .opacity(colorScheme == .light ? 0.6 : 0.75)
+                        .opacity(colorScheme == .light ? 0.6 : 0.9)
+//                        .opacity(0.6)
 //                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
                 }
                     .frame(width:width, height:height)
@@ -167,8 +177,28 @@ struct QuestCheckBoxView: View {
                         a
                     }
 
+//                    .background(colorScheme == .light ? .gray.opacity(0.3) : .white.opacity(0.85))
 //                    .background(.gray.opacity(colorScheme == .light ? 0.3 : 0.3))
-                    .background(invertForegroundStyleIntoBright ? .gray.opacity(0.3) : getTierColorOf(tier: dailyQuest.currentTier))
+//                    .background(letBackgroundStyleGray ? .gray.opacity(0.3) : getTierColorOf(tier: dailyQuest.currentTier).opacity(0.7))
+                    .background(
+                        ZStack {
+                            if colorScheme == .light {
+                                Color.gray.opacity(0.3)
+                                if dailyQuest.data != 0 {
+                                    getBrightTierColorOf(tier: dailyQuest.currentTier).opacity(0.05)
+                                }
+                            }
+                            else {
+                                Color.gray.opacity(0.3)
+                                if dailyQuest.data != 0 {
+                                    getDarkTierColorOf(tier: dailyQuest.currentTier).opacity(0.3)
+                                }
+                            }
+
+//                            }
+                        }
+                    )
+//                    .background(dailyQuest.data == 0 ? .gray.opacity(0.3) : (colorScheme == .light ? getBrightTierColorOf(tier: dailyQuest.currentTier).opacity(0.05) : getTierColorOf(tier: dailyQuest.currentTier).opacity(0.7)))
                     .blur(radius: 0.5)
 
                 

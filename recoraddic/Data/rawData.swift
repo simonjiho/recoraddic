@@ -290,13 +290,13 @@ final class DailyRecordSet: Equatable {
     
     func getIntegratedDailyRecordColor(colorScheme:ColorScheme) -> Color {
         if self.dailyRecordThemeName == "StoneTower" {
-            return StoneTower.getIntegratedDailyRecordColor(
+            return TowerView.getIntegratedDailyRecordColor(
                 index: dailyRecordColorIndex,
                 colorScheme: colorScheme
             )
         }
         else {
-            return StoneTower.getIntegratedDailyRecordColor(
+            return TowerView.getIntegratedDailyRecordColor(
                 index: dailyRecordColorIndex,
                 colorScheme: colorScheme
             )
@@ -364,28 +364,39 @@ final class DailyRecordSet: Equatable {
 
     }
     
-    func visibleDailyRecords() -> [DailyRecord] {
-        return self.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({$0.hasContent && ( ($0.getLocalDate() ?? getStartDateOfNow()) < .now )})
-    }
+//    func visibleDailyRecords() -> [DailyRecord] {
+//        return self.dailyRecords!.filter({$0.date != nil}).sorted(by: {$0.date! < $1.date!}).filter({$0.hasContent && ( ($0.getLocalDate() ?? getStartDateOfNow()) < .now )})
+//    }
 
-    func dailyRecordsWithContent(hiddenQuestNames:Set<String>, showHiddenQuests:Bool) -> [DailyRecord] {
+    func visibleDailyRecords(hiddenQuestNames:Set<String>, showHiddenQuests:Bool) -> [DailyRecord] {
+        let dailyRecords_filtered = self.dailyRecords!
+            .filter({$0.hasContent && $0.date != nil})
+            .filter({($0.getLocalDate() ?? getStartDateOfNow()) < .now })
         if showHiddenQuests {
-            return self.dailyRecords!
-                .filter({$0.hasContent})
+            return dailyRecords_filtered
                 .sorted(by: {
-                    if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
-                    else { return false }
+                    if let date0 = $0.date, let date1 = $1.date {
+                        return date0 > date1  // Sorts by date in descending order if both dates are non-nil
+                    } else if $0.date == nil {
+                        return false  // Places items with nil date after those with a non-nil date
+                    } else {
+                        return true  // Ensures $0 with a date is before $1 with nil
+                    }
                 })
         } else {
-            return self.dailyRecords!
+            return dailyRecords_filtered
                 .filter({
-                    $0.hasContent &&
-                    ($0.hasTodoOrDiary ||
-                     !Set($0.dailyQuestList!.filter({$0.data != 0}).map{$0.questName}).subtracting(hiddenQuestNames).isEmpty)
+                    $0.hasTodoOrDiary ||
+                    !Set($0.dailyQuestList!.filter({$0.data != 0}).map{$0.questName}).subtracting(hiddenQuestNames).isEmpty
                 })
                 .sorted(by:{
-                    if $0.date != nil && $1.date != nil { return $0.date! < $1.date! }
-                    else { return false }
+                    if let date0 = $0.date, let date1 = $1.date {
+                        return date0 > date1  // Sorts by date in descending order if both dates are non-nil
+                    } else if $0.date == nil {
+                        return false  // Places items with nil date after those with a non-nil date
+                    } else {
+                        return true  // Ensures $0 with a date is before $1 with nil
+                    }
                 }
             )
         }
@@ -625,6 +636,15 @@ class Quest: Equatable, Identifiable, Hashable {
             return self.name
         }
     }
+    
+    func getCumulative(from start:Date, to end:Date?) -> Int {
+        return self.dailyData.filter({$0.key >= start && $0.key <= (end ?? $0.key)}).values.reduce(0,+)
+    }
+    func getCount(from start:Date, to end:Date?) -> Int {
+        return self.dailyData.keys.filter({$0 >= start && $0 <= (end ?? $0) }).count
+    }
+
+    
 }
 
 
