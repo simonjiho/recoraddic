@@ -40,11 +40,12 @@ struct StoneTower: View {
     var cumulative_cnt:Int
     var cumulative_hours:CGFloat
     var dailyRecords_visible: [DailyRecord]
+    var dailyRecords_withDiaries: [DailyRecord]
     
     
     
     @State var checkQuest_hourly: Bool = true
-    
+    @State var popUp_diaries:Bool = false
 
     
     
@@ -54,7 +55,7 @@ struct StoneTower: View {
         //        let statusBarHeight:CGFloat = getStatusBarHeight()
         
 //        let shadowColor: Color = getShadowColor(colorScheme)
-        let totalHeightMultiplier:CGFloat = dailyRecords_visible.reduce(0) { $0 + stoneHeightMultiplier($1.recordedMinutes) }
+        let totalHeightMultiplier:CGFloat = dailyRecords_visible.reduce(0) { $0 + TowerView.stoneHeightMultiplier($1.recordedMinutes) }
 
         let colorParameter:CGFloat = min(totalHeightMultiplier, 100.0)
         let highestColor: Color = bgTopColor(parameter: 100.0, colorScheme: colorScheme)
@@ -80,40 +81,6 @@ struct StoneTower: View {
             
             let geoWidth:CGFloat = geometry.size.width
             let geoHeight:CGFloat = geometry.size.height
-            
-
-            
-            //            let heightGap:CGFloat = haveSelectedRecord ? stoneHeightMultiplier(selectedDailyRecord?.recordedMinutes ?? 0)*(selectedStoneHeight - stoneHeight) : 0.0
-            //            let horizontalUnitWidth:CGFloat = stoneWidth*0.07
-            //            //            let questionMarkSize: CGFloat = geoWidth*0.05
-            //
-            //            let groundHeight:CGFloat = geoHeight/2 - stoneHeight/2
-            //            //            let towerHeight:CGFloat = stoneHeight*CGFloat(numberOfStones) + heightGap
-            //            let towerHeight:CGFloat = {
-            //                var totalTowerHeight: CGFloat = 0
-            //                for dr in dailyRecords_withContent {
-            //                    totalTowerHeight += stoneHeight * stoneHeightMultiplier(dr.recordedMinutes)
-            //                }
-            //                return totalTowerHeight + heightGap
-            //            }()
-            //
-            //            let groundAndTowerHeight:CGFloat = groundHeight + towerHeight
-            //            let aboveSkyHeight:CGFloat = (groundAndTowerHeight-stoneHeight/2 > geoHeight/2 ? (geoHeight/2 - stoneHeight/2) : geoHeight - groundAndTowerHeight) - heightGap
-            //            let totalSkyHeight:CGFloat = aboveSkyHeight + towerHeight
-            //
-            //            //            let buttonWidth:CGFloat = geoWidth*0.25
-            //            let buttonWidth2:CGFloat = geoWidth*0.1
-            //
-            //            let detailTextBoxSize: CGFloat = geoWidth*0.25
-            //
-            //            let scrollViewCenter_bottom:CGFloat = scrollViewCenterY + stoneHeight
-            //            let scrollViewCenter_above:CGFloat = scrollViewCenterY - stoneHeight
-            //
-            //            let isLatestDailyRecordSet: Bool = selectedDrsIdx == dailyRecordSets.count - 1
-            //
-            //            let goalEditButtonSize:CGFloat = groundHeight/10
-            //            let plusMinusButtonSize:CGFloat = groundHeight/12
-            
             
         
             
@@ -158,10 +125,17 @@ struct StoneTower: View {
                         }
                         Button(action:{checkQuest_hourly.toggle()}) {
                             Text(checkQuest_hourly ? "시간" : "기록횟수")
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .background(.thickMaterial)
+                                .clipShape(.buttonBorder)
+                                .opacity(textOpacity)
                         }
                         .frame(width:(geoWidth-content1HorizontalPadding*2), height:titleHeight, alignment: .trailing)
-                        .buttonStyle(.borderedProminent)
-                        .opacity(0.6)
+                        .buttonStyle(.plain)
+
+//                        .buttonStyle(.borderedProminent)
+//                        .opacity(0.6)
                     }
                     .frame(width:geoWidth, height:titleHeight)
 //                    .border(.red)
@@ -287,15 +261,17 @@ struct StoneTower: View {
                             
                         HStack {
                             Button(action:{
-                                
+                                popUp_diaries.toggle()
                             }) {
                                 Image(systemName: "book.closed.fill")
                             }
-                            Button(action:{
-                                
-                            }) {
-                                Image(systemName: "list.dash")
-                            }
+                            .disabled(dailyRecords_withDiaries.count == 0)
+                            
+//                            Button(action:{
+//                                
+//                            }) {
+//                                Image(systemName: "list.dash")
+//                            }
                         }
                         .frame(height:content2ButtonHeight)
 
@@ -315,139 +291,18 @@ struct StoneTower: View {
                 }
                 .frame(width:geoWidth, height:geoHeight)
                 
-                
-                
-                //            ScrollViewReader { scrollProxy in
-                //                ScrollView {
-                //
-                //                    ZStack {
-                //                        StoneTowerBackground(
-                //                            backgroundThemeName: selectedDailyRecordSet.backgroundThemeName,
-                //                            totalSkyHeight: totalSkyHeight,
-                //                            groundHeight: groundHeight + keyboardHeight,
-                //                            displayHeight: geoHeight
-                //                        )
-                //                        .frame(height: totalSkyHeight + groundHeight + keyboardHeight)
-                //                        .onTapGesture {
-                //                            selectedDailyRecord = nil
-                //                            if isEditingTermGoals {
-                //                                selectedDailyRecordSet.termGoals = editText.filter({$0 != ""})
-                //                                editTermGoals = nil
-                //                                isEditingTermGoals = false
-                //                            }
-                //                        }
-                //                        .dismissingKeyboard(isEditingTermGoals)
-                //
-                //
-                //                        // stone
-                //                        VStack(spacing:0) { // -> 얘를 다 주석처리해도 compiler type-check error 남. 다른 바깥 부분의 문제일지도
-                //                            Spacer()
-                //                                .frame(width:geoWidth, height: aboveSkyHeight)
-                //                            if numberOfStones != 0 {
-                //
-                //                                ForEach((0...lastIndexOfRecordStone).reversed(), id:\.self) { index in
-                //                                    //                                    ForEach(dailyRecords_withContent, id:\.self) { record in
-                //
-                //
-                //                                    let record:DailyRecord = dailyRecords_withContent[index]
-                //
-                //                                    let isSelectedRecord:Bool = {
-                //                                        if selectedDailyRecord == nil { return false }
-                //                                        else {
-                //                                            if selectedDailyRecord == record { return true }
-                //                                            else { return false}
-                //                                        }
-                //                                    }()
-                //
-                //                                    let width:CGFloat = isSelectedRecord ? selectedStoneWidth : stoneWidth
-                //                                    let height:CGFloat = (isSelectedRecord ? selectedStoneHeight : stoneHeight) * stoneHeightMultiplier(record.recordedMinutes)
-                //
-                //
-                //
-                //
-                //                                    let brightness:Int = brightness(record.recordedAmount)
-                //                                    let shapeNum:Int = shapeNum(record.recordedMinutes)
-                //                                    let misalignment:Int = misalignment(record.absence, index)
-                //                                    let heat:Int = heatNum(record.streak)
-                //
-                //                                    ZStack {
-                //                                        ZStack {
-                //                                            StoneTower_stone(
-                //                                                shapeNum: shapeNum,
-                //                                                brightness: brightness,
-                //                                                defaultColorIndex: defaultColorIndex,
-                //                                                facialExpressionNum: record.mood,
-                //                                                selected: isSelectedRecord
-                //                                            )
-                //                                            .frame(width: width, height: height)
-                //
-                //                                            if record.dailyTextType == DailyTextType.inShort {
-                //                                                Image(systemName:"book.closed")
-                //                                                    .font(.caption)
-                //                                                    .frame(width: width, height: height, alignment:.topLeading)
-                //                                                    .opacity(isSelectedRecord ? 0.0 : 1.0)
-                //                                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                //
-                //                                            } else if record.dailyTextType == DailyTextType.diary {
-                //                                                Image(systemName:"book.closed.fill")
-                //                                                    .font(.caption)
-                //                                                    .frame(width: width, height: height, alignment:.topLeading)
-                //                                                    .opacity(isSelectedRecord ? 0.0 : 1.0)
-                //                                                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                //                                            }
-                //
-                //                                        }
-                //                                        .frame(width: width, height: height)
-                //                                        .padding(.leading, geoWidth/2 - width/2 + CGFloat(misalignment)*horizontalUnitWidth)
-                //                                        .padding(.trailing, geoWidth/2 - width/2 - CGFloat(misalignment)*horizontalUnitWidth)
-                //                                        .padding(.vertical, 0)
-                //                                        .onTapGesture {
-                //                                            if isSelectedRecord {
-                //                                                selectedDrIdx = index
-                //                                                popUp_recordInDetail.toggle()
-                //                                            }
-                //                                            else {
-                //                                                selectedDailyRecord = record
-                //                                                withAnimation {
-                //                                                    scrollProxy.scrollTo(index, anchor:.center)
-                //                                                }
-                //                                            }
-                //                                        }
-                //
-                //                                        let xPosRatio:CGFloat = {
-                //                                            switch dynamicTypeSize {
-                //                                            case ...DynamicTypeSize.xxLarge : return 0.23
-                //                                            case ...DynamicTypeSize.accessibility2 : return 0.20
-                //                                            default: return 0.16
-                //                                            }
-                //                                        }()
-                //                                        Text(yyyymmddFormatOf(record.getLocalDate()!))
-                //                                            .bold(isSelectedRecord)
-                //                                            .font(.caption)
-                //                                        //                                                    .opacity(isOnCenter ? 1.0 : (isNearCenter ? 0.3 : 0.0))
-                //                                            .opacity(isSelectedRecord ? 1.0 : 0.0)
-                //                                            .position(x: misalignment <= 0 ? geoWidth*(1-xPosRatio) : geoWidth*xPosRatio, y: height/2)
-                //                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                //
-                //
-                //
-                //                                        VStack {
-                //                                            if record.dailyTextType == DailyTextType.inShort {
-                //                                                Image(systemName:"book.closed")
-                //                                            } else if record.dailyTextType == DailyTextType.diary {
-                //                                                Image(systemName:"book.closed.fill")
-                //                                            }
-                //                                            Text_hours(value: record.recordedMinutes)
-                //                                            Text("\(record.recordedAmount) 개의 기록")
-                //                                        }
-                //                                        .frame(width:detailTextBoxSize, alignment: misalignment <= 0 ? .trailing : .leading)
-                //                                        //                                                .border(.red)
-                //                                        .bold(isSelectedRecord)
-                //                                        .font(.caption)
-                //                                        .opacity(isSelectedRecord ? 1.0 : 0.0)
-
             }
             .background(LinearGradient(colors: [bgTopColor, bgBottomColor], startPoint: .top, endPoint: .bottom))
+            .fullScreenCover(isPresented: $popUp_diaries) {
+                StoneTower_diaries(
+                    dailyRecords_withDiaries: dailyRecords_withDiaries,
+                    topColor: bgTopColor,
+                    bottomColor: lowestColor,
+                    popUp_diaries: $popUp_diaries)
+                .ignoresSafeArea(.container)
+
+
+            }
         } // geometryReader
 
 
@@ -457,9 +312,7 @@ struct StoneTower: View {
     }
     
     
-    func stoneHeightMultiplier(_ input: Int) -> CGFloat {
-        return 1.0 + min(1.0, CGFloat(input)/900.0) * 3.0 // 900분 == 15시간
-    }
+
     
     func bgTopColor(parameter: CGFloat, colorScheme:ColorScheme) -> Color {
         if colorScheme == .light {
@@ -544,12 +397,12 @@ struct TowerView: View {
             let stoneHeight:CGFloat = stoneWidth*0.5
             let horizontalUnitWidth:CGFloat = stoneWidth*0.07
             
-            let totalHeight:CGFloat = dailyRecords_visible.reduce(0) { $0 + stoneHeight*stoneHeightMultiplier($1.recordedMinutes) }
+            let totalHeight:CGFloat = dailyRecords_visible.reduce(0) { $0 + stoneHeight*TowerView.stoneHeightMultiplier($1.recordedMinutes) }
             let represented_cnt:Int = {
                 var cumulative:CGFloat = 0.0
                 var cnt: Int = 0
                 for record in dailyRecords_visible {
-                    cumulative += stoneHeight*stoneHeightMultiplier(record.recordedMinutes)
+                    cumulative += stoneHeight*TowerView.stoneHeightMultiplier(record.recordedMinutes)
                     cnt += 1
                     if cumulative >= extendedHeight {
                         break
@@ -565,12 +418,12 @@ struct TowerView: View {
 
             VStack(spacing:0.0) {
                 ForEach(Array(dr_represented.enumerated()), id:\.0) { idx, record in
-                    let brightness:Int = brightness(record.recordedAmount)
-                    let shapeNum:Int = shapeNum(record.recordedMinutes)
-                    let misalignment:Int = misalignment(record.absence, idx)
-                    let heat:Int = heatNum(record.streak)
+                    let brightness:Int = TowerView.brightness(record.recordedAmount)
+                    let shapeNum:Int = TowerView.shapeNum(record.recordedMinutes)
+                    let misalignment:Int = TowerView.misalignment(record.absence, idx)
+                    let heat:Int = TowerView.heatNum(record.streak)
                     let width:CGFloat = stoneWidth
-                    let height:CGFloat = stoneHeight * stoneHeightMultiplier(record.recordedMinutes)
+                    let height:CGFloat = stoneHeight * TowerView.stoneHeightMultiplier(record.recordedMinutes)
 
                     ZStack {
                         StoneTower_stone(
@@ -580,6 +433,7 @@ struct TowerView: View {
                             facialExpressionNum: record.mood
                         )
                         .frame(width: width, height: height)
+                        .opacity(0.8)
                         
                         if record.dailyTextType == DailyTextType.inShort {
                             Image(systemName:"book.closed")
@@ -606,11 +460,12 @@ struct TowerView: View {
         }
     }
     
-    func stoneHeightMultiplier(_ input: Int) -> CGFloat {
+    static func stoneHeightMultiplier(_ input: Int) -> CGFloat {
         return 1.0 + min(1.0, CGFloat(input)/900.0) * 3.0 // 900분 == 15시간
     }
+
     
-    func shapeNum(_ input: Int) -> Int { // 기록 시간 -> 모양 (0~1시간 / 1시간~3시간 / 3~5시간 / 5시간 이상)
+    static func shapeNum(_ input: Int) -> Int { // 기록 시간 -> 모양 (0~1시간 / 1시간~3시간 / 3~5시간 / 5시간 이상)
         switch input {
         case 0: return 2
         default: return 3
@@ -623,17 +478,17 @@ struct TowerView: View {
         
     }
     
-    func brightness(_ input: Int) -> Int { // 기록 갯수(색) 1~2 / 3~5 / 6~10 / 11개 이상
+    static func brightness(_ input: Int) -> Int { // 기록 갯수(색)
         
         switch input {
         case 0: return -3
-        case 1...7: return input - 4
+        case 1...7: return (input - 4)
         default: return 3 // 8개 이상의 기록갯수
         }
         
     }
     
-    func misalignment(_ input: Int, _ idx: Int) -> Int { // 기록 연속성(오랜만에 쌓을 수록 비뚤어짐) 0일 -> 0 / -1~-3일 -> +-1~3
+    static func misalignment(_ input: Int, _ idx: Int) -> Int { // 기록 연속성(오랜만에 쌓을 수록 비뚤어짐) 0일 -> 0 / -1~-3일 -> +-1~3
         
         //        let plusOrMinus:Int = Int.random(in: 0...1) == 1 ? 1 : -1
         let plusOrMinus:Int = idx % 2 * 2 - 1
@@ -648,7 +503,7 @@ struct TowerView: View {
         
     }
     
-    func heatNum(_ input: Int) -> Int { //기록 연속성2(오래 쌓을 수록 달궈짐) ->  2일 /  3일 / 4~5일 / 6~8일 / 9~11일 / 12~15일 / 16일~ /  20일~ / 25일~ / 30일~
+    static func heatNum(_ input: Int) -> Int { //기록 연속성2(오래 쌓을 수록 달궈짐) ->  2일 /  3일 / 4~5일 / 6~8일 / 9~11일 / 12~15일 / 16일~ /  20일~ / 25일~ / 30일~
         
         switch input {
         case ...1: return 0
@@ -703,6 +558,116 @@ struct TowerView: View {
 //  Created by 김지호 on 3/26/24.
 //
 
+
+struct StoneTower_diaries:View {
+    @Environment(\.colorScheme) var colorScheme
+    
+    var dailyRecords_withDiaries: [DailyRecord]
+    var topColor: Color
+    var bottomColor: Color
+    @Binding var popUp_diaries: Bool
+    
+    var body: some View {
+        let reversedColorSchemeColor = getReversedColorSchemeColor(colorScheme)
+        GeometryReader { geometry in
+            let geoWidth = geometry.size.width
+            let geoHeight = geometry.size.height
+            let diaryContentWidth = geoWidth*0.9
+            
+            let facialExpressionSize = 35.0
+            
+            
+            ZStack {
+                ScrollView {
+                    ZStack(alignment:.top) {
+                        Spacer()
+                            .frame(width: geoWidth, height: geoHeight)
+                        VStack {
+                            ForEach(dailyRecords_withDiaries) { dr in
+                                let brightness:Int = TowerView.brightness(dr.recordedAmount)
+                                let shapeNum:Int = TowerView.shapeNum(dr.recordedMinutes)
+                                let heat:Int = TowerView.heatNum(dr.streak)
+                                let diaryColor = StoneTower_stone.getStoneColor(defaultColorIdx: 0, brightness: brightness, colorScheme: colorScheme)
+                                
+                                VStack {
+                                    HStack {
+                                        ZStack {
+                                            if colorScheme == .light {
+                                                Circle()
+                                                    .stroke(lineWidth: geoWidth*0.002)
+                                                    .frame(width:facialExpressionSize, height: facialExpressionSize)
+                                            } else {
+                                                Circle()
+                                                    .fill(.white.opacity(0.6))
+                                                    .frame(width:facialExpressionSize, height: facialExpressionSize)
+                                            }
+
+                                            Color.black
+                                                .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
+                                                .mask(
+                                                    Image("facialExpression_\(dr.mood)")
+                                                        .resizable()
+                                                        .frame(width:facialExpressionSize*0.8, height: facialExpressionSize*0.8)
+                                                )
+                                        }
+                                        .frame(width:diaryContentWidth*0.2, alignment: .leading)
+                                        .opacity(dr.mood == 0 ? 0 : 1)
+                                        Text(kor_yyyymmddFormatOf(dr.date!))
+                                            .frame(width:diaryContentWidth*0.5)
+                                            .font(.title3)
+                                            .bold()
+
+                                        HStack {
+//                                            Button(action:{}) {
+//                                                Image(systemName: "list.bullet")
+//                                                
+//                                            }
+//                                            Button(action:{}) {
+//                                                Image(systemName: "pencil")
+//                                            }
+                                        }
+                                        .frame(width:diaryContentWidth*0.2, alignment: .trailing)
+
+                                    }
+                                    .padding(.bottom,10)
+                                    Text(dr.dailyText!)
+                                }
+                                .padding(10)
+                                .frame(width:diaryContentWidth)
+//                                .foregroundStyle(diaryForgroundColor)
+                                .background(.ultraThinMaterial)
+//                                .background(.thinMaterial)
+                                .clipShape(.buttonBorder)
+//                                .background(StoneShape_diary(mainColor: diaryColor).opacity(0.6))
+                                
+
+                                
+                                
+                            }
+                        }
+                        .padding(.top, geoHeight*0.15)
+                    }
+                    .background(LinearGradient(colors: [topColor, bottomColor], startPoint: .top, endPoint: .bottom), ignoresSafeAreaEdges: .top)
+//                    .background(LinearGradient(colors: [topColor, bottomColor], startPoint: .top, endPoint: .bottom))
+
+                }
+                .frame(width: geoWidth, height: geoHeight)
+
+                
+                Button(action:{popUp_diaries.toggle()}) {
+                    Image(systemName: "xmark")
+                        .bold()
+                }
+                .padding(.bottom, 50)
+                .frame(width: geoWidth, height: geoHeight, alignment: .bottom)
+            }
+            .frame(width: geoWidth, height: geoHeight)
+
+            
+        }
+    }
+}
+
 // MARK: Path rules: start from top left, clockwise
 
 import Foundation
@@ -716,7 +681,7 @@ struct StoneTower_stone: View {
     var brightness: Int
     var facialExpressionNum: Int
     
-    var defaultColor:Color
+    var defaultColorIndex:Int
     
     
     
@@ -724,38 +689,14 @@ struct StoneTower_stone: View {
         self.shapeNum = shapeNum
         self.brightness = brightness
         self.facialExpressionNum = facialExpressionNum
-        self.defaultColor = TowerView.getDailyRecordColor(index: defaultColorIndex)
+        self.defaultColorIndex = defaultColorIndex
     }
     
     
     
     var body: some View {
         
-        let stoneColor: Color = {
-            // later control saturation
-            let mainColorDarkness: CGFloat = {
-                let mainColor_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = defaultColor.getRGBA()
-                //            print("0: ",mainColor_rgba.0)
-                //            print("1: ",mainColor_rgba.1)
-                //            print("2: ",mainColor_rgba.2)
-                //                print(3 - mainColor_rgba.0 - mainColor_rgba.1 - mainColor_rgba.2)
-                return 3 - mainColor_rgba.0 - mainColor_rgba.1 - mainColor_rgba.2
-            }()
-            
-            let shouldBeDarkerInDarkStoneInDarkMode: Bool = mainColorDarkness > 0.001 && colorScheme == .dark
-            
-            switch brightness {
-            case 3: return defaultColor.adjust(brightness: colorScheme == .light ? -0.02 : -0.25)
-            case 2: return defaultColor.adjust(brightness: colorScheme == .light ? -0.08 : -0.38)
-            case 1: return defaultColor.adjust(brightness: colorScheme == .light ? -0.14 : -0.51)
-            case 0: return defaultColor.adjust(brightness: colorScheme == .light ? -0.27 : -0.64)
-            case -1: return defaultColor.adjust(brightness: colorScheme == .light ? -0.39 : (shouldBeDarkerInDarkStoneInDarkMode ? -0.8 : -0.70))
-            case -2: return defaultColor.adjust(brightness: colorScheme == .light ? -0.47 : (shouldBeDarkerInDarkStoneInDarkMode ? -0.9 : -0.75))
-            case -3: return defaultColor.adjust(brightness: colorScheme == .light ? -0.55 : (shouldBeDarkerInDarkStoneInDarkMode ? -1.0 : -0.80))
-                
-            default: return Color.red
-            }
-        }()
+        let stoneColor: Color = StoneTower_stone.getStoneColor(defaultColorIdx: defaultColorIndex, brightness: brightness, colorScheme: colorScheme)
         
         
         
@@ -770,12 +711,6 @@ struct StoneTower_stone: View {
                 // TODO: 그림자를 그 다음 stone과의 visualValue3 차이만큼 받아서 적용, nil이면 그림자 없음
                 
                 switch shapeNum {
-                case 0:
-                    StoneShape0(mainColor: stoneColor)
-                        .opacity(0.85)
-                case 1:
-                    StoneShape1(mainColor: stoneColor)
-                        .opacity(0.85)
                 case 2:
                     StoneShape2(mainColor: stoneColor)
                         .opacity(0.85)
@@ -813,300 +748,47 @@ struct StoneTower_stone: View {
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-}
-
-
-
-
-struct StoneShape0: View {
-    
-    @Environment(\.colorScheme) var colorScheme
-    
-    let point1:CGPoint = CGPoint(x: 0.27, y: 0.00)
-    let point2:CGPoint = CGPoint(x: 0.73, y: 0.00)
-    let point3:CGPoint = CGPoint(x: 0.93, y: 0.55)
-    let point4:CGPoint = CGPoint(x: 0.73, y: 1.00)
-    let point5:CGPoint = CGPoint(x: 0.27, y: 1.00)
-    let point6:CGPoint = CGPoint(x: 0.07, y: 0.55)
-    // outer point (order: topLeft, clockwise)
-    
-    
-    let point7:CGPoint = CGPoint(x: 0.32, y: 0.15)
-    let point8:CGPoint = CGPoint(x: 0.68, y: 0.15)
-    let point9: CGPoint = CGPoint(x: 0.78, y: 0.60)
-    let point10:CGPoint = CGPoint(x: 0.68, y: 0.90)
-    let point11:CGPoint = CGPoint(x: 0.32, y: 0.90)
-    let point12:CGPoint = CGPoint(x: 0.22, y: 0.60)
-    
-    
-    // inner point (order: topLeft, clockwise)
-    
-    /*
-     1 ------------- 2
-     /   \           /   \
-     /     7 ------- 8     \
-     /     /           \     \
-     6 --- 12            9 --- 3
-     \     \           /     /
-     \     11 ----- 10     /
-     \   /            \  /
-     5 -------------- 4
-     
-     */
-    
-    var mainColor: Color
-    
-    var body: some View {
+    static func getStoneColor(defaultColorIdx: Int, brightness: Int, colorScheme: ColorScheme) -> Color {
+        // later control saturation
         
-        let color1 = mainColor.adjust(saturation:-0.05, brightness: colorScheme == .light ? 0.03 : 0.1)
-        let color2 = mainColor.adjust(saturation:-0.02, brightness: colorScheme == .light ? 0.015 : 0.05)
-        let color3 = mainColor
-        let color4 = mainColor.adjust(brightness: colorScheme == .light ? -0.03 : -0.05)
-        let color5 = mainColor.adjust(brightness: colorScheme == .light ? -0.06 : -0.10)
+        let defaultColor:  Color = TowerView.getDailyRecordColor(index: defaultColorIdx)
         
-        let color1_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color1.getRGBA()
-        let color2_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color2.getRGBA()
-        let color3_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color3.getRGBA()
-        let color4_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color4.getRGBA()
-        let color5_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color5.getRGBA()
+        let mainColorDarkness: CGFloat = {
+            let mainColor_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = defaultColor.getRGBA()
+            //            print("0: ",mainColor_rgba.0)
+            //            print("1: ",mainColor_rgba.1)
+            //            print("2: ",mainColor_rgba.2)
+            //                print(3 - mainColor_rgba.0 - mainColor_rgba.1 - mainColor_rgba.2)
+            return 3 - mainColor_rgba.0 - mainColor_rgba.1 - mainColor_rgba.2
+        }()
         
-        let outLinePoints: [CGPoint] = [point1, point2, point3, point4, point5, point6]
-        let topCenterPoints: [CGPoint] = [
-            point1, point2, point8, point7
-        ]
-        let topLeftPoints: [CGPoint] = [
-            point1, point7, point12, point6
-        ]
-        let topRightPoints: [CGPoint] = [
-            point2, point3, point9, point8
-        ]
-        let bottomCenterPoints: [CGPoint] = [
-            point11, point10, point4, point5
-        ]
-        let bottomLeftPoints: [CGPoint] = [
-            point6, point12, point11, point5, point6
-        ]
-        let bottomRightPoints: [CGPoint] = [
-            point9, point3, point4, point10
-        ]
-        Canvas { context, size in
-            let frameWidth = size.width
-            let frameHeight = size.height
-            context.blendMode = .copy
-            context.opacity = 1.0
+        let shouldBeDarkerInDarkStoneInDarkMode: Bool = mainColorDarkness > 0.001 && colorScheme == .dark
+        
+        switch brightness {
+        case 3: return defaultColor.adjust(brightness: colorScheme == .light ? -0.02 : -0.25)
+        case 2: return defaultColor.adjust(brightness: colorScheme == .light ? -0.08 : -0.38)
+        case 1: return defaultColor.adjust(brightness: colorScheme == .light ? -0.14 : -0.51)
+        case 0: return defaultColor.adjust(brightness: colorScheme == .light ? -0.27 : -0.64)
+        case -1: return defaultColor.adjust(brightness: colorScheme == .light ? -0.39 : (shouldBeDarkerInDarkStoneInDarkMode ? -0.8 : -0.70))
+        case -2: return defaultColor.adjust(brightness: colorScheme == .light ? -0.47 : (shouldBeDarkerInDarkStoneInDarkMode ? -0.9 : -0.75))
+        case -3: return defaultColor.adjust(brightness: colorScheme == .light ? -0.55 : (shouldBeDarkerInDarkStoneInDarkMode ? -1.0 : -0.80))
             
-            let outLine:Path = Path { path in
-                path.addLines(outLinePoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-            }
-            let topCenter:Path = Path { path in
-                path.addLines(topCenterPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-            }
-            let topSides:Path = Path { path in
-                path.addLines(topLeftPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-                path.addLines(topRightPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-            }
-            let bottomCenter:Path = Path { path in
-                path.addLines(bottomCenterPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-            }
-            let bottomSides:Path = Path { path in
-                path.addLines(bottomLeftPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-                path.addLines(bottomRightPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-            }
-            
-            context.fill(outLine,with: .color(red:color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2))
-            context.fill(topCenter,with: .color(red:color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2))
-            
-            context.fill(topSides,with: .color(red:color2_rgba.0, green: color2_rgba.1, blue: color2_rgba.2))
-            context.fill(bottomSides,with: .color(red:color4_rgba.0, green: color4_rgba.1, blue: color4_rgba.2))
-            context.fill(bottomCenter,with: .color(red:color5_rgba.0, green: color5_rgba.1, blue: color5_rgba.2))
-            
-            
+        default: return Color.red
         }
         
-        
-        
     }
+
+    
+    
+    
+    
+    
+    
+    
     
 }
 
 
-struct StoneShape1: View {
-    
-    @Environment(\.colorScheme) var colorScheme
-    
-    let point1:CGPoint = CGPoint(x: 0.27, y: 0.00)
-    let point2:CGPoint = CGPoint(x: 0.73, y: 0.00)
-    let point3:CGPoint = CGPoint(x: 0.88, y: 0.30)
-    let point4:CGPoint = CGPoint(x: 0.88, y: 0.80)
-    let point5:CGPoint = CGPoint(x: 0.77, y: 1.00)
-    let point6:CGPoint = CGPoint(x: 0.23, y: 1.00)
-    let point7:CGPoint = CGPoint(x: 0.12, y: 0.80)
-    let point8:CGPoint = CGPoint(x: 0.12, y: 0.30)
-    // outer point (order: topLeft, clockwise)
-    
-    
-    let point9: CGPoint = CGPoint(x: 0.32, y: 0.10)
-    let point10:CGPoint = CGPoint(x: 0.68, y: 0.10)
-    let point11:CGPoint = CGPoint(x: 0.82, y: 0.40)
-    let point12:CGPoint = CGPoint(x: 0.82, y: 0.70)
-    let point13:CGPoint = CGPoint(x: 0.70, y: 0.88)
-    let point14:CGPoint = CGPoint(x: 0.30, y: 0.88)
-    let point15:CGPoint = CGPoint(x: 0.18, y: 0.70)
-    let point16:CGPoint = CGPoint(x: 0.18, y: 0.40)
-    
-    
-    
-    // inner point (order: topLeft, clockwise)
-    
-    /*
-     1       2
-     9    10
-     8                 3
-     16         11
-     
-     15         12
-     7    14     13    4
-     6         5
-     
-     
-     */
-    
-    var mainColor: Color
-    
-    var body: some View {
-        
-        
-        let color1 = mainColor.adjust(saturation:-0.05, brightness: colorScheme == .light ? 0.03 : 0.1)
-        let color2 = mainColor.adjust(saturation:-0.03, brightness: colorScheme == .light ? 0.015 : 0.05)
-        let color3 = mainColor
-        let color4 = mainColor.adjust(brightness: colorScheme == .light ? -0.03 : -0.05)
-        let color5 = mainColor.adjust(brightness: colorScheme == .light ? -0.06 : -0.10)
-        let color6 = mainColor.adjust(brightness: colorScheme == .light ? -0.09 : -0.13)
-        
-        
-        let color1_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color1.getRGBA()
-        let color2_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color2.getRGBA()
-        let color3_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color3.getRGBA()
-        let color4_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color4.getRGBA()
-        let color5_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color5.getRGBA()
-        let color6_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color6.getRGBA()
-        
-        
-        let outLinePoints: [CGPoint] = [point1, point2, point3, point4, point5, point6, point7, point8]
-        let topCenterPoints: [CGPoint] = [
-            point1, point2, point10, point9
-        ]
-        let topLeftPoints: [CGPoint] = [
-            point1, point9, point16, point8
-        ]
-        let topRightPoints: [CGPoint] = [
-            point2, point3, point11, point10
-        ]
-        let centerLeftPoints: [CGPoint] = [ point8, point16, point15, point7 ]
-        let centerRightPoints: [CGPoint] = [ point11, point3, point4, point12 ]
-        let bottomCenterPoints: [CGPoint] = [
-            point14, point13, point5, point6
-        ]
-        let bottomLeftPoints: [CGPoint] = [
-            point15, point14, point6, point7
-        ]
-        let bottomRightPoints: [CGPoint] = [
-            point12, point4, point5, point13
-        ]
-        Canvas { context, size in
-            let frameWidth = size.width
-            let frameHeight = size.height
-            context.blendMode = .copy
-            context.opacity = 1.0
-            
-            let outLine:Path = Path { path in
-                path.addLines(outLinePoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-            }
-            let topCenter:Path = Path { path in
-                path.addLines(topCenterPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-            }
-            let topSides:Path = Path { path in
-                path.addLines(topLeftPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-                path.addLines(topRightPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-            }
-            let centerSides: Path = Path { path in
-                path.addLines(centerLeftPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-                path.addLines(centerRightPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-            }
-            let bottomCenter:Path = Path { path in
-                path.addLines(bottomCenterPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-            }
-            let bottomSides:Path = Path { path in
-                path.addLines(bottomLeftPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-                path.addLines(bottomRightPoints.map({ ratio in
-                    CGPoint(x: frameWidth*ratio.x, y: frameHeight*ratio.y)}))
-                path.closeSubpath()
-            }
-            
-            context.fill(outLine,with: .color(red:color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2))
-            context.fill(topCenter,with: .color(red:color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2))
-            context.fill(topSides,with: .color(red:color2_rgba.0, green: color2_rgba.1, blue: color2_rgba.2))
-            context.fill(centerSides,with: .color(red:color4_rgba.0, green: color4_rgba.1, blue: color4_rgba.2))
-            context.fill(bottomSides,with: .color(red:color5_rgba.0, green: color5_rgba.1, blue: color5_rgba.2))
-            context.fill(bottomCenter,with: .color(red:color6_rgba.0, green: color6_rgba.1, blue: color6_rgba.2))
-            
-            
-        }
-        
-        
-        
-    }
-    
-}
-
-
-//#Preview(body: {
-//    ZStack {
-//        StoneShape2(mainColor:Color.white.adjust(brightness: -0.03))
-//            .frame(width:210, height:140)
-//    }
-//    .padding(20)
-//    .background(.gray)
-//})
 
 struct StoneShape2: View {
     
@@ -1336,8 +1018,6 @@ struct StoneShape2: View {
     }
     
 }
-
-
 struct StoneShape3: View {
     
     @Environment(\.colorScheme) var colorScheme
@@ -1350,61 +1030,14 @@ struct StoneShape3: View {
     
     var body: some View {
         
-        let mainColorDarkness: CGFloat = {
-            let mainColor_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = mainColor.getRGBA()
-            //            print("0: ",mainColor_rgba.0)
-            //            print("1: ",mainColor_rgba.1)
-            //            print("2: ",mainColor_rgba.2)
-            //            print(3 - mainColor_rgba.0 - mainColor_rgba.1 - mainColor_rgba.2)
-            return 3 - mainColor_rgba.0 - mainColor_rgba.1 - mainColor_rgba.2
-        }()
-        
-        
-        let color1 = {
-            if mainColorDarkness > 0.2 {
-                return mainColor.adjust(saturation:-0.06, brightness: colorScheme == .light ? 0.08 : 0.07)
-            }
-            else {
-                //                return mainColor.adjust(saturation:-0.04, brightness: 0.03)
-                //                print("hoho")
-                return mainColor.adjust(saturation:-0.045, brightness: colorScheme == .light ? 0.08 : 0.07)
-                
-            }
-        }()
-        //        let color1 = mainColor.adjust(saturation:-0.05, brightness: colorScheme == .light ? 0.08 : 0.07)
-        
-        //        let color2 = mainColor.adjust(brightness: colorScheme == .light ? 0.015 : 0.05)
-        //        let color3 = mainColor
-        let color3 = {
-            if mainColorDarkness > 0.1 || colorScheme == .dark {
-                return mainColor
-            }
-            else {
-                //                return mainColor.adjust(saturation:-0.04, brightness: 0.03)
-                //                print("hoho")
-                return mainColor.adjust(brightness: -0.03)
-                
-            }
-        }()
-        
-        
-        //        let color4 = mainColor.adjust(brightness: colorScheme == .light ? -0.03 : -0.05)
-        let color5 = mainColor.adjust(brightness: colorScheme == .light ? -0.1 : -0.13)
-        
-        
-        // MARK: Canvas does not apply color in the same process as the normal SwiftUI views. Even it's the same Color object(by SwiftUI), the display will return the unusual different color. So it should be substracted as rgb component to apply the same color. (24.03.29)
-        let color1_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color1.getRGBA()
-        //        let color2_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color2.getRGBA()
-        let color3_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color3.getRGBA()
-        //        let color4_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color4.getRGBA()
-        let color5_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color5.getRGBA()
-        
-        
-        
+        let color_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = mainColor.getRGBA()
         Canvas { context, size in
             let frameWidth = size.width*0.85
             let frameHeight = size.height
-            context.blendMode = .lighten
+//            context.blendMode = .lighten
+            context.blendMode = .normal
+//            context.blendMode = .hardLight
+//            context.blendMode = .softLight
             context.opacity = 1.0
             let xOrigin: CGFloat = size.width*0.075
             
@@ -1413,49 +1046,40 @@ struct StoneShape3: View {
             
             let oneElement:CGFloat = frameWidth*0.067
 
+            context.fill(outLine, with: .color(mainColor.colorExpressionIntegration()))
+            
+            context.blendMode = .softLight
             context.fill(outLine, with: .linearGradient(Gradient(colors: [
-                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2),
-                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2),
-                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2)
-                
+                .white.opacity(0.6),
+                .white.opacity(0.0)
             ]), startPoint: CGPoint(x: frameWidth/2, y: 0), endPoint: CGPoint(x: frameWidth/2, y: oneElement*2)))
-            
-            context.fill(outLine, with: .linearGradient(Gradient(colors: [
-                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
 
-            ]), startPoint: CGPoint(x: frameWidth/2, y: oneElement*2), endPoint: CGPoint(x: frameWidth/2, y: frameHeight-oneElement)))
+            context.blendMode = .darken
+
+            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+                .black.opacity(0.1),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .black.opacity(0.1)
+            ]), startPoint: CGPoint(x: xOrigin, y: frameHeight/2), endPoint: CGPoint(x: frameWidth+xOrigin, y: frameHeight/2)))
+
             
             context.fill(outLine, with: .linearGradient(Gradient(colors: [
-                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
-                Color(red: color5_rgba.0, green: color5_rgba.1, blue: color5_rgba.2)
+                .white.opacity(0.0),
+                .black.opacity(0.2)
             ]), startPoint: CGPoint(x: frameWidth/2, y: frameHeight-oneElement), endPoint: CGPoint(x: frameWidth/2, y: frameHeight)))
             
-//            context.fill(outLine, with: .linearGradient(Gradient(colors: [
-//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2),
-//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2),
-//                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
-//                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
-//                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
-//                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
-//                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
-//                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
-//                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
-//                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
-//                Color(red: color5_rgba.0, green: color5_rgba.1, blue: color5_rgba.2),
-//                
-//            ]), startPoint: CGPoint(x: frameWidth/2, y: 0), endPoint: CGPoint(x: frameWidth/2, y: frameHeight)))
             
-            context.fill(outLine, with: .linearGradient(Gradient(colors: [
-                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.85),
-                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2).opacity(0.0),
-                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2).opacity(0.0),
-                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2).opacity(0.0),
-                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2).opacity(0.0),
-                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2).opacity(0.0),
-                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.85),
-                
-            ]), startPoint: CGPoint(x: xOrigin, y: frameHeight/2), endPoint: CGPoint(x: frameWidth+xOrigin, y: frameHeight/2)))
-            
+
             
 
         }
@@ -1467,8 +1091,259 @@ struct StoneShape3: View {
 }
 
 
+//struct StoneShape3: View {
+//    
+//    @Environment(\.colorScheme) var colorScheme
+//    
+//    
+//    
+//    
+//    
+//    var mainColor: Color
+//    
+//    var body: some View {
+//        
+//        let mainColorDarkness: CGFloat = {
+//            let mainColor_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = mainColor.getRGBA()
+//            return 3 - mainColor_rgba.0 - mainColor_rgba.1 - mainColor_rgba.2
+//        }()
+//        
+//        
+//        let color1 = {
+//            if mainColorDarkness > 0.2 {
+//                return mainColor.adjust(saturation:-0.06, brightness: colorScheme == .light ? 0.08 : 0.07)
+//            }
+//            else {
+//                return mainColor.adjust(saturation:-0.045, brightness: colorScheme == .light ? 0.08 : 0.07)
+//                
+//            }
+//        }()
+//
+//        let color3 = {
+//            if mainColorDarkness > 0.1 || colorScheme == .dark {
+//                return mainColor
+//            }
+//            else {
+//                //                return mainColor.adjust(saturation:-0.04, brightness: 0.03)
+//                //                print("hoho")
+//                return mainColor.adjust(brightness: -0.03)
+//                
+//            }
+//        }()
+//        
+//        
+//        //        let color4 = mainColor.adjust(brightness: colorScheme == .light ? -0.03 : -0.05)
+//        let color5 = mainColor.adjust(brightness: colorScheme == .light ? -0.1 : -0.13)
+//        
+//        
+//        // MARK: Canvas does not apply color in the same process as the normal SwiftUI views. Even it's the same Color object(by SwiftUI), the display will return the unusual different color. So it should be substracted as rgb component to apply the same color. (24.03.29)
+//        let color1_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color1.getRGBA()
+//        //        let color2_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color2.getRGBA()
+//        let color3_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color3.getRGBA()
+//        //        let color4_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color4.getRGBA()
+//        let color5_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = color5.getRGBA()
+//        
+//        
+//        
+//        Canvas { context, size in
+//            let frameWidth = size.width*0.85
+//            let frameHeight = size.height
+////            context.blendMode = .lighten
+//            context.blendMode = .normal
+////            context.blendMode = .hardLight
+////            context.blendMode = .softLight
+//            context.opacity = 1.0
+//            let xOrigin: CGFloat = size.width*0.075
+//            
+//
+//            let outLine:Path = Path(roundedRect: CGRect(x: xOrigin, y: 0, width: frameWidth, height: frameHeight), cornerSize:CGSize(width: frameWidth*0.09, height: frameWidth*0.06), style: .continuous)
+//            
+//            let oneElement:CGFloat = frameWidth*0.067
+//
+//            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+////                Color(red: color5_rgba.0, green: color5_rgba.1, blue: color5_rgba.2).opacity(1.0),
+//                .black.opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(1.0),
+//                .black.opacity(1.0)
+////                Color(red: color5_rgba.0, green: color5_rgba.1, blue: color5_rgba.2).opacity(1.0)
+//
+//            ]), startPoint: CGPoint(x: xOrigin, y: frameHeight/2), endPoint: CGPoint(x: frameWidth+xOrigin, y: frameHeight/2)))
+//            
+//            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.5),
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.5),
+//                Color(red: color5_rgba.0, green: color5_rgba.1, blue: color5_rgba.2).opacity(0.5)
+//                
+//            ]), startPoint: CGPoint(x: frameWidth/2, y: 0), endPoint: CGPoint(x: frameWidth/2, y: oneElement*2)))
+//            
+//            
+//            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+//                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.5),
+////                Color(red: color5_rgba.0, green: color5_rgba.1, blue: color5_rgba.2).opacity(1.0)
+//                .black.opacity(0.5)
+//            ]), startPoint: CGPoint(x: frameWidth/2, y: frameHeight-oneElement), endPoint: CGPoint(x: frameWidth/2, y: frameHeight)))
+//            
+//            
+//
+//            
+////            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+////                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2),
+////                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2),
+////                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2)
+////                
+////            ]), startPoint: CGPoint(x: frameWidth/2, y: 0), endPoint: CGPoint(x: frameWidth/2, y: oneElement*2)))
+////            
+////            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+////                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
+////
+////            ]), startPoint: CGPoint(x: frameWidth/2, y: oneElement*2), endPoint: CGPoint(x: frameWidth/2, y: frameHeight-oneElement)))
+////            
+////            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+////                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2),
+////                Color(red: color5_rgba.0, green: color5_rgba.1, blue: color5_rgba.2)
+////            ]), startPoint: CGPoint(x: frameWidth/2, y: frameHeight-oneElement), endPoint: CGPoint(x: frameWidth/2, y: frameHeight)))
+////            
+////            
+////            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+////                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.3),
+////                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.7),
+////                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.7),
+////                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.7),
+////                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.7),
+////                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.7),
+////                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.3)
+////
+////            ]), startPoint: CGPoint(x: xOrigin, y: frameHeight/2), endPoint: CGPoint(x: frameWidth+xOrigin, y: frameHeight/2)))
+////
+////            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+////                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.85),
+////                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2).opacity(0.0),
+////                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2).opacity(0.0),
+////                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2).opacity(0.0),
+////                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2).opacity(0.0),
+////                Color(red: color3_rgba.0, green: color3_rgba.1, blue: color3_rgba.2).opacity(0.0),
+////                Color(red: color1_rgba.0, green: color1_rgba.1, blue: color1_rgba.2).opacity(0.85),
+////                
+////            ]), startPoint: CGPoint(x: xOrigin, y: frameHeight/2), endPoint: CGPoint(x: frameWidth+xOrigin, y: frameHeight/2)))
+//            
+//            
+//
+//        }
+//        
+//        
+//        
+//    }
+//    
+//}
+
+let color1 = StoneTower_stone.getStoneColor(defaultColorIdx: 0, brightness: 3, colorScheme: ColorScheme.light)
+let color2 = StoneTower_stone.getStoneColor(defaultColorIdx: 0, brightness: 2, colorScheme: ColorScheme.light)
+let color3 = StoneTower_stone.getStoneColor(defaultColorIdx: 0, brightness: 1, colorScheme: ColorScheme.light)
+let color4 = StoneTower_stone.getStoneColor(defaultColorIdx: 0, brightness: 0, colorScheme: ColorScheme.light)
+let color5 = StoneTower_stone.getStoneColor(defaultColorIdx: 0, brightness: -1, colorScheme: ColorScheme.light)
+let color6 = StoneTower_stone.getStoneColor(defaultColorIdx: 0, brightness: -2, colorScheme: ColorScheme.light)
+let color7 = StoneTower_stone.getStoneColor(defaultColorIdx: 0, brightness: -3, colorScheme: ColorScheme.light)
 
 
+#Preview(body: {
+    HStack {
+        StoneShape3(mainColor: color1)
+        StoneShape3(mainColor: color2)
+        StoneShape3(mainColor: color3)
+        StoneShape3(mainColor: color4)
+        StoneShape3(mainColor: color5)
+        StoneShape3(mainColor: color6)
+        StoneShape3(mainColor: color7)
+
+    }
+    .padding(10)
+    .frame(height:100)
+    .background(.cyan.opacity(0.2))
+})
+
+
+
+struct StoneShape_diary: View {
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    
+    
+    
+    
+    var mainColor: Color
+    
+    var body: some View {
+        
+        let color_rgba: (CGFloat, CGFloat, CGFloat, CGFloat) = mainColor.getRGBA()
+        Canvas { context, size in
+            let frameWidth = size.width
+            let frameHeight = size.height
+            let oneElement:CGFloat = frameWidth*0.02
+
+            let outLine:Path = Path(roundedRect: CGRect(x: 0, y: 0, width: frameWidth, height: frameHeight), cornerSize:CGSize(width: frameWidth*0.04, height: frameWidth*0.03), style: .continuous)
+    
+            
+            context.blendMode = .normal
+            context.opacity = 1.0
+                        
+            context.fill(outLine, with: .color(mainColor.colorExpressionIntegration()))
+            
+            context.blendMode = .softLight
+            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+                .white.opacity(0.2),
+                .white.opacity(0.0)
+            ]), startPoint: CGPoint(x: frameWidth/2, y: 0), endPoint: CGPoint(x: frameWidth/2, y: oneElement*2)))
+
+            context.blendMode = .darken
+
+            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+                .black.opacity(0.1),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .white.opacity(0.0),
+                .black.opacity(0.1)
+            ]), startPoint: CGPoint(x: 0, y: frameHeight/2), endPoint: CGPoint(x: frameWidth, y: frameHeight/2)))
+
+            
+            context.fill(outLine, with: .linearGradient(Gradient(colors: [
+                .white.opacity(0.0),
+                .black.opacity(0.1)
+            ]), startPoint: CGPoint(x: frameWidth/2, y: frameHeight-oneElement), endPoint: CGPoint(x: frameWidth/2, y: frameHeight)))
+        
+        
+
+
+
+
+            
+
+        }
+        
+        
+        
+    }
+    
+}
 
 
 

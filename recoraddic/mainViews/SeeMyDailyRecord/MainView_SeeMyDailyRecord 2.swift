@@ -88,13 +88,13 @@ struct MainView_TermSummation: View { //MARK: selectedDailyRecordSet은 selected
             
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
-
+                
             ZStack {
                 ScrollView(.horizontal) {
                     LazyHStack(spacing:0.0) {
                         ForEach(dailyRecordSets.indices, id:\.self) { idx in
                             let drs = dailyRecordSets[idx]
-//                            Text("test")
+                            //                            Text("test")
                             DrsSummationView(
                                 drs: drs,
                                 drsIdx: idx,
@@ -103,11 +103,11 @@ struct MainView_TermSummation: View { //MARK: selectedDailyRecordSet은 selected
                                 restrictedHeight: $restrictedHeight
                             )
                             .frame(width:geoWidth, height:geoHeight)
-
-//                                .containerRelativeFrame([.horizontal, .vertical])
+                            
+                            //                                .containerRelativeFrame([.horizontal, .vertical])
                             .id(idx)
-
-
+                            
+                            
                         }
                     }
                     .scrollTargetLayout()
@@ -115,7 +115,7 @@ struct MainView_TermSummation: View { //MARK: selectedDailyRecordSet은 selected
                 .scrollPosition(id: $selectedDrsIdx) // 가볍게 해야 초기화 시 오래 안걸림. 초기화 시간 오래걸리면 해당 index로 바로 안넘어감
                 .frame(width:geoWidth, height:geoHeight)
                 .scrollTargetBehavior(.paging)
-
+                
                 Button(action:{popUp_startNewRecordSet.toggle()}) {
                     VStack {
                         Image(systemName:"arrowshape.right")
@@ -126,8 +126,8 @@ struct MainView_TermSummation: View { //MARK: selectedDailyRecordSet은 selected
                 }
                 .padding(10)
                 .frame(width:geoWidth, height:geoHeight, alignment: .bottomTrailing)
-
-
+                
+                
                 if popUp_startNewRecordSet {
                     Color.gray.opacity(0.5)
                     let minDate = standardDateToLocalStartOfDay(std:dailyRecordSets.last?.start.addingDays(1) ?? getStandardDateOfNow())
@@ -138,61 +138,10 @@ struct MainView_TermSummation: View { //MARK: selectedDailyRecordSet은 selected
                         selectedDate:max(minDate, getStartDateOfNow())
                     )
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        .popUpViewLayout(width: geoWidth*0.9, height: (geoHeight-statusBarHeight)*0.6, color: backGroundColor)
-                        .position(x:geoWidth/2,y: statusBarHeight + (geoHeight-statusBarHeight)/2 )
+                    .popUpViewLayout(width: geoWidth*0.9, height: (geoHeight-statusBarHeight)*0.6, color: backGroundColor)
+                    .position(x:geoWidth/2,y: statusBarHeight + (geoHeight-statusBarHeight)/2 )
                 }
 
-//                if drsIdx == selectedDrsIdx {
-//                    Button(action: {
-//                        popUp_startNewRecordSet.toggle()
-//                    }) {
-//                        Text("다음 기록의 탑 생성")
-//                    }
-//
-//
-//                }
-//
-//                
-
-//                
-//                if popUp_changeStyle { //TODO: 나중에는 theme에 관계없이 통일된 popup창 -> 동일한 theme내에서 색만 변경 가능, 질문 있는 theme -> 질문없는 theme으로 변경 가능(경고메시지), 질문 있는 theme -> 질문 있는 theme, 질문 없는 theme -> 질문 없는 theme 기능 제공
-//                    Color.gray.opacity(0.5)
-//                        .onTapGesture {
-//                            popUp_changeStyle.toggle()
-//                        }
-//                    if selectedDailyRecordSet.dailyRecordThemeName == "StoneTower" {
-//                        StoneTower_popUp_ChangeStyleView(
-//                            popUp_changeStyle:$popUp_changeStyle,
-//                            defaultColorIndex_tmp: $selectedDailyRecordSet.dailyRecordColorIndex
-//                        )
-//                        .frame(width: geoWidth*0.8, height: geoHeight*0.7)
-//                        .background(.background)
-//                        .clipShape(.rect(cornerSize: CGSize(width: geoWidth*0.8*0.1, height: geoHeight*0.7*0.1)))
-//                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                    }
-//
-//                }
-////                if popUp_recordInDetail {
-//                if selectedDrIdx != nil && popUp_recordInDetail {
-//                    Color.gray.opacity(0.5)
-//                        .onTapGesture {
-//                            popUp_recordInDetail.toggle()
-//                        }
-//                    RecordInDetailView_new(
-//                        dailyRecords_withContent: dailyRecords_withContent,
-//                        showHiddenQuests:showHiddenQuests,
-////                        selectedDailyRecord:$selectedRecord,
-//                        popUp_recordInDetail: $popUp_recordInDetail,
-//                        selectedDrIdx: $selectedDrIdx
-////                        selectedDrDate:$selectedDrDate
-////                        selectedDrDate: selectedRecord?.date ?? nil
-//                    )
-//                    .frame(width: geoWidth*0.95, height: geoHeight*0.7)
-//                    .background(.background)
-//                    .clipShape(.rect(cornerSize: CGSize(width: geoWidth*0.95*0.1, height: geoHeight*0.7*0.1)))
-//                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//
-//                }
                 
                 
                 
@@ -200,11 +149,11 @@ struct MainView_TermSummation: View { //MARK: selectedDailyRecordSet은 selected
                 
             }
             .frame(width:geoWidth,height:geoHeight)
-//            .scrollDisabled(dailyRecordSetEmpty)
             .onAppear() {
                 selectedDrsIdx = dailyRecordSets.count - 1
                 if topEdgeIgnoredHeight == 0 {topEdgeIgnoredHeight = geoHeight}
             }
+            
         }
         .onChange(of: selectedDrsIdx) {
             updateSelectedDailyRecordSet = true
@@ -254,8 +203,6 @@ struct DrsSummationView: View {
     @Query var dailyRecords: [DailyRecord]
     @Query(sort:\Profile.createdTime) var profiles: [Profile]
     @Query var quests: [Quest]
-    
-
     
     
     
@@ -352,14 +299,8 @@ struct DrsSummationView: View {
         let hiddenQuestNames: Set<String> = showHiddenQuests ? [] : Set(quests.filter({$0.isHidden}).map({$0.name}))
 
         let dailyRecords_visible:[DailyRecord] = drs.visibleDailyRecords(hiddenQuestNames: hiddenQuestNames, showHiddenQuests: showHiddenQuests) // already sorted
+        let dailyRecords_withDiaries:[DailyRecord] = dailyRecords_visible.filter({$0.dailyTextType != nil && $0.dailyText != ""})
 
-        let recent5dailyRecords:[DailyRecord] = {
-            if dailyRecords_visible.count < 5 {
-                return dailyRecords_visible
-            } else {
-                return Array(dailyRecords_visible.prefix(5))
-            }
-        }()
         
         let shadowColor: Color = getShadowColor(colorScheme)
         
@@ -385,7 +326,6 @@ struct DrsSummationView: View {
             }
             return returnDict
         }()
-        
         let purposeData:[String:Int] = {
             var returnDict: [String:Int] = [:]
             for purpose in defaultPurposes {
@@ -398,7 +338,6 @@ struct DrsSummationView: View {
             }
             return returnDict
         }()
-        
         let purposeData_hours:[String:CGFloat] = {
             var returnDict: [String:CGFloat] = [:]
             for purpose in defaultPurposes {
@@ -462,8 +401,8 @@ struct DrsSummationView: View {
             let content2TowerHeight:CGFloat = content2Height*0.6
             
             
-            
-            
+                
+                
             ZStack {
                 if drs.dailyRecordThemeName == "StoneTower" {
                     StoneTower(
@@ -478,7 +417,8 @@ struct DrsSummationView: View {
                         restrictedHeight: restrictedHeight,
                         cumulative_cnt: cumulative_cnt,
                         cumulative_hours: cumulative_hours,
-                        dailyRecords_visible: dailyRecords_visible
+                        dailyRecords_visible: dailyRecords_visible,
+                        dailyRecords_withDiaries: dailyRecords_withDiaries
                     )
                 }
                 
@@ -493,8 +433,8 @@ struct DrsSummationView: View {
                             displayedComponents: [.date]
                         )
                         .labelsHidden()
-    //                        .frame(width:geoWidth*0.25)
-
+                        //                        .frame(width:geoWidth*0.25)
+                        
                         
                         Text("~")
                             .bold()
@@ -506,8 +446,8 @@ struct DrsSummationView: View {
                             displayedComponents: [.date]
                         )
                         .labelsHidden()
-    //                        .frame(width:geoWidth*0.25)
-
+                        //                        .frame(width:geoWidth*0.25)
+                        
                     }
                     else {
                         DatePicker(
@@ -517,22 +457,24 @@ struct DrsSummationView: View {
                             displayedComponents: [.date]
                         )
                         .labelsHidden()
-
+                        
                         Text("~")
                             .bold()
                             .padding(.horizontal,5)
                             .minimumScaleFactor(0.5)
                             .frame(width:30.0, alignment:.leading)
-
+                        
                     }
-
+                    
                 }
                 .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
                 .frame(width:geoWidth*0.95, height:restrictedHeight*0.05)
                 .position(x:geoWidth*0.5, y: (geoHeight - restrictedHeight) + restrictedHeight*0.035 + restrictedHeight*0.025 )
+//                .position(x:geoWidth*0.5, y: (geoHeight - restrictedHeight)/2 + restrictedHeight*0.035 + restrictedHeight*0.025 )
+//                .position(x:geoWidth*0.5, y: restrictedHeight*0.035 + restrictedHeight*0.025 )
                 .dynamicTypeSize( ...DynamicTypeSize.xxxLarge)
                 .offset(x: drs.end != nil ? 0.0 : 15.0)
-
+                
                 if drsIdx != 0 { // 나중에 다양한 스타일 생기면 drsIdx == 0 이어도 Menu 만들고 menu에 스타일 변경 넣기
                     
                     Menu { // menu의 요소들에는 dynamicTypeSize 안 통함
@@ -571,6 +513,10 @@ struct DrsSummationView: View {
                 }
             }
             .frame(width:geoWidth, height:geoHeight)
+//            .border(.red)
+
+
+            
 
         
             
