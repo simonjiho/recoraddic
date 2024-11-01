@@ -31,7 +31,6 @@ struct recoraddicApp: App {
 
     var syncManager: SyncManager = SyncManager()
 
-    @State private var isActive: Bool = false
 
     
     
@@ -39,41 +38,29 @@ struct recoraddicApp: App {
 
         
         WindowGroup {
-            if isActive {
-                ContentView()
-                //                .environmentObject(activityManager)
-                    .onAppear() {
-                        print("App started")
-                        if UserDefaults.standard.value(forKey: "stateSerialization") == nil {
-                            UserDefaults.standard.setValue(nil, forKey: "stateSerialization")
-                        }
-                        
-                        if UserDefaults.standard.value(forKey: "initialization") == nil {
-                            UserDefaults.standard.setValue(true, forKey: "initialization")
-                        }
-                        if UserDefaults.standard.value(forKey: "shouldBlockTheView") == nil {
-                            UserDefaults.standard.setValue(false,forKey: "shouldBlockTheView") // at initial, it starts with true
-                        }
-                        if UserDefaults.standard.value(forKey: "iCloudAvailable_forTheFirstTime") == nil {
-                            UserDefaults.standard.setValue(false,forKey: "iCloudAvailable_forTheFirstTime")
-                        }
-                        if UserDefaults.standard.value(forKey: "fetchDone") == nil {
-                            UserDefaults.standard.setValue(false,forKey: "fetchDone")
-                        }
+            ContentView_withLaunchScreen()
+            //                .environmentObject(activityManager)
+                .onAppear() {
+                    print("App started")
+                    if UserDefaults.standard.value(forKey: "stateSerialization") == nil {
+                        UserDefaults.standard.setValue(nil, forKey: "stateSerialization")
                     }
-            }
-            else {
-                LoadingView()
-                    .containerRelativeFrame([.horizontal,.vertical])
-                    .onAppear() {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                            withAnimation {
-                                self.isActive = true
-                            }
-                        }
+                    
+                    if UserDefaults.standard.value(forKey: "initialization") == nil {
+                        UserDefaults.standard.setValue(true, forKey: "initialization")
                     }
-
+                    if UserDefaults.standard.value(forKey: "shouldBlockTheView") == nil {
+                        UserDefaults.standard.setValue(false,forKey: "shouldBlockTheView") // at initial, it starts with true
+                    }
+                    if UserDefaults.standard.value(forKey: "iCloudAvailable_forTheFirstTime") == nil {
+                        UserDefaults.standard.setValue(false,forKey: "iCloudAvailable_forTheFirstTime")
+                    }
+                    if UserDefaults.standard.value(forKey: "fetchDone") == nil {
+                        UserDefaults.standard.setValue(false,forKey: "fetchDone")
+                    }
                 }
+            
+
         }
 
         .modelContainer(Self.container)
@@ -146,3 +133,27 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
 }
 
+
+
+struct ContentView_withLaunchScreen:View {
+    @State private var isActive: Bool = false
+    var body: some View {
+        if isActive {
+            ContentView()
+        }
+        else {
+            LoadingView()
+                .containerRelativeFrame([.horizontal,.vertical])
+                .onAppear() {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        withAnimation {
+                            self.isActive = true
+                        }
+                    }
+                }
+
+            }
+
+    }
+
+}

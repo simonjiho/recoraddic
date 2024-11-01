@@ -387,21 +387,54 @@ struct DrsSummationView: View {
         let cumulative_cnt:Int = questData.values.reduce(0, +)
         let cumulative_hours:CGFloat = questData_hours.values.reduce(0, +)
         
+        let conversionRate:[(day:Date,rate:Double)] =
+        {
+            var containedData:[(day:Date,rate:Double)] = dailyRecords_visible.compactMap({dr in (standardDateToLocalStartOfDay(std: dr.date), Double(dr.recordedMinutes)/(60.0*12.0)) as? (Date, Double)})
+            let localStart = standardDateToLocalStartOfDay(std: startDate)
+            let localEnd = drs.end == nil ? getStartDateOfNow() : standardDateToLocalStartOfDay(std: endDate)
+            let dateSequence = sequence(first: localStart) { date in
+                Calendar.current.date(byAdding: .day, value: 1, to: date)
+            }.prefix { $0 <= localEnd }
+            for day in dateSequence {
+                if !containedData.contains(where: {$0.day == day}) {
+                    containedData.append((day:day, rate:0.0))
+                }
+            }
+        
+            return containedData.sorted(by: {$0.day < $1.day})
+            
+        }()
+        
+        let questData_hours_max:CGFloat = {
+            let maxVal = questData_hours.max(by: { $0.value < $1.value })?.value ?? 0.0
+            if maxVal == 0.0 { return 1.0 }
+            else { return maxVal }
+        }()
+        let questData_cnt_max:CGFloat = {
+            let maxVal = CGFloat(questData.max(by: { $0.value < $1.value })?.value ?? 0)
+            if maxVal == 0.0 { return 1.0 }
+            else { return maxVal }
+        }()
+        let purposeData_hours_max:CGFloat = {
+            let maxVal = purposeData_hours.max(by: { $0.value < $1.value })?.value ?? 0.0
+            if maxVal == 0.0 { return 1.0 }
+            else { return maxVal }
+        }()
+        let purposeData_cnt_max:CGFloat = {
+            let maxVal = CGFloat(purposeData.max(by: { $0.value < $1.value })?.value ?? 0)
+            if maxVal == 0.0 { return 1.0 }
+            else { return maxVal }
+        }()
+        
+        let avgConversionRate: Double = conversionRate.count > 0 ? conversionRate.map(\.rate).reduce(0, +) / Double(conversionRate.count) : 0.0
+
+        
         GeometryReader { geometry in
             
             let geoWidth:CGFloat = geometry.size.width
             let geoHeight:CGFloat = geometry.size.height
-            
-            let topHeight = restrictedHeight*0.05
-            let content1TopPadding:CGFloat = geoHeight*0.15
-            let content1Height:CGFloat = geoHeight*0.35
-            let content2Height:CGFloat = geoHeight*0.5
-            let content2TopPadding:CGFloat = content2Height*0.1
-            let content2CumulativeHeight:CGFloat = content2Height*0.3
-            let content2TowerHeight:CGFloat = content2Height*0.6
-            
-            
                 
+            
                 
             ZStack {
                 if drs.dailyRecordThemeName == "StoneTower" {
@@ -418,7 +451,13 @@ struct DrsSummationView: View {
                         cumulative_cnt: cumulative_cnt,
                         cumulative_hours: cumulative_hours,
                         dailyRecords_visible: dailyRecords_visible,
-                        dailyRecords_withDiaries: dailyRecords_withDiaries
+                        dailyRecords_withDiaries: dailyRecords_withDiaries,
+                        conversionRate: conversionRate,
+                        questData_hours_max: questData_hours_max,
+                        questData_cnt_max: questData_cnt_max,
+                        purposeData_hours_max: purposeData_hours_max,
+                        purposeData_cnt_max:purposeData_cnt_max,
+                        avgConversionRate: avgConversionRate
                     )
                 }
                 
@@ -433,7 +472,7 @@ struct DrsSummationView: View {
                             displayedComponents: [.date]
                         )
                         .labelsHidden()
-                        //                        .frame(width:geoWidth*0.25)
+//                                                .frame(width:geoWidth*0.25)
                         
                         
                         Text("~")
@@ -447,7 +486,6 @@ struct DrsSummationView: View {
                         )
                         .labelsHidden()
                         //                        .frame(width:geoWidth*0.25)
-                        
                     }
                     else {
                         DatePicker(

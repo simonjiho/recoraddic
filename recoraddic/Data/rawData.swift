@@ -48,6 +48,7 @@ final class DefaultPurpose {
     static let ftr = "myFuture" // 개인적인 미래 (ftr)
     static let ach = "selfAchievement"
     static let rts = "relationship"
+    static let cmp = "competitiveness"
 
     // 타인지향
     static let lov = "love" // 사랑하는, 소중한 사람 (sgn)
@@ -79,6 +80,9 @@ final class DefaultPurpose {
         }
         else if input  == DefaultPurpose.rts {
             return "인간관계"
+        }
+        else if input == DefaultPurpose.cmp {
+            return "경쟁심"
         }
         
         
@@ -316,19 +320,22 @@ final class DailyRecordSet: Equatable {
     
 
     
-    func updateDailyRecordsMomentum() -> Void {
+    func updateDailyRecordsMomentum() -> Void { // modify absence and streak
         if let dailyRecords = self.dailyRecords {
-            let dates = dailyRecords.filter({$0.hasContent}).compactMap({$0.date})
+            let dates = dailyRecords.filter({$0.hasContent}).compactMap({$0.date}).sorted()
             for dailyRecord in dailyRecords {
                 if let date = dailyRecord.date {
                     let dates_beforeDate:[Date] = dates.filter({$0 < date})
-                    if let nearestDate:Date = dates_beforeDate.sorted().last {
+                    if let nearestDate:Date = dates_beforeDate.last {
                         dailyRecord.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
                         if dailyRecord.absence == 0 {
                             dailyRecord.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
                         } else {
                             dailyRecord.streak = 0
                         }
+                    } else { // first dailyRecord in drs
+                        dailyRecord.absence = 0
+                        dailyRecord.streak = 0
                     }
                 }
             }

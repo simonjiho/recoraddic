@@ -8,24 +8,46 @@
 import Foundation
 import SwiftUI
 
-let defaultPurposes:[String] = [DefaultPurpose.atr, DefaultPurpose.hlt, DefaultPurpose.ftr, DefaultPurpose.ent, DefaultPurpose.rts, DefaultPurpose.inq, DefaultPurpose.ach, DefaultPurpose.lov, DefaultPurpose.fml, DefaultPurpose.cmn, DefaultPurpose.alt, DefaultPurpose.wrl]
+let defaultPurposes:[String] = [DefaultPurpose.hlt, DefaultPurpose.cmp, DefaultPurpose.ent, DefaultPurpose.atr, DefaultPurpose.inq, DefaultPurpose.ach, DefaultPurpose.ftr, DefaultPurpose.rts, DefaultPurpose.lov, DefaultPurpose.fml, DefaultPurpose.cmn, DefaultPurpose.alt, DefaultPurpose.wrl]
 
-let defaultPurposes_per: [String] = [DefaultPurpose.atr, DefaultPurpose.hlt, DefaultPurpose.ftr, DefaultPurpose.ent, DefaultPurpose.rts, DefaultPurpose.inq, DefaultPurpose.ach]
+let defaultPurposes_per: [String] = [DefaultPurpose.hlt, DefaultPurpose.cmp, DefaultPurpose.ent, DefaultPurpose.atr, DefaultPurpose.inq, DefaultPurpose.ach, DefaultPurpose.ftr, DefaultPurpose.rts]
 let defaultPurposes_notper: [String] = [DefaultPurpose.lov, DefaultPurpose.fml, DefaultPurpose.cmn, DefaultPurpose.alt, DefaultPurpose.wrl]
 
-//let defaultDataTypes:[DataType] = [.hour, DataType.REP, DataType.HOUR, DataType.CUSTOM]
 
-//let diaryTopics:[String] = [DiaryTopic.inShort, DiaryTopic.feedbacks, DiaryTopic.specialEvent]
-// feedback is too heavy, making people irritated
+let defaultPurposeExpression1:[String:String] = [
+    DefaultPurpose.hlt: "운동선수",
+    DefaultPurpose.cmp: "야심가",
+    DefaultPurpose.ent: "쾌락주의자",
+    DefaultPurpose.atr: "스타",
+    DefaultPurpose.inq: "학자",
+    DefaultPurpose.ach: "등산가",
+    DefaultPurpose.ftr: "개척자",
+    DefaultPurpose.rts: "사교가",
+    DefaultPurpose.lov: "사랑꾼",
+    DefaultPurpose.fml: "파수꾼",
+    DefaultPurpose.cmn: "수호자",
+    DefaultPurpose.alt: "박애주의자", // 천사?
+    DefaultPurpose.wrl: "영웅"
+]
+let defaultPurposeExpression2:[String:String] = [
+    DefaultPurpose.hlt: "건강한",
+    DefaultPurpose.cmp: "승부욕 강한",
+    DefaultPurpose.ent: "행복한",
+    DefaultPurpose.atr: "매력적인",
+    DefaultPurpose.inq: "호기심 많은",
+    DefaultPurpose.ach: "열정적인",
+    DefaultPurpose.ftr: "별을 좇는",
+    DefaultPurpose.rts: "사교적인",
+    DefaultPurpose.lov: "사랑을 좇는",
+    DefaultPurpose.fml: "헌신적인",
+    DefaultPurpose.cmn: "정의로운",
+    DefaultPurpose.alt: "이타적인",
+    DefaultPurpose.wrl: "세계를 구하는"
+]
 
 
 // TODO: create recommended questions depending on the person's feature.
 
-//let facialExpression_tmp:[Int] = [1,2,3,7,8,9,10,11,13,14,15,20,21,23,24,25,26,27,34,37,42,44,50,54,56,58,59,72,79,85,87,88,89,96,99,100,102,105,106,111,112,116,118,122,123]
-
-
-//let facialExpression_Middle1:[Int] = [] // 그저그런 감정
-//let facialExpression_Middle2:[Int] = [] // 감정과 무관한 표정
 
 
 

@@ -178,7 +178,19 @@ func mmddFormatOf(_ date: Date) -> String {
     formatter.locale = Locale(identifier: "ko_KR")
     formatter.dateFormat = "MM/dd"
     return formatter.string(from: date)
+    
 }
+
+func mmddFormatOf2(_ date: Date) -> String {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "ko_KR")
+    formatter.dateStyle = .short // 날짜 스타일 설정
+    formatter.timeStyle = .none // 시간 스타일 설정
+    return formatter.string(from: date)
+    
+}
+
+
 
 func ddFormatOf(_ date: Date) -> String {
     let formatter = DateFormatter()
