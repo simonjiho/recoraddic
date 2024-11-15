@@ -205,7 +205,24 @@ struct ContentView: View {
                          }
                      }
 
-//                     _ = getBottomSafeAreaHeight()
+
+                     // 아래 코드는 1.0.7 배포 후 migration 시 didMigrate에 있는 closure가 잘 작동하지 않았을 때 활성화
+//                     // (11.21.2024) 임시코드 -> migration과정에서 didMigrate 부분의 코드가 실행되지 않아 일단 이 코드를 통해 실행 -> 1년 뒤 삭제
+//                     // 왜 안될까!!!! Test code (testingSpace.xcodeproj 의 testingSpace18_migration.swift에서 비슷한 기능의 코드를 실행 시 잘 작동하던데...
+//                     if UserDefaults.standard.bool(forKey: "ifMigrationV1toV2Fails") {
+//                         for quest in quests {
+//                             quest.id = UUID() // if not do this, some duplicated ids will be generated.(Don't know why) (11.21.2024)
+//                             for dailyQuest in dailyQuests {
+//                                 if dailyQuest.questName == quest.name {
+//                                     dailyQuest.quest = quest
+//                                 }
+//                             }
+//                         }
+//                     }
+                         
+                             
+                         
+                         
 
                      
                  }
@@ -225,7 +242,17 @@ struct ContentView: View {
                      for quest in quests {
                          quest.updateTier()
                          quest.updateMomentumLevel()
+                         if quest.inTrashCan {
+                             if let deletedTime = quest.deletedTime {
+                                 if calculateDaysBetweenTwoDates(from: deletedTime, to: .now) > 30 {
+                                     modelContext.delete(quest)
+                                 }
+                             }
+
+                         }
+
                      }
+                     
                      
                      
                  }

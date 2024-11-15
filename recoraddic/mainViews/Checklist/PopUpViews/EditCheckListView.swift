@@ -107,9 +107,30 @@ struct EditCheckListView: View {
                             }
                             else {
                                 let dailyQuestsNowAndWill: [DailyQuest] = currentDailyRecord.dailyQuestList! + dailyQuests_tmp
-                                let quests_notAdded: [Quest] = quests_visible.filter({quest in !(dailyQuestsNowAndWill.map({dailyQuest in dailyQuest.questName}).contains(quest.name)) })
+                                let quests_notAdded: [Quest] = quests_visible
+                                    .filter({
+                                        quest in !(dailyQuestsNowAndWill.map({dailyQuest in dailyQuest.questName}).contains(quest.name))
+                                    })
+                                    .sorted(by:{
+                                        if $0.momentumLevel != $1.momentumLevel {
+                                            return $0.momentumLevel > $1.momentumLevel
+                                        } else if $0.tier != $1.tier {
+                                            return $0.tier > $1.tier
+                                        }
+                                        else if $0.dataType != $1.dataType {
+                                            return $0.dataType < $1.dataType  // Sort by Age in ascending order
+                                        }
+    //                                    else if $0.name != $1.name {
+    //                                        return $0.name < $1.name  // Sort by Age in ascending order
+    //                                    }
+                                        else {
+                                            return $0.createdTime > $0.createdTime
+                                        }
+
+                                    })
 //                                ForEach(quests_notHidden) { quest in
-                                ForEach(quests_notAdded) { quest in
+//                                ForEach(quests_notAdded, id:\.id) { quest in
+                                ForEach(quests_notAdded, id:\.name) { quest in
                                     Button(action:{
                                         let newDailyQuest_tmp = DailyQuest(questName: quest.name, data: 0, dataType: quest.dataType, defaultPurposes: quest.recentPurpose, customDataTypeNotation: quest.customDataTypeNotation)
                                         newDailyQuest_tmp.currentTier = quest.tier
@@ -363,6 +384,7 @@ struct EditCheckListView: View {
     func addAll() -> Void {
         for dailyQuest in dailyQuests_tmp {
             dailyQuest.dailyRecord = currentDailyRecord
+            dailyQuest.quest = quests.first(where: {$0.name == dailyQuest.questName})
             modelContext.insert(dailyQuest)
         }
         

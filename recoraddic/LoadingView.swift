@@ -48,6 +48,7 @@ struct LoadingView_initialization: View {
 }
 
 #Preview(body: {
-    LoadingView_initialization()
-        .containerRelativeFrame([.horizontal,.vertical])
+//    LoadingView_initialization()
+    LoadingView()
+//        .containerRelativeFrame([.horizontal,.vertical])
 })

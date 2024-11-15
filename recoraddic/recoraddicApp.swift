@@ -7,9 +7,6 @@
 
 
 
-// MARK: Recoraddic의 기조: 1)기록 삭제는 가능하지만 기록 수정은 불가능하다. 2)각각의 기록 삭제(quest <-> dr&drs)는 서로의 데이터에 영향을 끼치지 않는다.
-
-
 // openSettingsURLString -> For direct to cloud setting
 
 
@@ -27,7 +24,11 @@ struct recoraddicApp: App {
 //    @StateObject private var activityManager = ActivityManager()
 
     
-    static let container = try! ModelContainer(for:Schema([Quest.self, Todo.self, DailyQuest.self, DailyRecord.self, DailyRecordSet.self, Profile.self, Todo_preset.self]), configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic))
+    static let container = try! ModelContainer(
+        for:Schema([Quest.self, Todo.self, DailyQuest.self, DailyRecord.self, DailyRecordSet.self, Profile.self, Todo_preset.self]),
+        migrationPlan: RecoraddicMigrationPlan.self,
+        configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic)
+    )
 
     var syncManager: SyncManager = SyncManager()
 
@@ -143,7 +144,7 @@ struct ContentView_withLaunchScreen:View {
         }
         else {
             LoadingView()
-                .containerRelativeFrame([.horizontal,.vertical])
+//                .containerRelativeFrame([.horizontal,.vertical])
                 .onAppear() {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         withAnimation {

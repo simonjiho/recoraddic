@@ -32,7 +32,7 @@ let defaultPurposeExpression1:[String:String] = [
 let defaultPurposeExpression2:[String:String] = [
     DefaultPurpose.hlt: "건강한",
     DefaultPurpose.cmp: "승부욕 강한",
-    DefaultPurpose.ent: "행복한",
+    DefaultPurpose.ent: "인생을 즐기는",
     DefaultPurpose.atr: "매력적인",
     DefaultPurpose.inq: "호기심 많은",
     DefaultPurpose.ach: "열정적인",

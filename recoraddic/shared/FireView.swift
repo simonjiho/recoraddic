@@ -89,6 +89,7 @@ func frameCount(momentumLevel:Int) -> Int {
 func fireSizeRatio(momentumLevel:Int) -> CGFloat {
     
     if momentumLevel == 0 { return 0.6}
+    if momentumLevel == 25 { return 1.2 }
     
     switch momentumLevel%6 {
     case 1: return 0.6

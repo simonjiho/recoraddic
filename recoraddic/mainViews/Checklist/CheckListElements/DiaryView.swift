@@ -70,7 +70,7 @@ struct InShortView: View {
                         TextField("하루를 요약해보세요",text:$inShortText)
                             .frame(width:geoWidth*(keyBoard ? 0.77 : 0.9), alignment: .trailing)
                             .lineLimit(3)
-                            .minimumScaleFactor(0.7)
+                            .minimumScaleFactor(keyBoard ? 1.0 : 0.8)
                             .focused($keyBoard)
                             .maxLength(50, text: $inShortText)
                         

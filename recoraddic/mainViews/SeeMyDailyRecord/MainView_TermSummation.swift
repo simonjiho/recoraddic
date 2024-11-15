@@ -259,7 +259,9 @@ struct DrsSummationView: View {
                 if let max = standardDateToLocalStartOfDay(std: drs.end)  {
 //                    print(min)
 //                    print(max)
-                    return min...max
+                    if min <= max { return min...max }
+                    else { return max...max }
+                    
                 }
                 else {
                     return min...Calendar.current.date(byAdding: .year, value: 50, to: min)!
@@ -292,7 +294,6 @@ struct DrsSummationView: View {
         }()
         
         
-//        let dailyRecords_visible: [DailyRecord] = drs.visibleDailyRecords()
         
         let showHiddenQuests = profiles.first?.showHiddenQuests ?? false
 
@@ -302,11 +303,13 @@ struct DrsSummationView: View {
         let dailyRecords_withDiaries:[DailyRecord] = dailyRecords_visible.filter({$0.dailyTextType != nil && $0.dailyText != ""})
 
         
-        let shadowColor: Color = getShadowColor(colorScheme)
         
         
         
-        let quests_recorded:[Quest] = quests.filter{showHiddenQuests ? true : !$0.isHidden}.filter{$0.getCumulative(from: drsStart, to: drsEnd) > 0}
+        let quests_recorded:[Quest] = quests
+            .filter{!$0.inTrashCan}
+            .filter{showHiddenQuests ? true : !$0.isHidden}
+            .filter{$0.getCumulative(from: drsStart, to: drsEnd) > 0}
         
         let quests_recorded_hours:[Quest] = quests_recorded.filter{$0.dataType == DataType.hour.rawValue}
 

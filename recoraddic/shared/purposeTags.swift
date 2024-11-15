@@ -36,7 +36,7 @@ struct PurposeOfDailyQuestView_circle_checkMark: View {
             
             .popover(isPresented: $popUp_changePurpose) {
                 ChoosePurposeView_dailyQuest(dailyQuest: dailyQuest)
-                    .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
+                    .frame(width:parentWidth*0.8, height: parentWidth*0.8) // 12개 3*4 grid => 13개 4*4 grid
                     .presentationCompactAdaptation(.popover)
                 
             }
@@ -68,7 +68,7 @@ struct PurposeOfTodoView_circle_checkMark: View {
             }
             .popover(isPresented: $popUp_changePurpose) {
                 ChoosePurposeView_todo(todo: todo)
-                    .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
+                    .frame(width:parentWidth*0.8, height: parentWidth*0.8) // 13개 4*4 grid
                     .presentationCompactAdaptation(.popover)
                     .onDisappear() {
                         if let todo_preset = todos_preset.first(where:{$0.content == todo.content}) {
@@ -130,7 +130,7 @@ struct PurposeOfDailyQuestView: View {
                 //                                    .popover(isPresented: $popUp_changePurpose) {
                 .popover(isPresented: $popUp_changePurpose) {
                     ChoosePurposeView_dailyQuest(dailyQuest: dailyQuest)
-                        .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
+                        .frame(width:parentWidth*0.8, height: parentWidth*0.8) // 13개 4*4 grid
                         .presentationCompactAdaptation(.popover)
                         .onDisappear() {
                             if let quest = quests.first(where:{$0.name == dailyQuest.questName && !$0.inTrashCan}) {
@@ -204,7 +204,7 @@ struct PurposeOfQuestView: View {
                 .frame(width:geoWidth, height:geoHeight)
                 .popover(isPresented: $popUp_changePurpose) {
                     ChoosePurposeView_Quest(quest: quest)
-                        .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
+                        .frame(width:parentWidth*0.8, height: parentWidth*0.8) // 13개 4*4 grid
                         .presentationCompactAdaptation(.popover)
                     
                 }
@@ -277,7 +277,8 @@ struct PurposeOfQuestView_redesigned: View {
                 .frame(width:geoWidth, height:geoHeight)
                 .popover(isPresented: $popUp_changePurpose) {
                     ChoosePurposeView_Quest(quest: quest)
-                        .frame(width:UIScreen.main.bounds.width*0.6, height: UIScreen.main.bounds.width*0.8) // 12개 3*4 grid
+                        .frame(width:UIScreen.main.bounds.width*0.8, height: UIScreen.main.bounds.width*0.8) // 13개 4*4 grid
+
                         .presentationCompactAdaptation(.popover)
                     
                 }
@@ -336,7 +337,7 @@ struct PurposeOfTodoView: View {
                 //                                    .popover(isPresented: $popUp_changePurpose) {
                 .popover(isPresented: $popUp_changePurpose) {
                     ChoosePurposeView_todo(todo: todo)
-                        .frame(width:parentWidth*0.6, height: parentWidth*0.8) // 12개 3*4 grid
+                        .frame(width:parentWidth*0.8, height: parentWidth*0.8) // 15개 4*4 grid
                         .presentationCompactAdaptation(.popover)
                         .onDisappear() {
                             if let todo_preset = todos_preset.first(where:{$0.content == todo.content}) {
@@ -364,7 +365,7 @@ struct ChoosePurposeView_Quest: View {
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
-            let gridSize = geoWidth/3
+            let gridSize = geoWidth/4
             let tagSize = gridSize*0.8
             
 
@@ -419,7 +420,7 @@ struct ChoosePurposeView_dailyQuest: View {
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
-            let gridSize = geoWidth/3
+            let gridSize = geoWidth/4
             let tagSize = gridSize*0.8
             
 
@@ -473,7 +474,7 @@ struct ChoosePurposeView_todo: View {
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
-            let gridSize = geoWidth/3
+            let gridSize = geoWidth/4
             let tagSize = gridSize*0.8
             LazyVGrid(columns: [GridItem(.adaptive(minimum: tagSize))],spacing: tagSize*0.2) {
 

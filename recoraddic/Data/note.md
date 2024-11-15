@@ -54,3 +54,6 @@ inverse 관계 없을 때:
 
 
 - modelContext apply the changes asynchronously,which causes undefined result if the main thread tries to approach the data from modelContext. it may need time interval to adjust the changes and execute the code appropriately. 
+
+
+- CAUTION: don't ever try to add new property to the existing modelContainer. It must follow proper schema migration to adjust changes of data structure. If not, the runtime error occurs on initial app entrance, from the modelContainer(if it is defined by "try!").

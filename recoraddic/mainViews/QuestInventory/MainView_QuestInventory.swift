@@ -156,6 +156,7 @@ struct MainView_QuestInventory: View {
                                                 
                                                 Button("휴지통으로 이동", systemImage:"trash") {
                                                     quest.inTrashCan = true
+                                                    quest.deletedTime = Date()
                                                 }
                                                 .foregroundStyle(.red)
                                             }))
@@ -274,6 +275,12 @@ struct MainView_QuestInventory: View {
                         )
                         .ignoresSafeArea(.keyboard)
                         .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                        .onAppear() {
+                            if let quest = selectedQuest {
+                                print("check if dailyQuest is connected")
+                                print(quest.dailyQuests?.count)
+                            }
+                        }
                     }
                 }
 
@@ -302,6 +309,7 @@ struct MainView_QuestInventory: View {
                     popUp_editQuest: $editQuestInfo,
                     selectedQuest: $selectedQuest
                 )
+
             }
             .sheet(isPresented: $isEdit) {
 //                if popUp_confirmation {
@@ -375,6 +383,7 @@ struct MainView_QuestInventory: View {
                         for selectedQuestName in selectedQuestNames {
                             if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName && !$0.inTrashCan}).first {
                                 targetQuest.inTrashCan = true
+                                targetQuest.deletedTime = Date()
                             }
                         }
                     }
@@ -1196,8 +1205,39 @@ struct CreateNewQuest: View {
                 }
             }
         }
-        newQuest.updateTier()
+        
         modelContext.insert(newQuest)
+        try? modelContext.save()
+
+        
+        let dataType_rawVal:Int = questDataTypeToAppend.rawValue
+        
+        let predicate = #Predicate<DailyQuest> { dailyQuest in
+            dailyQuest.quest == nil && dailyQuest.questName == questNameToAppend && dailyQuest.dataType == dataType_rawVal && dailyQuest.customDataTypeNotation == customDataTypeNotation
+        }
+        let descriptor = FetchDescriptor(predicate: predicate)
+        try! modelContext.enumerate(
+            descriptor,
+            batchSize: 5000,
+            allowEscapingMutations: true
+        ) { dailyQuest in
+            
+            dailyQuest.quest = newQuest
+            
+            if let date = dailyQuest.dailyRecord?.date {
+                if dailyQuest.data != 0 { newQuest.dailyData[date] = dailyQuest.data }
+            }
+            
+
+            try? modelContext.save()
+            
+        }
+        
+        
+        newQuest.updateTier()
+        newQuest.updateMomentumLevel()
+
+        
     }
     
     
@@ -1325,6 +1365,8 @@ struct EditQuest2: View {
                 pastCumulative: quest.pastCumulatve/60,
                 pastCumulative_str: String(quest.pastCumulatve/60)
             )
+
+            
         } else {
             Spacer()
         }

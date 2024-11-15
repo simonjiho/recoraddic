@@ -30,8 +30,8 @@ extension ContentView {
     func situation_YesterdayDataRemains() -> Void {
         print("generating example data.....")
         
-        let q1 = Quest(name: "Workout", dataType: DataType.hour.rawValue)
-        let q2 = Quest(name: "Create apps", dataType: DataType.hour.rawValue)
+        let q1 = Quest(name: "운동", dataType: DataType.hour.rawValue)
+        let q2 = Quest(name: "기타 연습", dataType: DataType.hour.rawValue)
         let q3 = Quest(name: "Drink milk", dataType: DataType.custom.rawValue)
         q3.customDataTypeNotation = "ml"
         
@@ -69,8 +69,8 @@ extension ContentView {
         
         let initialDailyRecordSet = DailyRecordSet(start:day1)
         initialDailyRecordSet.dailyRecordThemeName = "StoneTower"
-        initialDailyRecordSet.termGoals.append("앱 완성하기")
-        initialDailyRecordSet.termGoals.append("2일이상 쉬지 않고 운동하기")
+//        initialDailyRecordSet.termGoals.append("앱 완성하기")
+        initialDailyRecordSet.termGoals.append("2일이상 쉬지 않고 ㅋ운동하기")
 //        initialDailyRecordSet.dailyQuestions.append(recoraddic.defaultQuestions[0])
         modelContext.insert(initialDailyRecordSet)
         
@@ -79,7 +79,7 @@ extension ContentView {
         
         let dr1 = DailyRecord(date:day1)
         let dr1_qd1 = DailyQuest(
-            questName: "Workout",
+            questName: "운동",
             data: 5,
             dataType: DataType.hour.rawValue,
             defaultPurposes: Set([DefaultPurpose.hlt, DefaultPurpose.atr]),

@@ -233,12 +233,14 @@ struct FilteredQuests: View {
                                     quest.isArchived = false
                                     quest.isHidden = false
                                     quest.inTrashCan = false
+                                    quest.deletedTime = nil
                                 }
                                 if filteredOption != "isArchived" {
                                     Button("보관") {
                                         quest.isArchived = true
                                         quest.isHidden = false
                                         quest.inTrashCan = false
+                                        quest.deletedTime = nil
                                     }
                                 }
                                 if filteredOption != "isHidden" {
@@ -246,6 +248,7 @@ struct FilteredQuests: View {
                                         quest.isArchived = false
                                         quest.isHidden = true
                                         quest.inTrashCan = false
+                                        quest.deletedTime = nil
                                     }
                                 }
                                 if filteredOption != "inTrashCan" {
@@ -253,6 +256,7 @@ struct FilteredQuests: View {
                                         quest.isArchived = false
                                         quest.isHidden = false
                                         quest.inTrashCan = true
+                                        quest.deletedTime = Date()
                                     }
                                 }
                                 if filteredOption == "inTrashCan" {

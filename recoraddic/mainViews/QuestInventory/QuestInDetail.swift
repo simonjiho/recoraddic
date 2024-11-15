@@ -93,6 +93,7 @@ struct QuestInDetail: View {
                                             alert_sameName.toggle()
                                         } else {
                                             quest.inTrashCan = false
+                                            quest.deletedTime = nil
                                             popUp_questStatisticsInDetail.toggle()
                                         }
                                         alert_restore.toggle()
@@ -386,6 +387,7 @@ struct QuestInDetail: View {
                                     quest.isArchived = false
                                     quest.isHidden = false
                                     quest.inTrashCan = true
+                                    quest.deletedTime = Date()
                                 }
                                 .foregroundStyle(.red)
                                 Button("취소") {
@@ -786,17 +788,17 @@ struct SerialVisualization:View {
                 let firstRow:[Date]? = date_partition.first
                 let lastRow:[Date]? = date_partition.last
                 
-                
 
                 switch date_partition.count {
                 case 0:
                     Spacer()
                 case 1:
-                        
+                    let offsetNum: Int = 7 - Calendar.current.component(.weekday, from:firstRow!.last!)
                     let doneList_firstRow: [Bool] = firstRow!.map{data.keys.contains($0)}
                     RowContent(dates:firstRow!,doneList:doneList_firstRow, isFirst: true, tier: tier)
                         .frame(width:elementSize*7, height: elementSize)
                         .zIndex(containsFirstDateOfMonth(dates: firstRow!) ? 2 : 1)
+                        .offset(x:-Double(offsetNum)*elementSize)
                     
                 default:
                     let middleRows:[[Date]] = {
@@ -805,12 +807,14 @@ struct SerialVisualization:View {
                         a.removeLast()
                         return a
                     }()
-                    
+                    let offsetNum: Int = 7 - Calendar.current.component(.weekday, from:firstRow!.last!)
+
                     
                     let doneList_firstRow: [Bool] = firstRow!.map{data.keys.contains($0)}
                     RowContent(dates:firstRow!,doneList:doneList_firstRow, isFirst: true, tier: tier)
                         .frame(width:elementSize*7, height: elementSize)
                         .zIndex(containsFirstDateOfMonth(dates: firstRow!) ? 2 : 1)
+                        .offset(x:-Double(offsetNum)*elementSize)
 
 
 
@@ -1076,9 +1080,6 @@ struct EditQuest: View {
 
                     
                     HStack {
-//                        Text("이름:")
-//                            .frame(width:textBoxWidth,alignment: .trailing)
-//                            .font(.title3)
                         TextField("퀘스트 이름", text:$questName)
                             .tag(0)
                             .font(.title2)
@@ -1287,30 +1288,54 @@ struct EditQuest: View {
         let newSubName = addSubName ? questSubname : nil
         let newGetName = newSubName ?? newName
         
-        let predicate = #Predicate<DailyQuest> { dailyQuest in
-            dailyQuest.questName == oldName
-        }
-        let descriptor = FetchDescriptor(predicate: predicate)
-        try! modelContext.enumerate(
-            descriptor,
-            batchSize: 5000,
-            allowEscapingMutations: false
-        ) { dailyQuest in
-            if let alermTime = dailyQuest.notfTime {
-                if alermTime > Date() && oldGetName != newGetName {
-                    removeNotification(at: alermTime, for: oldGetName)
-                    scheduleNotification(at: alermTime, for: newGetName, goal: dailyQuest.dailyGoal, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation)
+        
+        if let dailyQuests = quest.dailyQuests {
+            for dailyQuest in dailyQuests {
+                if let alermTime = dailyQuest.notfTime {
+                    if alermTime > Date() && oldGetName != newGetName {
+                        removeNotification(at: alermTime, for: oldGetName)
+                        scheduleNotification(at: alermTime, for: newGetName, goal: dailyQuest.dailyGoal, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation)
+                    }
                 }
+                dailyQuest.questName = newName
+                if addSubName {
+                    dailyQuest.questSubName = newSubName
+                } else {
+                    dailyQuest.questSubName = nil
+                }
+                if questDataType == .custom { dailyQuest.customDataTypeNotation = customDataTypeNotation }
+    
+                try? modelContext.save()
             }
-            dailyQuest.questName = newName
-            if addSubName {
-                dailyQuest.questSubName = newSubName
-            } else {
-                dailyQuest.questSubName = nil
-            }
-            if questDataType == .custom { dailyQuest.customDataTypeNotation = customDataTypeNotation }
-
         }
+        
+//        let predicate = #Predicate<DailyQuest> { dailyQuest in
+//            dailyQuest.questName == oldName
+//        }
+//        let descriptor = FetchDescriptor(predicate: predicate)
+//        try! modelContext.enumerate(
+//            descriptor,
+//            batchSize: 5000,
+//            allowEscapingMutations: true
+////            allowEscapingMutations: true
+//        ) { dailyQuest in
+//            if let alermTime = dailyQuest.notfTime {
+//                if alermTime > Date() && oldGetName != newGetName {
+//                    removeNotification(at: alermTime, for: oldGetName)
+//                    scheduleNotification(at: alermTime, for: newGetName, goal: dailyQuest.dailyGoal, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation)
+//                }
+//            }
+//            dailyQuest.questName = newName
+//            if addSubName {
+//                dailyQuest.questSubName = newSubName
+//            } else {
+//                dailyQuest.questSubName = nil
+//            }
+//            if questDataType == .custom { dailyQuest.customDataTypeNotation = customDataTypeNotation }
+//
+//            try? modelContext.save() -> 없으면 저장 안 될 때도 있는 듯
+//        }
+        
         
         
 
