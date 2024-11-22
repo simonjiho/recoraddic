@@ -556,6 +556,9 @@ struct MainView_checklist: View {
             let newNilDailyRecord2: DailyRecord = DailyRecord()
             modelContext.insert(newNilDailyRecord2)
         }
+        
+        try? modelContext.save()
+
     }
     
     func findDailyRecordSet(_ date: Date) -> DailyRecordSet?  {

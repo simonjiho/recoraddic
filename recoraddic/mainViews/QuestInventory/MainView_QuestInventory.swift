@@ -275,12 +275,12 @@ struct MainView_QuestInventory: View {
                         )
                         .ignoresSafeArea(.keyboard)
                         .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                        .onAppear() {
-                            if let quest = selectedQuest {
-                                print("check if dailyQuest is connected")
-                                print(quest.dailyQuests?.count)
-                            }
-                        }
+//                        .onAppear() {
+//                            if let quest = selectedQuest {
+//                                print("check if dailyQuest is connected")
+//                                print(quest.dailyQuests?.count)
+//                            }
+//                        }
                     }
                 }
 
@@ -1236,6 +1236,9 @@ struct CreateNewQuest: View {
         
         newQuest.updateTier()
         newQuest.updateMomentumLevel()
+        
+        try? modelContext.save()
+
 
         
     }

@@ -27,9 +27,8 @@ import SwiftData
 enum RecoraddicSchemaV2: VersionedSchema {
     static var versionIdentifier: Schema.Version = Schema.Version(1, 0, 7)
     
-    static var models: [any PersistentModel.Type] {
-        [DailyQuest.self, Todo.self, Todo_preset.self, DailyRecordSet.self, DailyRecord.self, Quest.self, Profile.self]
-    }
+    static var models: [any PersistentModel.Type] = [DailyQuest.self, Todo.self, Todo_preset.self, DailyRecordSet.self, DailyRecord.self, Quest.self, Profile.self]
+
     
     // 여기에 데이터를 따로 담는 이유: quest가 삭제 되어도 일일기록은 남게 하기 위해
     @Model
@@ -76,32 +75,9 @@ enum RecoraddicSchemaV2: VersionedSchema {
             // Add any other properties that should be included in the hash
         }
         
-        func dataForDataRepresentation() -> (Int, Int, String?) {
-            return (data, dataType, customDataTypeNotation)
-        }
+
         
-        func getName() -> String {
-            if let subName = self.questSubName {
-                return subName
-            } else {
-                return self.questName
-            }
-        }
-        
-        //    func modifyData(_ newData: Int) -> Void {
-        //        if self.data != 0 && newData == 0 {
-        //
-        //        }
-        //        else if self.data == 0 && newData != 0 {
-        //
-        //        }
-        //
-        //
-        //        self.data = newData
-        //    }
-        //
-        //    func modifyDailyText(_ newDailyText: String) -> Void {
-        //    }
+
         
     }
     
@@ -195,146 +171,7 @@ enum RecoraddicSchemaV2: VersionedSchema {
         }
         
         
-        func getIntegratedDailyRecordColor(colorScheme:ColorScheme) -> Color {
-            if self.dailyRecordThemeName == "StoneTower" {
-                return TowerView.getIntegratedDailyRecordColor(
-                    index: dailyRecordColorIndex,
-                    colorScheme: colorScheme
-                )
-            }
-            else {
-                return TowerView.getIntegratedDailyRecordColor(
-                    index: dailyRecordColorIndex,
-                    colorScheme: colorScheme
-                )
-            }
-        }
-        
-        
-        
-        func getTerm_string() -> String {
-            if self.end != nil {
-                return "\(yymmddFormatOf(self.start)) ~ \(yymmddFormatOf(self.end!))"
-            }
-            else {
-                return "\(yymmddFormatOf(self.start)) ~ "
-            }
-        }
-        
-        
-        
-        func updateDailyRecordsMomentum() -> Void { // modify absence and streak
-            if let dailyRecords = self.dailyRecords {
-                let dates = dailyRecords.filter({$0.hasContent}).compactMap({$0.date}).sorted()
-                for dailyRecord in dailyRecords {
-                    if let date = dailyRecord.date {
-                        let dates_beforeDate:[Date] = dates.filter({$0 < date})
-                        if let nearestDate:Date = dates_beforeDate.last {
-                            dailyRecord.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
-                            if dailyRecord.absence == 0 {
-                                dailyRecord.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
-                            } else {
-                                dailyRecord.streak = 0
-                            }
-                        } else { // first dailyRecord in drs
-                            dailyRecord.absence = 0
-                            dailyRecord.streak = 0
-                        }
-                    }
-                }
-            }
-        }
-        
-        func getLocalStart() -> Date {
-            let date = self.start
-            var calendar = Calendar.current
-            calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
-            // Extract year, month, and day components in UTC
-            let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
-            // Set calendar to local time zone
-            calendar.timeZone = TimeZone.current
-            // Create a date from the components, now interpreted in the local time zone
-            return calendar.date(from: dateComponents) ?? date
-            
-            
-        }
-        func getLocalEnd() -> Date? {
-            if let date = self.end {
-                var calendar = Calendar.current
-                calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
-                // Extract year, month, and day components in UTC
-                let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
-                // Set calendar to local time zone
-                calendar.timeZone = TimeZone.current
-                // Create a date from the components, now interpreted in the local time zone
-                return calendar.date(from: dateComponents) ?? date
-            } else {
-                return nil
-            }
-            
-        }
-        
-        
-        func visibleDailyRecords(hiddenQuestNames:Set<String>, showHiddenQuests:Bool) -> [DailyRecord] {
-            let dailyRecords_filtered = self.dailyRecords!
-                .filter({$0.hasContent && $0.date != nil})
-                .filter({($0.getLocalDate() ?? getStartDateOfNow()) < .now })
-            if showHiddenQuests {
-                return dailyRecords_filtered
-                    .sorted(by: {
-                        if let date0 = $0.date, let date1 = $1.date {
-                            return date0 > date1  // Sorts by date in descending order if both dates are non-nil
-                        } else if $0.date == nil {
-                            return false  // Places items with nil date after those with a non-nil date
-                        } else {
-                            return true  // Ensures $0 with a date is before $1 with nil
-                        }
-                    })
-            } else {
-                return dailyRecords_filtered
-                    .filter({
-                        $0.hasTodoOrDiary ||
-                        !Set($0.dailyQuestList!.filter({$0.data != 0}).map{$0.questName}).subtracting(hiddenQuestNames).isEmpty
-                    })
-                    .sorted(by:{
-                        if let date0 = $0.date, let date1 = $1.date {
-                            return date0 > date1  // Sorts by date in descending order if both dates are non-nil
-                        } else if $0.date == nil {
-                            return false  // Places items with nil date after those with a non-nil date
-                        } else {
-                            return true  // Ensures $0 with a date is before $1 with nil
-                        }
-                    }
-                    )
-            }
-        }
-        
-        
-        //    func increaseStreak(from date:Date) {
-        //        if let dailyRecords = self.dailyRecords {
-        //            for dailyRecord in dailyRecords {
-        //
-        //
-        //            }
-        //        }
-        //
-        //        if let dates = dailyRecordSet.dailyRecords?.filter({$0.recordedAmount > 0}).map({ $0.date }) {
-        //            if let date = self.date {
-        //                let dates_beforeDate:[Date] = dates.compactMap({$0}).filter({$0 < date})
-        //                if let nearestDate:Date = dates_beforeDate.sorted().last {
-        //                    self.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
-        //                    if self.absence == 0 {
-        //                        self.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
-        //                    } else {
-        //                        self.streak = 0
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //    func decreaseStreak(from:Date) {
-        //
-        //    }
+
         
     }
     
@@ -397,63 +234,17 @@ enum RecoraddicSchemaV2: VersionedSchema {
         
         
         
-        
-        func updateRecordedMinutes() -> Void {
-            if let dailyQuestList = self.dailyQuestList {
-                self.recordedMinutes = sumIntArray(dailyQuestList.filter({dataTypeFrom($0.dataType) == DataType.hour}).map({$0.data}))
-            }
-        }
-        
-        func updateExternalFactors() -> Void {
-            if let dailyRecordSet = self.dailyRecordSet {
-                if let dates = dailyRecordSet.dailyRecords?.filter({$0.hasContent}).map({ $0.date }) {
-                    if let date = self.date {
-                        let dates_beforeDate:[Date] = dates.compactMap({$0}).filter({$0 < date})
-                        if let nearestDate:Date = dates_beforeDate.sorted().last {
-                            self.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
-                            if self.absence == 0 {
-                                self.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
-                            } else {
-                                self.streak = 0
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        func getLocalDate() -> Date? {
-            if let date = self.date {
-                //            print("convert \(date) into")
-                var calendar = Calendar.current
-                calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
-                // Extract year, month, and day components in UTC
-                let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
-                // Set calendar to local time zone
-                calendar.timeZone = TimeZone.current
-                // Create a date from the components, now interpreted in the local time zone
-                //            print("\(calendar.date(from: dateComponents))")
-                
-                return calendar.date(from: dateComponents) ?? date
-            } else {
-                
-                return nil
-            }
-            
-        }
-        
-        
     }
     
     
     @Model
     class Quest: Equatable, Identifiable, Hashable {
         
+        var id: UUID = UUID()
         
         var createdTime: Date = Date()
         var deletedTime: Date? = nil
         
-        var id: UUID = UUID()
         var name: String = ""
         var subName: String? //MARK: 아직 사용하지는 않지만, 일단 만들어둠. 쓸까 말까..
         var dataType: Int = 0
@@ -485,7 +276,7 @@ enum RecoraddicSchemaV2: VersionedSchema {
         
         
         //        @Relationship(deleteRule:.cascade, inverse: \DailyQuest.quest)
-        @Relationship(inverse: \DailyQuest.quest)
+        @Relationship(deleteRule: .nullify, inverse: \DailyQuest.quest)
         var dailyQuests:[DailyQuest]? = []
         
         
@@ -511,26 +302,11 @@ enum RecoraddicSchemaV2: VersionedSchema {
         
         
         
-        func isVisible() -> Bool {
-            return !isArchived && !isHidden && !inTrashCan
-        }
+
         
         
         
-        func getName() -> String {
-            if let subName = self.subName {
-                return subName
-            } else {
-                return self.name
-            }
-        }
-        
-        func getCumulative(from start:Date, to end:Date?) -> Int {
-            return self.dailyData.filter({$0.key >= start && $0.key <= (end ?? $0.key)}).values.reduce(0,+)
-        }
-        func getCount(from start:Date, to end:Date?) -> Int {
-            return self.dailyData.keys.filter({$0 >= start && $0 <= (end ?? $0) }).count
-        }
+
         
         
     }

@@ -22,13 +22,14 @@ struct recoraddicApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 //    @StateObject private var activityManager = ActivityManager()
+    @StateObject private var containerHolder = ModelContainerHolder()
 
     
-    static let container = try! ModelContainer(
-        for:Schema([Quest.self, Todo.self, DailyQuest.self, DailyRecord.self, DailyRecordSet.self, Profile.self, Todo_preset.self]),
-        migrationPlan: RecoraddicMigrationPlan.self,
-        configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic)
-    )
+//    static let container = try? ModelContainer(
+//        for:Schema([Quest.self, Todo.self, DailyQuest.self, DailyRecord.self, DailyRecordSet.self, Profile.self, Todo_preset.self]),
+//        migrationPlan: RecoraddicMigrationPlan.self,
+//        configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic)
+//    )
 
     var syncManager: SyncManager = SyncManager()
 
@@ -39,32 +40,40 @@ struct recoraddicApp: App {
 
         
         WindowGroup {
-            ContentView_withLaunchScreen()
-            //                .environmentObject(activityManager)
-                .onAppear() {
-                    print("App started")
-                    if UserDefaults.standard.value(forKey: "stateSerialization") == nil {
-                        UserDefaults.standard.setValue(nil, forKey: "stateSerialization")
+//            Text("????")
+            if let container = containerHolder.container {
+                ContentView_withLaunchScreen()
+                    .modelContainer(container)
+    //                .environmentObject(activityManager)
+                    .onAppear() {
+                        print("App started")
+                        if UserDefaults.standard.value(forKey: "stateSerialization") == nil {
+                            UserDefaults.standard.setValue(nil, forKey: "stateSerialization")
+                        }
+                        
+                        if UserDefaults.standard.value(forKey: "initialization") == nil {
+                            UserDefaults.standard.setValue(true, forKey: "initialization")
+                        }
+                        if UserDefaults.standard.value(forKey: "shouldBlockTheView") == nil {
+                            UserDefaults.standard.setValue(false,forKey: "shouldBlockTheView") // at initial, it starts with true
+                        }
+                        if UserDefaults.standard.value(forKey: "iCloudAvailable_forTheFirstTime") == nil {
+                            UserDefaults.standard.setValue(false,forKey: "iCloudAvailable_forTheFirstTime")
+                        }
+                        if UserDefaults.standard.value(forKey: "fetchDone") == nil {
+                            UserDefaults.standard.setValue(false,forKey: "fetchDone")
+                        }
                     }
-                    
-                    if UserDefaults.standard.value(forKey: "initialization") == nil {
-                        UserDefaults.standard.setValue(true, forKey: "initialization")
-                    }
-                    if UserDefaults.standard.value(forKey: "shouldBlockTheView") == nil {
-                        UserDefaults.standard.setValue(false,forKey: "shouldBlockTheView") // at initial, it starts with true
-                    }
-                    if UserDefaults.standard.value(forKey: "iCloudAvailable_forTheFirstTime") == nil {
-                        UserDefaults.standard.setValue(false,forKey: "iCloudAvailable_forTheFirstTime")
-                    }
-                    if UserDefaults.standard.value(forKey: "fetchDone") == nil {
-                        UserDefaults.standard.setValue(false,forKey: "fetchDone")
-                    }
-                }
+
+            }
+            else {
+                LoadingView_fetch(retryCount: containerHolder.getRetryCount())
+//                Text("waiting to fetch...")
+            }
             
 
         }
 
-        .modelContainer(Self.container)
 
     
 
@@ -156,5 +165,42 @@ struct ContentView_withLaunchScreen:View {
             }
 
     }
+    
 
+}
+
+
+class ModelContainerHolder: ObservableObject {
+    @Published var container: ModelContainer?
+    private var retryCount = 0
+    private let maxRetries = 3
+
+    init() {
+        initializeContainer()
+    }
+        
+    func getRetryCount() -> Int {return retryCount}
+    private func initializeContainer() {
+        do {
+            container = try ModelContainer(
+                for: Schema([Quest.self, Todo.self, DailyQuest.self, DailyRecord.self, DailyRecordSet.self, Profile.self, Todo_preset.self]),
+                migrationPlan: RecoraddicMigrationPlan.self,
+                configurations: ModelConfiguration(cloudKitDatabase: .automatic)
+            )
+            print("ModelContainer initialized successfully.")
+        } catch {
+            print("Failed to create ModelContainer: \(error.localizedDescription)")
+            if retryCount < maxRetries {
+                retryCount += 1
+                // Retry after a delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.initializeContainer()
+                }
+            } else {
+                // Handle the failure after retries
+                print("Failed to initialize ModelContainer after \(maxRetries) attempts.")
+                // You can update your UI to inform the user or take other appropriate actions
+            }
+        }
+    }
 }

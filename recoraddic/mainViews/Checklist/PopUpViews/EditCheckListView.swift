@@ -360,6 +360,7 @@ struct EditCheckListView: View {
                         .frame(width: geoWidth*0.4, alignment: .leading)
                         Button(action:{
                             addAll()
+                            try? modelContext.save()
                             popUp_self.toggle()
                         }) {
                             Text("추가")
