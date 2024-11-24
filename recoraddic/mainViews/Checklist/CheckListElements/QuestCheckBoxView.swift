@@ -1,5 +1,5 @@
 //
-//  QuestCheckBoxView.swift
+//  MountainCheckBoxView.swift
 //  recoraddic
 //
 //  Created by 김지호 on 12/19/23.
@@ -55,21 +55,28 @@ func getNotificationTimeString(at alermTime: Date?, from date: Date) -> String {
 
 
 
-struct QuestCheckBoxView: View {
+struct DailyAscentView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
     @Environment(\.colorScheme) var colorScheme
-    @Query var quests: [Quest]
-    var dailyQuest: DailyQuest
+    
+    @Environment(MountainsViewModel.self) var mountainsVM
+    
+//    @Bindable var dailyRecordsVM: DailyRecordsViewModel
+    
+    var mountainId:String
     
     
-    @Binding var targetDailyQuest: DailyQuest?
+    @Binding var targetMountainId: String?
     @Binding var deleteTarget: Bool
     
-    @State var value: Int
-    @State var dailyGoal: Int?
+//    @State var minutes: Int
+    @Binding var minutes: Int
+//    @State var dailyGoal: Int?
+    @Binding var dailyGoal: Int?
+    @Binding var notfTime: Date?
     var range: ClosedRange<CGFloat> {
-        return 0.0...CGFloat(dailyGoal ?? value)
+        return 0.0...CGFloat(dailyGoal ?? minutes)
     }
     @State var xOffset: CGFloat
 
@@ -79,73 +86,54 @@ struct QuestCheckBoxView: View {
     @State var showMenu: Bool = false
 //    @State var isDragging: Bool = false
     @State var isAnimating: Bool = false
-    
-
-    
-//    let menuSize:CGFloat = UIScreen.main.bounds.width * 0.2
     @State private var offset: CGFloat = 0
 
     
+    var isRecent: Bool
+    
     var body: some View {
+        let name = mountainsVM.nameOf(mountainId)
+        let tier = mountainsVM.tierOf(mountainId)
+
         
-        let height:CGFloat = qcbvHeight(dynamicTypeSize, stopWatchIsRunnig: stopwatch.isRunning, dataType: dailyQuest.dataType)
-        //            let geoHeight = geometry.size.height
+        let height:CGFloat = qcbvHeight(dynamicTypeSize, stopWatchIsRunnig: stopwatch.isRunning)
         let menuSize:CGFloat = width * 0.2
         
         let a: Path = Path(CGPath(rect: CGRect(x: 0, y: 0, width: (xOffset.isFinite && xOffset >= 0 && xOffset <= width +  0.1) ? xOffset : width, height: height), transform: nil))
-//        let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0)
-        let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0, isDark: colorScheme == .dark)
-//        let invertForegroundStyleIntoBright: Bool = {
-//            if colorScheme == .dark {
-//                if dailyQuest.data == 0  { return true }
-//                else if let dailyGoal = dailyQuest.dailyGoal {
-//                    if CGFloat(dailyQuest.data) / CGFloat(dailyGoal) <= 0.5 { return true } else { return false }
-//                }
-//                else { return false }
-//            }
-//            else {
-//                return false
-//            }
-//        }()
-//        let invertForegroundStyleIntoBright: Bool =  colorScheme == .dark && dailyQuest.data == 0
-        let invertForegroundStyleIntoBright: Bool =  colorScheme == .dark
-//        let letBackgroundStyleGray: Bool = invertForegroundStyleIntoBright || colorScheme == .light
-//        let letBackgroundStyleGray: Bool = invertForegroundStyleIntoBright || colorScheme == .light
+        let gradientColors = getGradientColorsOf(tier: tier, type:0, isDark: colorScheme == .dark)
 
-//        let gradientColors = getGradientColorsOf(tier: dailyQuest.currentTier, type:0, isDark: colorScheme == .dark)
-        
-//        let isRecent: Bool = getStartDateOfYesterday() <= dailyQuest.dailyRecord!.getLocalDate()!
+        let invertForegroundStyleIntoBright: Bool =  colorScheme == .dark
+
         
         HStack(spacing:0.0) {
             
             HStack(spacing:0.0) {
-                QuestCheckBoxContentView(
-                    dailyQuest: dailyQuest,
-                    height: height,
-                    value: $value,
+                AscentDataContentView(
+                    name: name,
+                    tier: tier,
+                    minutes: $minutes,
                     dailyGoal: $dailyGoal,
+                    hasGoal: dailyGoal != nil,
+                    hasGoal_toggle: dailyGoal != nil,
                     stopwatch: stopwatch,
-                    isAnimating: $isAnimating
+                    isAnimating: $isAnimating,
+                    isRecent: isRecent
                 )
                 .frame(width:width*7/8, height: height)
-//                .foregroundStyle(colorScheme == .dark && dailyQuest.data == 0 ? getBrightTierColorOf(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
                 .bold()
                 
                 NotificationButton(
-                    dailyQuest: dailyQuest,
+                    name: name,
+                    tier: tier,
+                    notfTime: $notfTime,
                     popOverWidth: width,
                     popOverHeight: height
                 )
                 .frame(width: width*1/8, height: height)
-//                .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
-//                .disabled(!isRecent)
-//                .opacity( isRecent ? 1.0 : 0.0)
-//                .border(.red)
+
             }
             .frame(width:width, height: height)
-//            .foregroundStyle(colorScheme == .dark ? getBrightTierColorOf2(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
-            .foregroundStyle( invertForegroundStyleIntoBright ? getBrightTierColorOf2(tier: dailyQuest.currentTier) : getDarkTierColorOf(tier: dailyQuest.currentTier))
-//            .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
+            .foregroundStyle( invertForegroundStyleIntoBright ? getBrightTierColorOf2(tier: tier) : getDarkTierColorOf(tier: tier))
             .background(
                 ZStack {
                     Color.white
@@ -155,11 +143,8 @@ struct QuestCheckBoxView: View {
                         )
                         .frame(width:width, height:height)
                         .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * width, y:0)
-//                        .opacity(colorScheme == .light ? 0.6 : 0.75)
                         .opacity(colorScheme == .light ? 0.6 : 0.9)
 
-//                        .opacity(0.6)
-//                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
                     
                     Rectangle()
                         .fill(
@@ -167,38 +152,29 @@ struct QuestCheckBoxView: View {
                         )
                         .frame(width:width, height:height)
                         .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * width, y:0)
-//                        .opacity(colorScheme == .light ? 0.6 : 0.75)
                         .opacity(colorScheme == .light ? 0.6 : 0.9)
-//                        .opacity(0.6)
-//                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
                 }
                     .frame(width:width, height:height)
                     .mask {
                         a
                     }
-
-//                    .background(colorScheme == .light ? .gray.opacity(0.3) : .white.opacity(0.85))
-//                    .background(.gray.opacity(colorScheme == .light ? 0.3 : 0.3))
-//                    .background(letBackgroundStyleGray ? .gray.opacity(0.3) : getTierColorOf(tier: dailyQuest.currentTier).opacity(0.7))
                     .background(
                         ZStack {
                             if colorScheme == .light {
                                 Color.gray.opacity(0.3)
-                                if dailyQuest.data != 0 {
-                                    getBrightTierColorOf(tier: dailyQuest.currentTier).opacity(0.05)
+                                if minutes != 0 {
+                                    getBrightTierColorOf(tier: tier).opacity(0.05)
                                 }
                             }
                             else {
                                 Color.gray.opacity(0.3)
-                                if dailyQuest.data != 0 {
-                                    getDarkTierColorOf(tier: dailyQuest.currentTier).opacity(0.3)
+                                if minutes != 0 {
+                                    getDarkTierColorOf(tier: tier).opacity(0.3)
                                 }
                             }
 
-//                            }
                         }
                     )
-//                    .background(dailyQuest.data == 0 ? .gray.opacity(0.3) : (colorScheme == .light ? getBrightTierColorOf(tier: dailyQuest.currentTier).opacity(0.05) : getTierColorOf(tier: dailyQuest.currentTier).opacity(0.7)))
                     .blur(radius: 0.5)
 
                 
@@ -228,56 +204,56 @@ struct QuestCheckBoxView: View {
         .clipShape(.buttonBorder)
         .simultaneousGesture(
             DragGesture()
-                .onChanged { value in
+                .onChanged { data in
                     
-                    targetDailyQuest = nil
+                    targetMountainId = nil
                     
                     if showMenu {
-                        if value.translation.width < 0 {
-                            let delta = log10(10 - value.translation.width*0.1)
+                        if data.translation.width < 0 {
+                            let delta = log10(10 - data.translation.width*0.1)
                             offset = (-menuSize) * (delta)
                         }
-                        else if value.translation.width > menuSize {
-                            let delta = log10(1 + (value.translation.width - menuSize)*0.01)
+                        else if data.translation.width > menuSize {
+                            let delta = log10(1 + (data.translation.width - menuSize)*0.01)
                             offset = (menuSize) * (delta)
                         }
                         else {
-                            offset = -menuSize + value.translation.width
+                            offset = -menuSize + data.translation.width
                             
                         }
                     } else {
-                        if value.translation.width < -menuSize {
-                            let delta = log10(10 - (value.translation.width + menuSize)*0.1)
+                        if data.translation.width < -menuSize {
+                            let delta = log10(10 - (data.translation.width + menuSize)*0.1)
                             offset = (-menuSize) * (delta)
                         }
-                        else if value.translation.width > 0 {
+                        else if data.translation.width > 0 {
                         }
                         else {
-                            offset = value.translation.width
+                            offset = data.translation.width
                         }
                         
                     }
                     
                     
                 }
-                .onEnded { value in
-                    if value.translation.width <= 0 || showMenu {
-                        if value.translation.width < -menuSize*0.1 {
-                            targetDailyQuest = dailyQuest
+                .onEnded { data in
+                    if data.translation.width <= 0 || showMenu {
+                        if data.translation.width < -menuSize*0.1 {
+                            targetMountainId = mountainId
                             withAnimation {
                                 offset = -menuSize
                             }
                             showMenu = true
                             
                         } else {
-                            targetDailyQuest = nil
+                            targetMountainId = nil
                             showMenu = false
                             withAnimation {
                                 offset = 0
                             }
                         }
                     } else {
-                        targetDailyQuest = nil
+                        targetMountainId = nil
                         showMenu = false
                         withAnimation {
                             offset = 0
@@ -286,20 +262,17 @@ struct QuestCheckBoxView: View {
                     
                 }
         )
-        .onChange(of: targetDailyQuest) { oldValue, newValue in
-            //                let selfToNil = oldValue == idx && newValue == nil
-            let nilToSelf = oldValue == nil && newValue == dailyQuest
-            //                let nilToOther = oldValue == nil && newValue != idx
-            //                let OtherToNil = oldValue != idx && newValue == nil
-            //                let selfToSelf = oldValue == idx && newValue == idx
+        .onChange(of: targetMountainId) { oldValue, newValue in
+
+            let nilToSelf = oldValue == nil && newValue == mountainId
+
             
             if nilToSelf {
                 withAnimation {
                     offset = -menuSize
                 }
             }
-            //                else if selfToSelf {
-            //                }
+
             else {
                 withAnimation {
                     offset = 0
@@ -307,36 +280,23 @@ struct QuestCheckBoxView: View {
             }
             
         }
-        .onChange(of: value) { oldValue, newValue in
+        .onChange(of: minutes) { oldValue, newValue in
             
-            if value == 0  {
+            if minutes == 0  {
                 xOffset = 0.01
             } else {
-                xOffset = CGFloat(value).map(from:range, to: 0...width)
+                xOffset = CGFloat(minutes).map(from:range, to: 0...width)
             }
             
-            dailyQuest.data = value
-            updateQuest(for: dailyQuest)
-            
-            if let dailyRecord = dailyQuest.dailyRecord {
-                if oldValue != 0 && newValue == 0 && !dailyRecord.hasContent {
-                    dailyRecord.dailyRecordSet?.updateDailyRecordsMomentum()
-                }
-                else if oldValue == 0 && newValue != 0 && dailyRecord.singleElm_dailyQuestOrTodo {
-    //                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    dailyRecord.dailyRecordSet?.updateDailyRecordsMomentum()
-    //                }
-                }
-            }
-            
-            if dailyQuest.dataType == DataType.hour.rawValue {
-                dailyQuest.dailyRecord?.updateRecordedMinutes()
-            }
+//            dailyRecordsVM.updateAscentData(mountainId, minutes)
+            let date = self.dailyRecordsVM.currentDate
+            mountainsVM.updateAscentData(id: mountainId, minutes: minutes, date: date)
+
             
 
         }
         .onChange(of: stopwatch.isRunning) {
-            if dailyGoal == nil && value == 0 {
+            if dailyGoal == nil && minutes == 0 {
                 if stopwatch.isRunning {
                     xOffset = width
                 } else if stopwatch.getTotalSec() < 60 {
@@ -344,24 +304,16 @@ struct QuestCheckBoxView: View {
                 }
             }
         }
-//        .onChange(of: isAnimating, { oldValue, newValue in
-//            if dailyGoal == nil && value == 0 && stopwatch.isRunning {
-//                if newValue == true {
-//                    xOffset = width
-//                } else if stopwatch.totalSec < 60 && !stopwatch.isRunning {
-//                    xOffset = 0.01
-//                }
-//            }
-//        })
+
         .onChange(of: dailyGoal) {
-            dailyQuest.dailyGoal = dailyGoal
-            xOffset = CGFloat(value).map(from:range, to: 0...width)
+            mountainsVM.updateDailyGoal(of: mountainId, value: dailyGoal)
+            xOffset = CGFloat(minutes).map(from:range, to: 0...width)
         }
         .onChange(of: range) {
-            if value == 0 {
+            if minutes == 0 {
                 xOffset = 0.01
             } else {
-                xOffset = CGFloat(value).map(from:range, to: 0...width)
+                xOffset = CGFloat(minutes).map(from:range, to: 0...width)
             }
         }
         .onChange(of: showMenu) {
@@ -394,150 +346,31 @@ struct QuestCheckBoxView: View {
             return newOffset
         }
     }
-    
-    func updateQuest(for dailyQuest: DailyQuest) -> Void {
-        if let date = dailyQuest.dailyRecord?.date {
-            if let targetQuest = findQuest(dailyQuest.questName) {
-                if dailyQuest.data != 0 {
-                    if targetQuest.dailyData[date] == nil {
-                        targetQuest.dailyData[date] = dailyQuest.data
-                        targetQuest.updateTier()
-                        targetQuest.updateMomentumLevel()
-                    }
-                    else {
-                        targetQuest.dailyData[date] = dailyQuest.data
-                    }
-                }
-                else {
-                    targetQuest.dailyData.removeValue(forKey: date)
-                }
-
-            }
-        }
-    }
-    
-    func findQuest(_ name: String) -> Quest? {
-        return quests.first(where: {$0.name == name && !$0.inTrashCan})
-    }
 
 
 }
 
 
-struct QuestCheckBoxContentView: View {
-    @Environment(\.modelContext) var modelContext
-    var dailyQuest: DailyQuest
-    var height: CGFloat
-    @Binding var value: Int
-    @Binding var dailyGoal: Int?
-    @ObservedObject var stopwatch: Stopwatch
-    @Binding var isAnimating: Bool
 
 
 
-    var body: some View {
-        
-        GeometryReader { geometry in
-            
-            let geoWidth = geometry.size.width
-//            let height:CGFloat = stopwatch.isRunning ? 75.0 : (dailyQuest.dataType != DataType.ox.rawValue ? 60.0 : 50.0)
-
-            if dailyQuest.dataType == DataType.ox.rawValue {
-                QuestCheckBoxContent_OX(
-                    dailyQuest:dailyQuest,
-                    value: $value
-                )
-                .frame(width: geoWidth,height: height)
-
-            } else if dailyQuest.dataType == DataType.hour.rawValue {
-                QuestCheckBoxContent_HOUR(
-                    dailyQuest:dailyQuest,
-                    value: $value,
-                    dailyGoal: $dailyGoal,
-                    hasGoal: dailyQuest.dailyGoal != nil,
-                    hasGoal_toggle: dailyQuest.dailyGoal != nil,
-                    stopwatch: stopwatch,
-                    isAnimating: $isAnimating
-//                    onTimer: dailyQuest.timerStart != nil
-                )
-                .frame(width: geoWidth,height: height)
-
-            } else {
-                QuestCheckBoxContent_CUSTOM(
-                    dailyQuest:dailyQuest,
-                    value: $value,
-                    dailyGoal: $dailyGoal,
-                    hasGoal: dailyQuest.dailyGoal != nil,
-                    hasGoal_toggle: dailyQuest.dailyGoal != nil
-                )
-                .frame(width: geoWidth,height: height)
-
-            }
-        }
-    }
-}
-
-struct QuestCheckBoxContent_OX:View {
-    
-    @Environment(\.modelContext) var modelContext
-    var dailyQuest: DailyQuest
-    @Binding var value: Int
-
-    
-    var body: some View {
-        
-        GeometryReader { geometry in
-            
-            let geoWidth = geometry.size.width
-            let geoHeight = geometry.size.height
-            
-            HStack(spacing:0.0) {
-                Group {
-                    Image(systemName: (value == 1) ? "checkmark.square" : "square")
-                        .resizable()
-                        .frame(width: geoWidth*1/7*0.67, height: geoWidth*1/7*0.67)
-                }
-                .frame(width: geoWidth*1/7, height: geoHeight)
-//                .border(.red)
-//                .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
-
-
-                Text(dailyQuest.getName())
-                    .frame(width: geoWidth*6/7, height: geoHeight)
-                    .bold()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-            }
-            .frame(width: geoWidth,height: geoHeight)
-            .background(.gray.opacity(0.01))
-            .onTapGesture {
-                value = ( value == 1 ) ? 0 : 1
-            }
-        }
-    }
-}
-
-
-
-struct QuestCheckBoxContent_HOUR:View {
+struct AscentDataContentView:View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
 //    @EnvironmentObject var activityManager: ActivityManager
 
-    var dailyQuest: DailyQuest
-
+    var name: String
+    var tier: Int
     
-    @Binding var value: Int
-    @Binding var dailyGoal: Int?
-
+    @Binding var minutes: Minutes
+    @Binding var dailyGoal: Minutes?
     
     @State var hasGoal: Bool
     @State var hasGoal_toggle: Bool // onChangeOf(hasGoal) 과 toggle버튼에 의해서만 변경해야 함
     @ObservedObject var stopwatch: Stopwatch
     @Binding var isAnimating: Bool
-//    @State var onTimer: Bool
+    var isRecent: Bool
     
-//    @ObservedObject var activityManager: ActivityManager
     @State var isEditing_hours: Bool = false
     @State private var activity: Activity<RecoraddicActivityAttributes>? = nil
 
@@ -550,22 +383,17 @@ struct QuestCheckBoxContent_HOUR:View {
 
     
     var body: some View {
-        let isRecent: Bool = {
-            if let date = dailyQuest.dailyRecord?.getLocalDate() {
-                return getStartDateOfYesterday() <= date
-            } else { return false }
-        }()
-//        let isRecent: Bool = getStandardDateOfYesterday() <= dailyQuest.dailyRecord!.date!
+        
+        let date = dailyRecordsVM.currentDailyRecord.id ?? "")
+
+
 
 
         
-        let questName = dailyQuest.getName()
 
-//        let dataType = dailyQuest.dataType
-//        let customDataTypeNotation = dailyQuest.customDataTypeNotation
 
-        let tier: Int = dailyQuest.currentTier
-//        let tierColor_dark = getDarkTierColorOf(tier: tier)
+
+        let tier: Int = tier
         
         GeometryReader { geometry in
             
@@ -579,10 +407,6 @@ struct QuestCheckBoxContent_HOUR:View {
                     Button(action:stopStopWatch) {
                         Image(systemName: "pause")
                             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(width: geoWidth*1/9*0.75, height: geoWidth*1/9*0.75)
                             
                     }
                     .frame(width: geoWidth*1/7, alignment: .center)
@@ -590,54 +414,32 @@ struct QuestCheckBoxContent_HOUR:View {
                     .opacity( isRecent ? 1.0 : 0.0)
 
                     
-//                    let heightOnTimer:CGFloat = qcbvHeight_large * qcbvMultiplier(dynamicTypeSize)
                     VStack {
-                        Text("\(questName)")
+                        Text("\(name)")
                             .lineLimit(1)
                             .font(.system(size: highlightValue2 == 0 ? height*0.35 : height*0.2))
-//                            .minimumScaleFactor(0.5)
                         
-//                            .font(.caption2)
                         Text(stopwatch.timeString)
                             .font(.system(size: highlightValue2 == 1 ? height*0.35 : height*0.2))
 
                         if hasGoal {
-                            Text_hours2(prefix: "목표: ",value: dailyQuest.dailyGoal ?? 0)
+                            Text_hours2(prefix: "목표: ",minutes: dailyGoal ?? 0)
                                 .font(.system(size: highlightValue2 == 2 ? height*0.35 : height*0.2))
-//                                .font(.caption2)
                         }
 
                     }
                     .padding(.horizontal,10)
                     .frame(width:geoWidth*6/7)
-//                    .onTapGesture {
-//                        lastTapTime = Date()
-//                        if dailyQuest.dailyGoal == nil {
-//                            highlightValue2 = (highlightValue2 + 1) % 2
-//                        } else {
-//                            highlightValue2 = (highlightValue2 + 1) % 3
-//                        }
-//                        if highlightValue2 != 1 {
-//                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-//                                if Date().timeIntervalSince(lastTapTime) > 4.0 {
-//                                    highlightValue2 = 1
-//                                }
-//                            }
-//                        }
-//                    }
+
 
 
 
                 }
                 else {
-//                    let height:CGFloat = 60.0
                     Button(action:startStopWatch) {
                         Image(systemName: "play")
                             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(width: geoWidth*1/9*0.75, height: geoWidth*1/9*0.75)
-//                            .bold(false)
+
 
                     }
                     .frame(width: geoWidth*1/7, alignment: .center)
@@ -647,19 +449,18 @@ struct QuestCheckBoxContent_HOUR:View {
                     
                     HStack {
                         VStack {
-                            Text("\(questName)")
+                            Text("\(name)")
                                 .lineLimit(1)
                                 .font(.system(size: highlightValue ? height*0.25 : height*0.4))
                                 .minimumScaleFactor(0.85)
 
-//                            Text("\(stopwatch.timeString)")
                             HStack {
-                                Text_hours(value: value)
+                                Text_hours(minutes: minutes)
                                     .lineLimit(1)
                                 if hasGoal {
                                     Text("/")
                                         .lineLimit(1)
-                                    Text_hours(value: dailyQuest.dailyGoal ?? 0)
+                                    Text_hours(minutes: dailyGoal ?? 0)
                                         .lineLimit(1)
                                 }
                                 
@@ -686,18 +487,6 @@ struct QuestCheckBoxContent_HOUR:View {
                     }
                     .padding(.horizontal,10)
                     .frame(width:geoWidth*6/7)
-//                    .onTapGesture {
-//                        lastTapTime = Date()
-//                        highlightValue.toggle()
-//                        if highlightValue {
-//                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-//                                if !isEditing_hours && (Date().timeIntervalSince(lastTapTime) > 4.0) {
-//                                    highlightValue = false
-//     
-//                                }
-//                            }
-//                        }
-//                    }
 
                 }
             }
@@ -707,7 +496,7 @@ struct QuestCheckBoxContent_HOUR:View {
                 
                 lastTapTime = Date()
                 if stopwatch.isRunning {
-                    if dailyQuest.dailyGoal == nil {
+                    if dailyGoal == nil {
                         highlightValue2 = (highlightValue2 + 1) % 2
                     } else {
                         highlightValue2 = (highlightValue2 + 1) % 3
@@ -737,22 +526,22 @@ struct QuestCheckBoxContent_HOUR:View {
                 // code for on dismiss
             } content: {
                 let dialMinutes:[Int] = {
-                    if value < 120 || value%5 == 0{
+                    if minutes < 120 || minute%5 == 0{
                         return Array(0...120) + stride(from: 125, through: 1440, by: 5)
                     } else {
-                        var arr = Array(0...120) + stride(from: 125, through: 1440, by: 5) + [value]
+                        var arr = Array(0...120) + stride(from: 125, through: 1440, by: 5) + [minute]
                         return arr.sorted()
                     }
                 }()
                 DialForHours(
-                    questName:questName,
+                    name:name,
                     dailyGoal: $dailyGoal,
-                    value: $value,
+                    minutes: $minutes,
                     isEditing: $isEditing_hours,
                     hasGoal_toggle: $hasGoal_toggle,
                     tier: tier,
                     dialMinutes: dialMinutes,
-                    dailyGoal_nonNil: dailyGoal ?? value
+                    dailyGoal_nonNil: dailyGoal ?? minute
                 )
                 .presentationDetents([.height(sheetHeight)])
                 .presentationCompactAdaptation(.none)
@@ -779,13 +568,13 @@ struct QuestCheckBoxContent_HOUR:View {
             }
         
             .onAppear() {
-                if dailyQuest.stopwatchStart != nil {
+                if dailyMountain.stopwatchStart != nil {
                     if isRecent {
                         autoCheckActivityAndAdjustToStopWatch()
                     }
                     else {
                         deleteOutdatedActivity()
-                        dailyQuest.stopwatchStart = nil
+                        dailyMountain.stopwatchStart = nil
                     }
                 }
             }
@@ -800,7 +589,7 @@ struct QuestCheckBoxContent_HOUR:View {
     func toggle_hour(_ setGoal: Bool) -> Void {
         hasGoal = hasGoal_toggle
         if setGoal {
-            dailyGoal = (value/5+1)*5
+            dailyGoal = (minute/5+1)*5
         }
         else {
             dailyGoal = nil
@@ -811,9 +600,9 @@ struct QuestCheckBoxContent_HOUR:View {
     func startStopWatch() -> Void {
         
         let calendar = Calendar.current
-        let startTime = calendar.date(byAdding: .minute, value: -(value), to: .now) ?? Date()
-        dailyQuest.stopwatchStart = startTime
-        stopwatch.setTotalSec(value*60)
+        let startTime = calendar.date(byAdding: .minutes, minutes: -(minutes), to: .now) ?? Date()
+        dailyMountain.stopwatchStart = startTime
+        stopwatch.setTotalSec(minute*60)
 
 //        isAnimating = false
         withAnimation(.easeInOut(duration:0.2)) {
@@ -825,13 +614,13 @@ struct QuestCheckBoxContent_HOUR:View {
             }
         }
         
-        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
+        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.name == dailyMountain.getName() && $0.attributes.startTime == startTime}) {
             self.activity = targetActivity
         } else {
-            let attributes = RecoraddicActivityAttributes(questName: dailyQuest.getName(), startTime:startTime, containedDate:dailyQuest.dailyRecord?.date ?? Date(), tier: dailyQuest.currentTier)
-            let initialContentState = RecoraddicActivityAttributes.ContentState(goal: dailyGoal)
+            let attributes = RecoraddicActivityAttributes(name: dailyMountain.getName(), startTime:startTime, containedDate:dailyMountain.dailyRecord?.date ?? Date(), tier: tier)
+            let initialContentState = RecoraddicActivityAttributes.ContentState(dailyGoal: dailyGoal)
             do {
-                let activity = try Activity<RecoraddicActivityAttributes>.request(
+                let activity = try Activity<RecoraddicActivityAttributes>.remountain(
                     attributes: attributes,
                     content: ActivityContent(state: initialContentState, staleDate: nil),
                     pushType: nil
@@ -847,9 +636,9 @@ struct QuestCheckBoxContent_HOUR:View {
     }
     
     func deleteOutdatedActivity() -> Void {
-        let startTime: Date = dailyQuest.stopwatchStart ?? Date()
+        let startTime: Date = dailyMountain.stopwatchStart ?? Date()
         
-        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
+        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.name == dailyMountain.getName() && $0.attributes.startTime == startTime}) {
             let dismissalPolicy: ActivityUIDismissalPolicy = .immediate
             Task {
                 await targetActivity.end(ActivityContent(state: targetActivity.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
@@ -858,18 +647,18 @@ struct QuestCheckBoxContent_HOUR:View {
         } else {
 //            onTimer = false
             if Int(Date().timeIntervalSince(startTime)) > 60*60*24 {
-                value = 60*24
+                minutes = 60*24
             } else {
-                value = Int(Date().timeIntervalSince(startTime)) / 60
+                minutes = Int(Date().timeIntervalSince(startTime)) / 60
             }
         }
     }
     
     func autoCheckActivityAndAdjustToStopWatch() -> Void {
         
-        let startTime: Date = dailyQuest.stopwatchStart ?? Date()
+        let startTime: Date = dailyMountain.stopwatchStart ?? Date()
         
-        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.questName == dailyQuest.getName() && $0.attributes.startTime == startTime}) {
+        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.name == dailyMountain.getName() && $0.attributes.startTime == startTime}) {
             stopwatch.setTotalSec(Int(Date().timeIntervalSince(startTime)))
 //            isAnimating = false
             stopwatch.start(startTime:startTime)
@@ -885,9 +674,9 @@ struct QuestCheckBoxContent_HOUR:View {
         } else {
             //            onTimer = false
             if Int(Date().timeIntervalSince(startTime)) > 60*60*24 {
-                value = 60*24
+                minutes = 60*24
             } else {
-                value = Int(Date().timeIntervalSince(startTime)) / 60
+                minutes = Int(Date().timeIntervalSince(startTime)) / 60
             }
         }
 
@@ -906,7 +695,7 @@ struct QuestCheckBoxContent_HOUR:View {
             await activity_activated.end(ActivityContent(state: activity_activated.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
         }
         activity = nil
-        dailyQuest.stopwatchStart = nil
+        dailyMountain.stopwatchStart = nil
         DispatchQueue.main.asyncAfter(deadline: .now()+0.1) {
 
             withAnimation(.easeInOut(duration:0.2)) {
@@ -917,17 +706,17 @@ struct QuestCheckBoxContent_HOUR:View {
                     isAnimating = false
                 }
             }
-            value = stopwatch.getTotalSec()/60
-            stopwatch.setTotalSec(value*60)
+            minutes = stopwatch.getTotalSec()/60
+            stopwatch.setTotalSec(minute*60)
         }
     }
 }
 
 
 struct Text_hours: View {
-    var value: Int
+    var minutes: Int
     var body: some View {
-        let (hours,minutes) = DataType.string_unitDataToRepresentableData_hours(data: value)
+        let (hours,minutes) = minute.hhmmFormat
         Text("\(hours == "0" ? "" : hours)")
             .bold(true) +
         Text("\(hours == "0" ? "" : (minutes == "0" ? "hr" : "h"))")
@@ -943,10 +732,10 @@ struct Text_hours: View {
 
 struct Text_hours2: View {
     var prefix: String = ""
-    var value: Int
+    var minutes: Int
     var suffix: String = ""
     var body: some View {
-        let (hours,minutes) = DataType.string_unitDataToRepresentableData_hours(data: value)
+        let (hours,minutes) = minute.hhmmFormat
         Text(prefix)
             .bold(true) +
         Text("\(hours == "0" ? "" : "\(hours)")")
@@ -967,266 +756,6 @@ struct Text_hours2: View {
 
 
 
-struct QuestCheckBoxContent_CUSTOM:View {
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.colorScheme) var colorScheme
-    var dailyQuest: DailyQuest
-    
-    @Binding var value: Int
-    @Binding var dailyGoal: Int?
-    @State var hasGoal: Bool
-    @State var hasGoal_toggle: Bool // onChangeOf(hasGoal) 과 toggle버튼에 의해서만 변경해야 함
-    
-    @State var isEditing: Bool = false
-    @State var valueInText: String = ""
-    @State var goalValueInText: String = ""
-
-    @FocusState var focusedField: Field?
-    enum Field: Int, CaseIterable {
-        case value
-        case goal
-    }
-    
-    @State var highlightValue: Bool = false
-    @State var onToggleModification: Bool = false
-    @State var lastTapTime: Date = Date()
-
-    var body: some View {
-        
-        let questName = dailyQuest.getName()
-        let dataType = dailyQuest.dataType
-        let tier: Int = dailyQuest.currentTier
-        let customDataTypeNotation = dailyQuest.customDataTypeNotation
-//        let tierColor_dark = getDarkTierColorOf(tier: tier)
-        
-        GeometryReader { geometry in
-            
-            
-            let geoWidth = geometry.size.width
-            let geoHeight = geometry.size.height
-            
-            HStack(spacing:0.0) {
-                Spacer()
-                    .frame(width: geoWidth*1/7, height: geoWidth*0.1)
-                VStack {
-                    Text(questName)
-                        .frame(width: geoWidth*4.5/7)
-                        .font(.system(size: highlightValue ? geoHeight*0.25 : geoHeight*0.4))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-                        .bold()
-
-                    HStack {
-//                    HStack(spacing:0.0) {
-                        if isEditing {
-                            TextField("", text:$valueInText)
-                                .keyboardType(.numberPad)
-                                .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-                                .frame(width: geoWidth*((focusedField == .value || focusedField == nil) ? 3.0 : 0.5)/7, height: geoHeight*0.4)
-                                .textFieldStyle(.roundedBorder)
-                                .clipShape(.buttonBorder)
-                                .multilineTextAlignment(.center)
-                                .focused($focusedField, equals: .value)
-                                .toolbar {
-                                    ToolbarItem(placement: .keyboard) {
-                                        HStack(spacing:0.0) {
-                                            Toggle("목표설정", isOn: $hasGoal_toggle)
-                                                .lineLimit(1)
-                                                .minimumScaleFactor(0.7)
-                                                .toggleStyle(.switch)
-                                                .frame(width:geoWidth*0.4, alignment: .leading)
-                                                .foregroundStyle(.blue)
-//                                                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                            Button("완료") {
-                                                editDone()
-                                            }
-                                            .frame(width:geoWidth*0.6, alignment: .trailing)
-                                            .foregroundStyle(.blue)
-//                                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                                        }
-//                                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                                        .environment(\.dynamicTypeSize, DynamicTypeSize.medium)
-
-                                    }
-
-                                
-                                    
-                                }
-                            if hasGoal  {
-                                Text(" / ")
-                                TextField("", text:$goalValueInText)
-                                    .keyboardType(.numberPad)
-                                    .foregroundStyle(getReversedColorSchemeColor(colorScheme))
-                                    .frame(width:geoWidth*(focusedField == .goal ? 3.0 : 0.5)/7, height: geoHeight*0.4)
-                                    .textFieldStyle(.roundedBorder)
-                                    .clipShape(.buttonBorder)
-                                    .multilineTextAlignment(.center)
-                                    .focused($focusedField, equals: .goal)
-                            }
-                            Text(DataType.unitNotationOf(dataType: dataTypeFrom(dataType), customDataTypeNotation: customDataTypeNotation))
-                                .bold(false)
-
-                                
-                            
-                        }
-                        else {
-                            Text("\(value)")
-                                .bold() +
-                            Text(customDataTypeNotation ?? "")
-                                .bold(false) +
-                            Text(!hasGoal ? "" : " / ")
-                                .bold(false) +
-                            Text(!hasGoal ? "" : "\(dailyGoal ?? 0)")
-                                .bold() +
-                            Text(!hasGoal ? "" : "\(customDataTypeNotation ?? "")")
-                                .bold(false)
-
-                            Button(action:{
-                                edit()
-                                highlightValue = true
-                            }) {
-                                Image(systemName: "square.and.pencil")
-                            }
-
-                        }
-
-                    }
-                    .font(.system(size: !highlightValue ? geoHeight*0.25 : geoHeight*0.4))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-//                    .environment(\.dynamicTypeSize, DynamicTypeSize.medium)
-
-
-                }
-                .padding(.horizontal,10)
-                .frame(width: geoWidth*6/7)
-//                .onTapGesture {
-//                    lastTapTime = Date()
-//                    if !isEditing {
-//                        highlightValue.toggle()
-//                        if highlightValue {
-//                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-//                                if !isEditing && (Date().timeIntervalSince(lastTapTime) > 4.0) {
-//                                    highlightValue = false
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-
-
-            }
-            .frame(width: geoWidth,height: geoHeight)
-            .background(.white.opacity(0.01))
-            .onTapGesture {
-                lastTapTime = Date()
-                if !isEditing {
-                    highlightValue.toggle()
-                    if highlightValue {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-                            if !isEditing && (Date().timeIntervalSince(lastTapTime) > 4.0) {
-                                highlightValue = false
-                            }
-                        }
-                    }
-                }
-            }
-            .onChange(of: hasGoal_toggle) {
-                // 똑같을 때: hasGoal에 따라 hasGoal_toggle을 설정
-                if hasGoal_toggle != hasGoal {
-                    toggle(hasGoal_toggle)
-                }
-            }
-            .onChange(of: hasGoal) {
-                hasGoal_toggle = hasGoal
-            }
-            .onChange(of: focusedField) {
-                
-                if focusedField == nil && !onToggleModification {
-                    editDone()
-                }
-            }
-            .onChange(of: isEditing) {
-                if !isEditing {highlightValue = false}
-            }
-
-            
-        }
-    }
-    
-    // below functions must contain three steps in proper order of their own functionality:
-    // - set focusField
-    // - set hasGoal
-    func editDone() -> Void { // tranform view -> change&save values
-
-        focusedField = nil
-        isEditing = false
-
-        if let newValue:Int = Int(valueInText) { value = newValue } // save value
-        else { value = 0 }
-
-        if let newGoalValue:Int = Int(goalValueInText) { // save dailyGoal
-            if newGoalValue == 0 {
-                hasGoal = false
-                dailyGoal = nil
-            }
-            else {
-                dailyGoal = newGoalValue
-            }
-        }
-        else {
-            hasGoal = false
-            dailyGoal = nil
-        }
-    }
-    func toggle(_ setGoal: Bool) -> Void {
-        onToggleModification = true
-        if setGoal { // setGoal
-            // set dailyQuest.dailyGoal into non-nil, change the focus into goal
-            hasGoal = hasGoal_toggle
-            focusedField = nil
-            goalValueInText = String(format: "%d", value)
-            dailyGoal = value
-            
-            DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
-                focusedField = .goal
-            }
-
-        }
-        else { // deleteGoal
-            dailyGoal = nil
-            goalValueInText = ""
-            focusedField = .value
-            DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
-                hasGoal = hasGoal_toggle
-            }
-
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now()+0.3) {
-            onToggleModification = false
-        }
-    }
-    func edit() -> Void { // set values -> transform view
-        if let goalValue = dailyGoal {
-            goalValueInText = String(goalValue)
-        }
-        else { // actually don't need it
-            goalValueInText = ""
-        }
-        
-        valueInText = String(value)
-        
-        isEditing = true
-        
-        DispatchQueue.main.asyncAfter(deadline: .now()+0.2) {
-            focusedField = .value
-        }
-        
-    }
-    
-    
-
-}
 
 
 class Stopwatch: ObservableObject {
@@ -1285,20 +814,16 @@ struct DialForHours: View {
 
     @Environment(\.colorScheme) var colorScheme
     
-    var questName: String
+    var name: String
     
     @Binding var dailyGoal: Int?
-    @Binding var value: Int
+    @Binding var minutes: Int
     @Binding var isEditing: Bool
     @Binding var hasGoal_toggle: Bool
     var tier: Int
-    let dialMinutes:[Int]
+    let dialMinutes:[Minute]
 
-    
-//    @State var hour = 0
-//    @State var minute = 0
-//    @State var hour_goal = 0
-//    @State var minute_goal = 0
+
     @State var dailyGoal_nonNil = 0
 
     var body: some View {
@@ -1310,7 +835,7 @@ struct DialForHours: View {
                 
                 ZStack(alignment:.top) {
                     VStack {
-                        Text(questName)
+                        Text(name)
                             .font(.title2)
                             .frame(width:geoWidth*0.6)
                             .lineLimit(2)
@@ -1347,13 +872,14 @@ struct DialForHours: View {
                         VStack {
                             Text("달성")
                                 .bold()
-                            Picker(selection: $value, label: Text("Second Value")) {
+                            Picker(selection: $minutes, label: Text("Second Value")) {
                                 //                            ForEach(0..<60*24) { i in
                                 ForEach(dialMinutes, id:\.self) { i in
-                                    Text("\(DataType.string_fullRepresentableNotation(data: i, dataType: DataType.hour))")
+                                    Text("\(i.hhmmFormat)")
                                         .foregroundStyle(getDarkTierColorOf(tier: tier))
                                     
                                 }
+                                let a: String = 1.format
                             }
                             
                             .frame(width: hasGoal_toggle ? geoWidth/3 : geoWidth*0.5)
@@ -1374,7 +900,7 @@ struct DialForHours: View {
                                     .bold()
                                 Picker(selection: $dailyGoal_nonNil, label: Text("Second Value")) {
                                     ForEach(0..<60*24/5) { i in
-                                        Text("\(DataType.string_fullRepresentableNotation(data: (i+1)*5, dataType: DataType.hour))")
+                                        Text("\((i+1)*5.hhmmFormat)")
                                             .tag((i+1)*5)
                                             .foregroundStyle(getDarkTierColorOf(tier: tier))
                                     }
@@ -1388,25 +914,7 @@ struct DialForHours: View {
                             }
                             .frame(width: geoWidth/2)
                             
-                            
-                            //                        Picker(selection: $hour_goal, label: Text("First Value")) {
-                            //                            ForEach(0..<25) { i in
-                            //                                Text("\(i)").tag(i)
-                            //                            }
-                            //                        }
-                            //                        .frame(width: 50)
-                            //                        .clipped()
-                            //                        .pickerStyle(.wheel)
-                            //                        Text("시간  ")
-                            //                        Picker(selection: $minute_goal, label: Text("Second Value")) {
-                            //                            ForEach(0..<60) { i in
-                            //                                Text("\(i)").tag(i)
-                            //                            }
-                            //                        }
-                            //                        .frame(width: 50)
-                            //                        .clipped()
-                            //                        .pickerStyle(.wheel)
-                            //                        Text("분")
+
                         }
                         
                         
@@ -1431,111 +939,29 @@ struct DialForHours: View {
                 }
             }
             if dailyGoal == nil {
-                dailyGoal_nonNil = (value/5+1)*5
+                dailyGoal_nonNil = (minutes/5+1)*5
             }
         }
 
 
-//        .onChange(of: hasGoal_toggle) {
-//            if hasGoal_toggle {
-//                dailyGoal_nonNil = (value/5+1)*5
-//            }
-//        }
         
     }
 
     
-    func save() -> Void {
-        //                            dailyGoal = hour*60 + minute
-        //                            if dailyGoal <= value {
-        //                                value = dailyGoal
-        //                            }
-    }
+  
 }
 
 
-//struct QuestCheckBoxColorPreview: View {
-//
-//    @State var isAnimating: Bool = false
-//    var tier: Int
-//    
-//    var body: some View {
-//        
-//
-//        
-//        GeometryReader { geometry in
-//            
-//            let geoWidth = geometry.size.width
-//            let geoHeight = geometry.size.height
-//            
-//            
-//            let a: Path = Path(CGPath(roundedRect: CGRect(x: 0, y: 0, width: geoWidth, height: geoHeight), cornerWidth: geoWidth/20, cornerHeight: geoHeight/20, transform: nil))
-//
-//            
-//            let percentage:CGFloat = 1.0
-//            let brightness:CGFloat = percentage * 0.0
-//            
-//            
-//            let gradientColors = getGradientColorsOf(tier: tier, type:0)
-//            let _: [Color] = {
-//                var newGradient: [Color] = []
-//                for idx in 0...(gradientColors.count - 1) {
-//                    if idx % 2 == 0 {
-//                        newGradient.append(gradientColors[idx].adjust(brightness: brightness))
-//                    }
-//                    else {
-//                        newGradient.append(gradientColors[idx].adjust(brightness: brightness*0.5))
-//                    }
-//                }
-//                return newGradient
-//            }()
-//            
-//
-//
-//                
-//            ZStack {
-//                
-//                ZStack {
-//                    Rectangle()
-//                        .fill(
-//                            LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)
-//                        )
-//                        .frame(width:geoWidth, height:geoHeight)
-//                        .offset(x: (CGFloat(0) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth, y:0)
-//                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
-//                    
-//                    Rectangle()
-//                        .fill(
-//                            LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)
-//                        )
-//                        .frame(width:geoWidth, height:geoHeight)
-//                        .offset(x: (CGFloat(1) - (self.isAnimating ? 0.0 : 1.0)) * geoWidth, y:0)
-//                        .animation(Animation.linear(duration: 3).repeatForever(autoreverses: false), value: isAnimating)
-//                }
-//                .frame(width:geoWidth, height:geoHeight)
-//                .mask{a}
-//                .onAppear() {
-//                    isAnimating = true
-//                }
-//                
-//                
-//                
-//            }
-//                    
-//
-//
-//
-//
-//        }
-//    }
-//}
 
 
 
 struct NotificationButton: View {
     
-    @Environment(\.modelContext) var modelContext
-    var dailyQuest: DailyQuest
+
+    
+    var name: String
+    var tier: Int
+    var notfTime: Date?
     var popOverWidth: CGFloat
     var popOverHeight: CGFloat
 
@@ -1551,21 +977,15 @@ struct NotificationButton: View {
     
     var body: some View {
 
-        let questName = dailyQuest.getName()
-        let date = dailyQuest.dailyRecord?.getLocalDate() ?? Date()
+        let date_str = dailyRecordsVM.currentDailyRecord.id ?? ""
+        let date = stringToDate(date_str)
 
-        let setAlready:Bool = dailyQuest.notfTime != nil
+        let setAlready:Bool = notfTime != nil
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
             let size = min(geoWidth, geoHeight)
-//            Button("",systemImage: setAlready ? "bell" : "bell.slash") {
-//                if setAlready {
-//                    showNotficationTime.toggle()
-//                } else {
-//                    editNotificationTime.toggle()
-//                }
-//            }
+
             Button(action: {
                 if setAlready {
                     showNotficationTime.toggle()
@@ -1574,22 +994,13 @@ struct NotificationButton: View {
                 }
 
             }) {
-                if let alermTime = dailyQuest.notfTime {
+                if let alermTime = notfTime {
                     VStack(spacing:3.0) {
                         Text(hhmmFormatOf(from: alermTime))
                             .font(.system(size: 12.0))
                             .bold()
-//                        Text(Calendar.current.component(.hour, from: alermTime) < 12 ? "am" : "pm")
-//                            .font(.system(size: 9.0))
-//                            .bold()
                     }
                     
-//                    VStack(spacing:3.0) {
-//                        ClockView(hour: Calendar.current.component(.hour, from: alermTime), minute: Calendar.current.component(.minute, from: alermTime))
-//                            .frame(width:25, height: 25)
-//                        Text(Calendar.current.component(.hour, from: alermTime) < 12 ? "am" : "pm")
-//                            .font(.system(size: 12.0))
-//                    }
                 } else {
                     Image(systemName: setAlready ? "bell" : "bell.slash")
                         .opacity(0.7)
@@ -1597,13 +1008,10 @@ struct NotificationButton: View {
                 }
                 
             }
-//            .bold(setAlready)
-//            .border(.yellow)
             .frame(width: geoWidth, height: geoHeight)
-//            .border(.red)
             .popover(isPresented: $showNotficationTime, attachmentAnchor: .point(.topLeading)) {
                 HStack {
-                    Text(getNotificationTimeString(at:dailyQuest.notfTime, from: date))
+                    Text(getNotificationTimeString(at:notfTime, from: date))
                         .padding(.horizontal)
                     Button("수정") {
                         showNotficationTime.toggle()
@@ -1611,72 +1019,63 @@ struct NotificationButton: View {
                             editNotificationTime.toggle()
                         }
                     }
-                    .buttonStyle(NotificationButtonStyle(dailyQuest.currentTier))
+                    .buttonStyle(NotificationButtonStyle(tier))
 
                     Button("해제") {
-                        if let previousAlermTime = dailyQuest.notfTime {
-                            removeNotification(at: previousAlermTime, for: questName) // MARK: questName 변경 시 지울 수 없음
+                        if let previousAlermTime = notfTime {
+                            removeNotification(at: previousAlermTime, for: name) // MARK: name 변경 시 지울 수 없음
                         }
                         showNotficationTime.toggle()
-                        dailyQuest.notfTime = nil
+                        notfTime = nil
                     }
-                    .buttonStyle(NotificationButtonStyle_red(dailyQuest.currentTier))
+                    .buttonStyle(NotificationButtonStyle_red(tier))
 
 
                 }
                 .frame(width:popOverWidth2)
-//                .frame(width:.greatestFiniteMagnitude, alignment: .center)
-//                .frame(width:popOverWidth, height: popOverHeight)
-                .foregroundStyle(getBrightTierColorOf(tier: dailyQuest.currentTier))
-                .background(getDarkTierColorOf(tier: dailyQuest.currentTier)) // 크기 유지를 위해(없으면 자동 조정됨)
+                .foregroundStyle(getBrightTierColorOf(tier: tier))
+                .background(getDarkTierColorOf(tier: tier)) // 크기 유지를 위해(없으면 자동 조정됨)
                 .presentationCompactAdaptation(.popover)
-                .presentationBackground(getDarkTierColorOf(tier: dailyQuest.currentTier))
+                .presentationBackground(getDarkTierColorOf(tier: tier))
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                .border(.red)
 
             }
             .sheet(isPresented: $editNotificationTime) {
-                let alermTime = {
-                    if let alermTime = dailyQuest.notfTime { return alermTime}
-                    else if let date = dailyQuest.dailyRecord?.getLocalDate() {
+                let initialNotfTime = {
+                    if let notfTime = notfTime { return notfTime }
+                    else {
                         if date == getStartDateOfNow() {
                             return Date()
                         }
                         else { return date.addingHours(9)}
                     }
-                    else {
-                        return getStartDateOfNow()
-                    }
+
                 }()
                 EditNotificationTimeView(
-                    dailyQuest: dailyQuest,
-                    selectedTime: alermTime,
-                    selectedDay: getDayOption(at: alermTime, from: date),
+                    name: name,
+                    tier: tier,
+                    notfTime: $notfTime,
+                    selectedTime: initialNotfTime,
+                    selectedDay: getDayOption(at: initialNotfTime, from: date),
                     editNotificationTime: $editNotificationTime
                 )
                 .presentationDetents([.height(sheetHeight)])
-//                .frame(width: popOverWidth, height: popOverHeight, alignment: .center)
-                .foregroundStyle(getBrightTierColorOf(tier: dailyQuest.currentTier))
-                .background(getDarkTierColorOf(tier: dailyQuest.currentTier))
+                .foregroundStyle(getBrightTierColorOf(tier: tier))
+                .background(getDarkTierColorOf(tier: tier))
                 .presentationDragIndicator(.visible)
                 .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                .preferredColorScheme(.dark)
 
                 
             }
         }
-//        .onChange(of: selectedTime, { oldValue, newValue in
-//            dailyQuest.alermTime = selectedTime
-//        })
-//        .onChange(of: dailyQuest.alermTime) { oldValue, newValue in
-////            selectedTime = dailyQuest.alermTime
-//        }
+
     }
 }
 
 struct NotificationButtonStyle: ButtonStyle {
     @Environment(\.colorScheme) var colorScheme
 
+    
     var tier:Int
     
 
@@ -1723,8 +1122,12 @@ struct NotificationButtonStyle_red: ButtonStyle {
 
 struct EditNotificationTimeView: View {
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.modelContext) var modelContext
-    var dailyQuest: DailyQuest
+
+    @Bindable var dailyRecordsVM: DailyRecordsViewModel
+
+    var name: String
+    var tier: Int
+    var notfTime: Date?
     @State var selectedTime: Date
     @State var selectedDay:DayOption
     
@@ -1734,10 +1137,9 @@ struct EditNotificationTimeView: View {
 
     var body: some View {
         
-        let questName = dailyQuest.getName()
 
-        let setAlready:Bool = dailyQuest.notfTime != nil
-        let notModifiedYet:Bool = setAlready && (dailyQuest.notfTime ?? selectedTime) == selectedTime
+        let setAlready:Bool = notfTime != nil
+        let notModifiedYet:Bool = setAlready && (notfTime ?? selectedTime) == selectedTime
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
@@ -1745,19 +1147,12 @@ struct EditNotificationTimeView: View {
                 Text(selectedTime,format: .dateTime)
                     .font(.title3)
                     .bold()
-//                    .minimumScaleFactor(0.7)
-//                    .frame(width:geoWidth)
                     .padding(.top)
-                //                if let alermTime = dailyQuest.alermTime {
-                ////                    HStack(spacing:0.0) {
-                //                        Text(alermTime,format: .dateTime)
-                ////                    }
-                //                }
+
                 Picker("", selection: $selectedDay) {
                     ForEach(DayOption.allCases, id:\.self) { dayOption in
                         Text(DayOption.dayOption_kor[dayOption] ?? "optionErr") // MARK: foreground, backgroundstyle adjustment not avaialable(xcode15), reported at 24/07/12
 
-                        
                     }
 
                 }
@@ -1777,9 +1172,6 @@ struct EditNotificationTimeView: View {
                     .environment(\.dynamicTypeSize, .large)
                     
                 
-                //                Text("현재 이후의 시간으로만 알림설정이 가능합니다.")
-                //                    .foregroundStyle(.red)
-                //                    .font(.caption)
                 HStack(spacing:0.0) {
 
                     Button("취소") {
@@ -1787,26 +1179,25 @@ struct EditNotificationTimeView: View {
                     }
                     .frame(width: geoWidth/2)
                     .foregroundStyle(.red)
-                    .buttonStyle(NotificationButtonStyle(dailyQuest.currentTier))
+                    .buttonStyle(NotificationButtonStyle(tier))
                     
+
                     
-                    //                    Button((dailyQuest.alermTime ?? selectedTime) == selectedTime ? "취소" : (dailyQuest.alermTime == nil ? "알림 설정" : "알림 수정") ) {
-                    
-                    Button(selectedTime <= Date() ? "달성 설정" :(dailyQuest.notfTime == nil ? "알림 설정" : "알림 수정")) {
-                        if let previousAlermTime = dailyQuest.notfTime {
-                            removeNotification(at: previousAlermTime, for: questName) // MARK: questName 변경 시 지울 수 없음
+                    Button(selectedTime <= Date() ? "달성 설정" :(notfTime == nil ? "알림 설정" : "알림 수정")) {
+                        if let previousAlermTime = notfTime {
+                            removeNotification(at: previousAlermTime, for: name) // MARK: name 변경 시 지울 수 없음
                         }
-                        dailyQuest.notfTime = selectedTime
+                        notfTime = selectedTime
                         if selectedTime > Date() {
-                            scheduleNotification(at: selectedTime, for: questName, goal: dailyQuest.dailyGoal, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation
-                            )
+                            scheduleNotification(at: selectedTime, for: name, goal: dailyGoal)
+                            
                         }
                         editNotificationTime.toggle()
                     }
                     .frame(width: geoWidth/2)
                     .disabled(notModifiedYet)
                     .opacity(notModifiedYet ? 0.3 : 1.0)
-                    .buttonStyle(NotificationButtonStyle(dailyQuest.currentTier))
+                    .buttonStyle(NotificationButtonStyle(tier))
                     
                 }
                 .padding()
@@ -1816,8 +1207,8 @@ struct EditNotificationTimeView: View {
             .frame(width:geoWidth, height: geoHeight)
             .onAppear() {
                 // MARK: 쓸 일 없을 것 같은데
-                if selectedDay == .today && getStartOfDate(date:selectedTime) != getStartOfDate(date: dailyQuest.dailyRecord?.getLocalDate() ?? Date()) {
-                    selectedTime = dailyQuest.dailyRecord?.getLocalDate() ?? Date()
+                if selectedDay == .today && getStartOfDate(date:selectedTime) != getStartOfDate(date: dailyMountain.dailyRecord?.getLocalDate() ?? Date()) {
+                    selectedTime = dailyMountain.dailyRecord?.getLocalDate() ?? Date()
                 }
             }
             .onChange(of: selectedDay) { oldValue, newValue in
@@ -1837,98 +1228,75 @@ struct EditNotificationTimeView: View {
 }
 
 
-struct ClockView: View {
-    var hour: Int
-    var minute: Int
-    
-    var body: some View {
-        GeometryReader { geometry in
-            let width = geometry.size.width
-            let height = geometry.size.height
-            let clockSize = min(width, height)
-            let mainLineWidth = clockSize / 10
-            let subLineWidth = mainLineWidth * 0.67
-            
-            ZStack {
-                // Draw the clock face
-                Circle()
-                    .stroke(lineWidth: mainLineWidth)
-                    .frame(width: clockSize, height: clockSize)
-                
-                // Draw the hour ticks
-                ForEach(0..<12) { tick in
-                    Rectangle()
-                        .fill(Color.primary)
-                        .frame(width: 1, height: clockSize / 20)
-                        .offset(y: -clockSize / 2 + clockSize / 40)
-                        .rotationEffect(Angle(degrees: Double(tick) * 30))
-                }
-                
-                Circle()
-                    .fill(Color.primary)
-                    .frame(width: subLineWidth, height: subLineWidth)
-                
-                // Draw the hour hand
-                Path { path in
-                    path.move(to: CGPoint(x: clockSize / 2, y: clockSize / 2))
-                    path.addLine(to: CGPoint(x: clockSize / 2, y: clockSize / 4))
-                }
-                .stroke(Color.primary, style: StrokeStyle(lineWidth: mainLineWidth, lineCap: .round))
-                
-//                .offset(x: -clockSize / 2, y: -clockSize / 2)
-                .rotationEffect(hourAngle(hour: hour, minute: minute), anchor: .center)
-                .offset(x:sin(hourAngle(hour: hour, minute: minute).radians)*(mainLineWidth-subLineWidth), y:-cos(hourAngle(hour: hour, minute: minute).radians)*(mainLineWidth-subLineWidth))
-                
-                // Draw the minute hand
-                Path { path in
-                    path.move(to: CGPoint(x: clockSize / 2, y: clockSize / 2))
-                    path.addLine(to: CGPoint(x: clockSize / 2, y: clockSize / 10))
-                }
-                .stroke(Color.primary, style: StrokeStyle(lineWidth: subLineWidth, lineCap: .round))
-//                .offset(x: -clockSize / 2, y: -clockSize / 2)
-                .rotationEffect(minuteAngle(minute: minute), anchor: .center)
-            }
-            .frame(width: clockSize, height: clockSize)
-        }
-    }
-    
-    private func hourAngle(hour: Int, minute: Int) -> Angle {
-        let hourIn12 = hour % 12
-        let hourAngle = (Double(hourIn12) + Double(minute) / 60.0) * 30.0
-        return Angle(degrees: hourAngle)
-    }
-    
-    private func minuteAngle(minute: Int) -> Angle {
-        let minuteAngle = Double(minute) * 6.0
-        return Angle(degrees: minuteAngle)
-    }
-}
-
-
-//#Preview(body: {
-//    VStack {
-//        QuestCheckBoxColorPreview(tier: 0)
-//            .frame(width:300, height: 45)
-//        QuestCheckBoxColorPreview(tier: 5)
-//            .frame(width:300, height: 45)
-//        QuestCheckBoxColorPreview(tier: 10)
-//            .frame(width:300, height: 45)
-//        QuestCheckBoxColorPreview(tier: 15)
-//            .frame(width:300, height: 45)
-//        QuestCheckBoxColorPreview(tier: 20)
-//            .frame(width:300, height: 45)
-//        QuestCheckBoxColorPreview(tier: 25)
-//            .frame(width:300, height: 45)
-//        QuestCheckBoxColorPreview(tier: 30)
-//            .frame(width:300, height: 45)
-//        QuestCheckBoxColorPreview(tier: 35)
-//            .frame(width:300, height: 45)
-//        QuestCheckBoxColorPreview(tier: 40)
-//            .frame(width:300, height: 45)
-//
+//struct ClockView: View {
+//    var hour: Int
+//    var minutes: Int
+//    
+//    var body: some View {
+//        GeometryReader { geometry in
+//            let width = geometry.size.width
+//            let height = geometry.size.height
+//            let clockSize = min(width, height)
+//            let mainLineWidth = clockSize / 10
+//            let subLineWidth = mainLineWidth * 0.67
+//            
+//            ZStack {
+//                // Draw the clock face
+//                Circle()
+//                    .stroke(lineWidth: mainLineWidth)
+//                    .frame(width: clockSize, height: clockSize)
+//                
+//                // Draw the hour ticks
+//                ForEach(0..<12) { tick in
+//                    Rectangle()
+//                        .fill(Color.primary)
+//                        .frame(width: 1, height: clockSize / 20)
+//                        .offset(y: -clockSize / 2 + clockSize / 40)
+//                        .rotationEffect(Angle(degrees: Double(tick) * 30))
+//                }
+//                
+//                Circle()
+//                    .fill(Color.primary)
+//                    .frame(width: subLineWidth, height: subLineWidth)
+//                
+//                // Draw the hour hand
+//                Path { path in
+//                    path.move(to: CGPoint(x: clockSize / 2, y: clockSize / 2))
+//                    path.addLine(to: CGPoint(x: clockSize / 2, y: clockSize / 4))
+//                }
+//                .stroke(Color.primary, style: StrokeStyle(lineWidth: mainLineWidth, lineCap: .round))
+//                
+////                .offset(x: -clockSize / 2, y: -clockSize / 2)
+//                .rotationEffect(hourAngle(hour: hour, minutes: minutes), anchor: .center)
+//                .offset(x:sin(hourAngle(hour: hour, minutes: minutes).radians)*(mainLineWidth-subLineWidth), y:-cos(hourAngle(hour: hour, minutes: minutes).radians)*(mainLineWidth-subLineWidth))
+//                
+//                // Draw the minutes hand
+//                Path { path in
+//                    path.move(to: CGPoint(x: clockSize / 2, y: clockSize / 2))
+//                    path.addLine(to: CGPoint(x: clockSize / 2, y: clockSize / 10))
+//                }
+//                .stroke(Color.primary, style: StrokeStyle(lineWidth: subLineWidth, lineCap: .round))
+////                .offset(x: -clockSize / 2, y: -clockSize / 2)
+//                .rotationEffect(minuteAngle(minutes: minutes), anchor: .center)
+//            }
+//            .frame(width: clockSize, height: clockSize)
+//        }
 //    }
-//
-//})
+//    
+//    private func hourAngle(hour: Int, minutes: Int) -> Angle {
+//        let hourIn12 = hour % 12
+//        let hourAngle = (Double(hourIn12) + Double(minutes) / 60.0) * 30.0
+//        return Angle(degrees: hourAngle)
+//    }
+//    
+//    private func minuteAngle(minutes: Int) -> Angle {
+//        let minuteAngle = Double(minutes) * 6.0
+//        return Angle(degrees: minuteAngle)
+//    }
+//}
+
+
+
 
 
 

@@ -12,7 +12,7 @@ struct RecoraddicActivityAttributes: ActivityAttributes {
         var goal: Int?
         
     }
-    var questName: String
+    var mountainName: String
     var startTime: Date
     var containedDate: Date
     var tier: Int

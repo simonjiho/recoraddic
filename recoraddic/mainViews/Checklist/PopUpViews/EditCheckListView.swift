@@ -14,54 +14,45 @@ import SwiftData
 
 struct EditCheckListView: View {
     
-    @Environment(\.modelContext) private var modelContext
+    //    @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
-    @Query(sort:\Profile.createdTime) var profiles: [Profile]
-    var showHiddenQuests: Bool { profiles.first?.showHiddenQuests ?? false }
+    @Environment(MountainsViewModel.self) var mountainsViewModel
     
-    @Query var quests: [Quest]
-//    var quests_visible: [Quest] {
-//        quests.filter({$0.isVisible()})
-//    }
-    @Query(sort:\Todo_preset.createdTime) var todos_preset: [Todo_preset]
+    @State var presetsViewModel: PresetsViewModel = .init()
     
-    
-    var currentDailyRecord: DailyRecord
+    @Binding var dailyRecordsViewModel: DailyRecordsViewModel
+    var showHiddenMountains: Bool
+    var currentDailyRecord: DailyRecord_fb
     @Binding var popUp_self: Bool
     @Binding var selectedView: MainViewName
     let todoIsEmpty: Bool
     
     
-    @State var dailyQuests_tmp: [DailyQuest] = []
-    @State var todos_tmp: [Todo] = []
+    @State var mountainIds_tmp: [String] = []
+    @State var todos_tmp: [String] = []
     @FocusState var focusField: Bool
     @State var createNewPreset: Bool = false
     @State var newTodoPresetName = ""
     
     @State var showHelp:Bool = false
     
-    enum AppendOption :String, CaseIterable, Identifiable  {
-        case quest
-        case todo
-        var id: String { self.rawValue }
-        static let appendOption_kor:[AppendOption:String] = [.quest:"누적퀘스트",.todo:"자주 하는 일"]
-
-    }
-
-    @State var appendOption: AppendOption = .quest
+    @State var appendOption: AppendOption = .mountain
     
-    @State var addEmptyTodo: Bool = false
     
     
     var body: some View {
         
-        let quests_visible =  {
-            if showHiddenQuests {
-                return quests.filter({$0.isVisible() || $0.isHidden })
-            } else {
-                return quests.filter({$0.isVisible()})
-            }
-        }()
+        
+        let mountains = mountainsViewModel.mountains
+        let mountains_visible = mountains.filter({$0.value.isVisible()})
+        //        let mountains_visible =  {
+        //            if showHiddenMountains {
+        //                return mountains.filter({$0.isVisible() || $0.isHidden })
+        //            } else {
+        //                return mountains.filter({$0.isVisible()})
+        //            }
+        //        }()
+        
         
         GeometryReader { geometry in
             let geoWidth = geometry.size.width
@@ -70,210 +61,91 @@ struct EditCheckListView: View {
             let contentWidth = geoWidth*0.95
             let boxHeight = geoHeight*0.4
             let elmWidth = contentWidth*0.9
-//            let questElmHeight = geoHeight*0.05
-            let questElmHeight:CGFloat = 45.0
+            //            let mountainElmHeight = geoHeight*0.05
+            let mountainElmHeight:CGFloat = 45.0
             let todoPresetElmHeight:CGFloat = 40.0
             let todoElmHeight:CGFloat = 35.0
-
+            
+            
             
             VStack {
                 
-                VStack {
-                    Picker("", selection: $appendOption, content: {
-                        ForEach(AppendOption.allCases) { option in
-                            Text(AppendOption.appendOption_kor[option] ?? "")
-                                .tag(option)
-                        }
-                    })
-                        .labelsHidden()
-                        .pickerStyle(.segmented)
-                        .padding(.bottom, 10)
-                        .disabled(createNewPreset)
-
+                ScrollView {
+                    if mountains_visible.isEmpty {
+                        Button(action:{
+                            popUp_self.toggle()
+                            selectedView = .gritBoardAndStatistics}){
+                                // TODO: 바로 새로운 퀘스트 누른 것처럼 만들기
+                                Text("새로운 누적 기록 만들기")
+                                    .padding()
+                            }
+                            .padding()
                         
-                    
-                    ScrollView {
-                        if appendOption == .quest {
-                            if quests_visible.isEmpty {
-                                Button(action:{
-                                    popUp_self.toggle()
-                                    selectedView = .gritBoardAndStatistics}){
-                                    // TODO: 바로 새로운 퀘스트 누른 것처럼 만들기
-                                    Text("새로운 누적 퀘스트 만들기")
-                                            .padding()
+                    }
+                    else {
+                        let mountainIdsNowAndWill: [String] = dailyRecordsViewModel.currentDailyRecord.ascentData.keys + mountainIds_tmp
+                        let mountains_notAdded: [Mountain_fb] = mountains_visible
+                            .filter({
+                                mountain in !(mountainIdsNowAndWill.contains(mountain.id))
+                            })
+                            .sorted(by:{
+                                if $0.momentumLevel != $1.momentumLevel {
+                                    return $0.momentumLevel > $1.momentumLevel
+                                } else if $0.tier != $1.tier {
+                                    return $0.tier > $1.tier
                                 }
-                                    .padding()
-
-                            }
-                            else {
-                                let dailyQuestsNowAndWill: [DailyQuest] = currentDailyRecord.dailyQuestList! + dailyQuests_tmp
-                                let quests_notAdded: [Quest] = quests_visible
-                                    .filter({
-                                        quest in !(dailyQuestsNowAndWill.map({dailyQuest in dailyQuest.questName}).contains(quest.name))
-                                    })
-                                    .sorted(by:{
-                                        if $0.momentumLevel != $1.momentumLevel {
-                                            return $0.momentumLevel > $1.momentumLevel
-                                        } else if $0.tier != $1.tier {
-                                            return $0.tier > $1.tier
-                                        }
-                                        else if $0.dataType != $1.dataType {
-                                            return $0.dataType < $1.dataType  // Sort by Age in ascending order
-                                        }
-    //                                    else if $0.name != $1.name {
-    //                                        return $0.name < $1.name  // Sort by Age in ascending order
-    //                                    }
-                                        else {
-                                            return $0.createdTime > $0.createdTime
-                                        }
-
-                                    })
-//                                ForEach(quests_notHidden) { quest in
-//                                ForEach(quests_notAdded, id:\.id) { quest in
-                                ForEach(quests_notAdded, id:\.name) { quest in
-                                    Button(action:{
-                                        let newDailyQuest_tmp = DailyQuest(questName: quest.name, data: 0, dataType: quest.dataType, defaultPurposes: quest.recentPurpose, customDataTypeNotation: quest.customDataTypeNotation)
-                                        newDailyQuest_tmp.currentTier = quest.tier
-                                        newDailyQuest_tmp.questSubName = quest.subName
-                                        
-                                        dailyQuests_tmp.append(newDailyQuest_tmp)
-                                    }) {
-                                        
-                                        HStack(spacing:0.0) {
-                                            //                                        FireView(momentumLevel: quest.momentumLevel)
-                                            Image(systemName: "plus")
-                                                .frame(width:elmWidth*0.09)
-                                            
-                                            Text(quest.getName())
-                                                .frame(width:elmWidth*0.75)
-
-
-                                            FireView(momentumLevel: quest.momentumLevel)
-                                                .frame(width:elmWidth*0.09,height:questElmHeight*0.9)
-                                            
-
-                                        }
-                                        .padding()
-                                        .frame(width:elmWidth, height:questElmHeight)
-                                        .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
-                                        .bold()
-                                        //                                    .background(getBrightTierColorOf(tier: quest.tier))
-                                        .background(
-                                            Rectangle()
-                                                .fill(getTierColorOf(tier: quest.tier))
-                                        )
-                                        .clipShape(.buttonBorder)
-                                    }
-                                    .buttonStyle(.plain)
-                                    
+                                else if $0.dataType != $1.dataType {
+                                    return $0.dataType < $1.dataType  // Sort by Age in ascending order
                                 }
-                            }
-                        }
-                        else if appendOption == .todo {
-                            Group {
-                                
-                                Group {
-
-                                    if (!createNewPreset && todos_preset.isEmpty) {
-                                        Text("자주 하는 일이 있다면")
-                                            .opacity(0.5)
-                                        Text("하단의 + 버튼을 눌러 생성하세요!")
-                                            .opacity(0.5)
-                                    }
-                                    
-                                    let todos_preset_notAdded:[Todo_preset] = todos_preset.filter({todo_preset in currentDailyRecord.todoList!.map({todo in todo.content}).contains(todo_preset.content)})
-                                    ForEach(todos_preset) { todo_preset in
-                                        HStack(spacing:0.0) {
-                                            Button(action:{
-                                                let newTodo_tmp = Todo(content: todo_preset.content)
-                                                newTodo_tmp.purposes = todo_preset.purposes
-                                                todos_tmp.append(newTodo_tmp)
-                                            }) {
-                                                
-                                                HStack(spacing:0.0) {
-                                                    Image(systemName: "plus")
-                                                        .frame(width:elmWidth*0.08)
-                                                    Text(todo_preset.content)
-                                                        .padding(.leading, 5)
-                                                        .frame(width:elmWidth*0.78, alignment:.leading)
-                                                        .lineLimit(2)
-                                                        .minimumScaleFactor(0.7)
-                                                        .multilineTextAlignment(.leading)
-
-                                                    
-                                                }
-                                                .padding(.horizontal)
-                                                .frame(width:elmWidth*0.9, height:todoPresetElmHeight)
-                                                .background(.gray.opacity(0.5))
-                                                .clipShape(.buttonBorder)
-                                                
-                                            }
-                                            .buttonStyle(.plain)
-                                            
-                                            Button (action: {
-                                                modelContext.delete(todo_preset)
-                                            }) {
-                                                Image(systemName: "xmark")
-                                            }
-                                            .frame(width:elmWidth*0.1)
-                                            
-                                        }
-                                        
-                                        .frame(width:elmWidth, height:todoPresetElmHeight)
-                                        
-                                        
-                                        
-                                    }
-                                }
-                                .disabled(createNewPreset)
-                                if createNewPreset {
-                                    TextField("자주 사용하는 일일퀘스트를 생성하세요.", text: $newTodoPresetName)
-                                        .padding()
-                                        .frame(width:elmWidth, height:todoPresetElmHeight)
-                                        .onSubmit {
-                                            focusField.toggle()
-                                            if newTodoPresetName != "" {
-                                                modelContext.insert(Todo_preset(content: newTodoPresetName))
-                                                newTodoPresetName = ""
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                                }
-                                            }
-                                            createNewPreset.toggle()
-                                            
-                                        }
-                                        .focused($focusField)
-                                        .keyboardShortcut(.end)
-                                    
-                                }
+                                //                                    else if $0.name != $1.name {
+                                //                                        return $0.name < $1.name  // Sort by Age in ascending order
+                                //                                    }
                                 else {
-                                    
-                                    Button(action:{
-                                        createNewPreset.toggle()
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                            focusField = true
-                                        }
-                                    }) {
-                                        Image(systemName: "plus")
-                                            .bold()
-                                    }
-                                    .padding()
+                                    return $0.createdTime > $0.createdTime
                                 }
+                                
+                            })
+                        //                                ForEach(mountains_notHidden) { mountain in
+                        //                                ForEach(mountains_notAdded, id:\.id) { mountain in
+                        ForEach(mountains_notAdded, id:\.name) { mountain in
+                            Button(action:{
+                                mountainIds_tmp.append(mountain.id)
+                            }) {
+                                
+                                HStack(spacing:0.0) {
+                                    Image(systemName: "plus")
+                                        .frame(width:elmWidth*0.09)
+                                    
+                                    Text(mountain.getName())
+                                        .frame(width:elmWidth*0.75)
+                                    
+                                    
+                                    FireView(momentumLevel: mountain.momentumLevel)
+                                        .frame(width:elmWidth*0.09,height:mountainElmHeight*0.9)
+                                    
+                                    
+                                }
+                                .padding()
+                                .frame(width:elmWidth, height:mountainElmHeight)
+                                .foregroundStyle(getDarkTierColorOf(tier: mountain.tier))
+                                .bold()
+                                //                                    .background(getBrightTierColorOf(tier: mountain.tier))
+                                .background(
+                                    Rectangle()
+                                        .fill(getTierColorOf(tier: mountain.tier))
+                                )
+                                .clipShape(.buttonBorder)
                             }
-                            .disabled(addEmptyTodo)
+                            .buttonStyle(.plain)
                             
                         }
-                        else {
-                            // later, add dailyPreset
-                        }
                     }
-                    .scrollIndicators(.visible)
-                    
                 }
+                .scrollIndicators(.visible)
                 .padding()
                 .frame(width: geoWidth*0.95, height: geoHeight*0.4, alignment: .top)
                 .background(.gray.opacity(0.3))
                 .clipShape(.rect(cornerRadius: geoWidth*0.05))
-                
                 
                 Image(systemName: "arrow.down")
                     .bold()
@@ -282,73 +154,36 @@ struct EditCheckListView: View {
                 
                 VStack {
                     ScrollView {
-                        ForEach(dailyQuests_tmp) { dailyQuest in
-
+                        ForEach(mountainIds_tmp) { mountainId in
+                            let mountainName = mountainsViewModel.nameOf(mountainId)
+                            let mountainTier = mountainsViewModel.tierOf(mountainId)
+                            
                             HStack(spacing:0.0) {
-                                Text(dailyQuest.getName())
+                                Text(mountainName)
                                     .padding()
-                                    .frame(width:elmWidth*0.9, height:questElmHeight)
-                                    .foregroundStyle(getDarkTierColorOf(tier: dailyQuest.currentTier))
+                                    .frame(width:elmWidth*0.9, height:mountainElmHeight)
+                                    .foregroundStyle(getDarkTierColorOf(tier: mountainTier))
                                     .bold()
-//                                    .background(getTierColorOf(tier: dailyQuest.currentTier))
                                     .background(
                                         Rectangle()
-                                            .fill(getTierColorOf(tier: dailyQuest.currentTier))
+                                            .fill(getTierColorOf(tier: mountainTier))
                                     )
                                     .clipShape(.buttonBorder)
                                 Button (action: {
-                                    if let idx = dailyQuests_tmp.firstIndex(where: {$0 == dailyQuest}) {
-                                        modelContext.delete(dailyQuest)
-                                        dailyQuests_tmp.remove(at: idx)
+                                    if let idx = mountainIds_tmp.firstIndex(where: {$0 == mountainId}) {
+                                        mountainIds_tmp.remove(at: idx)
                                     }
                                 }) {
                                     Image(systemName: "xmark")
                                 }
                                 .frame(width:elmWidth*0.1)
-
-                                    
+                                
+                                
                             }
-                            .frame(width:elmWidth, height:questElmHeight)
-
+                            .frame(width:elmWidth, height:mountainElmHeight)
+                            
                         }
                         
-                        if addEmptyTodo {
-                            HStack(spacing:0.0) {
-                                Text("비어있는 일반 퀘스트")
-                                    .frame(width:elmWidth*0.9, alignment:.leading)
-                                    .multilineTextAlignment(.leading)
-                                Button (action: {
-                                    addEmptyTodo.toggle()
-                                }) {
-                                    Image(systemName: "xmark")
-                                }
-                                .frame(width:elmWidth*0.1)
-
-                            }
-                        }
-                        
-                        ForEach(todos_tmp) { todo in
-                            HStack(spacing:0.0) {
-//                                Image(systemName: "circle")
-//                                    .frame(width:elmWidth*0.1)
-                                Text(todo.content)
-                                    .frame(width:elmWidth*0.9, alignment:.leading)
-                                    .multilineTextAlignment(.leading)
-                                Button (action: {
-                                    if let idx = todos_tmp.firstIndex(where: {$0 == todo}) {
-                                        modelContext.delete(todo)
-                                        todos_tmp.remove(at: idx)
-                                    }
-                                }) {
-                                    Image(systemName: "xmark")
-                                }
-                                .frame(width:elmWidth*0.1)
-                            }
-//                            .frame(width:elmWidth, height: todoElmHeight)
-                            .frame(width:elmWidth)
-                            .padding(.bottom, 3)
-                            // 새로운 todo_preset은 어떻게 추가하는 것이 좋을까.....??????
-                        }
                         
                     }
                     .padding(.bottom)
@@ -366,57 +201,31 @@ struct EditCheckListView: View {
                             Text("추가")
                         }
                         .frame(width: geoWidth*0.4, alignment: .trailing)
-                        .disabled(dailyQuests_tmp.isEmpty && todos_tmp.isEmpty && !addEmptyTodo)
+                        .disabled(mountainIds_tmp.isEmpty)
                     }
-
+                    
                 }
                 .padding()
                 .frame(width: geoWidth*0.95, height: geoHeight*0.4)
                 .background(.gray.opacity(0.3))
                 .clipShape(.rect(cornerRadius: geoWidth*0.05))
-
-
+                
+                
                 
             }
             .frame(width: geoWidth, height: geoHeight)
         }
     }
-
+        
     func addAll() -> Void {
-        for dailyQuest in dailyQuests_tmp {
-            dailyQuest.dailyRecord = currentDailyRecord
-            dailyQuest.quest = quests.first(where: {$0.name == dailyQuest.questName})
-            modelContext.insert(dailyQuest)
-        }
-        
-        if addEmptyTodo {
-            let emptyTodo = Todo(dailyRecord: currentDailyRecord, index: 0)
-            emptyTodo.dailyRecord = currentDailyRecord
-            modelContext.insert(emptyTodo)
-        }
-        else {
-            var lastIdx = currentDailyRecord.todoList!.map({$0.idx}).sorted().first ?? 0 // if empty -> 0
-            for todo in todos_tmp {
-                lastIdx += 1
-                todo.idx = lastIdx
-                todo.dailyRecord = currentDailyRecord
-                modelContext.insert(todo)
-            }
-        }
-        
+        dailyRecordsViewModel.createAscentData(mountainIds_tmp)
     }
-    
-    func addDailyQuest(_ quest: Quest) -> Void {
-        let dailyQuest = DailyQuest(
-            questName: quest.name,
-            data: 0,
-            dataType: quest.dataType,
-            defaultPurposes: quest.recentPurpose
-        )
-        dailyQuest.questSubName = quest.subName
-        dailyQuest.customDataTypeNotation = quest.customDataTypeNotation
-        dailyQuest.currentTier = quest.tier
-        modelContext.insert(dailyQuest)
+        
+        
+        
+        
+        
+        
         
         
         
@@ -424,18 +233,10 @@ struct EditCheckListView: View {
     
     
     
-
-
     
-
-}
-
-
-
-
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    

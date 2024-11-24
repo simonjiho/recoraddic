@@ -363,7 +363,7 @@ extension ContentView {
         let doneList: [DailyQuest] = [dr1_qd1, dr2_qd1, dr2_qd2, dr3_qd1, dr3_qd2, dr4_qd1, dr4_qd2, dr5_qd1, dr5_qd2, dr6_qd1, dr6_qd2, dr7_qd1, dr7_qd2, dr8_qd1, dr8_qd2]
         for questData in doneList {
             if questData.dailyRecord!.date != nil {
-                quests.first(where: {quest in quest.name == questData.questName})!.dailyData[questData.dailyRecord!.date!] = questData.data
+                quests.first(where: {quest in quest.name == questData.questName})!.dailyAscent[questData.dailyRecord!.date!] = questData.data
             }
             
         }

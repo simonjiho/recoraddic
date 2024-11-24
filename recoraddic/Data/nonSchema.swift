@@ -11,12 +11,19 @@ import SwiftUI
 // use @observable after update to swift 5.9
 
 
-final class RecordInterval {
-    static let everyDay = 0
-    static let onceInNdays = 1
-    static let chooseInCalander = 2
+enum HabitMakerDifficulty:Int, Codable {
+    case easy = 0
+    case medium = 1
+    case hard = 2
+}
+
+
+@Observable class Todo: Identifiable {
+    var id: UUID = UUID()
+    var content: String
     
-    init() {
+    init(content: String = "") {
+        self.content = content
     }
 }
 
@@ -93,7 +100,7 @@ final class DefaultPurpose {
     
 }
 
-final class QuestRepresentingData {
+final class MountainRepresentingData {
     
     static let cumulativeData = 0
     static let recentMontlyData = 1
@@ -102,11 +109,11 @@ final class QuestRepresentingData {
     init() {}
     
     static func titleOf(representingData:Int) -> String {
-        if representingData == QuestRepresentingData.cumulativeData {
+        if representingData == MountainRepresentingData.cumulativeData {
             return "누적:"
         }
         
-        else if representingData == QuestRepresentingData.recentMontlyData {
+        else if representingData == MountainRepresentingData.recentMontlyData {
             return "최근 30일:"
         }
         else {
@@ -128,21 +135,23 @@ final class DailyTextType {
 }
 
 
-extension DailyQuest {
-    func dataForDataRepresentation() -> (Int, Int, String?) {
-        return (data, dataType, customDataTypeNotation)
-    }
-    
-    func getName() -> String {
-        if let subName = self.questSubName {
-            return subName
-        } else {
-            return self.questName
-        }
-    }
-}
+//extension DailyMountain_fb {
+//    func dataForDataRepresentation() -> (Int, Int, String?) {
+//        return (data, dataType, customDataTypeNotation)
+//    }
+//    
+//    func getName() -> String {
+//        if let subName = self.mountainSubName {
+//            return subName
+//        } else {
+//            return self.mountainName
+//        }
+//    }
+//}
 
-extension DailyRecordSet {
+
+
+extension DailyRecordSet_fb {
     func getIntegratedDailyRecordColor(colorScheme:ColorScheme) -> Color {
         if self.dailyRecordThemeName == "StoneTower" {
             return TowerView.getIntegratedDailyRecordColor(
@@ -171,27 +180,27 @@ extension DailyRecordSet {
     
     
     
-    func updateDailyRecordsMomentum() -> Void { // modify absence and streak
-        if let dailyRecords = self.dailyRecords {
-            let dates = dailyRecords.filter({$0.hasContent}).compactMap({$0.date}).sorted()
-            for dailyRecord in dailyRecords {
-                if let date = dailyRecord.date {
-                    let dates_beforeDate:[Date] = dates.filter({$0 < date})
-                    if let nearestDate:Date = dates_beforeDate.last {
-                        dailyRecord.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
-                        if dailyRecord.absence == 0 {
-                            dailyRecord.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
-                        } else {
-                            dailyRecord.streak = 0
-                        }
-                    } else { // first dailyRecord in drs
-                        dailyRecord.absence = 0
-                        dailyRecord.streak = 0
-                    }
-                }
-            }
-        }
-    }
+//    func updateDailyRecordsMomentum() -> Void { // modify absence and streak
+//        if let dailyRecords = self.dailyRecords {
+//            let dates = dailyRecords.filter({$0.hasContent}).compactMap({$0.date}).sorted()
+//            for dailyRecord in dailyRecords {
+//                if let date = dailyRecord.date {
+//                    let dates_beforeDate:[Date] = dates.filter({$0 < date})
+//                    if let nearestDate:Date = dates_beforeDate.last {
+//                        dailyRecord.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
+//                        if dailyRecord.absence == 0 {
+//                            dailyRecord.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
+//                        } else {
+//                            dailyRecord.streak = 0
+//                        }
+//                    } else { // first dailyRecord in drs
+//                        dailyRecord.absence = 0
+//                        dailyRecord.streak = 0
+//                    }
+//                }
+//            }
+//        }
+//    }
     
     func getLocalStart() -> Date {
         let date = self.start
@@ -223,118 +232,99 @@ extension DailyRecordSet {
     }
     
     
-    func visibleDailyRecords(hiddenQuestNames:Set<String>, showHiddenQuests:Bool) -> [DailyRecord] {
-        let dailyRecords_filtered = self.dailyRecords!
-            .filter({$0.hasContent && $0.date != nil})
-            .filter({($0.getLocalDate() ?? getStartDateOfNow()) < .now })
-        if showHiddenQuests {
-            return dailyRecords_filtered
-                .sorted(by: {
-                    if let date0 = $0.date, let date1 = $1.date {
-                        return date0 > date1  // Sorts by date in descending order if both dates are non-nil
-                    } else if $0.date == nil {
-                        return false  // Places items with nil date after those with a non-nil date
-                    } else {
-                        return true  // Ensures $0 with a date is before $1 with nil
-                    }
-                })
-        } else {
-            return dailyRecords_filtered
-                .filter({
-                    $0.hasTodoOrDiary ||
-                    !Set($0.dailyQuestList!.filter({$0.data != 0}).map{$0.questName}).subtracting(hiddenQuestNames).isEmpty
-                })
-                .sorted(by:{
-                    if let date0 = $0.date, let date1 = $1.date {
-                        return date0 > date1  // Sorts by date in descending order if both dates are non-nil
-                    } else if $0.date == nil {
-                        return false  // Places items with nil date after those with a non-nil date
-                    } else {
-                        return true  // Ensures $0 with a date is before $1 with nil
-                    }
-                }
-                )
-        }
-    }
     
     
-    //    func increaseStreak(from date:Date) {
-    //        if let dailyRecords = self.dailyRecords {
-    //            for dailyRecord in dailyRecords {
-    //
-    //
-    //            }
-    //        }
-    //
-    //        if let dates = dailyRecordSet.dailyRecords?.filter({$0.recordedAmount > 0}).map({ $0.date }) {
-    //            if let date = self.date {
-    //                let dates_beforeDate:[Date] = dates.compactMap({$0}).filter({$0 < date})
-    //                if let nearestDate:Date = dates_beforeDate.sorted().last {
-    //                    self.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
-    //                    if self.absence == 0 {
-    //                        self.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
-    //                    } else {
-    //                        self.streak = 0
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //    func decreaseStreak(from:Date) {
-    //
-    //    }
+
 }
 
-extension DailyRecord {
-    func updateRecordedMinutes() -> Void {
-        if let dailyQuestList = self.dailyQuestList {
-            self.recordedMinutes = sumIntArray(dailyQuestList.filter({dataTypeFrom($0.dataType) == DataType.hour}).map({$0.data}))
-        }
-    }
+extension DailyRecord_fb {
     
-    func updateExternalFactors() -> Void {
-        if let dailyRecordSet = self.dailyRecordSet {
-            if let dates = dailyRecordSet.dailyRecords?.filter({$0.hasContent}).map({ $0.date }) {
-                if let date = self.date {
-                    let dates_beforeDate:[Date] = dates.compactMap({$0}).filter({$0 < date})
-                    if let nearestDate:Date = dates_beforeDate.sorted().last {
-                        self.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
-                        if self.absence == 0 {
-                            self.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
-                        } else {
-                            self.streak = 0
-                        }
-                    }
-                }
-            }
-        }
-    }
+    var recordedAmount: Int {mountainCount + todoCount} // 기록 갯수
+    var hasContent: Bool { self.recordedAmount > 0 || (self.dailyText != nil && self.dailyText != "")}
+    var singleElm_dailyMountainOrTodo: Bool { self.dailyText == nil && self.recordedAmount == 1 }
+    var singleElm_diary: Bool { self.dailyText != nil && self.recordedAmount == 0 }
+    var hasTodoOrDiary: Bool { todoCount != 0 || self.dailyText != nil }
     
-    func getLocalDate() -> Date? {
-        if let date = self.date {
-            //            print("convert \(date) into")
-            var calendar = Calendar.current
-            calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
-            // Extract year, month, and day components in UTC
-            let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
-            // Set calendar to local time zone
-            calendar.timeZone = TimeZone.current
-            // Create a date from the components, now interpreted in the local time zone
-            //            print("\(calendar.date(from: dateComponents))")
-            
-            return calendar.date(from: dateComponents) ?? date
-        } else {
-            
-            return nil
-        }
+//    func updateRecordedMinutes() -> Void {
+//        if let dailyMountainList = self.dailyMountainList {
+//            self.recordedMinutes = sumIntArray(dailyMountainList.filter({dataTypeFrom($0.dataType) == DataType.hour}).map({$0.data}))
+//        }
+//    }
+    
+//    var todos_seperated: [Todo] {
+//        get {
+//            todos.components(separatedBy: "\n").filter { !$0.isEmpty }.map{Todo(content: $0) }
+//        }
+//        set {
+//            todos = newValue.map{$0.content}.joined(separator: "\n")
+//        }
+//    }
+    
+    func updateDailyRecordElementCount(_ mountainIds_dataType_time:[String]) {
+//        guard let date_str = dailyRecord?.id else { return }
         
+        self.recordedMinutes = self.ascentData
+            .filter({mountainIds_dataType_time.contains($0.key)})
+            .map({$0.value}).reduce(0, +) ?? 0
+        self.mountainCount = self.ascentData.filter({$0.value == 0}).count ?? 0
+        self.todoCount = self.todos_done.count(where: {$0.value != false}) ?? 0
+        self.scheduleCount = self.schedules.count ?? 0
+        
+        // 문제: Todo
+
+    }
+    
+    
+    
+    
+//    func updateExternalFactors() -> Void {
+//        if let dailyRecordSet = self.dailyRecordSet {
+//            if let dates = dailyRecordSet.dailyRecords?.filter({$0.hasContent}).map({ $0.date }) {
+//                if let date = self.date {
+//                    let dates_beforeDate:[Date] = dates.compactMap({$0}).filter({$0 < date})
+//                    if let nearestDate:Date = dates_beforeDate.sorted().last {
+//                        self.absence = calculateDaysBetweenTwoDates(from: nearestDate, to: date)
+//                        if self.absence == 0 {
+//                            self.streak = dailyStreak(from: dates_beforeDate, targetDate: date)
+//                        } else {
+//                            self.streak = 0
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+    
+//    func getLocalDate() -> Date? {
+//        if let date = self.date {
+//            //            print("convert \(date) into")
+//            var calendar = Calendar.current
+//            calendar.timeZone = TimeZone(identifier: "UTC") ?? .current
+//            // Extract year, month, and day components in UTC
+//            let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
+//            // Set calendar to local time zone
+//            calendar.timeZone = TimeZone.current
+//            // Create a date from the components, now interpreted in the local time zone
+//            //            print("\(calendar.date(from: dateComponents))")
+//            
+//            return calendar.date(from: dateComponents) ?? date
+//        } else {
+//            
+//            return nil
+//        }
+//        
+//    }
+    
+    mutating func addAscentData(_ mountainId: String) {
+        if self.ascentData.keys.contains(mountainId) { return }
+        self.ascentData[mountainId] = 0
     }
 }
 
-extension Quest {
+extension Mountain_fb {
     
     func isVisible() -> Bool {
-        return !isArchived && !isHidden && !inTrashCan
+        return self.mountainState == .available
     }
     
     func getName() -> String {
@@ -346,20 +336,26 @@ extension Quest {
     }
     
     func getCumulative(from start:Date, to end:Date?) -> Int {
-        return self.dailyData.filter({$0.key >= start && $0.key <= (end ?? $0.key)}).values.reduce(0,+)
+        let start_str = dateToString(start)
+        let end_str = dateToString(end)
+        
+        return self.dailyAscent.filter({$0.key >= start_str && $0.key <= (end_str ?? $0.key)}).values.reduce(0,+)
     }
+    
     func getCount(from start:Date, to end:Date?) -> Int {
-        return self.dailyData.keys.filter({$0 >= start && $0 <= (end ?? $0) }).count
+        let start_str = dateToString(start)
+        let end_str = dateToString(end)
+        return self.dailyAscent.keys.filter({$0 >= start_str && $0 <= (end_str ?? $0) }).count
     }
     
     func cumulative() -> Int {
-        return sumIntArray(Array(self.dailyData.values)) + self.pastCumulatve
+        return sumIntArray(Array(self.dailyAscent.values)) + self.pastCumulatve
     }
     
-    func updateTier() -> Void {
+    mutating func updateTier() -> Void {
         
 //        if self.tier == 40 { return }
-        var cumulative = dataType == DataType.custom.rawValue ? self.dailyData.count : cumulative()
+        var cumulative = dataType == DataType.custom.rawValue ? self.dailyAscent.count : cumulative()
         if dataType == DataType.hour.rawValue {
             for i in 0...40 {
                 let minus: Int = {
@@ -425,6 +421,7 @@ extension Quest {
             }
         }
     }
+
     
     func getNextTierCondition() -> Int {
         // 0~4 -> 5
@@ -456,124 +453,43 @@ extension Quest {
     func representingDataToString() -> String {
 //        let calendar = Calendar.current
         
-//        let currentDate = (dailyData.isEmpty || dailyData.keys.contains(getStandardDateOfNow())) ? getStartDateOfNow() : calendar.date(byAdding: .day, value: -1, to: getStartDateOfNow())!
+//        let currentDate = (dailyAscent.isEmpty || dailyAscent.keys.contains(getStandardDateOfNow())) ? getStartDateOfNow() : calendar.date(byAdding: .day, value: -1, to: getStartDateOfNow())!
         // 오늘기록완료시(get d -> 마지막기록날짜 / 기록완료 안했을 시: 전날
         
-        if representingData == QuestRepresentingData.cumulativeData {
+        if representingData == MountainRepresentingData.cumulativeData {
             return "누적 \(DataType.string_fullRepresentableNotation(data: cumulative(), dataType: dataTypeFrom(dataType), customDataTypeNotation: self.customDataTypeNotation))"
         }
         
-        // not used
-//        else if representingData == QuestRepresentingData.recentMontlyData {
-//
-//            let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: currentDate)!
-//
-//            let recentData = dailyData.filter { (key: Date, value: Int) -> Bool in
-//                return key >= thirtyDaysAgo
-//            }
-//
-//            let actualTerm:Int = {
-//                if recentData.isEmpty {
-//                    return 1
-//                }
-//                else {
-//                    if recentData.keys.sorted().first! != currentDate {
-//                        return calculateDaysBetweenTwoDates(from: recentData.keys.sorted().first!, to: currentDate) + 1
-//                    }
-//                    else {
-//                        return 1
-//                    }
-//                }
-//            }()
-//
-//
-//            let numberOfDoneDates: Int = recentData.isEmpty ? 1 : recentData.count
-//
-//            let averageTermOfQuest: Float = recentData.isEmpty ? 0.0 : Float(actualTerm) / Float(numberOfDoneDates)
-//
-//            let averageValueOfQuest: Float = Float(sumIntArray(Array(recentData.values))) / Float(numberOfDoneDates)
-//
-//            return "\(String(format:"%.1f",averageTermOfQuest)) 일마다 \(String(format:"%.1f",DataType.float_unitDataToRepresentableData(data:Int(averageValueOfQuest*10), dataType: self.dataType)/10.0 ) )\(DataType.unitNotationOf(dataType: self.dataType, customDataTypeNotation: customDataTypeNotation))"
-//
-//        }
+
         
         else {
-            return "questRepresentOptionError"
+            return "mountainRepresentOptionError"
         }
         
     }
     
-    func updateMomentumLevel() -> Void {
+    mutating func updateMomentumLevel() -> Void {
         self.momentumLevel = returnMomentumLevel()
     }
-//    func returnMomentumLevel() -> Int {
-//        // 1. special
-//
-//        let datesRecorded:[Date] = self.dailyData.keys.filter({self.dailyData[$0] ?? 0 > 0})
-//        let boolArray60days:[Bool] = generateBoolArray(from:datesRecorded)
-//        let (days, percentage) = getRecentPercentage(from:boolArray60days)
-//
-//        if days == 0 { return 0 }
-//
-//        let fire:Int = {
-//            switch percentage {
-//            case 1.0...: return 4
-//            case 0.75..<1.0: return 3
-//            case 0.5..<0.75: return 2
-//            case 0.25..<0.5: return 1
-//            case 0.01..<0.5: return 0
-//            default: return 0
-//            }
-//        }()
-//
-//        let size:Int = {
-//            switch days {
-//            case 60...: return 5
-//            case 30..<60: return 4
-//            case 20..<30: return 3
-//            case 10..<20: return 2
-//            case 5..<10: return 1
-//            default: return 0
-//            }
-//        }()
-//
-//
-//        return 1 + fire*6 + size
-//
-//
-//
-//
-//    }
+
 
     func returnMomentumLevel() -> Int {
 
-        if self.dailyData.count == 0 {
+        if self.dailyAscent.count == 0 {
             return 0
         }
         
-        let latestRecordDate: Date = self.dailyData.sorted { element1, element2 in
+        let latestRecordDate_str: String = self.dailyAscent.sorted { element1, element2 in
             element1.key < element2.key
         }.last!.key
         
-        let today: Date = getStandardDateOfNow()
-        let todayOrYesterday = latestRecordDate == today ? today : getStandardDateOfYesterday()
+        let latestRecordDate: Date = stringToDate(latestRecordDate_str)
+        
+        let today: Date = Date()
+        let todayOrYesterday = latestRecordDate == today ? today : Date().addingDays(-1)
         
         let unactivatedPeriod: Int = calculateDaysBetweenTwoDates(from:latestRecordDate, to: today)
         
-//        if self.name == "시간퀘스트" {
-//            print(unactivatedPeriod)
-//            print(self.dailyData)
-//            let baseDate = Calendar.current.date(byAdding: .day, value: -3, to: todayOrYesterday)!
-//            print(baseDate)
-//            for key in self.dailyData.keys {
-//                print(calculateDaysBetweenTwoDates(from: baseDate, to: key) > 0)
-//            }
-//            let numberOfRecordedDates:Int = self.dailyData.filter({ element in
-//                calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0
-//            }).count
-//            print(numberOfRecordedDates)
-//            print(checkMomentumLevel(ratio: 0.33, termLength: 3, today: todayOrYesterday))
-//        }
         
         if unactivatedPeriod <= 1 { // try finding if there's special(extreme high) momentumLevel
             if checkMomentumLevel(ratio: 1.0, termLength: 60, today: todayOrYesterday) {
@@ -669,8 +585,8 @@ extension Quest {
         
         let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: today) ?? today
         
-        let numberOfRecordedDates:Int = self.dailyData.filter({ element in
-            calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0
+        let numberOfRecordedDates:Int = self.dailyAscent.filter({ element in
+            calculateDaysBetweenTwoDates(from: baseDate, to: (stringToDate(element.key))) > 0
         }).count
         
         return ratio <= CGFloat(numberOfRecordedDates)/CGFloat(termLength)
@@ -680,16 +596,17 @@ extension Quest {
     
     func textForMomentumLevel() -> String {
         
-        if self.dailyData.count == 0 {
+        if self.dailyAscent.count == 0 {
             return "기록 없음"
         }
         
-        let latestRecordDate: Date = self.dailyData.sorted { element1, element2 in
+        let latestRecordDate_str: String = self.dailyAscent.sorted { element1, element2 in
             element1.key < element2.key
         }.last!.key
-//        let today: Date = getStandardDateOfNow()
-//        let todayOrYesterday = latestRecordDate == today ? today : getStandardDateOfYesterday()
-        let datesRecorded:[Date] = self.dailyData.keys.filter({(self.dailyData[$0] ?? 0) > 0})
+        let latestRecordDate: Date = stringToDate(latestRecordDate_str)
+
+        
+        let datesRecorded:[Date] = self.dailyAscent.keys.filter({(self.dailyAscent[$0] ?? 0) > 0}).map({stringToDate($0)})
         let boolArray60days:[Bool] = generateBoolArray(from:datesRecorded)
 //        let (days, percentage) = getRecentPercentage(from:boolArray60days)
         if momentumLevel >= 19 {
@@ -726,8 +643,8 @@ extension Quest {
         
         let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: today) ?? Date()
         
-        let numberOfRecordedDates:Int = self.dailyData.filter({ element in
-            calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0
+        let numberOfRecordedDates:Int = self.dailyAscent.filter({ element in
+            calculateDaysBetweenTwoDates(from: baseDate, to: stringToDate(element.key)) > 0
         }).count
         
         return CGFloat(numberOfRecordedDates)/CGFloat(termLength)
@@ -738,7 +655,7 @@ extension Quest {
 //
 //        let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: today) ?? Date()
 //
-//        let numberOfRecordedDates:Int = self.dailyData.filter({ element in
+//        let numberOfRecordedDates:Int = self.dailyAscent.filter({ element in
 //            calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0
 //        }).count
 //

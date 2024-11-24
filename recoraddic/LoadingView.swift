@@ -49,7 +49,10 @@ struct LoadingView_initialization: View {
 
 struct LoadingView_fetch: View {
 //    @State var dot: String = ""
-    var retryCount: Int
+    
+    @ObservedObject var containerHolder: ModelContainerHolder
+    
+    @State var retryCount: Int
     
     var body: some View {
         VStack {
@@ -68,12 +71,16 @@ struct LoadingView_fetch: View {
                 .padding(.top, 5)
             }
             else {
-                Text("오류: 앱을 재시작 해주세요.")
+                Text("오류: 앱을 삭제 후 재설치 해주세요.")
             }
 
         }
         .containerRelativeFrame([.horizontal,.vertical])
         .background(.quinary)
+        .onAppear() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+                retryCount = containerHolder.getRetryCount()}
+        }
     }
 }
 

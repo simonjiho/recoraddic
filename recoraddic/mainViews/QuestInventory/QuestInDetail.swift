@@ -1,5 +1,5 @@
 //
-//  Popup_QuestStatistics.swift
+//  Popup_MountainStatistics.swift
 //  recoraddic
 //
 //  Created by 김지호 on 3/16/24.
@@ -14,16 +14,16 @@ import ActivityKit
 
 
 
-struct QuestInDetail: View {
+struct MountainInDetail: View {
     
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
     
-    @Query var quests: [Quest]
+    @Query var mountains: [Mountain]
     
-    @Binding var selectedQuest: Quest? // MARK: 이렇게 하지 않으면 화면이 잘 업데이트 되지 않았었음.
+    @Binding var selectedMountain: Mountain? // MARK: 이렇게 하지 않으면 화면이 잘 업데이트 되지 않았었음.
     
-    @Binding var popUp_questStatisticsInDetail: Bool
+    @Binding var popUp_mountainStatisticsInDetail: Bool
     
     @State var alert_inTrashCan: Bool = false
     @State var alert_restore: Bool = false
@@ -32,13 +32,13 @@ struct QuestInDetail: View {
     
     @State var currentPage = 0
 
-    @State var popUp_editQuest = false
+    @State var popUp_editMountain = false
     
     @State var keyBoardAppeared = false
     
     var body: some View {
         
-        let questNames = quests.filter({!$0.inTrashCan}).map { $0.name }
+        let mountainNames = mountains.filter({!$0.inTrashCan}).map { $0.name }
         
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let contentColor: Color = colorScheme == .light ? colorSchemeColor.adjust(brightness: -0.05) : colorSchemeColor
@@ -55,23 +55,23 @@ struct QuestInDetail: View {
             let contentWidth2 = geoWidth*0.8
             let contentWidth3 = contentWidth2/7
             
-            let tierColor_dark: Color = getDarkTierColorOf(tier: selectedQuest?.tier ?? 0)
-            let tierColor_bright: Color = getBrightTierColorOf2(tier: selectedQuest?.tier ?? 0)
+            let tierColor_dark: Color = getDarkTierColorOf(tier: selectedMountain?.tier ?? 0)
+            let tierColor_bright: Color = getBrightTierColorOf2(tier: selectedMountain?.tier ?? 0)
 
-            let questTier: Int = selectedQuest?.tier ?? 0
-            let nextTier: Int = (questTier/5 + 1)*5
+            let mountainTier: Int = selectedMountain?.tier ?? 0
+            let nextTier: Int = (mountainTier/5 + 1)*5
             
-            if let quest = selectedQuest {
+            if let mountain = selectedMountain {
                 VStack(spacing:0.0) {
                     VStack {
                         Group {
-                            Text(quest.name)
+                            Text(mountain.name)
                                 .padding(.horizontal,40)
                                 .frame(width: geoWidth)
                                 .font(.title)
                                 .padding(.top, geoHeight*0.02)
                                 .minimumScaleFactor(0.5)
-                            if let startDate: Date  = quest.dailyData.keys.sorted().first {
+                            if let startDate: Date  = mountain.dailyAscent.keys.sorted().first {
                                 if !keyBoardAppeared {
                                     Text("시작일: \(yyyymmddFormatOf(startDate))")
                                 }
@@ -82,19 +82,19 @@ struct QuestInDetail: View {
                         Spacer()
                             .frame(height:geoHeight*0.02)
                         
-                        if quest.inTrashCan {
+                        if mountain.inTrashCan {
                             HStack(spacing:geoWidth/4) {
                                 Button("되돌리기") {
                                     alert_restore.toggle()
                                 }
-                                .alert("퀘스트 '\(quest.name)' 를 복구하시겠습니까?", isPresented: $alert_restore) {
+                                .alert("퀘스트 '\(mountain.name)' 를 복구하시겠습니까?", isPresented: $alert_restore) {
                                     Button("복구") {
-                                        if questNames.contains(quest.name) {
+                                        if mountainNames.contains(mountain.name) {
                                             alert_sameName.toggle()
                                         } else {
-                                            quest.inTrashCan = false
-                                            quest.deletedTime = nil
-                                            popUp_questStatisticsInDetail.toggle()
+                                            mountain.inTrashCan = false
+                                            mountain.deletedTime = nil
+                                            popUp_mountainStatisticsInDetail.toggle()
                                         }
                                         alert_restore.toggle()
                                     }
@@ -115,16 +115,16 @@ struct QuestInDetail: View {
                                     alert_delete.toggle()
                                 }
                                 .foregroundStyle(.red)
-                                .alert("퀘스트 '\(quest.name)' 를 영구적으로 삭제하시겠습니까?", isPresented: $alert_delete) {
+                                .alert("퀘스트 '\(mountain.name)' 를 영구적으로 삭제하시겠습니까?", isPresented: $alert_delete) {
                                     Button("영구적으로 삭제") {
                                         
-                                        let targetQuest: Quest = quest
-                                        selectedQuest = nil
+                                        let targetMountain: Mountain = mountain
+                                        selectedMountain = nil
                                         
-                                        popUp_questStatisticsInDetail.toggle()
+                                        popUp_mountainStatisticsInDetail.toggle()
                                         alert_delete.toggle()
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                                            modelContext.delete(targetQuest)
+                                            modelContext.delete(targetMountain)
                                         }
                                     }
                                     Button("취소") {
@@ -140,35 +140,35 @@ struct QuestInDetail: View {
                         } // 휴지통에 있을 때의 메뉴
                         else if !keyBoardAppeared {
                             let current: Int = {
-                                if quest.dataType == DataType.custom.rawValue {
-                                    return quest.dailyData.count
+                                if mountain.dataType == DataType.custom.rawValue {
+                                    return mountain.dailyAscent.count
                                 }
                                 else {
-                                    return DataType.cumulative_integratedValueNotation(data: (quest.cumulative()), dataType: dataTypeFrom(quest.dataType))
+                                    return DataType.cumulative_integratedValueNotation(data: (mountain.cumulative()), dataType: dataTypeFrom(mountain.dataType))
                                 }
                             }()
-                            let next: Int = DataType.cumulative_integratedValueNotation(data: (quest.getNextTierCondition()), dataType: dataTypeFrom(quest.dataType))
+                            let next: Int = DataType.cumulative_integratedValueNotation(data: (mountain.getNextTierCondition()), dataType: dataTypeFrom(mountain.dataType))
                             HStack(spacing:0.0) {
-                                if quest.dataType == DataType.hour.rawValue {
+                                if mountain.dataType == DataType.hour.rawValue {
                                     Text("누적 시간: \(current)hr")
-                                } else if quest.dataType == DataType.ox.rawValue {
+                                } else if mountain.dataType == DataType.ox.rawValue {
                                     Text("누적 달성: \(current)회")
                                 } else {
                                     Text("기록 횟수: \(current)회")
                                 }
                             }
                             .frame(width:contentWidth1, height: titleHeight*0.2)
-                            .foregroundStyle(getDarkTierColorOf(tier: questTier))
+                            .foregroundStyle(getDarkTierColorOf(tier: mountainTier))
                             .background(
                                 
                                 HStack(spacing:0.0) {
                                     let ratio: CGFloat = CGFloat(current) / CGFloat(next)
                                     if ratio.isFinite && ratio >= 0 && ratio <= 1 {
-                                        //                                    QuestTierView(tier: nextTier)
+                                        //                                    MountainTierView(tier: nextTier)
                                         getTierColorOf(tier: nextTier).colorExpressionIntegration()
                                             .frame(width: contentWidth1*ratio)
 //                                            tierColor_dark
-                                        getTierColorOf(tier: questTier)
+                                        getTierColorOf(tier: mountainTier)
                                             .frame(width: contentWidth1*(1-ratio))
                                     }
                                     
@@ -176,7 +176,7 @@ struct QuestInDetail: View {
                                 }
                                     .frame(width:contentWidth1, height: titleHeight*0.2)
                                     .clipShape(.buttonBorder)
-                                    .shadow(color:getDarkTierColorOf(tier: questTier), radius: 0.5)
+                                    .shadow(color:getDarkTierColorOf(tier: mountainTier), radius: 0.5)
 
                             )
                             .padding(.bottom,geoHeight*0.01)
@@ -232,7 +232,7 @@ struct QuestInDetail: View {
                                 ZStack { // for scroll
                                     let elementSize:CGFloat = contentWidth2/7
                                     let (startDate,endDate): (Date,Date) = {
-                                        let sorted_dates: [Date] = quest.dailyData.keys.sorted()
+                                        let sorted_dates: [Date] = mountain.dailyAscent.keys.sorted()
                                         
                                         if sorted_dates.isEmpty {
                                             return (.now, .now)
@@ -247,7 +247,7 @@ struct QuestInDetail: View {
                                     let scrollViewHeight:CGFloat = elementSize * CGFloat(numberOfRows)
                                     ScrollView {
                                         
-                                        SerialVisualization(data: quest.dailyData, tier: questTier)
+                                        SerialVisualization(data: mountain.dailyAscent, tier: mountainTier)
                                             .frame(width: contentWidth2, height: scrollViewHeight, alignment: .center)
 //                                            .border(.red)
                                             .padding(.horizontal, (contentWidth1-contentWidth2)/2)
@@ -279,7 +279,7 @@ struct QuestInDetail: View {
                     }
                     else if currentPage == 1 {
                         
-                        QuestStatistics_inTerm(selectedQuest: quest)
+                        MountainStatistics_inTerm(selectedMountain: mountain)
                             .padding(.vertical)
                             .frame(width:geoWidth, height: contentHeight)
                             .scrollTargetLayout()
@@ -291,7 +291,7 @@ struct QuestInDetail: View {
                         
                     }
                     else { // currentPage == 2
-                        QuestMemo(quest:quest,keyBoardAppeared: $keyBoardAppeared)
+                        MountainMemo(mountain:mountain,keyBoardAppeared: $keyBoardAppeared)
                             .padding(.vertical)
                             .frame(width:contentWidth1, height: contentHeight)
                     }
@@ -306,7 +306,7 @@ struct QuestInDetail: View {
 //                                .foregroundStyle(tierColor_dark)
                             .tag(0)
 
-                        if quest.dataType != DataType.ox.rawValue {
+                        if mountain.dataType != DataType.ox.rawValue {
                             Image(systemName: "chart.line.uptrend.xyaxis")
                                 .tag(1)
                         }
@@ -337,38 +337,38 @@ struct QuestInDetail: View {
 //                        .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
                     
                     
-                    if !quest.inTrashCan {
+                    if !mountain.inTrashCan {
                         VStack(spacing:0.0) {
                             Spacer()
                                 .frame(width: contentWidth1, height: 1)
                                 .background(tierColor_dark.opacity(0.35))
                             
                             HStack(spacing: geoWidth*0.1) {
-                                if !quest.isArchived {
+                                if !mountain.isArchived {
                                     Button("보관",systemImage: "archivebox") {
-                                        quest.isArchived = true
-                                        quest.isHidden = false
+                                        mountain.isArchived = true
+                                        mountain.isHidden = false
                                     }
                                     .foregroundStyle(tierColor_dark)
                                 }
                                 else {
                                     Button("되돌리기") {
-                                        quest.isArchived = false
-                                        quest.isHidden = false
+                                        mountain.isArchived = false
+                                        mountain.isHidden = false
                                     }
                                     .foregroundStyle(tierColor_dark)
                                 }
-                                if !quest.isHidden {
+                                if !mountain.isHidden {
                                     Button("숨김",systemImage: "eye.slash") {
-                                        quest.isArchived = false
-                                        quest.isHidden = true
+                                        mountain.isArchived = false
+                                        mountain.isHidden = true
                                     }
                                     .foregroundStyle(tierColor_dark)
                                 }
                                 else {
                                     Button("되돌리기") {
-                                        quest.isArchived = false
-                                        quest.isHidden = false
+                                        mountain.isArchived = false
+                                        mountain.isHidden = false
                                     }
                                     .foregroundStyle(tierColor_dark)
                                 }
@@ -380,14 +380,14 @@ struct QuestInDetail: View {
                             .frame(height: menuHeight*0.29)
                             .padding(.top, menuHeight*0.2)
                             .padding(.bottom, menuHeight*0.1)
-                            .alert("퀘스트 '\(quest.name)' 를 삭제하시겠습니까?", isPresented: $alert_inTrashCan) {
+                            .alert("퀘스트 '\(mountain.name)' 를 삭제하시겠습니까?", isPresented: $alert_inTrashCan) {
                                 Button("휴지통으로 이동") {
                                     alert_inTrashCan.toggle()
-                                    popUp_questStatisticsInDetail.toggle()
-                                    quest.isArchived = false
-                                    quest.isHidden = false
-                                    quest.inTrashCan = true
-                                    quest.deletedTime = Date()
+                                    popUp_mountainStatisticsInDetail.toggle()
+                                    mountain.isArchived = false
+                                    mountain.isHidden = false
+                                    mountain.inTrashCan = true
+                                    mountain.deletedTime = Date()
                                 }
                                 .foregroundStyle(.red)
                                 Button("취소") {
@@ -402,30 +402,30 @@ struct QuestInDetail: View {
                     
                 }
                 .frame(width: geoWidth, height: geoHeight, alignment: .top)
-                .background(LinearGradient(colors: getGradientColorsOf(tier: quest.tier, type: 1), startPoint: .topLeading, endPoint: .bottomTrailing))
-                .fullScreenCover(isPresented: $popUp_editQuest) {
-//                    if let quest = selectedQuest {
-                    let pastCumulative = quest.dataType == DataType.hour.rawValue ? quest.pastCumulatve/60 : quest.pastCumulatve
-                    EditQuest(
-                        popUp_editQuest: $popUp_editQuest,
-                        quest: quest,
-                        questName: quest.name,
-                        questDataType: DataType(rawValue: quest.dataType) ?? .hour ,
-                        customDataTypeNotation:quest.customDataTypeNotation,
-                        customDataTypeNotation_textField: quest.customDataTypeNotation ?? "",
-                        addSubName: quest.subName != nil,
-                        questSubname: quest.subName ?? "",
-                        addPastCumulative: quest.pastCumulatve != 0,
+                .background(LinearGradient(colors: getGradientColorsOf(tier: mountain.tier, type: 1), startPoint: .topLeading, endPoint: .bottomTrailing))
+                .fullScreenCover(isPresented: $popUp_editMountain) {
+//                    if let mountain = selectedMountain {
+                    let pastCumulative = mountain.dataType == DataType.hour.rawValue ? mountain.pastCumulatve/60 : mountain.pastCumulatve
+                    EditMountain(
+                        popUp_editMountain: $popUp_editMountain,
+                        mountain: mountain,
+                        mountainName: mountain.name,
+                        ascentDataType: DataType(rawValue: mountain.dataType) ?? .hour ,
+                        customDataTypeNotation:mountain.customDataTypeNotation,
+                        customDataTypeNotation_textField: mountain.customDataTypeNotation ?? "",
+                        addSubName: mountain.subName != nil,
+                        mountainSubname: mountain.subName ?? "",
+                        addPastCumulative: mountain.pastCumulatve != 0,
                         pastCumulative: pastCumulative,
                         pastCumulative_str: String(pastCumulative)
                     )
 //                    }
                 }
                 .overlay {
-                    if let quest = selectedQuest {
+                    if let mountain = selectedMountain {
                         
-                        if !quest.inTrashCan {
-                            Button(action:{popUp_editQuest.toggle()}) {
+                        if !mountain.inTrashCan {
+                            Button(action:{popUp_editMountain.toggle()}) {
                                 Image(systemName: "square.and.pencil")
                                     .foregroundStyle(tierColor_dark)
                             }
@@ -447,10 +447,10 @@ struct QuestInDetail: View {
 }
 
 
-struct QuestMemo: View {
+struct MountainMemo: View {
     @Environment(\.modelContext) var modelContext
     
-    @State var quest: Quest
+    @State var mountain: Mountain
     
     @FocusState var editing: Bool
     
@@ -462,19 +462,19 @@ struct QuestMemo: View {
                 Button("완료") {
                     editing = false
                 }
-                .buttonStyle(QuestMemoButtonStyle(quest.tier))
+                .buttonStyle(MountainMemoButtonStyle(mountain.tier))
                 .padding(.top, 10)
             } else {
                 Image(systemName: "note.text")
-                    .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
+                    .foregroundStyle(getDarkTierColorOf(tier: mountain.tier))
                     .padding(.top, 10)
             }
-            TextEditor(text: $quest.memo)
+            TextEditor(text: $mountain.memo)
                 .textEditorStyle(.plain)
                 .focused($editing)
             //            .opacity(0.5)
         }
-        .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
+        .foregroundStyle(getDarkTierColorOf(tier: mountain.tier))
         .background(.ultraThinMaterial.opacity(0.5))
         .onChange(of: editing) { oldValue, newValue in
             keyBoardAppeared = editing
@@ -482,7 +482,7 @@ struct QuestMemo: View {
     }
 }
 
-struct QuestMemoButtonStyle: ButtonStyle {
+struct MountainMemoButtonStyle: ButtonStyle {
     @Environment(\.colorScheme) var colorScheme
 
     var tier:Int
@@ -502,10 +502,10 @@ struct QuestMemoButtonStyle: ButtonStyle {
     }
 }
 
-struct QuestStatistics_inTerm: View {
+struct MountainStatistics_inTerm: View {
     @Environment(\.modelContext) var modelContext
     
-    var selectedQuest: Quest
+    var selectedMountain: Mountain
     
 //    @State var start: Date = Date()
 //    @State var end: Date = Date()
@@ -518,7 +518,7 @@ struct QuestStatistics_inTerm: View {
 
 //    var selectedDate: Date? {
 //      guard let rawSelectedDate else { return nil }
-//        return selectedQuest.dailyData.ke.first?.sales.first(where: {
+//        return selectedMountain.dailyAscent.ke.first?.sales.first(where: {
 //            let endOfDay = endOfDay(for: $0.day)
 //            return ($0.day ... endOfDay).contains(rawSelectedDate)
 //        })?.day
@@ -533,10 +533,10 @@ struct QuestStatistics_inTerm: View {
     
     var body: some View {
         
-        let tierColor_dark: Color = getDarkTierColorOf(tier: selectedQuest.tier)
-        let tierColor_bright: Color = getBrightTierColorOf2(tier: selectedQuest.tier)
+        let tierColor_dark: Color = getDarkTierColorOf(tier: selectedMountain.tier)
+        let tierColor_bright: Color = getBrightTierColorOf2(tier: selectedMountain.tier)
                 
-        if selectedQuest.dailyData.count == 0 {
+        if selectedMountain.dailyAscent.count == 0 {
             Text("데이터가 존재하지 않습니다.")
                 .foregroundStyle(tierColor_dark)
         }
@@ -544,9 +544,9 @@ struct QuestStatistics_inTerm: View {
             
             
             
-//            let chartData:[Date:Int] = selectedQuest.dailyData.filter({$0.key >= start && $0.key <= end})
-            let chartData:[Date:Int] = selectedQuest.dailyData.filter({selectedOption == -1 ? true : calculateDaysBetweenTwoDates(from: $0.key, to: getStandardDateOfNow())  < selectedOption })
-            let maxValue:Int = selectedQuest.dailyData.values.max() ?? 0
+//            let chartData:[Date:Int] = selectedMountain.dailyAscent.filter({$0.key >= start && $0.key <= end})
+            let chartData:[Date:Int] = selectedMountain.dailyAscent.filter({selectedOption == -1 ? true : calculateDaysBetweenTwoDates(from: $0.key, to: getStandardDateOfNow())  < selectedOption })
+            let maxValue:Int = selectedMountain.dailyAscent.values.max() ?? 0
             
             
             
@@ -563,7 +563,7 @@ struct QuestStatistics_inTerm: View {
                         .foregroundStyle(tierColor_dark)
                         .padding(10)
                     
-                    if selectedQuest.dataType != DataType.ox.rawValue {
+                    if selectedMountain.dataType != DataType.ox.rawValue {
                         
                         Chart {
                             ForEach(chartData.sorted(by: <), id:\.key) { item in
@@ -600,7 +600,7 @@ struct QuestStatistics_inTerm: View {
                                 ) {
                                     VStack {
                                         Text(rawSelectedDate)
-                                        Text("\(DataType.string_fullRepresentableNotation(data: chartData[convertToDate(from: rawSelectedDate) ?? .now] ?? 0, dataType: dataTypeFrom(selectedQuest.dataType),customDataTypeNotation:selectedQuest.customDataTypeNotation))")
+                                        Text("\(DataType.string_fullRepresentableNotation(data: chartData[convertToDate(from: rawSelectedDate) ?? .now] ?? 0, dataType: dataTypeFrom(selectedMountain.dataType),customDataTypeNotation:selectedMountain.customDataTypeNotation))")
                                     }
                                     .padding(5)
                                     .foregroundStyle(tierColor_dark)
@@ -627,7 +627,7 @@ struct QuestStatistics_inTerm: View {
                                 if let valueAsInt = value.as(Int.self) {
                                     
                                     AxisValueLabel {
-//                                        if selectedQuest.dataType == DataType.hour.rawValue {
+//                                        if selectedMountain.dataType == DataType.hour.rawValue {
 //                                            Text("\(DataType.string_fullRepresentableNotation(data: valueAsInt, dataType: DataType.hour) )")
 //                                        }
 //                                        else {
@@ -686,11 +686,11 @@ struct QuestStatistics_inTerm: View {
                         
                         let cumulative_term : Int = sumIntArray(Array(chartData.values))
                         let cumulative_representation: String = {
-                            if selectedQuest.dataType == DataType.ox.rawValue {
+                            if selectedMountain.dataType == DataType.ox.rawValue {
                                 return ""
                             }
                             else {
-                                return "(누적 \(DataType.string_fullRepresentableNotation(data: cumulative_term, dataType: dataTypeFrom(selectedQuest.dataType), customDataTypeNotation: selectedQuest.customDataTypeNotation)))"
+                                return "(누적 \(DataType.string_fullRepresentableNotation(data: cumulative_term, dataType: dataTypeFrom(selectedMountain.dataType), customDataTypeNotation: selectedMountain.customDataTypeNotation)))"
                             }
                             
                         }()
@@ -716,17 +716,17 @@ struct QuestStatistics_inTerm: View {
                             }
                         }()
                         let average_term: String = {
-                            if chartData.count == 0 || selectedQuest.dataType == DataType.ox.rawValue {
+                            if chartData.count == 0 || selectedMountain.dataType == DataType.ox.rawValue {
                                 return ""
                             }
                             
-                            else if selectedQuest.dataType == DataType.hour.rawValue {
+                            else if selectedMountain.dataType == DataType.hour.rawValue {
                                 let average: Int = cumulative_term/term
                                 return "(\(DataType.string_fullRepresentableNotation(data: average, dataType: DataType.hour)))"
                             }
                             else {
                                 let average: CGFloat = CGFloat(cumulative_term)/CGFloat(term)
-                                return "(\(String(format: "%.1f", average)) \(DataType.unitNotationOf(dataType: dataTypeFrom(selectedQuest.dataType), customDataTypeNotation: selectedQuest.customDataTypeNotation)  ))"
+                                return "(\(String(format: "%.1f", average)) \(DataType.unitNotationOf(dataType: dataTypeFrom(selectedMountain.dataType), customDataTypeNotation: selectedMountain.customDataTypeNotation)  ))"
                             }
                             
                         }()
@@ -740,8 +740,8 @@ struct QuestStatistics_inTerm: View {
                 }
                 .frame(width:geoWidth, height: geoHeight, alignment: .top)
 //                .onAppear() {
-//                    start = selectedQuest.dailyData.keys.sorted().first ?? Date()
-//                    end = selectedQuest.dailyData.keys.sorted().last ?? Date()
+//                    start = selectedMountain.dailyAscent.keys.sorted().first ?? Date()
+//                    end = selectedMountain.dailyAscent.keys.sorted().last ?? Date()
 //                    print("chart appeared")
 //                    print(chartData)
 //                }
@@ -1011,24 +1011,22 @@ struct RowContent: View {
 //
 
 
-struct EditQuest: View {
+struct EditMountain: View {
     
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
 //    @Environment(\.isPresented) var isPresented
     @Environment(\.dismiss) var dismiss
     
-    @Query var quests: [Quest]
+    @Environment(MountainsViewModel.self) var mountainsViewModel
+    
+    @Bindable var dailyRecordsViewModel: DailyRecordsViewModel
         
-    @Binding var popUp_editQuest: Bool
+    @Binding var popUp_editMountain: Bool
     // isPlan, popUp
-    var quest: Quest
-    @State var questName: String
-    @State var questDataType: DataType
-    @State var customDataTypeNotation: String?
-    @State var customDataTypeNotation_textField: String
+    var mountain: Mountain_fb
+    @State var mountainName: String
     @State var addSubName: Bool
-    @State var questSubname: String
+    @State var mountainSubname: String
     @State var addPastCumulative: Bool
     @State var pastCumulative: Int
     @State var pastCumulative_str:String
@@ -1051,219 +1049,210 @@ struct EditQuest: View {
             
             let contentHeight = geometry.size.height*0.9
             
-            let questNames:[String] = quests.filter({!$0.inTrashCan}).map{$0.name}.filter({$0 != quest.name})
+            let mountainNames:[String] = mountainsViewModel.mountains.values.filter({$0.mountainState != .archived}).map{$0.name}.filter({$0 != mountain.name})
             
-//            ZStack {
                                 
-                VStack(alignment: .leading) {
-                    HStack {
-                        Button("취소",systemImage: "chevron.left") {
-                            popUp_editQuest.toggle()
-                        }
-                        .padding(20)
-                        .frame(width: geoWidth/4, alignment: .leading)
-                        Text("퀘스트 정보 수정")
-                            .frame(width: geoWidth/2, alignment: .center)
-                        Button(action:saveQuestInfo) {
-                                Text("저장")
-                        }
-                        .padding(20)
-                        .frame(width: geoWidth/4, alignment: .trailing)
-                        .disabled(
-                            questNames.contains(questName) ||
-                            (questDataType == .custom &&
-                            (customDataTypeNotation == "" || customDataTypeNotation == nil)) ||
-                            questName == ""
-                        )
-                        
+            VStack(alignment: .leading) {
+                HStack {
+                    Button("취소",systemImage: "chevron.left") {
+                        popUp_editMountain.toggle()
                     }
-
+                    .padding(20)
+                    .frame(width: geoWidth/4, alignment: .leading)
+                    Text("퀘스트 정보 수정")
+                        .frame(width: geoWidth/2, alignment: .center)
+                    Button(action:saveMountainInfo) {
+                            Text("저장")
+                    }
+                    .padding(20)
+                    .frame(width: geoWidth/4, alignment: .trailing)
+                    .disabled(
+                        mountainNames.contains(mountainName) ||
+                        (ascentDataType == .custom &&
+                        (customDataTypeNotation == "" || customDataTypeNotation == nil)) ||
+                        mountainName == ""
+                    )
                     
-                    HStack {
-                        TextField("퀘스트 이름", text:$questName)
-                            .tag(0)
-                            .font(.title2)
-                            .maxLength(30, text: $questName)
-                            .multilineTextAlignment(.center)
-                            .focused($focusedTextField, equals:0)
-                            .textFieldStyle(.roundedBorder)
+                }
+
+                
+                HStack {
+                    TextField("퀘스트 이름", text:$mountainName)
+                        .tag(0)
+                        .font(.title2)
+                        .maxLength(30, text: $mountainName)
+                        .multilineTextAlignment(.center)
+                        .focused($focusedTextField, equals:0)
+                        .textFieldStyle(.roundedBorder)
 //                            .shadow(radius: 1)
-                        
-                    }
-                    .padding(.horizontal)
-                    .frame(width: geometry.size.width)
-                    //                                .frame(height: textBoxHeight)
                     
+                }
+                .padding(.horizontal)
+                .frame(width: geometry.size.width)
+                //                                .frame(height: textBoxHeight)
+                
 
+                    
+                if mountainName == "" {
+                    Text("퀘스트 이름을 입력하세요")
+                        .frame(width: geometry.size.width)
+                        .foregroundStyle(.red)
+                        .font(.caption)
                         
-                    if questName == "" {
-                        Text("퀘스트 이름을 입력하세요")
-                            .frame(width: geometry.size.width)
-                            .foregroundStyle(.red)
-                            .font(.caption)
-                            
-                        }
-                    else if questNames.contains(questName) {
-                        Text("퀘스트 이름이 이미 존재합니다.")
-                            .frame(width: geometry.size.width, height: 20)
-                            .foregroundStyle(.red)
-                            .font(.caption)
                     }
-                    if questDataType == DataType.custom {
-                        HStack(spacing:0.0) {
+                else if mountainNames.contains(mountainName) {
+                    Text("퀘스트 이름이 이미 존재합니다.")
+                        .frame(width: geometry.size.width, height: 20)
+                        .foregroundStyle(.red)
+                        .font(.caption)
+                }
+                if ascentDataType == DataType.custom {
+                    HStack(spacing:0.0) {
 //                            Spacer()
 //                                .frame(width:checkBoxWidth)
 //                                .border(.yellow)
 
-                            Text("사용자 지정 단위")
-                                .padding(.leading, 3)
-                                .padding(.trailing,20)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
-                                .frame(width:textBoxWidth,alignment: .leading)
-                                .multilineTextAlignment(.leading)
+                        Text("사용자 지정 단위")
+                            .padding(.leading, 3)
+                            .padding(.trailing,20)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                            .frame(width:textBoxWidth,alignment: .leading)
+                            .multilineTextAlignment(.leading)
 //                                    .padding(.horizontal)
 
-                            TextField("예시: 푸시업 -> n회",text: $customDataTypeNotation_textField)
-                                .frame(width: textFieldWidth2)
-                                .textFieldStyle(.roundedBorder)
-                                .focused($focusedTextField, equals:1)
-                                .onChange(of: customDataTypeNotation_textField) {
-                                    customDataTypeNotation = customDataTypeNotation_textField
-                                }
-                        }
-                        .padding(.horizontal)
-                        .frame(alignment: .leading)
+                        TextField("예시: 푸시업 -> n회",text: $customDataTypeNotation_textField)
+                            .frame(width: textFieldWidth2)
+                            .textFieldStyle(.roundedBorder)
+                            .focused($focusedTextField, equals:1)
+                            .onChange(of: customDataTypeNotation_textField) {
+                                customDataTypeNotation = customDataTypeNotation_textField
+                            }
+                    }
+                    .padding(.horizontal)
+                    .frame(alignment: .leading)
 //                        .border(.red)
 
-                    }
-                    
-                    
+                }
+                
+                
+                HStack(spacing:0.0) {
                     HStack(spacing:0.0) {
-                        HStack(spacing:0.0) {
-
-                            Button(action:{
-                                addSubName.toggle()
-                                focusedTextField = 2
-                                
-                            }) {
-                                Image(systemName: addSubName ? "checkmark.square" : "square")
-                            }
-                            //                        .border(.yellow)
-                            
-                            
-                            Text("줄임말")
-                                .padding(.leading, 3)
-                                .padding(.trailing,30)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                                .frame(width: textBoxWidth2, alignment: .leading)
-                                .multilineTextAlignment(.leading)
-                                .opacity(addSubName ? 1.0 : 0.5)
-                            //                            .border(.blue)
-                        }
-                        .frame(width: textBoxWidth, alignment: .leading)
-
-//                        .padding(.horizontal)
-                        
-                        TextField("퀘스트를 요약할 이름", text: $questSubname)
-                            .frame(width: textFieldWidth)
-                            .textFieldStyle(.roundedBorder)
-                            .autocorrectionDisabled()
-                            .focused($focusedTextField, equals:2)
-                            .disabled(!addSubName)
-                            .opacity(addSubName ? 1.0 : 0.2)
-
 
                         Button(action:{
-                            showSubnameHelp.toggle()
+                            addSubName.toggle()
+                            focusedTextField = 2
+                            
                         }) {
-                            Image(systemName: "questionmark.circle")
+                            Image(systemName: addSubName ? "checkmark.square" : "square")
                         }
-                        .padding(.leading)
-                        .popover(isPresented: $showSubnameHelp, content: {
-                            Text("줄임말 설정 시 퀘스트 상세 창을 제외한 모든 화면에서 줄임말로 표시됩니다.")
-                                .padding(.horizontal)
-                                .font(.caption)
-                                .foregroundStyle(.red)
-                                .presentationCompactAdaptation(.popover)
-                        })
-
-
+                        //                        .border(.yellow)
                         
-
+                        
+                        Text("줄임말")
+                            .padding(.leading, 3)
+                            .padding(.trailing,30)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                            .frame(width: textBoxWidth2, alignment: .leading)
+                            .multilineTextAlignment(.leading)
+                            .opacity(addSubName ? 1.0 : 0.5)
+                        //                            .border(.blue)
                     }
-                    .padding(.horizontal)
+                    .frame(width: textBoxWidth, alignment: .leading)
+
+//                        .padding(.horizontal)
+                    
+                    TextField("퀘스트를 요약할 이름", text: $mountainSubname)
+                        .frame(width: textFieldWidth)
+                        .textFieldStyle(.roundedBorder)
+                        .autocorrectionDisabled()
+                        .focused($focusedTextField, equals:2)
+                        .disabled(!addSubName)
+                        .opacity(addSubName ? 1.0 : 0.2)
+
+
+                    Button(action:{
+                        showSubnameHelp.toggle()
+                    }) {
+                        Image(systemName: "questionmark.circle")
+                    }
+                    .padding(.leading)
+                    .popover(isPresented: $showSubnameHelp, content: {
+                        Text("줄임말 설정 시 퀘스트 상세 창을 제외한 모든 화면에서 줄임말로 표시됩니다.")
+                            .padding(.horizontal)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .presentationCompactAdaptation(.popover)
+                    })
+
+
+                    
+
+                }
+                .padding(.horizontal)
 
 //                    .border(.red)
 
 
-                        
+                    
+                HStack(spacing:0.0) {
+                    
                     HStack(spacing:0.0) {
                         
-                        HStack(spacing:0.0) {
+                        Button(action:{
+                            addPastCumulative.toggle()
+                            focusedTextField = 3
                             
-                            Button(action:{
-                                addPastCumulative.toggle()
-                                focusedTextField = 3
-                                
-                            }) {
-                                Image(systemName: addPastCumulative ? "checkmark.square" : "square")
-                            }
-                            //                        .border(.yellow)
-                            
-                            
-                            Text("과거 누적량")
-                                .padding(.leading, 3)
-                                .padding(.trailing,20)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.6)
-                                .frame(width: textBoxWidth2, alignment: .leading)
-                                .multilineTextAlignment(.leading)
-                                .opacity(addPastCumulative ? 1.0 : 0.5)
+                        }) {
+                            Image(systemName: addPastCumulative ? "checkmark.square" : "square")
                         }
-                        .frame(width: textBoxWidth, alignment: .leading)
+                        //                        .border(.yellow)
+                        
+                        
+                        Text("과거 누적량")
+                            .padding(.leading, 3)
+                            .padding(.trailing,20)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                            .frame(width: textBoxWidth2, alignment: .leading)
+                            .multilineTextAlignment(.leading)
+                            .opacity(addPastCumulative ? 1.0 : 0.5)
+                    }
+                    .frame(width: textBoxWidth, alignment: .leading)
 //                        .padding(.horizontal)
 
-                        TextField("생성 이전의 누적량", text: $pastCumulative_str)
-                            .frame(width: textFieldWidth)
-                            .textFieldStyle(.roundedBorder)
-                            .disabled(!addPastCumulative)
-                            .opacity(addPastCumulative ? 1.0 : 0.0)
-                            .focused($focusedTextField, equals:3)
-                            .keyboardType(.numberPad)
-                        if addPastCumulative {
-                            Text(DataType.unitNotationOf(dataType: questDataType, customDataTypeNotation: customDataTypeNotation_textField))
-                                .opacity(addPastCumulative ? 1.0 : 0.2)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
-                                .padding(.leading)
-                        }
+                    TextField("생성 이전의 누적량", text: $pastCumulative_str)
+                        .frame(width: textFieldWidth)
+                        .textFieldStyle(.roundedBorder)
+                        .disabled(!addPastCumulative)
+                        .opacity(addPastCumulative ? 1.0 : 0.0)
+                        .focused($focusedTextField, equals:3)
+                        .keyboardType(.numberPad)
+                    if addPastCumulative {
+                        Text(DataType.unitNotationOf(dataType: ascentDataType, customDataTypeNotation: customDataTypeNotation_textField))
+                            .opacity(addPastCumulative ? 1.0 : 0.2)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                            .padding(.leading)
                     }
-                    .padding(.horizontal)
+                }
+                .padding(.horizontal)
 //                    .border(.red)
-                    .frame(width: geoWidth, alignment: .leading)
+                .frame(width: geoWidth, alignment: .leading)
 //                    .border(.yellow)
 
 
-                    
-                    
-
-                    
-                    
-                } // Vstack
-                .padding()
-                .frame(width:geometry.size.width, height:contentHeight, alignment: .top)
-                
                 
                 
 
                 
                 
-//            }// Zstack
-//            .frame(width:geometry.size.width, height: contentHeight)
-//            .navigationTitle("새로운 퀘스트")
-//            .navigationBarTitleDisplayMode(.inline)
+            } // Vstack
+            .padding()
+            .frame(width:geometry.size.width, height:contentHeight, alignment: .top)
+                
+
 
             .onAppear() {
                 focusedTextField = 0
@@ -1277,40 +1266,61 @@ struct EditQuest: View {
         }
     }
     
-    func saveQuestInfo() -> Void {
+    func saveMountainInfo(_ mountain: Mountain_fb) -> Void {
         
-        // change related data (dailyQuest, notification, activity(later) )
+        // change related data (dailyMountain, notification, activity(later) )
         
-        let oldName = quest.name
-        let oldSubName = quest.subName
+        let oldName = mountain.name
+        let oldSubName = mountain.subName
         let oldGetName = oldSubName ?? oldName
-        let newName = questName
-        let newSubName = addSubName ? questSubname : nil
+        let newName = mountainName
+        let newSubName = addSubName ? mountainSubname : nil
         let newGetName = newSubName ?? newName
         
         
-        if let dailyQuests = quest.dailyQuests {
-            for dailyQuest in dailyQuests {
-                if let alermTime = dailyQuest.notfTime {
-                    if alermTime > Date() && oldGetName != newGetName {
-                        removeNotification(at: alermTime, for: oldGetName)
-                        scheduleNotification(at: alermTime, for: newGetName, goal: dailyQuest.dailyGoal, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation)
-                    }
+        var newMountain: Mountain_fb = mountain
+        newMountain.name = newName
+        if addSubName { newMountain.subName = newSubName }
+        else { newMountain.subName = nil }
+        if ascentDataType == .custom { newMountain.customDataTypeNotation = customDataTypeNotation }
+        if addPastCumulative {
+            if let pastCumulatve = Int(pastCumulative_str) {
+                if ascentDataType == .hour {
+                    newMountain.pastCumulatve = pastCumulatve * 60
                 }
-                dailyQuest.questName = newName
-                if addSubName {
-                    dailyQuest.questSubName = newSubName
-                } else {
-                    dailyQuest.questSubName = nil
+                else {
+                    newMountain.pastCumulatve = pastCumulatve
                 }
-                if questDataType == .custom { dailyQuest.customDataTypeNotation = customDataTypeNotation }
-    
-                try? modelContext.save()
             }
+        } else {
+            newMountain.pastCumulatve = 0
+        }
+        newMountain.updateTier()
+        
+        
+        mountainsViewModel.updateMountain(newMountain)
+        dailyRecordsViewModel.updateDailyMountains(for: newMountain, addSubName: addSubName)
+        
+        
+        for dailyMountain in dailyMountains {
+            if let alermTime = dailyMountain.notfTime {
+                if alermTime > Date() && oldGetName != newGetName {
+                    removeNotification(at: alermTime, for: oldGetName)
+                    scheduleNotification(at: alermTime, for: newGetName, goal: dailyMountain.dailyGoal, dataType: dailyMountain.dataType, customDataTypeNotation: dailyMountain.customDataTypeNotation)
+                }
+            }
+            dailyMountain.mountainName = newName
+            if addSubName {
+                dailyMountain.mountainSubName = newSubName
+            } else {
+                dailyMountain.mountainSubName = nil
+            }
+            if ascentDataType == .custom { dailyMountain.customDataTypeNotation = customDataTypeNotation }
+
         }
         
-//        let predicate = #Predicate<DailyQuest> { dailyQuest in
-//            dailyQuest.questName == oldName
+//        let predicate = #Predicate<DailyMountain> { dailyMountain in
+//            dailyMountain.mountainName == oldName
 //        }
 //        let descriptor = FetchDescriptor(predicate: predicate)
 //        try! modelContext.enumerate(
@@ -1318,20 +1328,20 @@ struct EditQuest: View {
 //            batchSize: 5000,
 //            allowEscapingMutations: true
 ////            allowEscapingMutations: true
-//        ) { dailyQuest in
-//            if let alermTime = dailyQuest.notfTime {
+//        ) { dailyMountain in
+//            if let alermTime = dailyMountain.notfTime {
 //                if alermTime > Date() && oldGetName != newGetName {
 //                    removeNotification(at: alermTime, for: oldGetName)
-//                    scheduleNotification(at: alermTime, for: newGetName, goal: dailyQuest.dailyGoal, dataType: dailyQuest.dataType, customDataTypeNotation: dailyQuest.customDataTypeNotation)
+//                    scheduleNotification(at: alermTime, for: newGetName, goal: dailyMountain.dailyGoal, dataType: dailyMountain.dataType, customDataTypeNotation: dailyMountain.customDataTypeNotation)
 //                }
 //            }
-//            dailyQuest.questName = newName
+//            dailyMountain.mountainName = newName
 //            if addSubName {
-//                dailyQuest.questSubName = newSubName
+//                dailyMountain.mountainSubName = newSubName
 //            } else {
-//                dailyQuest.questSubName = nil
+//                dailyMountain.mountainSubName = nil
 //            }
-//            if questDataType == .custom { dailyQuest.customDataTypeNotation = customDataTypeNotation }
+//            if ascentDataType == .custom { dailyMountain.customDataTypeNotation = customDataTypeNotation }
 //
 //            try? modelContext.save() -> 없으면 저장 안 될 때도 있는 듯
 //        }
@@ -1341,27 +1351,11 @@ struct EditQuest: View {
 
         
         
-        quest.name = newName
-        if addSubName { quest.subName = newSubName }
-        else { quest.subName = nil }
-        if questDataType == .custom { quest.customDataTypeNotation = customDataTypeNotation }
-        if addPastCumulative {
-            if let pastCumulatve = Int(pastCumulative_str) {
-                if questDataType == .hour {
-                    quest.pastCumulatve = pastCumulatve * 60
-                }
-                else {
-                    quest.pastCumulatve = pastCumulatve
-                }
-            }
-        } else {
-            quest.pastCumulatve = 0
-        }
-        quest.updateTier()
+
         
         
         
-        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.questName == oldGetName }) {
+        if let targetActivity: Activity<RecoraddicActivityAttributes> = Activity<RecoraddicActivityAttributes>.activities.first(where: {$0.attributes.mountainName == oldGetName }) {
             
             let startTime = targetActivity.attributes.startTime
             let containedDate = targetActivity.attributes.containedDate
@@ -1373,7 +1367,7 @@ struct EditQuest: View {
                 await targetActivity.end(ActivityContent(state: targetActivity.content.state, staleDate: nil), dismissalPolicy: dismissalPolicy)
             }
             
-            let attributes = RecoraddicActivityAttributes(questName: newGetName, startTime:startTime, containedDate:containedDate, tier: tier)
+            let attributes = RecoraddicActivityAttributes(mountainName: newGetName, startTime:startTime, containedDate:containedDate, tier: tier)
             let initialContentState = RecoraddicActivityAttributes.ContentState(goal: dailyGoal)
             do {
                 let activity = try Activity<RecoraddicActivityAttributes>.request(
@@ -1388,7 +1382,7 @@ struct EditQuest: View {
         }
      
         
-        popUp_editQuest.toggle()
+        popUp_editMountain.toggle()
         
     }
     

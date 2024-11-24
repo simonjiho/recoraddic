@@ -126,15 +126,10 @@ let qcbvHeight_large: CGFloat = 70.0
 let qcbvHeight_medium: CGFloat = 55.0
 let qcbvHeight_small: CGFloat = 45.0
 
-func qcbvHeight(_ dynamicTypeSize: DynamicTypeSize, stopWatchIsRunnig:Bool, dataType:Int) -> CGFloat {
-    let height:CGFloat = stopWatchIsRunnig ? qcbvHeight_large : (dataType != DataType.ox.rawValue ? qcbvHeight_medium : qcbvHeight_small)
-    let multiplier = qcbvMultiplier(dynamicTypeSize)
 
-    return height * multiplier
-}
 
-func qcbvHeight(_ dynamicTypeSize: DynamicTypeSize, dataType:Int) -> CGFloat {
-    let height:CGFloat = dataType != DataType.ox.rawValue ? qcbvHeight_medium : qcbvHeight_small
+func qcbvHeight(_ dynamicTypeSize: DynamicTypeSize) -> CGFloat {
+    let height:CGFloat = qcbvHeight_medium
     let multiplier = qcbvMultiplier(dynamicTypeSize)
     return height * multiplier
 }

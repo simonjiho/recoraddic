@@ -9,53 +9,54 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-enum QuestEditOption {
+enum MountainEditOption {
     case archive
     case hide
     case delete
 }
 
-
-struct MainView_QuestInventory: View {
+// TODO: 내일은 여기부터
+struct MainView_MountainInventory: View {
     
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dynamicTypeSize) var dynamicTypeSize
-    @Query var quests:[Quest]
+    
+    @Bindable var mountainsViewModel: MountainsViewModel
     
     @Binding var selectedView: MainViewName
     
-//    @State var chooseQuestToHide:Bool = false
+//    @State var chooseMountainToHide:Bool = false
     
     enum StatisticOption {
-        case quest
+        case mountain
         case defaultPurpose
     } // add customPurpose later
     
-    @State var selectedQuest: Quest?
-    @State var selectedQuest2: Quest = Quest(name: "", dataType: 0)
-    @State var popUp_questStatisticsInDetail: Bool = false
+    @State var selectedMountain: Mountain_fb?
+    @State var selectedMountain2: Mountain_fb = Mountain_fb(name: "")
+    @State var popUp_mountainStatisticsInDetail: Bool = false
     
-    @State var popUp_addNewQuest: Bool = false
+    @State var popUp_addNewMountain: Bool = false
     @State var popUp_help: Bool = false
     @State var popUp_confirmation: Bool = false
     @State var editConfirmed: Bool = false
     @State var isEdit: Bool = false
-    @State var selectedQuestNames: Set<String> = []
+    @State var selectedMountainNames: Set<String> = []
     
-    @State var editOption: QuestEditOption?
+    @State var editOption: MountainEditOption?
     
-    @State var editQuestInfo: Bool = false
+    @State var editMountainInfo: Bool = false
     
     @State var popOver_changePurpose: Bool = false
     
     // @State enum -> 보관 / 숨기기 / 휴지통 하시겠습니까? -> enum에 따른 함수 구분해서 바꿔주기
     
     var body: some View {
-//        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-//        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+
         
-        let quest_sorted_visible = quests.filter({$0.isVisible()}).sorted(by: {
+        let mountains = mountainsViewModel.mountains
+        let mountain_sorted_visible = mountains.filter({$0.isVisible()}).sorted(by: {
             if $0.momentumLevel != $1.momentumLevel {
                 return $0.momentumLevel > $1.momentumLevel
             } else if $0.tier != $1.tier {
@@ -73,11 +74,10 @@ struct MainView_QuestInventory: View {
             let gridHorizontalPadding = geoWidth*0.02
             let gridInnerPadding = geoWidth * 0.02
             let gridViewFrameWidth = geoWidth - gridHorizontalPadding*2 - gridInnerPadding*2
-            let gridWidth = questThumbnailWidth(dynamicTypeSize, defaultWidth: (gridViewFrameWidth) / 2) * 0.97
+            let gridWidth = mountainThumbnailWidth(dynamicTypeSize, defaultWidth: (gridViewFrameWidth) / 2) * 0.97
             let gridHeight = gridWidth / 1.618
             let gridItemWidth = gridWidth * 0.92
             let gridItemHeight = gridHeight * 0.92
-//            let gridItemSpacing = gridItemWidth*0.3
             let gridVerticalSpacing = gridWidth*0.06
         
             let topBarTopPadding = geoHeight*0.035
@@ -92,7 +92,7 @@ struct MainView_QuestInventory: View {
                         ZStack {
                             HStack(spacing:0.0) {
                                 //                            if !isEdit {
-                                Text_scaleToFit("누적 퀘스트 목록")
+                                Text_scaleToFit("누적 기록 목록")
                                     .bold()
                                     .fontDesign(.serif)
                                     .padding(.trailing, 10)
@@ -121,42 +121,42 @@ struct MainView_QuestInventory: View {
                                 
                                 
                                 LazyVGrid(columns: [GridItem(.adaptive(minimum: gridWidth, maximum: gridWidth))], spacing: gridVerticalSpacing) {
-                                    ForEach(quest_sorted_visible,id:\.createdTime) { quest in
+                                    ForEach(mountain_sorted_visible,id:\.createdTime) { mountain in
                                         ZStack {
                                             Button(action:{
                                                 if !isEdit {
-                                                    selectedQuest = quest
-                                                    popUp_questStatisticsInDetail.toggle()
+                                                    selectedMountain = mountain
+                                                    popUp_mountainStatisticsInDetail.toggle()
                                                 }
                                                 else {
-                                                    if selectedQuestNames.contains(quest.name) {
-                                                        selectedQuestNames.remove(quest.name)
+                                                    if selectedMountainNames.contains(mountain.name) {
+                                                        selectedMountainNames.remove(mountain.name)
                                                     }
                                                     else {
-                                                        selectedQuestNames.insert(quest.name)
+                                                        selectedMountainNames.insert(mountain.name)
                                                     }
                                                 }
                                             }) {
-                                                QuestThumbnailView_redesigned(quest: quest)
+                                                MountainThumbnailView_redesigned(mountain: mountain)
                                                     .frame(width: gridItemWidth, height: gridItemHeight)
                                             }
                                             .contextMenu(ContextMenu(menuItems: {
                                                 
                                                 Button("정보 수정") {
-                                                    selectedQuest = quest
-                                                    editQuestInfo.toggle()
-                                                    //                                                toggleEditQuestInfo()
+                                                    selectedMountain = mountain
+                                                    editMountainInfo.toggle()
+                                                    //                                                toggleEditMountainInfo()
                                                 }
                                                 Button("보관") {
-                                                    quest.isArchived = true
+                                                    mountain.isArchived = true
                                                 }
                                                 Button("숨기기") {
-                                                    quest.isHidden = true
+                                                    mountain.isHidden = true
                                                 }
                                                 
                                                 Button("휴지통으로 이동", systemImage:"trash") {
-                                                    quest.inTrashCan = true
-                                                    quest.deletedTime = Date()
+                                                    mountain.inTrashCan = true
+                                                    mountain.deletedTime = Date()
                                                 }
                                                 .foregroundStyle(.red)
                                             }))
@@ -164,18 +164,18 @@ struct MainView_QuestInventory: View {
                                             
                                             if isEdit {
                                                 Button(action:{
-                                                    if selectedQuestNames.contains(quest.name) {
-                                                        selectedQuestNames.remove(quest.name)
+                                                    if selectedMountainNames.contains(mountain.name) {
+                                                        selectedMountainNames.remove(mountain.name)
                                                     }
                                                     else {
-                                                        selectedQuestNames.insert(quest.name)
+                                                        selectedMountainNames.insert(mountain.name)
                                                     }
                                                 }) {
                                                     ZStack {
                                                         let path: Path = Path(roundedRect: CGRect(x: 0, y: 0, width: gridItemWidth, height: gridItemHeight), cornerSize: CGSize(width: gridItemWidth/11, height: gridItemWidth/11))
                                                         path
                                                             .stroke(lineWidth: gridItemHeight/15)
-                                                        if selectedQuestNames.contains(quest.name) {
+                                                        if selectedMountainNames.contains(mountain.name) {
                                                             Image(systemName:"checkmark")
                                                                 .resizable()
                                                                 .scaledToFit()
@@ -191,7 +191,7 @@ struct MainView_QuestInventory: View {
                                         }
                                         .frame(width: gridItemWidth, height: gridItemHeight)
                                         .onAppear() {
-                                            quest.updateMomentumLevel()
+                                            mountain.updateMomentumLevel()
                                         }
                                         .frame(width:gridWidth, height: gridHeight)
                                         //                                        .border(.yellow)
@@ -206,7 +206,7 @@ struct MainView_QuestInventory: View {
                                     // TODO: plus button
                                     if !isEdit {
                                         
-                                        NavigationLink(destination: CreateNewQuest(popUp_createNewQuest: $popUp_addNewQuest) .ignoresSafeArea(.keyboard)
+                                        NavigationLink(destination: CreateNewMountain(popUp_createNewMountain: $popUp_addNewMountain) .ignoresSafeArea(.keyboard)
                                                        
                                         ){
                                             ZStack {
@@ -237,7 +237,7 @@ struct MainView_QuestInventory: View {
                                 
                                 
                                 Spacer()
-                                    .frame(height:gridItemHeight*(quest_sorted_visible.count%2 == 0 ? 2 : 3))
+                                    .frame(height:gridItemHeight*(mountain_sorted_visible.count%2 == 0 ? 2 : 3))
                                 
                                 
                                 
@@ -245,7 +245,7 @@ struct MainView_QuestInventory: View {
                             } // ScrollView
                             .frame(width:geometry.size.width, height: geometry.size.height*0.9)
                             
-                            if quests.filter({$0.isVisible()}).isEmpty {
+                            if mountains.filter({$0.isVisible()}).isEmpty {
                                 VStack {
                                     Text_scaleToFit("반복적으로 해야 할 일을 퀘스트로 생성하고 ")
                                         
@@ -268,17 +268,17 @@ struct MainView_QuestInventory: View {
                     } // VStack
                     .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
                     .background(.quinary)
-                    .sheet(isPresented: $popUp_questStatisticsInDetail, onDismiss: {selectedQuest = nil}) {
-                        QuestInDetail(
-                            selectedQuest: $selectedQuest,
-                            popUp_questStatisticsInDetail: $popUp_questStatisticsInDetail
+                    .sheet(isPresented: $popUp_mountainStatisticsInDetail, onDismiss: {selectedMountain = nil}) {
+                        MountainInDetail(
+                            selectedMountain: $selectedMountain,
+                            popUp_mountainStatisticsInDetail: $popUp_mountainStatisticsInDetail
                         )
                         .ignoresSafeArea(.keyboard)
                         .dynamicTypeSize(...DynamicTypeSize.xxLarge)
 //                        .onAppear() {
-//                            if let quest = selectedQuest {
-//                                print("check if dailyQuest is connected")
-//                                print(quest.dailyQuests?.count)
+//                            if let mountain = selectedMountain {
+//                                print("check if dailyMountain is connected")
+//                                print(mountain.dailyMountains?.count)
 //                            }
 //                        }
                     }
@@ -291,7 +291,7 @@ struct MainView_QuestInventory: View {
                         .onTapGesture {
                             popUp_help.toggle()
                         }
-                    QuestHelpView(popUp_help: $popUp_help)
+                    MountainHelpView(popUp_help: $popUp_help)
 //                        .popUpViewLayout(width: geoWidth*0.9, height: geoHeight*0.85, color: colorSchemeColor)
 //                        .popUpViewLayout(width: geoWidth*0.9, height: 200, color: colorSchemeColor)
                         .popUpViewLayout()
@@ -304,11 +304,13 @@ struct MainView_QuestInventory: View {
 
             }
             .onAppear() {print("main: \(geoHeight)")}
-            .fullScreenCover(isPresented: $editQuestInfo, onDismiss: {selectedQuest=nil}) {
-                EditQuest2(
-                    popUp_editQuest: $editQuestInfo,
-                    selectedQuest: $selectedQuest
+            .fullScreenCover(isPresented: $editMountainInfo, onDismiss: {selectedMountain=nil}) {
+                EditMountain2(
+                    dailyRecordsViewModel: dailyRecordsViewModel,
+                    popUp_editMountain: $editMountainInfo,
+                    selectedMountain: $selectedMountain
                 )
+                
 
             }
             .sheet(isPresented: $isEdit) {
@@ -317,32 +319,32 @@ struct MainView_QuestInventory: View {
 //                }
 //                else {
                     ZStack {
-                        Text("\(selectedQuestNames.count)개의 퀘스트 선택")
+                        Text("\(selectedMountainNames.count)개의 퀘스트 선택")
                         HStack(spacing:0.0) {
                             Button(action:{
                                 editOption = .archive
                                 popUp_confirmation.toggle()
                             }){Image(systemName: "archivebox")}
                                 .frame(width:geoWidth*0.12,alignment: .center)
-                                .disabled(selectedQuestNames.count == 0)
+                                .disabled(selectedMountainNames.count == 0)
                             Button(action:{
                                 editOption = .hide
                                 popUp_confirmation.toggle()
                             }){Image(systemName: "eye.slash")}
                                 .frame(width:geoWidth*0.76, alignment: .leading)
-                                .disabled(selectedQuestNames.count == 0)
+                                .disabled(selectedMountainNames.count == 0)
                             Button(action:{
                                 editOption = .delete
                                 popUp_confirmation.toggle()
                             }){Image(systemName: "trash")}
-                                .foregroundStyle(selectedQuestNames.count == 0 ? .gray : .red)
+                                .foregroundStyle(selectedMountainNames.count == 0 ? .gray : .red)
                                 .frame(width:geoWidth*0.12, alignment: .center)
-                                .disabled(selectedQuestNames.count == 0)
+                                .disabled(selectedMountainNames.count == 0)
                         }
                         .sheet(isPresented: $popUp_confirmation) {
-                            let questName = (selectedQuestNames.count == 1) ? selectedQuestNames.first! : "\(selectedQuestNames.count)개의 퀘스트"
-                            QuestEditConfirmationView2(
-                                questName: questName,
+                            let mountainName = (selectedMountainNames.count == 1) ? selectedMountainNames.first! : "\(selectedMountainNames.count)개의 퀘스트"
+                            MountainEditConfirmationView2(
+                                mountainName: mountainName,
                                 editOption: $editOption,
                                 editConfirmed: $editConfirmed,
                                 popUp_self: $popUp_confirmation
@@ -366,24 +368,24 @@ struct MainView_QuestInventory: View {
             .onChange(of: editConfirmed) { oldValue, newValue in
                 if newValue == true {
                     if editOption == .archive {
-                        for selectedQuestName in selectedQuestNames {
-                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName && !$0.isArchived}).first {
-                                targetQuest.isArchived = true
+                        for selectedMountainName in selectedMountainNames {
+                            if let targetMountain:Mountain = mountains.filter({$0.name == selectedMountainName && !$0.isArchived}).first {
+                                targetMountain.isArchived = true
                             }
                         }
                     }
                     else if editOption == .hide {
-                        for selectedQuestName in selectedQuestNames {
-                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName && !$0.isHidden}).first {
-                                targetQuest.isHidden = true
+                        for selectedMountainName in selectedMountainNames {
+                            if let targetMountain:Mountain = mountains.filter({$0.name == selectedMountainName && !$0.isHidden}).first {
+                                targetMountain.isHidden = true
                             }
                         }
                     }
                     else if editOption == .delete {
-                        for selectedQuestName in selectedQuestNames {
-                            if let targetQuest:Quest = quests.filter({$0.name == selectedQuestName && !$0.inTrashCan}).first {
-                                targetQuest.inTrashCan = true
-                                targetQuest.deletedTime = Date()
+                        for selectedMountainName in selectedMountainNames {
+                            if let targetMountain:Mountain = mountains.filter({$0.name == selectedMountainName && !$0.inTrashCan}).first {
+                                targetMountain.inTrashCan = true
+                                targetMountain.deletedTime = Date()
                             }
                         }
                     }
@@ -410,20 +412,11 @@ struct MainView_QuestInventory: View {
     }
     
     func resetEditData() -> Void {
-        selectedQuestNames = []
+        selectedMountainNames = []
         editOption = nil
         editConfirmed = false
     }
-    
-//    func toggleEditQuestInfo() -> Void {
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-//            if selectedQuest != nil {
-//                editQuestInfo = true
-//            } else {
-//                toggleEditQuestInfo()
-//            }
-//        }
-//    }
+
     
 }
 
@@ -441,11 +434,11 @@ private struct BarDetent: CustomPresentationDetent {
 }
 
 
-struct QuestEditConfirmationView: View {
+struct MountainEditConfirmationView: View {
         
-    var questName: String
+    var mountainName: String
     
-    var editOption: QuestEditOption
+    var editOption: MountainEditOption
     
     @Binding var editConfirmed: Bool
     @Binding var popUp_self: Bool
@@ -453,15 +446,15 @@ struct QuestEditConfirmationView: View {
     
     var body: some View {
         
-        let question: String = {
+        let mountainion: String = {
             if editOption == .archive {
-                return "\(questName) 를 보관하시겠습니까?"
+                return "\(mountainName) 를 보관하시겠습니까?"
             }
             else if editOption == .hide {
-                return "\(questName) 를 숨기시겠습니까?"
+                return "\(mountainName) 를 숨기시겠습니까?"
             }
             else if editOption == .delete {
-                return "\(questName) 를 삭제하시겠습니까?"
+                return "\(mountainName) 를 삭제하시겠습니까?"
             }
             else {
                 return ""
@@ -487,7 +480,7 @@ struct QuestEditConfirmationView: View {
             let geoWidth = geometry.size.width
             let geoHeight = geometry.size.height
             VStack {
-                Text("\(question)")
+                Text("\(mountainion)")
                 if editOption == .delete {
                     Text("(삭제한 누적퀘스트는 휴지통으로 이동됩니다.)")
                 }
@@ -511,11 +504,11 @@ struct QuestEditConfirmationView: View {
 }
 
 
-struct QuestEditConfirmationView2: View {
+struct MountainEditConfirmationView2: View {
         
-    var questName: String
+    var mountainName: String
     
-    @Binding var editOption: QuestEditOption?
+    @Binding var editOption: MountainEditOption?
     
     @Binding var editConfirmed: Bool
     @Binding var popUp_self: Bool
@@ -523,15 +516,15 @@ struct QuestEditConfirmationView2: View {
     
     var body: some View {
         
-        let question: String = {
+        let mountainion: String = {
             if editOption == .archive {
-                return "\(questName) 를 보관하시겠습니까?"
+                return "\(mountainName) 를 보관하시겠습니까?"
             }
             else if editOption == .hide {
-                return "\(questName) 를 숨기시겠습니까?"
+                return "\(mountainName) 를 숨기시겠습니까?"
             }
             else if editOption == .delete {
-                return "\(questName) 를 삭제하시겠습니까?"
+                return "\(mountainName) 를 삭제하시겠습니까?"
             }
             else {
                 return ""
@@ -561,7 +554,7 @@ struct QuestEditConfirmationView2: View {
                 List {
                     Section {
                         VStack(spacing:0.0) {
-                            Text("\(question)")
+                            Text("\(mountainion)")
                                 .frame(height:elementHeight)
                             if editOption == .delete {
                                 Text("(삭제한 누적퀘스트는 휴지통으로 이동됩니다.)")
@@ -598,7 +591,7 @@ struct QuestEditConfirmationView2: View {
 }
 
 
-struct QuestTierView: View {
+struct MountainTierView: View {
     
     @Environment (\.colorScheme) var colorScheme
 //    @Environment (\.modelContext) var modelContext
@@ -754,12 +747,11 @@ struct QuestTierView: View {
         
     }
 }
-struct QuestThumbnailView_redesigned: View {
+struct MountainThumbnailView_redesigned: View {
     
-    @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
 
-    @State var quest: Quest
+    @State var mountain: Mountain_fb
     @State var showMomentumLvDetail:Bool = false
     
     var body: some View {
@@ -773,33 +765,33 @@ struct QuestThumbnailView_redesigned: View {
             let textWidth:CGFloat = (geoWidth - badgeSize)*0.9
             
             ZStack {
-                QuestTierView(tier: quest.tier, notUsedYet: quest.cumulative() == 0)
+                MountainTierView(tier: mountain.tier, notUsedYet: mountain.cumulative() == 0)
                     .frame(width: geoWidth, height: geoHeight)
                 HStack(spacing: 0.0) {
                     VStack(spacing:0.0) {
-                        FireView(momentumLevel: quest.momentumLevel)
+                        FireView(momentumLevel: mountain.momentumLevel)
                             .frame(width: badgeSize, height: badgeSize, alignment: .trailing)
                             .onTapGesture{showMomentumLvDetail.toggle()}
                             .popover(isPresented:$showMomentumLvDetail) {
-                                Text(quest.textForMomentumLevel())
+                                Text(mountain.textForMomentumLevel())
 //                                    .buttonStyle(.plain)
                                     .padding()
                                     .presentationCompactAdaptation(.popover)
                             }
-                        PurposeOfQuestView_redesigned(quest:quest)
+                        PurposeOfMountainView_redesigned(mountain:mountain)
                         .frame(width:badgeSize, height:badgeSize)
                         
                     }
                     .frame(width:badgeSize,height:geoHeight*0.9)
                     VStack(spacing:5.0) {
-                        Text(quest.getName())
-                            .foregroundStyle(getDarkTierColorOf(tier:quest.tier))
+                        Text(mountain.getName())
+                            .foregroundStyle(getDarkTierColorOf(tier:mountain.tier))
                             .bold()
                             .minimumScaleFactor(0.5)
                             .lineLimit(1)
 
-                        Text(quest.representingDataToString())
-                            .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
+                        Text(mountain.representingDataToString())
+                            .foregroundStyle(getDarkTierColorOf(tier: mountain.tier))
                             .font(.caption)
                             .minimumScaleFactor(0.3)
                             .lineLimit(1)
@@ -822,12 +814,12 @@ struct QuestThumbnailView_redesigned: View {
 
 
 
-struct QuestThumbnailView: View {
+struct MountainThumbnailView: View {
     
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
 
-    @State var quest: Quest
+    @State var mountain: Mountain_fb
 
     
     var body: some View {
@@ -838,28 +830,28 @@ struct QuestThumbnailView: View {
 //            let gridItemWidth = geoWidth
             
             ZStack {
-                QuestTierView(tier: quest.tier, notUsedYet: quest.cumulative() == 0)
+                MountainTierView(tier: mountain.tier, notUsedYet: mountain.cumulative() == 0)
                     .frame(width: geoWidth, height: geoHeight)
-                PurposeOfQuestView(quest:quest, parentWidth:UIScreen.main.bounds.width, parentHeight:UIScreen.main.bounds.height)
+                PurposeOfMountainView(mountain:mountain, parentWidth:UIScreen.main.bounds.width, parentHeight:UIScreen.main.bounds.height)
                     .frame(width:geoWidth/4, height:geoWidth/4)
                     .position(CGPoint(x: geoWidth/8, y: geoWidth/8))
                     .opacity(0.8)
-                FireView(momentumLevel: quest.momentumLevel)
+                FireView(momentumLevel: mountain.momentumLevel)
                     .frame(width: geoWidth/1.5, height: geoHeight/1.5)
                     .position(x:geoWidth/2,y:geoHeight/2)
                     .opacity(0.7)
                 VStack {
-                    Text("\(quest.getName())")
-                        .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
+                    Text("\(mountain.getName())")
+                        .foregroundStyle(getDarkTierColorOf(tier: mountain.tier))
                         .bold()
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
                         .padding(.bottom, geoHeight/10)
                     
-                    //                                        Text(QuestRepresentingData.titleOf(representingData: quest.representingData))
+                    //                                        Text(MountainRepresentingData.titleOf(representingData: mountain.representingData))
                     
-                    Text(quest.representingDataToString())
-                        .foregroundStyle(getDarkTierColorOf(tier: quest.tier))
+                    Text(mountain.representingDataToString())
+                        .foregroundStyle(getDarkTierColorOf(tier: mountain.tier))
                         .font(.caption)
                         .minimumScaleFactor(0.3)
                         .lineLimit(1)
@@ -869,7 +861,7 @@ struct QuestThumbnailView: View {
                 .padding(10)
                 .frame(width:geoWidth ,height: geoHeight, alignment: .center)
 //                .onAppear() {
-//                    print("\(quest.name): tier \(quest.tier)")
+//                    print("\(mountain.name): tier \(mountain.tier)")
 //                }
                 
             }
@@ -879,7 +871,7 @@ struct QuestThumbnailView: View {
 
 
 
-struct CreateNewQuest: View {
+struct CreateNewMountain: View {
     
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
@@ -887,18 +879,17 @@ struct CreateNewQuest: View {
 //    @Environment(\.isPresented) var isPresented
     @Environment(\.dismiss) var dismiss
     
-    @Query var quests: [Quest]
+    @Bindable var mountainsViewModel: MountainsViewModel
         
-    @Binding var popUp_createNewQuest: Bool
+    @Binding var popUp_createNewMountain: Bool
     // isPlan, popUp
     
-    @State var questNameToAppend = ""
-    @State var questDataTypeToAppend: DataType = .hour
+    @State var mountainNameToAppend = ""
     @State var customDataTypeNotation: String?
     @State var customDataTypeNotation_textField: String = ""
     @State var additionalInfo: Bool = false
     @State var addSubName: Bool = false
-    @State var questSubnameToAppend = ""
+    @State var mountainSubnameToAppend = ""
     @State var addPastCumulative: Bool = false
     @State var pastCumulative: Int = 0
     @State var pastCumulative_str:String = ""
@@ -912,7 +903,9 @@ struct CreateNewQuest: View {
     
     var body: some View {
         
-        let questNames = quests.filter({!$0.inTrashCan}).map { $0.name }
+        let mountains:[Mountain_fb] = Array(mountainsViewModel.mountains.values)
+        
+        let mountainNames = mountains.filter({$0.mountainState != .archived}).map { $0.name }
         
         GeometryReader { geometry in
             
@@ -933,12 +926,12 @@ struct CreateNewQuest: View {
                     
                     
 
-                    TextField("퀘스트 이름", text:$questNameToAppend)
+                    TextField("퀘스트 이름", text:$mountainNameToAppend)
                         .padding(.horizontal)
                         .frame(width: geometry.size.width)
                     
                         .font(.title2)
-                        .maxLength(30, text: $questNameToAppend)
+                        .maxLength(30, text: $mountainNameToAppend)
                         .multilineTextAlignment(.center)
                         .focused($focusedTextField, equals:0)
                         .textFieldStyle(.roundedBorder)
@@ -946,7 +939,7 @@ struct CreateNewQuest: View {
                     
                     
 //                    HStack {
-                        if questNameToAppend == "" {
+                        if mountainNameToAppend == "" {
                             Text_scaleToFit("퀘스트 이름을 입력하세요")
                                 .lineLimit(1)
                                 .padding(.horizontal)
@@ -955,7 +948,7 @@ struct CreateNewQuest: View {
                                 .foregroundStyle(.red)
                             
                         }
-                        else if questNames.contains(questNameToAppend) {
+                        else if mountainNames.contains(mountainNameToAppend) {
                             Text_scaleToFit("퀘스트 이름이 이미 존재합니다.")
                                 .lineLimit(1)
                                 .padding(.horizontal)
@@ -976,38 +969,6 @@ struct CreateNewQuest: View {
                         
                         .frame(width:textBoxWidth,alignment:.leading)
 
-                        VStack(spacing:0.0) {
-                            Picker("", selection: $questDataTypeToAppend) {
-                                
-                                ForEach([DataType.hour, DataType.ox, DataType.custom], id:\.self) {
-                                    
-                                    Text(DataType.kor_stringOf(dataType: $0))
-                                    
-                                }
-                            }
-                            .labelsHidden()
-                            
-                            
-                            if questDataTypeToAppend == .hour {
-                                Text_scaleToFit("소요된 시간을 기록합니다")
-                                    .frame(width:textFieldWidth)
-                                    .lineLimit(2)
-                                    .font(.caption)
-                            } else if questDataTypeToAppend == .custom {
-                                Text_scaleToFit("사용자 지정 단위를 기록합니다")
-                                    .frame(width:textFieldWidth)
-                                    .lineLimit(2)
-                                //                                .minimumScaleFactor(0.2)
-                                    .font(.caption)
-                            } else if questDataTypeToAppend == .ox {
-                                Text_scaleToFit("달성여부를 체크박스로 체크합니다.")
-                                    .frame(width:textFieldWidth)
-                                    .lineLimit(2)
-                                    .font(.caption)
-                            }
-                            
-                        }
-//                        .frame(width:textFieldWidth)
 
                         
                     }
@@ -1015,30 +976,6 @@ struct CreateNewQuest: View {
                     .padding(.horizontal)
                     
                     
-                    // MARK: 계획수치 또는 달성수치
-                    if questDataTypeToAppend == DataType.custom {
-                        HStack(spacing:0.0) {
-                            
-                            Text_scaleToFit("사용자 지정 단위")
-                                .padding(.leading, 3)
-                                .padding(.trailing,20)
-                                .lineLimit(2)
-                                .frame(width:textBoxWidth,alignment: .leading)
-                                .multilineTextAlignment(.leading)
-                            
-                            TextField("예시: 푸시업 -> n회",text: $customDataTypeNotation_textField)
-                                .frame(width: textFieldWidth2)
-                                .textFieldStyle(.roundedBorder)
-                                .focused($focusedTextField, equals:1)
-                                .onChange(of: customDataTypeNotation_textField) {
-                                    customDataTypeNotation = customDataTypeNotation_textField
-                                }
-                        }
-                        .padding(.horizontal)
-//                        .frame(idealHeight:geoHeight*0.07, alignment: .leading)
-                        
-                        
-                    }
                     
                     
                     HStack(spacing:0.0) {
@@ -1065,7 +1002,7 @@ struct CreateNewQuest: View {
                         .frame(width: textBoxWidth, alignment: .leading)
                         
                         
-                        TextField("퀘스트를 요약할 이름", text: $questSubnameToAppend)
+                        TextField("퀘스트를 요약할 이름", text: $mountainSubnameToAppend)
                             .frame(width: textFieldWidth)
                             .textFieldStyle(.roundedBorder)
                             .autocorrectionDisabled()
@@ -1124,9 +1061,8 @@ struct CreateNewQuest: View {
                             .opacity(addPastCumulative ? 1.0 : 0.5)
                             .focused($focusedTextField, equals:3)
                             .keyboardType(.numberPad)
-    //                        if addPastCumulative {
                         HStack {
-                            Text_scaleToFit(DataType.unitNotationOf(dataType: questDataTypeToAppend, customDataTypeNotation: customDataTypeNotation_textField))
+                            Text_scaleToFit("시간")
                                 .opacity(addPastCumulative ? 1.0 : 0.5)
                                 .lineLimit(2)
                                 .frame(width:geoWidth*0.1)
@@ -1143,7 +1079,7 @@ struct CreateNewQuest: View {
     
     
                     Button(action: {
-                        createNewQuest()
+                        createNewMountain()
                         dismiss.callAsFunction()
     
                     } ) {
@@ -1153,8 +1089,8 @@ struct CreateNewQuest: View {
                     .padding(.top,10)
                     .disabled(
                         (
-                            questNames.contains(questNameToAppend) || (questDataTypeToAppend == .custom && (customDataTypeNotation == "" || customDataTypeNotation == nil)) ||
-                            questNameToAppend == "")
+                            mountainNames.contains(mountainNameToAppend) || (ascentDataTypeToAppend == .custom && (customDataTypeNotation == "" || customDataTypeNotation == nil)) ||
+                            mountainNameToAppend == "")
     
                     )
                     .frame(width:geometry.size.width, alignment: .center)
@@ -1164,7 +1100,7 @@ struct CreateNewQuest: View {
                 .frame(width:geometry.size.width,alignment: .top)
                 Spacer().frame(height:geoHeight*0.7)
             }
-            .navigationTitle("새로운 누적 퀘스트")
+            .navigationTitle("새로운 누적 기록")
             .navigationBarTitleDisplayMode(.inline)
             .scrollDisabled(!largeDynamicTypeSizes.contains(dynamicTypeSize))
             .onAppear() {
@@ -1187,57 +1123,38 @@ struct CreateNewQuest: View {
         }
     }
     
-    func createNewQuest() -> Void {
-        let newQuest = Quest(name: questNameToAppend, dataType: questDataTypeToAppend.rawValue)
-        if questDataTypeToAppend == .custom {
-            newQuest.customDataTypeNotation = customDataTypeNotation
+    func createNewMountain() -> Void {
+        var newMountain = Mountain_fb(name: mountainNameToAppend)
+        if ascentDataTypeToAppend == .custom { // should not be put in on initialization
+            newMountain.customDataTypeNotation = customDataTypeNotation
         }
-        if addSubName && questSubnameToAppend != "" {
-            newQuest.subName = questSubnameToAppend
+        if addSubName && mountainSubnameToAppend != "" { // should not be put in on initialization
+            newMountain.subName = mountainSubnameToAppend
         }
-        if addPastCumulative {
+        if addPastCumulative { // should not be put in on initialization
             if let pastCumulatve = Int(pastCumulative_str) {
-                if questDataTypeToAppend == .hour {
-                    newQuest.pastCumulatve = pastCumulatve * 60
+                if ascentDataTypeToAppend == .hour {
+                    newMountain.pastCumulatve = pastCumulatve * 60
                 }
                 else {
-                    newQuest.pastCumulatve = pastCumulatve
+                    newMountain.pastCumulatve = pastCumulatve
                 }
             }
         }
         
-        modelContext.insert(newQuest)
-        try? modelContext.save()
+        newMountain.updateTier()
+        newMountain.updateMomentumLevel()
+        
+        mountainsViewModel.addNewMountain(newMountain)
+        
+        
+        
+        
 
         
-        let dataType_rawVal:Int = questDataTypeToAppend.rawValue
         
-        let predicate = #Predicate<DailyQuest> { dailyQuest in
-            dailyQuest.quest == nil && dailyQuest.questName == questNameToAppend && dailyQuest.dataType == dataType_rawVal && dailyQuest.customDataTypeNotation == customDataTypeNotation
-        }
-        let descriptor = FetchDescriptor(predicate: predicate)
-        try! modelContext.enumerate(
-            descriptor,
-            batchSize: 5000,
-            allowEscapingMutations: true
-        ) { dailyQuest in
-            
-            dailyQuest.quest = newQuest
-            
-            if let date = dailyQuest.dailyRecord?.date {
-                if dailyQuest.data != 0 { newQuest.dailyData[date] = dailyQuest.data }
-            }
-            
 
-            try? modelContext.save()
-            
-        }
         
-        
-        newQuest.updateTier()
-        newQuest.updateMomentumLevel()
-        
-        try? modelContext.save()
 
 
         
@@ -1245,33 +1162,6 @@ struct CreateNewQuest: View {
     
     
 }
-
-
-//
-//struct PickerElement:View {
-//    var option: DataType
-//    let string: String
-//    
-//    init(option: DataType) {
-//        self.option = option
-//        self.string = {
-//            if option == .ox {
-//                return "달성여부를 체크박스로 체크합니다."
-//            } else if option == .hour {
-//                return "소요된 시간을 기록합니다"
-//            } else {
-//                return "사용자 지정 단위를 기록합니다"
-//            }
-//        }()
-//    }
-//    
-//    var body: some View {
-//        Text(DataType.kor_stringOf(dataType: option))
-//            .font(.callout) +
-//        Text("\n\(string)")
-//            .font(.system(size: 20.0))
-//    }
-//}
 
 
 
@@ -1342,31 +1232,31 @@ struct RotatingGradient: View {
 
 
 
-struct EditQuest2: View {
+struct EditMountain2: View {
     
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
     
-    @Query var quests: [Quest]
+    @Bindable var dailyRecordsViewModel: DailyRecordsViewModel
+    
         
-    @Binding var popUp_editQuest: Bool
-    @Binding var selectedQuest: Quest?
+    @Binding var popUp_editMountain: Bool
+    @Binding var selectedMountain: Mountain_fb?
 
     
     var body: some View {
-        if let quest = selectedQuest {
-            EditQuest(
-                popUp_editQuest: $popUp_editQuest,
-                quest: quest,
-                questName: quest.name,
-                questDataType: DataType(rawValue: quest.dataType) ?? .hour ,
-                customDataTypeNotation:quest.customDataTypeNotation,
-                customDataTypeNotation_textField: quest.customDataTypeNotation ?? "",
-                addSubName: quest.subName != nil,
-                questSubname: quest.subName ?? "",
-                addPastCumulative: quest.pastCumulatve != 0,
-                pastCumulative: quest.pastCumulatve/60,
-                pastCumulative_str: String(quest.pastCumulatve/60)
+        if let mountain = selectedMountain {
+            EditMountain(
+                dailyRecordsViewModel:dailyRecordsViewModel,
+                popUp_editMountain: $popUp_editMountain,
+                mountain: mountain,
+                mountainName: mountain.name,
+                addSubName: mountain.subName != nil,
+                mountainSubname: mountain.subName ?? "",
+                addPastCumulative: mountain.pastCumulatve != 0,
+                pastCumulative: mountain.pastCumulatve/60,
+                pastCumulative_str: String(mountain.pastCumulatve/60)
+                
             )
 
             

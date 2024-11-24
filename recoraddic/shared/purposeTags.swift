@@ -9,154 +9,49 @@ import Foundation
 import SwiftUI
 import SwiftData
 
-struct PurposeOfDailyQuestView_circle_checkMark: View {
-    
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.colorScheme) var colorScheme
-
-    
-    @State var popUp_changePurpose: Bool = false
-    var dailyQuest: DailyQuest
-    var parentWidth: CGFloat
-    var parentHeight: CGFloat
-    var tierColor: Color
-    
-    var body: some View {
-        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
-        
-
-            Image(systemName:"checkmark")
-
-                    .background(PurposeInCircle(purposes:dailyQuest.purposes))
-                    .foregroundStyle(tierColor.opacity(dailyQuest.purposes.count == 0 ? 1.0 : 0.0))
-            .onTapGesture {
-                popUp_changePurpose.toggle()
-            }
-            
-            .popover(isPresented: $popUp_changePurpose) {
-                ChoosePurposeView_dailyQuest(dailyQuest: dailyQuest)
-                    .frame(width:parentWidth*0.8, height: parentWidth*0.8) // 12개 3*4 grid => 13개 4*4 grid
-                    .presentationCompactAdaptation(.popover)
-                
-            }
-                    
-    }
-}
-struct PurposeOfTodoView_circle_checkMark: View {
-    
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.colorScheme) var colorScheme
-    @Query var todos_preset: [Todo_preset]
-
-    
-    @State var popUp_changePurpose: Bool = false
-    var todo: Todo
-    var parentWidth: CGFloat
-    var parentHeight: CGFloat
-    
-    var body: some View {
-        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
-        
-
-            Image(systemName:"checkmark")
-                .background(PurposeInCircle(purposes:todo.purposes))
-                .foregroundStyle(reversedColorSchemeColor.opacity(todo.purposes.count == 0 ? 1.0 : 0.0))
-            .onTapGesture {
-                popUp_changePurpose.toggle()
-            }
-            .popover(isPresented: $popUp_changePurpose) {
-                ChoosePurposeView_todo(todo: todo)
-                    .frame(width:parentWidth*0.8, height: parentWidth*0.8) // 13개 4*4 grid
-                    .presentationCompactAdaptation(.popover)
-                    .onDisappear() {
-                        if let todo_preset = todos_preset.first(where:{$0.content == todo.content}) {
-                            todo_preset.purposes = todo.purposes
-                        }
-                    }
-                
-            }
-                    
-    }
-}
-
-struct PurposeOfDailyQuestView: View {
-    
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.colorScheme) var colorScheme
-
-    @Query var quests: [Quest]
-    
-    @State var popUp_changePurpose: Bool = false
-    var dailyQuest: DailyQuest
-    var parentWidth: CGFloat
-    var parentHeight: CGFloat
-    
-    var body: some View {
-        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
-        
-        GeometryReader { geometry in
-            let geoWidth: CGFloat = geometry.size.width
-            let geoHeight: CGFloat = geometry.size.height
-            let tagSize = min(geoWidth*0.8,geoHeight*0.3)
-
-            
-//            Group {
-                Group {
-                    // purpose 0개일 때
-                    if dailyQuest.purposes.isEmpty {
-                        Color.white.opacity(0.01)
-                            .overlay(
-                                Image(systemName:"questionmark.square")
-                                    .resizable()
-                                    .frame(width:tagSize, height:tagSize)
-                                    .foregroundStyle(reversedColorSchemeColor)
-                            )
-                        // MARK: 이렇게 안 하면 외부의 zIndex가 작동 안 함.
-                    }
-                    else {
-                        PurposeTagsView_vertical(purposes:dailyQuest.purposes)
-                            .frame(width: geoWidth, height:geoHeight)
-                    }
-                    
-                }
-                .frame(width:geoWidth, height:geoHeight)
-                .onTapGesture {
-                    popUp_changePurpose.toggle()
-                }
-                
-                //                                    .popover(isPresented: $popUp_changePurpose) {
-                .popover(isPresented: $popUp_changePurpose) {
-                    ChoosePurposeView_dailyQuest(dailyQuest: dailyQuest)
-                        .frame(width:parentWidth*0.8, height: parentWidth*0.8) // 13개 4*4 grid
-                        .presentationCompactAdaptation(.popover)
-                        .onDisappear() {
-                            if let quest = quests.first(where:{$0.name == dailyQuest.questName && !$0.inTrashCan}) {
-                                quest.recentPurpose = dailyQuest.purposes
-                            } else if let quest = quests.first(where:{$0.name == dailyQuest.questName}){
-                                quest.recentPurpose = dailyQuest.purposes
-                            }
-                        }
-                    
-                }
+//struct PurposeOfTodoView_circle_checkMark: View {
+//    
+//    @Environment(\.colorScheme) var colorScheme
+//
+//    
+//    @Bindable var dailyRecordsViewModel: DailyRecordsViewModel
+//    
+//    @State var popUp_changePurpose: Bool = false
+//    var todoId: String
+//    var parentWidth: CGFloat
+//    var parentHeight: CGFloat
+//    
+//    var body: some View {
+//        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
+//        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
+//        
+//
+//            Image(systemName:"checkmark")
+//                .background(PurposeInCircle(purposes:todo.purposes))
+//                .foregroundStyle(reversedColorSchemeColor.opacity(todo.purposes.count == 0 ? 1.0 : 0.0))
+//            .onTapGesture {
+//                popUp_changePurpose.toggle()
 //            }
-            
-            
-        }
-    }
-}
+//            .popover(isPresented: $popUp_changePurpose) {
+//                ChoosePurposeView_todo(todoId: todoId)
+//                    .frame(width:parentWidth*0.8, height: parentWidth*0.8) // 13개 4*4 grid
+//                    .presentationCompactAdaptation(.popover)
+//                
+//            }
+//                    
+//    }
+//}
 
-struct PurposeOfQuestView: View {
+
+struct PurposeOfMountainView: View {
     
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
 
-    @Query var quests: [Quest]
+    @Query var mountains: [Mountain_fb]
     
     @State var popUp_changePurpose: Bool = false
-    var quest: Quest
+    var mountain: MileStone
     var parentWidth: CGFloat
     var parentHeight: CGFloat
 //    var isAlmostLast: Bool = false
@@ -172,13 +67,13 @@ struct PurposeOfQuestView: View {
                 
                 Button(action:{
                     if geometry.frame(in: .global).minY > UIScreen.main.bounds.height*0.5 {
-                        scrollProxy.scrollTo(quest.name, anchor: .center)
+                        scrollProxy.scrollTo(mountain.name, anchor: .center)
                     }
-//                    scrollProxy.scrollTo(quest.name, anchor: isAlmostLast ? .top : .center)
+//                    scrollProxy.scrollTo(mountain.name, anchor: isAlmostLast ? .top : .center)
                     popUp_changePurpose.toggle()
                 }) {
                     Group {
-                        if quest.recentPurpose.isEmpty {
+                        if mountain.recentPurpose.isEmpty {
                             Color.white.opacity(0.01)
                                 .frame(width: geoWidth/2.5, height:geoHeight/2.5)
                                 .overlay(
@@ -190,9 +85,8 @@ struct PurposeOfQuestView: View {
                             // MARK: buttonStyle(.plain) 이 조건문에서는 작동 안해서 이렇게 함
                         }
                         else {
-                            PurposeInCircle(purposes:quest.recentPurpose)
+                            PurposeInCircle(purposes:mountain.recentPurpose)
                                 .frame(width: geoWidth/2.5, height:geoHeight/2.5)
-                            
                         }
                     }
                     .padding(.init(top: 7.5, leading: 7.5, bottom: 0, trailing: 0))
@@ -203,12 +97,12 @@ struct PurposeOfQuestView: View {
                 }
                 .frame(width:geoWidth, height:geoHeight)
                 .popover(isPresented: $popUp_changePurpose) {
-                    ChoosePurposeView_Quest(quest: quest)
+                    ChoosePurposeView_Mountain(mountain: mountain)
                         .frame(width:parentWidth*0.8, height: parentWidth*0.8) // 13개 4*4 grid
                         .presentationCompactAdaptation(.popover)
                     
                 }
-                .id(quest.name)
+                .id(mountain.name)
             }
             
             
@@ -217,15 +111,14 @@ struct PurposeOfQuestView: View {
     }
 }
 
-struct PurposeOfQuestView_redesigned: View {
+struct PurposeOfMountainView_redesigned: View {
     
-    @Environment(\.modelContext) var modelContext
-//    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) var colorScheme
 
-    @Query var quests: [Quest]
+    @Bindable var mountainsViewModel: MountainsViewModel
     
     @State var popUp_changePurpose: Bool = false
-    var quest: Quest
+    var mountain: Mountain_fb
 
 //    var isAlmostLast: Bool = false
     
@@ -240,13 +133,13 @@ struct PurposeOfQuestView_redesigned: View {
                 
                 Button(action:{
                     if geometry.frame(in: .global).minY > UIScreen.main.bounds.height*0.5 {
-                        scrollProxy.scrollTo(quest.name, anchor: .center)
+                        scrollProxy.scrollTo(mountain.name, anchor: .center)
                     }
-//                    scrollProxy.scrollTo(quest.name, anchor: isAlmostLast ? .top : .center)
+//                    scrollProxy.scrollTo(mountain.name, anchor: isAlmostLast ? .top : .center)
                     popUp_changePurpose.toggle()
                 }) {
                     Group {
-                        if quest.recentPurpose.isEmpty {
+                        if mountain.recentPurpose.isEmpty {
                             Color.white.opacity(0.01)
                                 .frame(width: geoWidth/2.5, height:geoHeight/2.5)
                                 .overlay(
@@ -259,11 +152,11 @@ struct PurposeOfQuestView_redesigned: View {
                         }
                         else {
                             ZStack {
-                                PurposeInCircle(purposes:quest.recentPurpose)
+                                PurposeInCircle(purposes:mountain.recentPurpose)
                                     .frame(width: geoWidth/2.5, height:geoHeight/2.5)
                                 Circle()
-                                    .stroke(getTierColorOf(tier:quest.tier))
-//                                    .stroke(getDarkTierColorOf(tier:quest.tier))
+                                    .stroke(getTierColorOf(tier:mountain.tier))
+//                                    .stroke(getDarkTierColorOf(tier:mountain.tier))
 
                             }
                             .frame(width: geoWidth/2.5, height:geoHeight/2.5)
@@ -276,13 +169,13 @@ struct PurposeOfQuestView_redesigned: View {
                 }
                 .frame(width:geoWidth, height:geoHeight)
                 .popover(isPresented: $popUp_changePurpose) {
-                    ChoosePurposeView_Quest(quest: quest)
+                    ChoosePurposeView_Mountain(mountain: mountain)
                         .frame(width:UIScreen.main.bounds.width*0.8, height: UIScreen.main.bounds.width*0.8) // 13개 4*4 grid
 
                         .presentationCompactAdaptation(.popover)
                     
                 }
-                .id(quest.name)
+                .id(mountain.name)
             }
             
             
@@ -300,12 +193,11 @@ struct PurposeOfTodoView: View {
     @Query var todos_preset: [Todo_preset]
     
     @State var popUp_changePurpose: Bool = false
-    var todo: Todo
+    var todo: Todo_fb
     var parentWidth: CGFloat
     var parentHeight: CGFloat
     
     var body: some View {
-//        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
         let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
         
         GeometryReader { geometry in
@@ -352,11 +244,13 @@ struct PurposeOfTodoView: View {
     }
 }
 
-struct ChoosePurposeView_Quest: View {
-    @Environment(\.modelContext) var modelContext
+struct ChoosePurposeView_Mountain: View {
+
     @Environment(\.colorScheme) var colorScheme
     
-    var quest: Quest
+    @Bindable var mountainsViewModel: MountainsViewModel
+    
+    var mountain: Mountain_fb
     
     var body: some View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
@@ -377,9 +271,9 @@ struct ChoosePurposeView_Quest: View {
                         PurposeTagView(purpose: purpose)
                             .frame(width: tagSize*0.65, height: tagSize*0.65)
                             .onTapGesture {
-                                if quest.recentPurpose.contains(purpose) { quest.recentPurpose.remove(purpose)}
-                                else if quest.recentPurpose.count < 3 {
-                                    quest.recentPurpose.insert(purpose)
+                                if mountain.recentPurpose.contains(purpose) { mountain.recentPurpose.remove(purpose)}
+                                else if mountain.recentPurpose.count < 3 {
+                                    mountain.recentPurpose.insert(purpose)
                                 }
                                 
                             }
@@ -388,12 +282,12 @@ struct ChoosePurposeView_Quest: View {
                             .padding(.horizontal,2)
                         //                                .frame(width: geometry.size.width*0.3)
                             .minimumScaleFactor(0.5)
-                            .foregroundStyle(quest.recentPurpose.contains(purpose) ? colorSchemeColor : reversedColorSchemeColor)
+                            .foregroundStyle(mountain.recentPurpose.contains(purpose) ? colorSchemeColor : reversedColorSchemeColor)
                         
                         
                     } // Vstack
                     .frame(width: tagSize, height: tagSize)
-                    .background(quest.recentPurpose.contains(purpose) ? reversedColorSchemeColor : .gray.opacity(0.2))
+                    .background(mountain.recentPurpose.contains(purpose) ? reversedColorSchemeColor : .gray.opacity(0.2))
                     .clipShape(.buttonBorder)
                     
                     
@@ -407,65 +301,14 @@ struct ChoosePurposeView_Quest: View {
 }
 
 
-struct ChoosePurposeView_dailyQuest: View {
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.colorScheme) var colorScheme
-    
-    var dailyQuest: DailyQuest
-    
-    var body: some View {
-        let colorSchemeColor: Color = getColorSchemeColor(colorScheme)
-        let reversedColorSchemeColor: Color = getReversedColorSchemeColor(colorScheme)
-        
-        GeometryReader { geometry in
-            let geoWidth = geometry.size.width
-            let geoHeight = geometry.size.height
-            let gridSize = geoWidth/4
-            let tagSize = gridSize*0.8
-            
-
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: tagSize))],spacing: tagSize*0.2) {
-                
-                ForEach(recoraddic.defaultPurposes, id:\.self) { purpose in
-                    VStack(spacing:3.0) {
-                        
-                        PurposeTagView(purpose: purpose)
-                            .frame(width: tagSize*0.65, height: tagSize*0.65)
-                            .onTapGesture {
-                                if dailyQuest.purposes.contains(purpose) { dailyQuest.purposes.remove(purpose)}
-                                else if dailyQuest.purposes.count < 3 {
-                                    dailyQuest.purposes.insert(purpose)
-                                }
-                                
-                            }
-                        Text(DefaultPurpose.inKorean(purpose))
-                            .font(.caption)
-                            .padding(.horizontal,2)
-                        //                                .frame(width: geometry.size.width*0.3)
-                            .minimumScaleFactor(0.5)
-                            .foregroundStyle(dailyQuest.purposes.contains(purpose) ? colorSchemeColor : reversedColorSchemeColor)
-                        
-                        
-                    } // Vstack
-                    .frame(width: tagSize, height: tagSize)
-                    .background(dailyQuest.purposes.contains(purpose) ? reversedColorSchemeColor : .gray.opacity(0.2))
-                    .clipShape(.buttonBorder)
-                    
-                    
-                } // forEach
-                
-            } // scrollView
-            .padding(10)
-            .frame(width:geoWidth, height:geoHeight)
-        }
-    }
-}
 
 struct ChoosePurposeView_todo: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.colorScheme) var colorScheme
     
-    var todo: Todo
+    @Bindable var dailyRecordsViewModel: DailyRecordsViewModel
+    
+    var todoId: String
     
     var body: some View {
         let colorSchemeColor: Color = getColorSchemeColor(colorScheme)

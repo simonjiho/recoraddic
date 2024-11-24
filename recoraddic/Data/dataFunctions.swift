@@ -9,13 +9,13 @@
 //
 //extension Quest {
 //    func cumulative() -> Int {
-//        return sumIntArray(Array(self.dailyData.values)) + self.pastCumulatve
+//        return sumIntArray(Array(self.dailyAscent.values)) + self.pastCumulatve
 //    }
 //    
 //    func updateTier() -> Void {
 //        
 ////        if self.tier == 40 { return }
-//        var cumulative = dataType == DataType.custom.rawValue ? self.dailyData.count : cumulative()
+//        var cumulative = dataType == DataType.custom.rawValue ? self.dailyAscent.count : cumulative()
 //        if dataType == DataType.hour.rawValue {
 //            for i in 0...40 {
 //                let minus: Int = {
@@ -112,7 +112,7 @@
 //    func representingDataToString() -> String {
 ////        let calendar = Calendar.current
 //        
-////        let currentDate = (dailyData.isEmpty || dailyData.keys.contains(getStandardDateOfNow())) ? getStartDateOfNow() : calendar.date(byAdding: .day, value: -1, to: getStartDateOfNow())!
+////        let currentDate = (dailyAscent.isEmpty || dailyAscent.keys.contains(getStandardDateOfNow())) ? getStartDateOfNow() : calendar.date(byAdding: .day, value: -1, to: getStartDateOfNow())!
 //        // 오늘기록완료시(get d -> 마지막기록날짜 / 기록완료 안했을 시: 전날
 //        
 //        if representingData == QuestRepresentingData.cumulativeData {
@@ -124,7 +124,7 @@
 ////            
 ////            let thirtyDaysAgo = calendar.date(byAdding: .day, value: -30, to: currentDate)!
 ////            
-////            let recentData = dailyData.filter { (key: Date, value: Int) -> Bool in
+////            let recentData = dailyAscent.filter { (key: Date, value: Int) -> Bool in
 ////                return key >= thirtyDaysAgo
 ////            }
 ////            
@@ -165,7 +165,7 @@
 ////    func returnMomentumLevel() -> Int {
 ////        // 1. special
 ////
-////        let datesRecorded:[Date] = self.dailyData.keys.filter({self.dailyData[$0] ?? 0 > 0})
+////        let datesRecorded:[Date] = self.dailyAscent.keys.filter({self.dailyAscent[$0] ?? 0 > 0})
 ////        let boolArray60days:[Bool] = generateBoolArray(from:datesRecorded)
 ////        let (days, percentage) = getRecentPercentage(from:boolArray60days)
 ////        
@@ -203,11 +203,11 @@
 //
 //    func returnMomentumLevel() -> Int {
 //
-//        if self.dailyData.count == 0 {
+//        if self.dailyAscent.count == 0 {
 //            return 0
 //        }
 //        
-//        let latestRecordDate: Date = self.dailyData.sorted { element1, element2 in
+//        let latestRecordDate: Date = self.dailyAscent.sorted { element1, element2 in
 //            element1.key < element2.key
 //        }.last!.key
 //        
@@ -218,13 +218,13 @@
 //        
 ////        if self.name == "시간퀘스트" {
 ////            print(unactivatedPeriod)
-////            print(self.dailyData)
+////            print(self.dailyAscent)
 ////            let baseDate = Calendar.current.date(byAdding: .day, value: -3, to: todayOrYesterday)!
 ////            print(baseDate)
-////            for key in self.dailyData.keys {
+////            for key in self.dailyAscent.keys {
 ////                print(calculateDaysBetweenTwoDates(from: baseDate, to: key) > 0)
 ////            }
-////            let numberOfRecordedDates:Int = self.dailyData.filter({ element in
+////            let numberOfRecordedDates:Int = self.dailyAscent.filter({ element in
 ////                calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0
 ////            }).count
 ////            print(numberOfRecordedDates)
@@ -322,7 +322,7 @@
 //        
 //        let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: today) ?? today
 //        
-//        let numberOfRecordedDates:Int = self.dailyData.filter({ element in
+//        let numberOfRecordedDates:Int = self.dailyAscent.filter({ element in
 //            calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0
 //        }).count
 //        
@@ -333,16 +333,16 @@
 //    
 //    func textForMomentumLevel() -> String {
 //        
-//        if self.dailyData.count == 0 {
+//        if self.dailyAscent.count == 0 {
 //            return "기록 없음"
 //        }
 //        
-//        let latestRecordDate: Date = self.dailyData.sorted { element1, element2 in
+//        let latestRecordDate: Date = self.dailyAscent.sorted { element1, element2 in
 //            element1.key < element2.key
 //        }.last!.key
 ////        let today: Date = getStandardDateOfNow()
 ////        let todayOrYesterday = latestRecordDate == today ? today : getStandardDateOfYesterday()
-//        let datesRecorded:[Date] = self.dailyData.keys.filter({(self.dailyData[$0] ?? 0) > 0})
+//        let datesRecorded:[Date] = self.dailyAscent.keys.filter({(self.dailyAscent[$0] ?? 0) > 0})
 //        let boolArray60days:[Bool] = generateBoolArray(from:datesRecorded)
 ////        let (days, percentage) = getRecentPercentage(from:boolArray60days)
 //        if momentumLevel >= 19 {
@@ -378,7 +378,7 @@
 //        
 //        let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: today) ?? Date()
 //        
-//        let numberOfRecordedDates:Int = self.dailyData.filter({ element in
+//        let numberOfRecordedDates:Int = self.dailyAscent.filter({ element in
 //            calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0
 //        }).count
 //        
@@ -390,7 +390,7 @@
 ////        
 ////        let baseDate:Date = Calendar.current.date(byAdding: .day, value: -termLength, to: today) ?? Date()
 ////        
-////        let numberOfRecordedDates:Int = self.dailyData.filter({ element in
+////        let numberOfRecordedDates:Int = self.dailyAscent.filter({ element in
 ////            calculateDaysBetweenTwoDates(from: baseDate, to: element.key) > 0
 ////        }).count
 ////        

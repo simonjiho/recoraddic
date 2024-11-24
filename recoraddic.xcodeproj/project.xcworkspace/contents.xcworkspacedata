@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/kimjiho/my_folder/apps/recoraddic/recoraddic_apple/recoraddic/recoraddic.xcodeproj">
+      location = "self:">
    </FileRef>
 </Workspace>

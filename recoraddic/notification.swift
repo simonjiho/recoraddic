@@ -9,12 +9,12 @@ import Foundation
 import UserNotifications
 
 
-func scheduleNotification(at date: Date, for questName: String, goal: Int?, dataType: Int, customDataTypeNotation: String?) {
+func scheduleNotification(at date: Date, for questName: String, goal: Int?) {
     let content = UNMutableNotificationContent()
     content.title = questName
 //    content.subtitle = String(describing: date)
     if let goal_nonNil = goal {
-        content.body = "목표: \(DataType.string_fullRepresentableNotation(data: goal_nonNil, dataType: dataTypeFrom(dataType), customDataTypeNotation: customDataTypeNotation))"
+        content.body = "목표: \(goal_nonNil.hhmmFormat)"
     }
     content.sound = .default
 

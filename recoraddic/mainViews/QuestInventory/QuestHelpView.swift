@@ -1,5 +1,5 @@
 //
-//  QuestHelpView.swift
+//  MountainHelpView.swift
 //  recoraddic
 //
 //  Created by 김지호 on 10/26/24.
@@ -8,7 +8,7 @@ import Foundation
 import SwiftUI
 
 
-struct QuestHelpView: View {
+struct MountainHelpView: View {
     
     @Environment(\.colorScheme) var colorScheme
     
@@ -172,7 +172,7 @@ struct QuestHelpView: View {
 
 
 
-//struct QuestHelpView: View {
+//struct MountainHelpView: View {
 //    
 //    @Environment(\.colorScheme) var colorScheme
 //    
@@ -261,7 +261,7 @@ struct QuestHelpView: View {
 //                        ScrollView {
 //                            ForEach(0...8, id:\.self) { tier in
 //                                VStack {
-//                                    QuestTierView(tier: tier*5, notUsedYet: false)
+//                                    MountainTierView(tier: tier*5, notUsedYet: false)
 //                                        .frame(width:tierViewSize, height: tierViewSize)
 ////                                    Text(selectedOption == "시간x" ?  notHourTierGuideLines[tier]: hourTierGuideLines[tier])
 ////                                        .font(.caption)
