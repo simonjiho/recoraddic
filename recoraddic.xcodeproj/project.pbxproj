@@ -1088,7 +1088,7 @@
 				CODE_SIGN_ENTITLEMENTS = recoraddic/recoraddic.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 88;
+				CURRENT_PROJECT_VERSION = 89;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"recoraddic/Preview Content\"";
 				DEVELOPMENT_TEAM = K5V8U9HR59;
@@ -1137,7 +1137,7 @@
 				CODE_SIGN_ENTITLEMENTS = recoraddic/recoraddicRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 88;
+				CURRENT_PROJECT_VERSION = 89;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"recoraddic/Preview Content\"";
 				DEVELOPMENT_TEAM = K5V8U9HR59;
