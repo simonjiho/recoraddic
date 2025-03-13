@@ -210,20 +210,18 @@ struct QuestThumbnailView3: View {
                             }
                         }
                         .frame(width:geoHeight*0.45, height:geoHeight*0.45)
-//                        .border(.blue)
                         
                     }
                     .frame(width:badgeSize,height:geoHeight*0.9)
-//                    .border(.red)
+                    
+                    
                     VStack {
                         Text("\(name)")
                             .foregroundStyle(getDarkTierColorOf(tier:tier))
                             .bold()
                             .minimumScaleFactor(0.5)
                             .lineLimit(1)
-//                            .padding(.bottom, geoHeight*0.05)
-                        
-                        //                                        Text(QuestRepresentingData.titleOf(representingData: quest.representingData))
+
                         
                         Text("누적 000h 00m")
                             .foregroundStyle(getDarkTierColorOf(tier: tier))

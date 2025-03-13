@@ -275,27 +275,18 @@ struct MainView_QuestInventory: View {
                         )
                         .ignoresSafeArea(.keyboard)
                         .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-//                        .onAppear() {
-//                            if let quest = selectedQuest {
-//                                print("check if dailyQuest is connected")
-//                                print(quest.dailyQuests?.count)
-//                            }
-//                        }
+
                     }
                 }
 
                 if popUp_help {
-//                    Color.gray.opacity(0.2)
                     Color.gray.opacity(0.01)
                         .background(.ultraThinMaterial)
                         .onTapGesture {
                             popUp_help.toggle()
                         }
                     QuestHelpView(popUp_help: $popUp_help)
-//                        .popUpViewLayout(width: geoWidth*0.9, height: geoHeight*0.85, color: colorSchemeColor)
-//                        .popUpViewLayout(width: geoWidth*0.9, height: 200, color: colorSchemeColor)
                         .popUpViewLayout()
-//                        .frame(width:UIScreen.main.bounds.width*0.9, height:150)
 
                         .position(CGPoint(x: geoWidth/2, y: geoHeight*0.85*0.6))
                         .shadow(color:shadowColor, radius: 3.0)
@@ -312,10 +303,6 @@ struct MainView_QuestInventory: View {
 
             }
             .sheet(isPresented: $isEdit) {
-//                if popUp_confirmation {
-//
-//                }
-//                else {
                     ZStack {
                         Text("\(selectedQuestNames.count)개의 퀘스트 선택")
                         HStack(spacing:0.0) {
@@ -348,7 +335,6 @@ struct MainView_QuestInventory: View {
                                 popUp_self: $popUp_confirmation
                             )
                             .presentationDetents([.height(editOption == .delete ? 200*1.2 : 200)])
-//                            .presentationDetents([.bar])
                             .presentationBackground(.thickMaterial)
                         }
 
@@ -359,7 +345,6 @@ struct MainView_QuestInventory: View {
                     .presentationBackground(.thickMaterial)
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 
-//                }
             }
 
 
@@ -601,16 +586,13 @@ struct QuestEditConfirmationView2: View {
 struct QuestTierView: View {
     
     @Environment (\.colorScheme) var colorScheme
-//    @Environment (\.modelContext) var modelContext
     
-//    @Binding var tier: Int
     var tier: Int
     var notUsedYet: Bool
 
     
     var body: some View {
         
-//        let shadowColor:Color = getShadowColor(colorScheme)
         
         let tierColor:Color = getTierColorOf(tier: tier)
         
@@ -657,7 +639,6 @@ struct QuestTierView: View {
             }()
             
             let tierViewFrame: Path = Path(CGPath(roundedRect: CGRect(x: 0, y: 0, width: geoWidth, height: geoHeight), cornerWidth: geoWidth/11, cornerHeight: geoWidth/11, transform: nil))
-//            let strokeLineWidth:CGFloat = geoWidth*0.04*(0.5 * CGFloat(tier%5))
 
             
             
@@ -665,13 +646,6 @@ struct QuestTierView: View {
                 tierViewFrame
                     .fill(.white)
                     .opacity(notUsedYet ? 0.0 : 1.0 )
-                
-//                RoundedRectangle(cornerSize: CGSize(width: geoWidth/11, height: geoWidth/11))
-//                tierViewFrame
-//                    .stroke(lineWidth: strokeWidth)
-//                    .fill(.white)
-//                    .frame(width:geoWidth+strokeWidth/2, height: geoHeight+strokeWidth/2)
-//                    .opacity(colorScheme == .light ? 0.5 : 0.6)
                 
                 if notUsedYet {
                     tierViewFrame
@@ -687,14 +661,12 @@ struct QuestTierView: View {
                 
                 if tier % 5 == 4 {
                     let width1:CGFloat = geoWidth+strokeWidth/3
-                    let height1: CGFloat = geoHeight+strokeWidth/3
+//                    let height1: CGFloat = geoHeight+strokeWidth/3
                     RoundedRectangle(cornerSize: CGSize(width: width1/11, height: width1/11))
                         .stroke(.white.opacity(0.7), lineWidth: strokeWidth/3)
-    //                    .stroke(lineWidth: strokeWidth)
                         .frame(width:geoWidth, height: geoHeight)
                         .position(x:geoWidth/2, y:geoHeight/2)
                         .rotationEffect(.radians(.pi/36*0.6))
-//                        .position(x:width1/2, y:height1/2)
 
                     RoundedRectangle(cornerSize: CGSize(width: width1/11, height: width1/11))
                         .stroke(.white.opacity(0.7), lineWidth: strokeWidth/3)
@@ -702,32 +674,21 @@ struct QuestTierView: View {
                         .frame(width:geoWidth, height: geoHeight)
                         .position(x:geoWidth/2, y:geoHeight/2)
                         .rotationEffect(.radians(-(.pi/36*0.6)))
-//                        .position(x:width1/2-strokeWidth/3, y:height1/2-strokeWidth/3)
 
                 }
                 if tier % 5 == 3 {
                     let width1:CGFloat = geoWidth+strokeWidth/3
-                    let height1: CGFloat = geoHeight+strokeWidth/3
+//                    let height1: CGFloat = geoHeight+strokeWidth/3
                     RoundedRectangle(cornerSize: CGSize(width: width1/11, height: width1/11))
                         .stroke(.white, lineWidth: strokeWidth/3)
-    //                    .stroke(lineWidth: strokeWidth)
                         .frame(width:geoWidth, height: geoHeight)
                         .position(x:geoWidth/2, y:geoHeight/2)
                 }
-//                else if tier % 5 == 4 {
-//                    let width1:CGFloat = geoWidth+strokeWidth/3
-//                    let height1: CGFloat = geoHeight+strokeWidth/3
-//                    RoundedRectangle(cornerSize: CGSize(width: width1/11, height: width1/11))
-//                        .stroke(.white.opacity(0.4), lineWidth: strokeWidth/3)
-//    //                    .stroke(lineWidth: strokeWidth)
-//                        .frame(width:geoWidth, height: geoHeight)
-//                        .position(x:geoWidth/2, y:geoHeight/2)
-//                }
                 
 
 
                 let width2:CGFloat = geoWidth+strokeWidth
-                let height2: CGFloat = geoHeight+strokeWidth
+//                let height2: CGFloat = geoHeight+strokeWidth
                 RotatingGradient(level: tier%5, colors: rotationGradientColors)
                     .frame(width:(geoWidth+strokeWidth*2)*1.5, height: (geoWidth+strokeWidth*2)*1.5)
                     .position(x:geoWidth/2, y:geoHeight/2)

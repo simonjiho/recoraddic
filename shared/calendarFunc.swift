@@ -10,23 +10,6 @@ import Foundation
 
 let dueTime:Int = 10 // 10AM
 
-//func getDateOfNow() -> Date {
-//    let now = Date()
-//    var calendar = Calendar.current
-//    calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
-//    let hour = calendar.component(.hour, from: now)
-//    
-//    if hour >= recoraddic.dueTime {
-////        print("\(hour)hours passed, so today")
-////        print(calendar.startOfDay(for: now))
-//        return calendar.startOfDay(for: now)
-//    } else {
-////        print("\(hour)hours passed, so yesterday")
-//        let yesterday = calendar.date(byAdding: .day, value: -1, to: now)!
-////        print(calendar.startOfDay(for: yesterday))
-//        return calendar.startOfDay(for: yesterday)
-//    }
-//}
 
 func getStartDateOfNow() -> Date {
     let now = Date()

@@ -21,15 +21,9 @@ import CoreData
 struct recoraddicApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-//    @StateObject private var activityManager = ActivityManager()
     @StateObject private var containerHolder = ModelContainerHolder()
 
     
-//    static let container = try? ModelContainer(
-//        for:Schema([Quest.self, Todo.self, DailyQuest.self, DailyRecord.self, DailyRecordSet.self, Profile.self, Todo_preset.self]),
-//        migrationPlan: RecoraddicMigrationPlan.self,
-//        configurations: ModelConfiguration(cloudKitDatabase: ModelConfiguration.CloudKitDatabase.automatic)
-//    )
 
     var syncManager: SyncManager = SyncManager()
 
@@ -68,7 +62,6 @@ struct recoraddicApp: App {
             }
             else {
                 LoadingView_fetch(retryCount: containerHolder.getRetryCount())
-//                Text("waiting to fetch...")
             }
             
 
@@ -96,34 +89,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
         return true
     }
-    
-
-//    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-//        if url.scheme == "stopWatch" && url.host == "recoraddic" {
-//            url.description
-//            // Handle the tap on the Live Activity
-//            NotificationCenter.default.post(name: .specificNotification, object: nil, userInfo: <#T##[AnyHashable : Any]?#>)
-//            return true
-//        }
-//        return false
-//    }
-//    
-////     This method is called when the app is opened from a notification
-//    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-//        handleNotification(userInfo)
-//        completionHandler(.newData)
-//    }
-//    
-//    
-//    // This method is called when the app is opened from a notification while being in the background
-//    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
-//        handleNotification(userInfo)
-//    }
-//
-//    func handleNotification(_ userInfo: [AnyHashable : Any]) {
-//        NotificationCenter.default.post(name: Notification.Name(""), object: nil, userInfo: userInfo)
-//    }
-
     
     private func setupNotificationCategories() {
         let customCategory = UNNotificationCategory(
