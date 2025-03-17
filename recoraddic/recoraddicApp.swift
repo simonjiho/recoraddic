@@ -23,22 +23,16 @@ struct recoraddicApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var containerHolder = ModelContainerHolder()
 
-    
-
     var syncManager: SyncManager = SyncManager()
-
-
     
     
     var body: some Scene {
 
         
         WindowGroup {
-//            Text("????")
             if let container = containerHolder.container {
                 ContentView_withLaunchScreen()
                     .modelContainer(container)
-    //                .environmentObject(activityManager)
                     .onAppear() {
                         print("App started")
                         if UserDefaults.standard.value(forKey: "stateSerialization") == nil {
@@ -118,7 +112,6 @@ struct ContentView_withLaunchScreen:View {
         }
         else {
             LoadingView()
-//                .containerRelativeFrame([.horizontal,.vertical])
                 .onAppear() {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         withAnimation {
