@@ -147,7 +147,6 @@
 		B229F01C2C3E895F00198445 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		B229F01E2C3E895F00198445 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B229F0252C3E8AF400198445 /* notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = notification.swift; sourceTree = "<group>"; };
-		B2314BBA2AECD7DB00EDD5C7 /* idea&plan&simpleNote.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "idea&plan&simpleNote.md"; sourceTree = "<group>"; };
 		B2314BBE2AF4DD7400EDD5C7 /* stone_default1.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = stone_default1.xcassets; sourceTree = "<group>"; };
 		B234C6EC2BC564CA0031BAD7 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		B241C05F2C7AF84B00873985 /* recoraddicWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = recoraddicWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -163,7 +162,6 @@
 		B24C298D2C283331000F3EEE /* dailyQuestionsGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dailyQuestionsGraph.swift; sourceTree = "<group>"; };
 		B24C29912C329B7B000F3EEE /* test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test.swift; sourceTree = "<group>"; };
 		B25BF9042B1C886E0039F1F9 /* ResizableText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizableText.swift; sourceTree = "<group>"; };
-		B2600B062A35E1FF00E00D91 /* what_I_learned.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = what_I_learned.md; sourceTree = "<group>"; };
 		B260A3902A9B88AE00D73208 /* MainView_checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_checklist.swift; sourceTree = "<group>"; };
 		B260A3932A9B8B8F00D73208 /* MainView_QuestInventory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_QuestInventory.swift; sourceTree = "<group>"; };
 		B260A3992A9C759B00D73208 /* MainView_SeeMyDailyRecord_deprecated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView_SeeMyDailyRecord_deprecated.swift; sourceTree = "<group>"; };
@@ -225,6 +223,7 @@
 		B2F0171C2C3D155400765EF6 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		B2F0171E2C3D155400765EF6 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		B2F017342C3D157600765EF6 /* recoraddicActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = recoraddicActivityAttributes.swift; sourceTree = "<group>"; };
+		B2F7A7972D869C9C002C3079 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		B2FB726E2A8762810012EBE1 /* customArrayFunc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = customArrayFunc.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -415,13 +414,12 @@
 			children = (
 				B2F017332C3D156100765EF6 /* shared */,
 				B234C6EC2BC564CA0031BAD7 /* LICENSE */,
-				B2314BBA2AECD7DB00EDD5C7 /* idea&plan&simpleNote.md */,
-				B2600B062A35E1FF00E00D91 /* what_I_learned.md */,
 				B29C702C2A35C5E30046873E /* recoraddic */,
 				B229F0182C3E895F00198445 /* recoraddicNotification */,
 				B241C0622C7AF84B00873985 /* recoraddicWidget */,
 				B2F0171B2C3D155400765EF6 /* Frameworks */,
 				B29C702B2A35C5E30046873E /* Products */,
+				B2F7A7972D869C9C002C3079 /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
