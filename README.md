@@ -1,4 +1,4 @@
-#### [기능영상 링크](https://studio.youtube.com/video/OncT1_G78BQ/edit)
+#### 기능영상 링크: [https://youtu.be/OncT1_G78BQ](https://youtu.be/OncT1_G78BQ)
 
 
 # What I Learned
