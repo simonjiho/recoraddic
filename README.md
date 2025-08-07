@@ -1,3 +1,6 @@
+# (기능영상)[https://studio.youtube.com/video/OncT1_G78BQ/edit]
+
+
 # What I Learned
 
 
